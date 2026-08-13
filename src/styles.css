@@ -2,23 +2,21 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
-
+@import "@fontsource-variable/fraunces"; /* ← new: premium display serif */
 * {
   box-sizing: border-box;
 }
-
 html,
 body,
 #app {
   min-height: 100%;
 }
-
 body {
   margin: 0;
 }
-
 @theme inline {
-  --font-heading: var(--font-sans);
+  --font-heading:
+    "Fraunces Variable", "Fraunces", ui-serif, Georgia, serif; /* ← changed from var(--font-sans) */
   --font-sans: "Inter Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -59,49 +57,31 @@ body {
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 }
-
 :root {
-  /* Base surfaces */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-
-  /* Brand: gold as primary action color */
   --primary: oklch(0.77 0.15 85);
   --primary-foreground: oklch(0.145 0 0);
-
-  /* Brand: black as secondary (used heavily in header/footer) */
   --secondary: oklch(0.145 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-
-  /* Muted neutrals with a warm, cream undertone */
   --muted: oklch(0.97 0.005 85);
   --muted-foreground: oklch(0.45 0.01 85);
-
-  /* Accent: lighter gold for highlights/hover states */
   --accent: oklch(0.94 0.04 85);
   --accent-foreground: oklch(0.25 0.02 85);
-
   --destructive: oklch(0.577 0.245 27.325);
-
-  /* Borders/inputs/ring tinted gold for cohesion */
   --border: oklch(0.9 0.02 85);
   --input: oklch(0.9 0.02 85);
   --ring: oklch(0.77 0.15 85);
-
-  /* Charts: gold-to-black gradient scale */
   --chart-1: oklch(0.83 0.17 90);
   --chart-2: oklch(0.77 0.15 85);
   --chart-3: oklch(0.6 0.13 80);
   --chart-4: oklch(0.42 0.09 75);
   --chart-5: oklch(0.25 0.02 85);
-
   --radius: 0.625rem;
-
-  /* Sidebar: black with gold accents */
   --sidebar: oklch(0.145 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.77 0.15 85);
@@ -111,7 +91,6 @@ body {
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.77 0.15 85);
 }
-
 @layer base {
   * {
     @apply border-border outline-ring/50;

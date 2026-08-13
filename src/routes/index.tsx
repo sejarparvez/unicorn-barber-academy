@@ -14,8 +14,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const SITE_URL = "https://unicornbta.com";
-
+const SITE_URL = "https://unicornbarbertrainingacademy.com";
 export const Route = createFileRoute("/")({
 	component: Home,
 	head: () => ({
