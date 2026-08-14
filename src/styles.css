@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
-@import "@fontsource-variable/fraunces"; /* ← new: premium display serif */
 * {
   box-sizing: border-box;
 }
@@ -16,7 +15,7 @@ body {
 }
 @theme inline {
   --font-heading:
-    "Fraunces Variable", "Fraunces", ui-serif, Georgia, serif; /* ← changed from var(--font-sans) */
+    "Inter Variable", ui-serif, Georgia, serif; /* ← changed from var(--font-sans) */
   --font-sans: "Inter Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
