@@ -11,6 +11,7 @@ import {
 	SectionEyebrow,
 } from "@/components/site/decor";
 import { pic, SITE_URL, type Track } from "@/lib/site-data";
+import { SOCIAL_URLS } from "@/lib/social";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/enroll")({
@@ -62,11 +63,7 @@ const ENROLL_JSON_LD = {
 	provider: {
 		"@type": "EducationalOrganization",
 		name: "Unicorn Barber Training Academy",
-		sameAs: [
-			"https://instagram.com",
-			"https://facebook.com",
-			"https://youtube.com",
-		],
+		sameAs: [SOCIAL_URLS.instagram, SOCIAL_URLS.facebook, SOCIAL_URLS.youtube],
 	},
 	hasCourseInstance: [
 		{

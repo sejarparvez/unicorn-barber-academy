@@ -9,6 +9,7 @@ import {
 	SectionEyebrow,
 } from "@/components/site/decor";
 import { INSTRUCTORS, pic, SITE_URL } from "@/lib/site-data";
+import { SOCIAL_URLS } from "@/lib/social";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/about")({
@@ -57,11 +58,7 @@ const ORG_JSON_LD = {
 	name: "Unicorn Barber Training Academy",
 	url: SITE_URL,
 	logo: `${SITE_URL}/logo.png`,
-	sameAs: [
-		"https://instagram.com",
-		"https://facebook.com",
-		"https://youtube.com",
-	],
+	sameAs: [SOCIAL_URLS.instagram, SOCIAL_URLS.facebook, SOCIAL_URLS.youtube],
 	address: {
 		"@type": "PostalAddress",
 		streetAddress: "123 Fade Street",
@@ -231,7 +228,7 @@ function OurStory() {
 function OurApproach() {
 	const pillars = [
 		{
-			icon: "����",
+			icon: "�������",
 			title: "Working Professionals Only",
 			description:
 				"No career academics. Every instructor earns their living cutting, colouring, or styling — then teaches what they did that week.",
@@ -243,7 +240,7 @@ function OurApproach() {
 				"Small cohorts mean more one-on-one time, more client rotations, and no hiding in the back row.",
 		},
 		{
-			icon: "����",
+			icon: "������",
 			title: "Real Clients, Real Pressure",
 			description:
 				"Students work on paying clients from week three. You learn speed, consultation, and retail under actual shop conditions.",

@@ -1,3 +1,4 @@
+// components/Footer.tsx
 import {
 	IconBrandFacebook,
 	IconBrandInstagram,
@@ -11,8 +12,14 @@ import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
+
+// TODO: move to a shared site-config module and reuse in Header.tsx too
+const SITE_URL = "https://unicornbta.com";
 
 const PROGRAMS: FooterLink[] = [
 	{ label: "Classic Barbering", to: "/programs/classic-barbering" },
@@ -35,14 +42,21 @@ const LEGAL_LINKS: FooterLink[] = [
 ];
 
 /**
- * LocalBusiness structured data so search engines can surface address, phone,
- * and hours directly in results. Keep this in sync with the markup below.
+ * LocalBusiness/EducationalOrganization structured data so search engines
+ * and AI answer engines can surface address, phone, hours, and programs
+ * directly. Keep this in sync with the markup below.
+ *
+ * NOTE: `logo`/`image` need a stable absolute production URL — if `logo.png`
+ * is bundled/hashed by Vite, serve a static copy from /public instead
+ * (e.g. /public/logo.png) and reference that path here.
  */
 const LOCAL_BUSINESS_JSON_LD = {
 	"@context": "https://schema.org",
 	"@type": "EducationalOrganization",
 	name: "Unicorn Barber Training Academy",
-	url: "https://unicornbta.com",
+	url: SITE_URL,
+	logo: `${SITE_URL}/logo.png`,
+	image: `${SITE_URL}/logo.png`,
 	telephone: "+880-1234-567890",
 	email: "hello@unicornbta.com",
 	address: {
@@ -52,12 +66,34 @@ const LOCAL_BUSINESS_JSON_LD = {
 		postalCode: "1212",
 		addressCountry: "BD",
 	},
-	openingHours: "Mo-Sa 09:00-19:00",
-	sameAs: [
-		"https://instagram.com",
-		"https://facebook.com",
-		"https://youtube.com",
-	],
+	areaServed: "Dhaka, Bangladesh",
+	openingHoursSpecification: {
+		"@type": "OpeningHoursSpecification",
+		dayOfWeek: [
+			"Monday",
+			"Tuesday",
+			"Wednesday",
+			"Thursday",
+			"Friday",
+			"Saturday",
+		],
+		opens: "09:00",
+		closes: "19:00",
+	},
+	sameAs: [SOCIAL_URLS.instagram, SOCIAL_URLS.facebook, SOCIAL_URLS.youtube],
+	hasOfferCatalog: {
+		"@type": "OfferCatalog",
+		name: "Barbering Programs",
+		itemListElement: PROGRAMS.map((program) => ({
+			"@type": "Course",
+			name: program.label,
+			url: `${SITE_URL}${program.to}`,
+			provider: {
+				"@type": "EducationalOrganization",
+				name: "Unicorn Barber Training Academy",
+			},
+		})),
+	},
 };
 
 export default function Footer() {
@@ -65,20 +101,23 @@ export default function Footer() {
 		<footer className="relative overflow-hidden bg-secondary text-secondary-foreground">
 			<script
 				type="application/ld+json"
-				// eslint-disable-next-line react/no-danger
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{
 					__html: JSON.stringify(LOCAL_BUSINESS_JSON_LD),
 				}}
 			/>
 
 			{/* Top gradient hairline, echoing the header divider */}
-			<div className="h-px w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-70" />
+			<Separator
+				aria-hidden="true"
+				className="h-px w-full bg-linear-to-r from-transparent via-primary to-transparent opacity-70"
+			/>
 
 			{/* Faint watermark crest for texture */}
 			<svg
 				viewBox="0 0 400 400"
 				aria-hidden="true"
-				className="pointer-events-none absolute -right-16 -bottom-24 h-[420px] w-[420px] opacity-[0.04]"
+				className="pointer-events-none absolute -right-16 -bottom-24 h-105 w-105 opacity-[0.04]"
 			>
 				<path
 					d="M200 40 L240 190 L200 360 L160 190 Z"
@@ -120,7 +159,7 @@ export default function Footer() {
 								>
 									UNICORN
 								</span>
-								<span className="mt-1 text-[8px] sm:text-[10px]  text-secondary-foreground/60 truncate">
+								<span className="mt-1 text-[8px] sm:text-[10px] text-secondary-foreground/60 truncate">
 									BARBER TRAINING ACADEMY
 								</span>
 							</span>
@@ -131,29 +170,41 @@ export default function Footer() {
 							Hands-on training, taught by working professionals.
 						</p>
 						<div className="mt-6 flex items-center gap-4">
-							<SocialIcon href="https://instagram.com" label="Instagram">
+							<SocialIcon href={SOCIAL_URLS.instagram} label="Instagram">
 								<IconBrandInstagram className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
-							<SocialIcon href="https://facebook.com" label="Facebook">
+							<SocialIcon href={SOCIAL_URLS.facebook} label="Facebook">
 								<IconBrandFacebook className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
-							<SocialIcon href="https://youtube.com" label="YouTube">
+							<SocialIcon href={SOCIAL_URLS.youtube} label="YouTube">
 								<IconBrandYoutube className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
 						</div>
 					</div>
 
-					<div className="hidden bg-primary/15 lg:block" />
+					<Separator
+						orientation="vertical"
+						aria-hidden="true"
+						className="hidden bg-primary/15 lg:block"
+					/>
 
 					{/* Programs column */}
 					<FooterColumn title="Programs" links={PROGRAMS} />
 
-					<div className="hidden bg-primary/15 lg:block" />
+					<Separator
+						orientation="vertical"
+						aria-hidden="true"
+						className="hidden bg-primary/15 lg:block"
+					/>
 
 					{/* Academy column */}
 					<FooterColumn title="Academy" links={ACADEMY} />
 
-					<div className="hidden bg-primary/15 lg:block" />
+					<Separator
+						orientation="vertical"
+						aria-hidden="true"
+						className="hidden bg-primary/15 lg:block"
+					/>
 
 					{/* Contact column */}
 					<div>
@@ -209,16 +260,19 @@ export default function Footer() {
 						All rights reserved.
 					</p>
 					<nav className="flex items-center gap-6" aria-label="Legal">
-						{LEGAL_LINKS.map((link) => (
-							<Link
-								key={link.label}
-								to={link.to}
-								preload="intent"
-								className="hover:text-primary"
-							>
-								{link.label}
-							</Link>
-						))}
+						<ul className="flex items-center gap-6">
+							{LEGAL_LINKS.map((link) => (
+								<li key={link.label}>
+									<Link
+										to={link.to}
+										preload="intent"
+										className="hover:text-primary"
+									>
+										{link.label}
+									</Link>
+								</li>
+							))}
+						</ul>
 					</nav>
 				</div>
 			</div>
@@ -234,7 +288,7 @@ function FooterColumn({
 	links: FooterLink[];
 }) {
 	return (
-		<div>
+		<nav aria-label={title}>
 			<h3 className="text-[12px] font-semibold tracking-[0.24em] text-primary">
 				{title.toUpperCase()}
 			</h3>
@@ -251,7 +305,7 @@ function FooterColumn({
 					</li>
 				))}
 			</ul>
-		</div>
+		</nav>
 	);
 }
 
@@ -265,14 +319,19 @@ function SocialIcon({
 	children: ReactNode;
 }) {
 	return (
-		<a
-			href={href}
-			target="_blank"
-			rel="noreferrer"
-			aria-label={label}
-			className="flex h-9 w-9 items-center justify-center border border-primary/30 text-primary/80 transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
+		<Button
+			size="icon"
+			render={
+				// biome-ignore lint/a11y/useAnchorContent: this is fine
+				<a
+					href={href}
+					target="_blank"
+					rel="noopener noreferrer"
+					aria-label={label}
+				/>
+			}
 		>
 			{children}
-		</a>
+		</Button>
 	);
 }
