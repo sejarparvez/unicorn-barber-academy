@@ -20,6 +20,8 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as StudentLifeRouteImport } from './routes/student-life'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiEnrollRouteImport } from './routes/api/enroll'
+import { Route as AuthSigninRouteImport } from './routes/auth/signin'
+import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
 import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
 
@@ -78,6 +80,16 @@ const ApiEnrollRoute = ApiEnrollRouteImport.update({
   path: '/api/enroll',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSigninRoute = AuthSigninRouteImport.update({
+  id: '/auth/signin',
+  path: '/auth/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgramsIndexRoute = ProgramsIndexRouteImport.update({
   id: '/programs/',
   path: '/programs/',
@@ -101,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/enroll': typeof ApiEnrollRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/programs/': typeof ProgramsIndexRoute
 }
@@ -116,6 +130,8 @@ export interface FileRoutesByTo {
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/enroll': typeof ApiEnrollRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/programs': typeof ProgramsIndexRoute
 }
@@ -132,6 +148,8 @@ export interface FileRoutesById {
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/enroll': typeof ApiEnrollRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/programs/': typeof ProgramsIndexRoute
 }
@@ -149,6 +167,8 @@ export interface FileRouteTypes {
     | '/student-life'
     | '/terms'
     | '/api/enroll'
+    | '/auth/signin'
+    | '/auth/signup'
     | '/programs/$slug'
     | '/programs/'
   fileRoutesByTo: FileRoutesByTo
@@ -164,6 +184,8 @@ export interface FileRouteTypes {
     | '/student-life'
     | '/terms'
     | '/api/enroll'
+    | '/auth/signin'
+    | '/auth/signup'
     | '/programs/$slug'
     | '/programs'
   id:
@@ -179,6 +201,8 @@ export interface FileRouteTypes {
     | '/student-life'
     | '/terms'
     | '/api/enroll'
+    | '/auth/signin'
+    | '/auth/signup'
     | '/programs/$slug'
     | '/programs/'
   fileRoutesById: FileRoutesById
@@ -195,6 +219,8 @@ export interface RootRouteChildren {
   StudentLifeRoute: typeof StudentLifeRoute
   TermsRoute: typeof TermsRoute
   ApiEnrollRoute: typeof ApiEnrollRoute
+  AuthSigninRoute: typeof AuthSigninRoute
+  AuthSignupRoute: typeof AuthSignupRoute
   ProgramsSlugRoute: typeof ProgramsSlugRoute
   ProgramsIndexRoute: typeof ProgramsIndexRoute
 }
@@ -278,6 +304,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEnrollRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/signin': {
+      id: '/auth/signin'
+      path: '/auth/signin'
+      fullPath: '/auth/signin'
+      preLoaderRoute: typeof AuthSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/programs/': {
       id: '/programs/'
       path: '/programs'
@@ -307,6 +347,8 @@ const rootRouteChildren: RootRouteChildren = {
   StudentLifeRoute: StudentLifeRoute,
   TermsRoute: TermsRoute,
   ApiEnrollRoute: ApiEnrollRoute,
+  AuthSigninRoute: AuthSigninRoute,
+  AuthSignupRoute: AuthSignupRoute,
   ProgramsSlugRoute: ProgramsSlugRoute,
   ProgramsIndexRoute: ProgramsIndexRoute,
 }
