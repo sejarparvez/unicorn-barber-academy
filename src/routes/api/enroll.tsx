@@ -24,7 +24,7 @@ export const Route = createFileRoute("/api/enroll")({
 					}
 
 					// Validate phone format (basic check)
-					const phoneRegex = /^[\+]?[\d\s\-\(\)]{10,}$/;
+					const phoneRegex = /^[+]?[\d\s\-()]{10,}$/;
 					if (!phoneRegex.test(phone)) {
 						return json({ message: "Invalid phone number" }, { status: 400 });
 					}

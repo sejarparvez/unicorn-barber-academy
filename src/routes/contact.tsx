@@ -5,7 +5,6 @@ import {
 	IconCheck,
 	IconClockHour4,
 	IconCopy,
-	IconHelpCircle,
 	IconMail,
 	IconMapPin,
 	IconNews,
@@ -15,6 +14,7 @@ import {
 	IconSend,
 } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Image } from "@unpic/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { type FormEvent, useState } from "react";
 import {
@@ -24,6 +24,12 @@ import {
 	Reveal,
 	SectionEyebrow,
 } from "@/components/site/decor";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -83,11 +89,11 @@ function ContactPage() {
 		<main>
 			<script
 				type="application/ld+json"
-				// eslint-disable-next-line react/no-danger
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
 			/>
 			<ContactHero />
-			<InquiryAndForm />
+			<ContactForm />
 			<VisitStudio />
 			<ContactFaq />
 		</main>
@@ -114,14 +120,17 @@ function ContactHero() {
 	return (
 		<section className="relative overflow-hidden bg-secondary text-secondary-foreground">
 			<div className="absolute inset-0 grid grid-cols-2">
-				<img
+				<Image
 					src={pic("unicorn-contact-hero-1", 900, 1000)}
 					alt=""
+					layout="fullWidth"
+					priority
 					className="h-full w-full object-cover opacity-40"
 				/>
-				<img
+				<Image
 					src={pic("unicorn-contact-hero-2", 900, 1000)}
 					alt=""
+					layout="fullWidth"
 					className="hidden h-full w-full object-cover opacity-40 sm:block"
 				/>
 			</div>
@@ -163,8 +172,8 @@ function ContactHero() {
 					className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-secondary-foreground/70 sm:text-lg"
 				>
 					Questions about a program, a partnership, or just want to see the
-					studio in person? Tell us which, and we&rsquo;ll route it to the right
-					person.
+					studio in person? One message reaches us — tell us what it&rsquo;s
+					about below.
 				</motion.p>
 
 				<motion.div
@@ -200,56 +209,35 @@ function ContactHero() {
 	);
 }
 
-/* -------------------------- Inquiry + form -------------------------- */
+/* ------------------------------ Form ------------------------------ */
 
-type InquiryKey = "student" | "partner" | "press" | "other";
+const SUBJECTS = [
+	{ value: "student", label: "Prospective student" },
+	{ value: "partner", label: "Salon or barbershop partnership" },
+	{ value: "press", label: "Press & media" },
+	{ value: "other", label: "Something else" },
+];
 
-const INQUIRIES: Record<
-	InquiryKey,
+const DESKS = [
 	{
-		label: string;
-		icon: typeof IconSchool;
-		description: string;
-		response: string;
-		email: string;
-	}
-> = {
-	student: {
-		label: "Prospective Student",
 		icon: IconSchool,
-		description: "Ask about programs, tuition, kit fees, or how to apply.",
-		response: "Replies within 24 hours",
-		email: "admissions@unicornbta.com",
+		label: "Admissions",
+		handles: "Programs, tuition, kit fees, applying",
 	},
-	partner: {
-		label: "Salon or Barbershop",
+	{
 		icon: IconBuildingStore,
-		description: "Hire graduates or explore a placement partnership with us.",
-		response: "Replies within 2 business days",
-		email: "partnerships@unicornbta.com",
+		label: "Partnerships",
+		handles: "Hiring graduates, placement partnerships",
 	},
-	press: {
-		label: "Press & Media",
+	{
 		icon: IconNews,
-		description: "Interview requests, brand assets, or press inquiries.",
-		response: "Replies within 3 business days",
-		email: "press@unicornbta.com",
+		label: "Press",
+		handles: "Interviews, brand assets, media requests",
 	},
-	other: {
-		label: "Something Else",
-		icon: IconHelpCircle,
-		description: "General questions about the academy or your visit.",
-		response: "Replies within 48 hours",
-		email: "hello@unicornbta.com",
-	},
-};
+];
 
-const INQUIRY_ORDER: InquiryKey[] = ["student", "partner", "press", "other"];
-
-function InquiryAndForm() {
-	const [inquiry, setInquiry] = useState<InquiryKey>("student");
+function ContactForm() {
 	const [submitted, setSubmitted] = useState(false);
-	const active = INQUIRIES[inquiry];
 
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -262,59 +250,7 @@ function InquiryAndForm() {
 			aria-labelledby="contact-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="1"
-					title="Reach the Right Desk"
-					id="contact-heading"
-				/>
-
-				<div
-					className="mt-10"
-					role="radiogroup"
-					aria-label="I'm reaching out as a"
-				>
-					<p className="text-[11px] tracking-[0.18em] text-muted-foreground">
-						I&rsquo;M REACHING OUT AS A&hellip;
-					</p>
-					<div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-						{INQUIRY_ORDER.map((key) => {
-							const opt = INQUIRIES[key];
-							const isActive = inquiry === key;
-							return (
-								<button
-									key={key}
-									type="button"
-									role="radio"
-									aria-checked={isActive}
-									onClick={() => {
-										setInquiry(key);
-										setSubmitted(false);
-									}}
-									className={cn(
-										"flex flex-col items-start gap-3 border p-5 text-left transition-colors",
-										isActive
-											? "border-primary bg-accent"
-											: "border-border hover:border-primary/40",
-									)}
-								>
-									<opt.icon
-										className={cn(
-											"h-5 w-5",
-											isActive ? "text-primary" : "text-muted-foreground",
-										)}
-										stroke={1.5}
-									/>
-									<span className="text-sm font-semibold text-foreground">
-										{opt.label}
-									</span>
-									<span className="text-xs leading-relaxed text-muted-foreground">
-										{opt.description}
-									</span>
-								</button>
-							);
-						})}
-					</div>
-				</div>
+				<SectionEyebrow guard="1" title="Send a Message" id="contact-heading" />
 
 				<div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-5">
 					{/* Form */}
@@ -324,7 +260,6 @@ function InquiryAndForm() {
 								{submitted ? (
 									<SealedConfirmation
 										key="confirmation"
-										response={active.response}
 										onReset={() => setSubmitted(false)}
 									/>
 								) : (
@@ -369,38 +304,51 @@ function InquiryAndForm() {
 													placeholder="+880"
 												/>
 											</div>
-											{inquiry === "student" && (
-												<div className="space-y-2">
-													<Label htmlFor="program">
-														Program you&rsquo;re interested in
-													</Label>
-													<Select name="program">
-														<SelectTrigger id="program">
-															<SelectValue placeholder="Not sure yet" />
-														</SelectTrigger>
-														<SelectContent>
-															{ALL_PROGRAMS.map((p) => (
-																<SelectItem key={p.title} value={p.title}>
-																	{p.title}
-																</SelectItem>
-															))}
-															<SelectItem value="undecided">
-																Not sure yet
+											<div className="space-y-2">
+												<Label htmlFor="subject">
+													What&rsquo;s this about?
+												</Label>
+												<Select name="subject" defaultValue="student">
+													<SelectTrigger id="subject">
+														<SelectValue placeholder="Select one" />
+													</SelectTrigger>
+													<SelectContent>
+														{SUBJECTS.map((s) => (
+															<SelectItem key={s.value} value={s.value}>
+																{s.label}
 															</SelectItem>
-														</SelectContent>
-													</Select>
-												</div>
-											)}
+														))}
+													</SelectContent>
+												</Select>
+											</div>
 										</div>
 
 										<div className="space-y-2">
-											<Label htmlFor="message">
-												{inquiry === "student" && "What do you want to know?"}
-												{inquiry === "partner" &&
-													"Tell us about your salon or barbershop"}
-												{inquiry === "press" && "What are you working on?"}
-												{inquiry === "other" && "Your message"}
+											<Label htmlFor="program">
+												Program you&rsquo;re interested in{" "}
+												<span className="text-muted-foreground">
+													(if applicable)
+												</span>
 											</Label>
+											<Select name="program">
+												<SelectTrigger id="program">
+													<SelectValue placeholder="Not applicable" />
+												</SelectTrigger>
+												<SelectContent>
+													{ALL_PROGRAMS.map((p) => (
+														<SelectItem key={p.title} value={p.title}>
+															{p.title}
+														</SelectItem>
+													))}
+													<SelectItem value="not-applicable">
+														Not applicable
+													</SelectItem>
+												</SelectContent>
+											</Select>
+										</div>
+
+										<div className="space-y-2">
+											<Label htmlFor="message">Your message</Label>
 											<Textarea
 												id="message"
 												name="message"
@@ -413,8 +361,11 @@ function InquiryAndForm() {
 										<div className="flex flex-wrap items-center justify-between gap-4 pt-2">
 											<p className="text-xs text-muted-foreground">
 												Sent to{" "}
-												<span className="text-foreground">{active.email}</span>{" "}
-												&middot; {active.response}
+												<span className="text-foreground">
+													hello@unicornbta.com
+												</span>{" "}
+												&middot; we typically reply within 1&ndash;2 business
+												days
 											</p>
 											<Button
 												type="submit"
@@ -430,30 +381,45 @@ function InquiryAndForm() {
 						</div>
 					</Reveal>
 
-					{/* Direct details */}
+					{/* Direct details — static, not tied to form state */}
 					<Reveal delay={0.1} className="lg:col-span-2">
 						<div className="flex h-full flex-col justify-between border border-border bg-muted/40 p-8 sm:p-10">
 							<div>
-								<active.icon className="h-6 w-6 text-primary" stroke={1.5} />
-								<h3 className="mt-4 font-heading text-xl font-medium text-foreground">
-									{active.label}
+								<h3 className="font-heading text-xl font-medium text-foreground">
+									Reach us directly
 								</h3>
 								<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-									{active.description}
+									Prefer not to use the form? Call, WhatsApp, or email — same
+									inbox, same team.
 								</p>
 
 								<div className="mt-6 space-y-3">
-									<CopyRow icon={IconMail} value={active.email} />
+									<CopyRow icon={IconMail} value="hello@unicornbta.com" />
 									<CopyRow icon={IconPhone} value="+880 1234-567890" />
 								</div>
+
+								<ul className="mt-8 space-y-4 border-t border-border pt-6">
+									{DESKS.map((desk) => (
+										<li key={desk.label} className="flex items-start gap-3">
+											<desk.icon
+												className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+												stroke={1.75}
+											/>
+											<span className="text-sm text-muted-foreground">
+												<span className="text-foreground">{desk.label}</span>{" "}
+												&mdash; {desk.handles}
+											</span>
+										</li>
+									))}
+								</ul>
 							</div>
 
-							<div className="mt-8 flex items-center gap-2 border-t border-border pt-6 text-[11px] tracking-[0.1em] text-muted-foreground">
+							<div className="mt-8 flex items-center gap-2 border-t border-border pt-6 text-[11px] tracking-widest text-muted-foreground">
 								<IconClockHour4
 									className="h-3.5 w-3.5 text-primary"
 									stroke={1.75}
 								/>
-								{active.response.toUpperCase()}
+								WE REPLY WITHIN 1&ndash;2 BUSINESS DAYS
 							</div>
 						</div>
 					</Reveal>
@@ -508,13 +474,7 @@ function CopyRow({
 
 /* The Guild Seal's payoff moment: a literal wax-stamp confirmation,
    the same mark that's been decorative everywhere else on the site. */
-function SealedConfirmation({
-	response,
-	onReset,
-}: {
-	response: string;
-	onReset: () => void;
-}) {
+function SealedConfirmation({ onReset }: { onReset: () => void }) {
 	const shouldReduceMotion = useReducedMotion();
 	return (
 		<motion.div
@@ -539,12 +499,13 @@ function SealedConfirmation({
 				Sealed.
 			</h3>
 			<p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-				Your message has been logged. {response.toLowerCase()}.
+				Your message has been logged. We typically reply within 1&ndash;2
+				business days.
 			</p>
 			<button
 				type="button"
 				onClick={onReset}
-				className="mt-6 text-[12px] font-medium tracking-[0.1em] text-primary hover:underline"
+				className="mt-6 text-[12px] font-medium tracking-widest text-primary hover:underline"
 			>
 				SEND ANOTHER MESSAGE
 			</button>
@@ -623,9 +584,10 @@ function VisitStudio() {
 				</Reveal>
 
 				<Reveal delay={0.1} className="relative h-72 lg:h-auto">
-					<img
+					<Image
 						src={pic("unicorn-contact-map", 1000, 900)}
 						alt="Street map showing the location of Unicorn Barber Training Academy in Gulshan, Dhaka"
+						layout="fullWidth"
 						className="h-full w-full object-cover opacity-70"
 					/>
 					<div className="absolute inset-0 bg-secondary/30" />
@@ -644,7 +606,7 @@ const CONTACT_FAQS = [
 	},
 	{
 		q: "How fast will I hear back?",
-		a: "It depends on your inquiry — admissions questions get same-day attention on weekdays; partnership and press inquiries take a little longer since they're routed to a specific person.",
+		a: "Most messages get a same-day reply on weekdays, and within 1–2 business days otherwise.",
 	},
 	{
 		q: "Can I call instead of using the form?",
@@ -652,38 +614,51 @@ const CONTACT_FAQS = [
 	},
 ];
 
+const CONTACT_FAQ_JSON_LD = {
+	"@context": "https://schema.org",
+	"@type": "FAQPage",
+	mainEntity: CONTACT_FAQS.map((f) => ({
+		"@type": "Question",
+		name: f.q,
+		acceptedAnswer: { "@type": "Answer", text: f.a },
+	})),
+};
+
 function ContactFaq() {
 	return (
 		<section
 			className="border-t border-border bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="contact-faq-heading"
 		>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{
+					__html: JSON.stringify(CONTACT_FAQ_JSON_LD),
+				}}
+			/>
 			<div className="mx-auto max-w-3xl">
 				<SectionEyebrow
 					guard="3"
 					title="Before You Reach Out"
 					id="contact-faq-heading"
 				/>
-				<div className="mt-10 divide-y divide-border border-y border-border">
+				<Accordion className="mt-10">
 					{CONTACT_FAQS.map((item, i) => (
-						<Reveal key={item.q} delay={i * 0.06}>
-							<details className="group py-5">
-								<summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-foreground marker:content-none">
-									{item.q}
-									<span
-										className="shrink-0 text-primary transition-transform group-open:rotate-45"
-										aria-hidden="true"
-									>
-										+
-									</span>
-								</summary>
-								<p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-									{item.a}
-								</p>
-							</details>
-						</Reveal>
+						<AccordionItem
+							key={item.q}
+							value={`item-${i}`}
+							className="border-border py-1 first:border-t"
+						>
+							<AccordionTrigger className="py-4 text-base font-medium text-foreground hover:no-underline [&>svg]:text-primary">
+								{item.q}
+							</AccordionTrigger>
+							<AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+								{item.a}
+							</AccordionContent>
+						</AccordionItem>
 					))}
-				</div>
+				</Accordion>
 			</div>
 		</section>
 	);

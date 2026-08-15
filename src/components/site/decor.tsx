@@ -80,10 +80,26 @@ export function GuildSeal({ className }: { className?: string }) {
 				const angle = (i / dots.length) * Math.PI * 2;
 				const x = 60 + Math.cos(angle) * 52;
 				const y = 60 + Math.sin(angle) * 52;
-				return <circle key={`dot-${i}`} cx={x} cy={y} r="1.1" fill="currentColor" />;
+				return (
+					<circle key={`dot-${i}`} cx={x} cy={y} r="1.1" fill="currentColor" />
+				);
 			})}
-			<line x1="36" y1="44" x2="84" y2="76" stroke="currentColor" strokeWidth="1.5" />
-			<line x1="84" y1="44" x2="36" y2="76" stroke="currentColor" strokeWidth="1.5" />
+			<line
+				x1="36"
+				y1="44"
+				x2="84"
+				y2="76"
+				stroke="currentColor"
+				strokeWidth="1.5"
+			/>
+			<line
+				x1="84"
+				y1="44"
+				x2="36"
+				y2="76"
+				stroke="currentColor"
+				strokeWidth="1.5"
+			/>
 			<circle cx="36" cy="44" r="3.2" stroke="currentColor" strokeWidth="1.5" />
 			<circle cx="84" cy="44" r="3.2" stroke="currentColor" strokeWidth="1.5" />
 			<circle cx="60" cy="60" r="2" fill="currentColor" />

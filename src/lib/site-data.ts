@@ -177,7 +177,7 @@ export const INSTRUCTORS: Instructor[] = [
 		teaches: { program: "Fades & Tapers", to: "/programs/fades-and-tapers" },
 	},
 	{
-		name: "Tanvir Ahmed",
+		name: "Shakil Ahmed",
 		title: "Instructor, Beard Sculpting",
 		track: "barbering",
 		memberNo: "GM-04",

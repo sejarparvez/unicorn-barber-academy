@@ -37,7 +37,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<Header />
-				<div className="mt-16 min-h-screen">{children}</div>
+				<div className="md:mt-16 mt-15 min-h-screen">{children}</div>
 				<Footer />
 				<TanStackDevtools
 					config={{
