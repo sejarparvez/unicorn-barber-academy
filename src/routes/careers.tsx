@@ -56,6 +56,7 @@ function CareersPage() {
 		<main>
 			<script
 				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
 			/>
 			<CareersHero />
@@ -208,7 +209,7 @@ function OpenRoles() {
 											{role.description}
 										</p>
 									</div>
-									<ul className="flex flex-col gap-2 min-w-[200px]">
+									<ul className="flex flex-col gap-2 min-w-50">
 										{role.requirements.map((req) => (
 											<li
 												key={req}

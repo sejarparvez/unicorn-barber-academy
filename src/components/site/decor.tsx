@@ -81,7 +81,16 @@ export function GuildSeal({ className }: { className?: string }) {
 				const x = 60 + Math.cos(angle) * 52;
 				const y = 60 + Math.sin(angle) * 52;
 				return (
-					<circle key={`dot-${i}`} cx={x} cy={y} r="1.1" fill="currentColor" />
+					<circle
+						key={`dot-${
+							// biome-ignore lint/suspicious/noArrayIndexKey: this is fine
+							i
+						}`}
+						cx={x}
+						cy={y}
+						r="1.1"
+						fill="currentColor"
+					/>
 				);
 			})}
 			<line
@@ -130,7 +139,7 @@ export function SectionEyebrow({
 	return (
 		<div className="flex items-center gap-4">
 			<span
-				className="h-6 w-px bg-gradient-to-b from-[var(--chart-1)] via-primary to-[var(--chart-4)]"
+				className="h-6 w-px bg-linear-to-b from-chart-1 via-primary to-chart-4"
 				aria-hidden="true"
 			/>
 			<div>
@@ -193,7 +202,10 @@ export function TrustBar() {
 			>
 				{loop.map((c, i) => (
 					<span
-						key={`${c}-${i}`}
+						key={`${c}-${
+							// biome-ignore lint/suspicious/noArrayIndexKey: this is fine
+							i
+						}`}
 						className="flex items-center gap-14 text-[11px] font-medium tracking-[0.14em] text-muted-foreground"
 					>
 						{c.toUpperCase()}
@@ -225,7 +237,7 @@ export function FinalCta({
 			<Grain />
 			<motion.div
 				aria-hidden="true"
-				className="pointer-events-none absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 text-primary opacity-[0.05]"
+				className="pointer-events-none absolute left-1/2 top-1/2 h-140 w-140 -translate-x-1/2 -translate-y-1/2 text-primary opacity-[0.05]"
 				animate={shouldReduceMotion ? {} : { rotate: 360 }}
 				transition={{ duration: 90, ease: "linear", repeat: Infinity }}
 			>

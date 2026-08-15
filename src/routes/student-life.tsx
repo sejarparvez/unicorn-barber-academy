@@ -59,6 +59,7 @@ function StudentLifePage() {
 		<main>
 			<script
 				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
 			/>
 			<StudentLifeHero />

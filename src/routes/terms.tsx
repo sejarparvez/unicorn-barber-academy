@@ -1,13 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "motion/react";
-import {
-	Grain,
-	GuildSeal,
-	Reveal,
-	SectionEyebrow,
-} from "@/components/site/decor";
+import { Grain, GuildSeal } from "@/components/site/decor";
 import { SITE_URL } from "@/lib/site-data";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/terms")({
 	component: TermsPage,
@@ -49,6 +43,7 @@ function TermsPage() {
 		<main className="min-h-screen">
 			<script
 				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
 			/>
 			<LegalHero title="Terms of Service" />

@@ -1,3 +1,4 @@
+// routes/programs.tsx
 import {
 	IconArrowRight,
 	IconCertificate,
@@ -9,27 +10,21 @@ import {
 	IconSparkles,
 	IconSun,
 } from "@tabler/icons-react";
+
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useMemo, useState } from "react";
 import {
 	FinalCta,
 	GOLD_TEXT,
-	Grain,
-	GuildSeal,
 	Reveal,
 	SectionEyebrow,
 } from "@/components/site/decor";
-import {
-	ALL_PROGRAMS,
-	type Program,
-	pic,
-	SITE_URL,
-	type Track,
-} from "@/lib/site-data";
+
+import { ALL_PROGRAMS, SITE_URL, type Track } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/programs")({
+export const Route = createFileRoute("/programs/")({
 	component: ProgramsPage,
 	head: () => ({
 		meta: [
@@ -74,7 +69,7 @@ function ProgramsPage() {
 		<main>
 			<script
 				type="application/ld+json"
-				// eslint-disable-next-line react/no-danger
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
 			/>
 			<ProgramsHero />
@@ -91,91 +86,113 @@ function ProgramsPage() {
 }
 
 /* ----------------------------- Hero ----------------------------- */
-/* Shorter than the homepage hero (this is a listing page, not the
-   thesis statement) but built on the same vignette + seal language
-   so it reads as the same site, not a different one. */
+/* Not the Contact-page vignette-and-seal template — this is a listing
+   page, so its job is navigation. The right column is a literal
+   ledger index of every program, continuing the record-keeping
+   language from the homepage's trade ticket and instructors' member
+   numbers, instead of a photographic pitch. */
 
 function ProgramsHero() {
-	const shouldReduceMotion = useReducedMotion();
-	const fadeUp = (delay = 0) =>
-		shouldReduceMotion
-			? {}
-			: {
-					initial: { opacity: 0, y: 18 },
-					animate: { opacity: 1, y: 0 },
-					transition: {
-						duration: 0.7,
-						delay,
-						ease: [0.16, 1, 0.3, 1] as const,
-					},
-				};
+	const totalWeeks = ALL_PROGRAMS.map((p) => Number.parseInt(p.duration, 10));
+	const min = Math.min(...totalWeeks);
+	const max = Math.max(...totalWeeks);
 
 	return (
-		<section className="relative overflow-hidden bg-secondary text-secondary-foreground">
-			<div className="absolute inset-0 grid grid-cols-2">
-				<img
-					src={pic("unicorn-programs-hero-1", 900, 1100)}
-					alt=""
-					className="h-full w-full object-cover opacity-40"
-				/>
-				<img
-					src={pic("unicorn-programs-hero-2", 900, 1100)}
-					alt=""
-					className="h-full w-full object-cover opacity-40"
-				/>
-			</div>
-			<div
-				aria-hidden="true"
-				className="pointer-events-none absolute inset-0"
-				style={{
-					background:
-						"radial-gradient(60% 65% at 50% 42%, rgba(8,8,8,0.93) 0%, rgba(8,8,8,0.8) 45%, rgba(8,8,8,0.55) 78%, rgba(8,8,8,0.34) 100%)",
-				}}
-			/>
-			<Grain />
-
-			<div className="relative mx-auto max-w-3xl px-6 py-24 text-center lg:py-32">
-				<motion.div
-					{...fadeUp(0)}
-					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/50"
-				>
+		<section className="border-b border-border bg-background px-6 pt-28 pb-16 lg:px-10 lg:pt-36 lg:pb-20">
+			<div className="mx-auto max-w-7xl">
+				<div className="flex items-center gap-2 text-[11px] tracking-[0.22em] text-muted-foreground">
 					<Link to="/" className="hover:text-primary">
 						HOME
 					</Link>
 					<span aria-hidden="true">/</span>
 					<span className="text-primary">PROGRAMS</span>
-				</motion.div>
+				</div>
 
-				<motion.div {...fadeUp(0.06)}>
-					<GuildSeal className="mx-auto mb-6 mt-6 h-12 w-12 text-primary/85" />
-				</motion.div>
+				<div className="mt-10 grid grid-cols-1 gap-14 lg:grid-cols-2 lg:items-start">
+					{/* Left: statement */}
+					<div>
+						<SectionEyebrow id="program" guard="1" title="The Catalogue" />
+						<h1 className="mt-6 font-heading text-5xl font-medium leading-[1.08] sm:text-6xl">
+							Every program,{" "}
+							<span className={cn("italic font-normal", GOLD_TEXT)}>
+								on the record.
+							</span>
+						</h1>
+						<p className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
+							Six programs across barbering and beauty & cosmetology, taught by
+							people who still work a chair or a station. Full curriculum, kit,
+							and outcomes on every listing — no guessing what you're signing up
+							for.
+						</p>
 
-				<motion.h1
-					{...fadeUp(0.12)}
-					className="font-heading text-5xl font-medium leading-[1.08] sm:text-6xl"
-				>
-					Find your{" "}
-					<span className={cn("italic font-normal", GOLD_TEXT)}>craft.</span>
-				</motion.h1>
-				<motion.p
-					{...fadeUp(0.18)}
-					className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-secondary-foreground/70 sm:text-lg"
-				>
-					Six programs across barbering and beauty & cosmetology — from 4-week
-					specialisations to full certifications. Every one taught by someone
-					who still works a chair or a station.
-				</motion.p>
+						<div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] tracking-[0.14em] text-muted-foreground">
+							<span>{ALL_PROGRAMS.length} PROGRAMS</span>
+							<span className="h-1 w-1 rounded-full bg-primary/50" />
+							<span>
+								{min}&ndash;{max} WEEKS
+							</span>
+							<span className="h-1 w-1 rounded-full bg-primary/50" />
+							<span>DAY &amp; EVENING COHORTS</span>
+						</div>
 
-				<motion.div
-					{...fadeUp(0.26)}
-					className="mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[11px] tracking-[0.18em] text-secondary-foreground/55"
-				>
-					<span>{ALL_PROGRAMS.length} PROGRAMS</span>
-					<span className="h-1 w-1 rounded-full bg-primary/50" />
-					<span>4&ndash;16 WEEKS</span>
-					<span className="h-1 w-1 rounded-full bg-primary/50" />
-					<span>DAY &amp; EVENING COHORTS</span>
-				</motion.div>
+						<div className="mt-9 flex flex-wrap gap-4">
+							<Link
+								to="/enroll"
+								className="inline-flex items-center gap-2 border border-primary bg-primary px-6 py-3.5 text-[12px] font-semibold tracking-[0.16em] text-primary-foreground transition-colors hover:bg-transparent hover:text-primary"
+							>
+								APPLY NOW
+							</Link>
+							<Link
+								to="."
+								hash="catalogue-heading"
+								className="inline-flex items-center gap-2 border border-border px-6 py-3.5 text-[12px] font-semibold tracking-[0.16em] text-foreground transition-colors hover:border-primary hover:text-primary"
+							>
+								BROWSE THE CATALOGUE
+								<IconArrowRight className="h-3.5 w-3.5" stroke={1.75} />
+							</Link>
+						</div>
+					</div>
+
+					{/* Right: the ledger — a real index, not decoration */}
+					<div className="border border-border">
+						<p className="border-b border-border bg-muted/40 px-5 py-3 text-[10px] tracking-[0.24em] text-muted-foreground">
+							PROGRAM INDEX
+						</p>
+						<ol>
+							{ALL_PROGRAMS.map((program, i) => (
+								<li
+									key={program.slug}
+									className="border-b border-border last:border-b-0"
+								>
+									<Link
+										to={program.to}
+										className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/40"
+									>
+										<span
+											className="w-6 shrink-0 font-heading text-sm text-primary"
+											aria-hidden="true"
+										>
+											{String(i + 1).padStart(2, "0")}
+										</span>
+										<span className="min-w-0 flex-1">
+											<span className="block truncate text-sm font-medium text-foreground group-hover:text-primary">
+												{program.title}
+											</span>
+											<span className="block text-[11px] tracking-[0.06em] text-muted-foreground">
+												{program.duration.toUpperCase()} &middot;{" "}
+												{program.level.toUpperCase()}
+											</span>
+										</span>
+										<IconArrowRight
+											className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary"
+											stroke={1.75}
+										/>
+									</Link>
+								</li>
+							))}
+						</ol>
+					</div>
+				</div>
 			</div>
 		</section>
 	);
@@ -208,8 +225,8 @@ function ProgramCatalogue() {
 		>
 			<div className="mx-auto max-w-7xl">
 				<SectionEyebrow
-					guard="1"
-					title="The Catalogue"
+					guard="2"
+					title="Browse by Track"
 					id="catalogue-heading"
 				/>
 
@@ -226,7 +243,7 @@ function ProgramCatalogue() {
 							aria-selected={active === f.key}
 							onClick={() => setActive(f.key)}
 							className={cn(
-								"relative pb-4 text-[13px] font-medium tracking-[0.1em] transition-colors",
+								"relative pb-4 text-[13px] font-medium tracking-widest transition-colors",
 								active === f.key
 									? "text-foreground"
 									: "text-muted-foreground hover:text-foreground",
@@ -236,7 +253,7 @@ function ProgramCatalogue() {
 							{active === f.key && (
 								<motion.span
 									layoutId="programs-tab-underline"
-									className="absolute inset-x-0 -bottom-px h-[2px] bg-primary"
+									className="absolute inset-x-0 -bottom-px h-0.5 bg-primary"
 									transition={
 										shouldReduceMotion
 											? { duration: 0 }
@@ -266,7 +283,7 @@ function ProgramCatalogue() {
 									ease: [0.16, 1, 0.3, 1],
 								}}
 							>
-								<ProgramListingCard program={program} />
+								<ProgramCard program={program} />
 							</motion.div>
 						))}
 					</AnimatePresence>
@@ -282,64 +299,7 @@ function ProgramCatalogue() {
 	);
 }
 
-function ProgramListingCard({ program }: { program: Program }) {
-	const trackLabel =
-		program.track === "barbering" ? "Barbering" : "Beauty & Cosmetology";
-	return (
-		<Link
-			to={program.to}
-			className="group flex h-full flex-col overflow-hidden border border-border transition-colors hover:border-primary/40"
-		>
-			<div className="relative aspect-[4/3] overflow-hidden">
-				<img
-					src={program.image}
-					alt={program.alt}
-					loading="lazy"
-					className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
-				/>
-				<div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-				<span className="absolute left-4 top-4 border border-primary/50 bg-black/40 px-2.5 py-1 text-[10px] tracking-[0.16em] text-primary backdrop-blur-sm">
-					{trackLabel.toUpperCase()}
-				</span>
-			</div>
-			<div className="flex flex-1 flex-col p-6">
-				<div className="flex items-center gap-3 text-[11px] tracking-[0.14em] text-muted-foreground">
-					<span>{program.duration.toUpperCase()}</span>
-					<span className="h-1 w-1 rounded-full bg-primary/40" />
-					<span>{program.level.toUpperCase()}</span>
-				</div>
-				<h3 className="mt-3 font-heading text-xl font-medium text-foreground group-hover:text-primary">
-					{program.title}
-				</h3>
-				<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-					{program.description}
-				</p>
-				<ul className="mt-4 flex flex-wrap gap-2">
-					{program.highlights.map((h) => (
-						<li
-							key={h}
-							className="border border-border px-2.5 py-1 text-[10px] tracking-[0.06em] text-muted-foreground"
-						>
-							{h}
-						</li>
-					))}
-				</ul>
-				<span className="mt-5 inline-flex items-center gap-1.5 text-[12px] font-medium tracking-[0.1em] text-primary">
-					VIEW CURRICULUM
-					<IconArrowRight
-						className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
-						stroke={1.75}
-					/>
-				</span>
-			</div>
-		</Link>
-	);
-}
-
 /* ----------------------------- How it works ----------------------------- */
-/* This IS a real sequence — you enroll, then train, then practice in
-   the studio, then certify — so numbered steps are earned here, unlike
-   the GUARD markers elsewhere which are a section motif, not an order. */
 
 const STEPS = [
 	{
@@ -379,7 +339,7 @@ function HowItWorks() {
 			aria-labelledby="how-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="2" title="How Training Works" id="how-heading" />
+				<SectionEyebrow guard="3" title="How Training Works" id="how-heading" />
 				<div className="relative mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
 					<div
 						aria-hidden="true"
@@ -422,7 +382,7 @@ function CohortFormat() {
 			aria-labelledby="cohort-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="3" title="Day or Evening" id="cohort-heading" />
+				<SectionEyebrow guard="4" title="Day or Evening" id="cohort-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-px overflow-hidden border border-border lg:grid-cols-2">
 					<Reveal className="bg-background p-10">
 						<IconSun
@@ -496,5 +456,66 @@ function CohortFormat() {
 				</p>
 			</div>
 		</section>
+	);
+}
+
+import { Image } from "@unpic/react";
+import type { Program } from "@/lib/site-data";
+
+export function ProgramCard({ program }: { program: Program }) {
+	const trackLabel =
+		program.track === "barbering" ? "Barbering" : "Beauty & Cosmetology";
+
+	return (
+		<Link
+			to={program.to}
+			className="group flex h-full flex-col overflow-hidden border border-border transition-colors hover:border-primary/40"
+		>
+			<div className="relative aspect-4/3 overflow-hidden">
+				<Image
+					src={program.image}
+					alt={program.alt}
+					layout="constrained"
+					width={480}
+					height={360}
+					loading="lazy"
+					className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
+				/>
+				<div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/5 to-transparent" />
+				<span className="absolute left-4 top-4 border border-primary/50 bg-black/40 px-2.5 py-1 text-[10px] tracking-[0.16em] text-primary backdrop-blur-sm">
+					{trackLabel.toUpperCase()}
+				</span>
+			</div>
+			<div className="flex flex-1 flex-col p-6">
+				<div className="flex items-center gap-3 text-[11px] tracking-[0.14em] text-muted-foreground">
+					<span>{program.duration.toUpperCase()}</span>
+					<span className="h-1 w-1 rounded-full bg-primary/40" />
+					<span>{program.level.toUpperCase()}</span>
+				</div>
+				<h3 className="mt-3 font-heading text-xl font-medium text-foreground group-hover:text-primary">
+					{program.title}
+				</h3>
+				<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+					{program.description}
+				</p>
+				<ul className="mt-4 flex flex-wrap gap-2">
+					{program.highlights.map((h) => (
+						<li
+							key={h}
+							className="border border-border px-2.5 py-1 text-[10px] tracking-[0.06em] text-muted-foreground"
+						>
+							{h}
+						</li>
+					))}
+				</ul>
+				<span className="mt-5 inline-flex items-center gap-1.5 text-[12px] font-medium tracking-widest text-primary">
+					VIEW CURRICULUM
+					<IconArrowRight
+						className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
+						stroke={1.75}
+					/>
+				</span>
+			</div>
+		</Link>
 	);
 }

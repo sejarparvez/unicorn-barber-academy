@@ -1,21 +1,14 @@
-import {
-	IconArrowRight,
-	IconBrandInstagram,
-	IconBriefcase,
-	IconClockHour4,
-	IconMapPin,
-	IconPhone,
-	IconQuote,
-	IconScissors,
-	IconUsers,
-} from "@tabler/icons-react";
+import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import Faq from "#/components/pages/home/faq";
 import Hero from "#/components/pages/home/hero";
 import Instructors from "#/components/pages/home/instructors";
 import Programs from "#/components/pages/home/programs";
 import Stats from "#/components/pages/home/stats";
+import StudentLife from "#/components/pages/home/student-life";
 import Testimonials from "#/components/pages/home/testimonials";
+import WhyUnicorn from "#/components/pages/home/why-us";
+import { SectionEyebrow } from "#/components/site/decor";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +48,7 @@ function Home() {
 		<>
 			<a
 				href="#main-content"
-				className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:border focus:border-primary focus:bg-secondary focus:px-4 focus:py-2 focus:text-sm focus:text-secondary-foreground"
+				className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-100 focus:border focus:border-primary focus:bg-secondary focus:px-4 focus:py-2 focus:text-sm focus:text-secondary-foreground"
 			>
 				Skip to content
 			</a>
@@ -72,190 +65,6 @@ function Home() {
 				<FinalCta />
 			</main>
 		</>
-	);
-}
-
-/* --------------------------- Why Unicorn --------------------------- */
-
-const FEATURES = [
-	{
-		icon: IconScissors,
-		title: "Taught by Working Professionals",
-		description:
-			"Every instructor still works a chair or a station. You learn what's current, not what's textbook.",
-	},
-	{
-		icon: IconBriefcase,
-		title: "Full Kit Included",
-		description:
-			"Clippers and shears, or a professional makeup and styling kit — yours from week one. No extra spend.",
-	},
-	{
-		icon: IconUsers,
-		title: "Job Placement Support",
-		description:
-			"Sixty partner salons and barbershops hire straight out of our cohorts.",
-	},
-	{
-		icon: IconClockHour4,
-		title: "Day & Evening Cohorts",
-		description:
-			"Train around a job or family. Same curriculum, same instructors, your schedule.",
-	},
-];
-
-function SectionEyebrow({
-	guard,
-	title,
-	id,
-}: {
-	guard: string;
-	title: string;
-	id: string;
-}) {
-	return (
-		<div className="flex items-center gap-4">
-			<span
-				className="h-6 w-px bg-gradient-to-b from-[#F4C430] via-primary to-[#8B6914]"
-				aria-hidden="true"
-			/>
-			<div>
-				<p className="text-[11px] tracking-[0.28em] text-primary">
-					GUARD &#8470; {guard}
-				</p>
-				<h2
-					id={id}
-					className="mt-1 text-3xl text-foreground sm:text-4xl"
-					style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
-				>
-					{title}
-				</h2>
-			</div>
-		</div>
-	);
-}
-
-function WhyUnicorn() {
-	return (
-		<section
-			className="bg-background px-6 py-24 lg:px-10"
-			aria-labelledby="why-heading"
-		>
-			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="1" title="Why Unicorn" id="why-heading" />
-				<div className="mt-14 grid grid-cols-1 gap-px overflow-hidden border border-border sm:grid-cols-2 lg:grid-cols-4">
-					{FEATURES.map((feature) => (
-						<div
-							key={feature.title}
-							className="bg-background p-8 transition-colors hover:bg-accent"
-						>
-							<feature.icon
-								className="h-7 w-7 text-primary"
-								stroke={1.5}
-								aria-hidden="true"
-							/>
-							<h3 className="mt-5 text-base font-semibold text-foreground">
-								{feature.title}
-							</h3>
-							<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-								{feature.description}
-							</p>
-						</div>
-					))}
-				</div>
-			</div>
-		</section>
-	);
-}
-
-/* --------------------------- Student Life --------------------------- */
-
-const GALLERY_ITEMS = [
-	{
-		seed: "unicorn-gallery-1",
-		alt: "Barbering students practicing fades on mannequin heads",
-	},
-	{
-		seed: "unicorn-gallery-2",
-		alt: "Close-up of a professional makeup kit laid out for class",
-	},
-	{
-		seed: "unicorn-gallery-3",
-		alt: "Instructor demonstrating a straight-razor technique",
-	},
-	{
-		seed: "unicorn-gallery-4",
-		alt: "Beauty student styling hair during a practical session",
-	},
-	{
-		seed: "unicorn-gallery-5",
-		alt: "Graduating cohort posing together at the academy",
-	},
-	{
-		seed: "unicorn-gallery-6",
-		alt: "Row of barber chairs and styling stations in the training studio",
-	},
-];
-
-function StudentLife() {
-	return (
-		<section
-			className="border-t border-primary/15 bg-secondary px-6 py-24 text-secondary-foreground lg:px-10"
-			aria-labelledby="academy-heading"
-		>
-			<div className="mx-auto max-w-7xl">
-				<div className="flex flex-wrap items-end justify-between gap-6">
-					<div className="flex items-center gap-4">
-						<span
-							className="h-6 w-px bg-gradient-to-b from-[#F4C430] via-primary to-[#8B6914]"
-							aria-hidden="true"
-						/>
-						<div>
-							<p className="text-[11px] tracking-[0.28em] text-primary">
-								GUARD &#8470; 3
-							</p>
-							<h2
-								id="academy-heading"
-								className="mt-1 text-3xl sm:text-4xl"
-								style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
-							>
-								Inside the Academy
-							</h2>
-						</div>
-					</div>
-					<Link
-						to="/gallery"
-						className="group inline-flex items-center gap-2 text-[13px] font-medium tracking-[0.16em] text-secondary-foreground/70 hover:text-primary"
-					>
-						SEE FULL GALLERY
-						<IconArrowRight
-							className="h-4 w-4 transition-transform group-hover:translate-x-1"
-							stroke={1.75}
-						/>
-					</Link>
-				</div>
-
-				<div className="mt-14 grid grid-cols-2 gap-3 lg:grid-cols-6">
-					{GALLERY_ITEMS.map((item, i) => (
-						<div
-							key={item.seed}
-							className={cn(
-								"group relative overflow-hidden",
-								i === 0 || i === 3 ? "col-span-2 row-span-2" : "col-span-1",
-							)}
-						>
-							<img
-								src={pic(item.seed, 700, 700)}
-								alt={item.alt}
-								loading="lazy"
-								className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-110"
-							/>
-							<div className="absolute inset-0 bg-primary/0 transition-colors duration-500 group-hover:bg-primary/10" />
-						</div>
-					))}
-				</div>
-			</div>
-		</section>
 	);
 }
 
@@ -330,7 +139,7 @@ function FinalCta() {
 			<svg
 				viewBox="0 0 400 400"
 				aria-hidden="true"
-				className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-[0.03]"
+				className="pointer-events-none absolute left-1/2 top-1/2 h-150 w-150 -translate-x-1/2 -translate-y-1/2 opacity-[0.03]"
 			>
 				<path
 					d="M200 40 L240 190 L200 360 L160 190 Z"
@@ -353,7 +162,7 @@ function FinalCta() {
 					style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
 				>
 					Your chair &mdash; or your studio &mdash;{" "}
-					<span className="bg-gradient-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-transparent">
+					<span className="bg-linear-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-transparent">
 						is waiting.
 					</span>
 				</h2>

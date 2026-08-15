@@ -1,22 +1,15 @@
-import {
-	IconArrowRight,
-	IconAward,
-	IconBrandInstagram,
-	IconBriefcase,
-	IconQuote,
-} from "@tabler/icons-react";
+import { IconArrowRight, IconAward, IconBriefcase } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "motion/react";
+import { Image } from "@unpic/react";
 import {
 	FinalCta,
-	GOLD_TEXT,
-	Grain,
 	GuildSeal,
 	Reveal,
 	SectionEyebrow,
 } from "@/components/site/decor";
-import { INSTRUCTORS, type Instructor, pic, SITE_URL } from "@/lib/site-data";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { INSTRUCTORS, type Instructor, SITE_URL } from "@/lib/site-data";
 
 export const Route = createFileRoute("/instructors")({
 	component: InstructorsPage,
@@ -44,7 +37,25 @@ export const Route = createFileRoute("/instructors")({
 	}),
 });
 
-const JSON_LD = {
+const INSTRUCTORS_JSON_LD = {
+	"@context": "https://schema.org",
+	"@type": "ItemList",
+	itemListElement: INSTRUCTORS.map((person, i) => ({
+		"@type": "Person",
+		position: i + 1,
+		name: person.name,
+		jobTitle: person.title,
+		description: person.bio,
+		knowsAbout: person.specialties,
+		worksFor: {
+			"@type": "EducationalOrganization",
+			name: "Unicorn Barber Training Academy",
+			sameAs: SITE_URL,
+		},
+	})),
+};
+
+const BREADCRUMB_JSON_LD = {
 	"@context": "https://schema.org",
 	"@type": "BreadcrumbList",
 	itemListElement: [
@@ -66,16 +77,23 @@ function InstructorsPage() {
 	const beautyFaculty = INSTRUCTORS.filter(
 		(i) => !i.lead && i.track === "beauty",
 	);
-	const totalYears = INSTRUCTORS.reduce((sum, i) => sum + i.years, 0);
 
 	return (
 		<main>
 			<script
 				type="application/ld+json"
-				// eslint-disable-next-line react/no-danger
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{
+					__html: JSON.stringify(BREADCRUMB_JSON_LD),
+				}}
 			/>
-			<FacultyHero totalYears={totalYears} />
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{
+					__html: JSON.stringify(INSTRUCTORS_JSON_LD),
+				}}
+			/>
 			<Spotlight leads={leads} />
 			<FacultyGroup
 				guard="2"
@@ -96,100 +114,6 @@ function InstructorsPage() {
 		</main>
 	);
 }
-
-/* ----------------------------- Hero ----------------------------- */
-
-function FacultyHero({ totalYears }: { totalYears: number }) {
-	const shouldReduceMotion = useReducedMotion();
-	const fadeUp = (delay = 0) =>
-		shouldReduceMotion
-			? {}
-			: {
-					initial: { opacity: 0, y: 18 },
-					animate: { opacity: 1, y: 0 },
-					transition: {
-						duration: 0.7,
-						delay,
-						ease: [0.16, 1, 0.3, 1] as const,
-					},
-				};
-
-	return (
-		<section className="relative overflow-hidden bg-secondary text-secondary-foreground">
-			<div className="absolute inset-0 grid grid-cols-3">
-				<img
-					src={pic("unicorn-faculty-hero-1", 700, 1100)}
-					alt=""
-					className="h-full w-full object-cover opacity-40"
-				/>
-				<img
-					src={pic("unicorn-faculty-hero-2", 700, 1100)}
-					alt=""
-					className="hidden h-full w-full object-cover opacity-40 sm:block"
-				/>
-				<img
-					src={pic("unicorn-faculty-hero-3", 700, 1100)}
-					alt=""
-					className="hidden h-full w-full object-cover opacity-40 lg:block"
-				/>
-			</div>
-			<div
-				aria-hidden="true"
-				className="pointer-events-none absolute inset-0"
-				style={{
-					background:
-						"radial-gradient(60% 65% at 50% 42%, rgba(8,8,8,0.93) 0%, rgba(8,8,8,0.8) 45%, rgba(8,8,8,0.55) 78%, rgba(8,8,8,0.34) 100%)",
-				}}
-			/>
-			<Grain />
-
-			<div className="relative mx-auto max-w-3xl px-6 py-24 text-center lg:py-32">
-				<motion.div
-					{...fadeUp(0)}
-					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/50"
-				>
-					<Link to="/" className="hover:text-primary">
-						HOME
-					</Link>
-					<span aria-hidden="true">/</span>
-					<span className="text-primary">INSTRUCTORS</span>
-				</motion.div>
-
-				<motion.div {...fadeUp(0.06)}>
-					<GuildSeal className="mx-auto mb-6 mt-6 h-12 w-12 text-primary/85" />
-				</motion.div>
-
-				<motion.h1
-					{...fadeUp(0.12)}
-					className="font-heading text-5xl font-medium leading-[1.08] sm:text-6xl"
-				>
-					The{" "}
-					<span className={cn("italic font-normal", GOLD_TEXT)}>faculty.</span>
-				</motion.h1>
-				<motion.p
-					{...fadeUp(0.18)}
-					className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-secondary-foreground/70 sm:text-lg"
-				>
-					Six working professionals, {totalYears}+ years behind the chair
-					between them. Nobody here teaches full-time — everybody here still
-					cuts, colours, or does makeup for paying clients.
-				</motion.p>
-
-				<motion.div
-					{...fadeUp(0.26)}
-					className="mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[11px] tracking-[0.18em] text-secondary-foreground/55"
-				>
-					<span>{INSTRUCTORS.length} INSTRUCTORS</span>
-					<span className="h-1 w-1 rounded-full bg-primary/50" />
-					<span>{totalYears}+ COMBINED YEARS</span>
-					<span className="h-1 w-1 rounded-full bg-primary/50" />
-					<span>GUILD REGISTERED</span>
-				</motion.div>
-			</div>
-		</section>
-	);
-}
-
 /* ----------------------------- Spotlight ----------------------------- */
 /* The two lead instructors, presented as oversized membership cards —
    the guild-member motif carried to its most detailed form. */
@@ -205,71 +129,63 @@ function Spotlight({ leads }: { leads: Instructor[] }) {
 				<div className="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-2">
 					{leads.map((lead, i) => (
 						<Reveal key={lead.name} delay={i * 0.1}>
-							<article className="group relative flex h-full flex-col overflow-hidden border border-border sm:flex-row">
-								<div className="relative aspect-[4/5] w-full overflow-hidden sm:w-2/5">
-									<img
-										src={lead.image}
-										alt={`${lead.name}, ${lead.title}`}
-										loading="lazy"
-										className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
-									/>
-									<span className="absolute left-4 top-4 border border-primary/60 bg-black/40 px-2.5 py-1 text-[10px] tracking-[0.16em] text-primary backdrop-blur-sm">
-										MEMBER &#8470; {lead.memberNo}
-									</span>
-								</div>
-								<div className="relative flex flex-1 flex-col justify-between p-8">
-									<GuildSeal className="pointer-events-none absolute -bottom-8 -right-8 h-32 w-32 text-primary/[0.05]" />
-									<div className="relative">
-										<h3 className="font-heading text-2xl font-medium text-foreground">
-											{lead.name}
-										</h3>
-										<p className="mt-1 text-sm text-primary">{lead.title}</p>
-										<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-											{lead.bio}
-										</p>
-										{lead.quote && (
-											<blockquote className="mt-5 flex gap-3 border-l-2 border-primary/40 pl-4 text-sm italic leading-relaxed text-foreground/80">
-												<IconQuote
-													className="h-4 w-4 shrink-0 text-primary/50"
-													stroke={1.5}
+							<Card className="group h-full gap-0 overflow-hidden rounded-none border-border p-0">
+								<div className="flex h-full flex-col sm:flex-row">
+									<div className="relative aspect-4/5 w-full overflow-hidden sm:w-2/5">
+										<Image
+											src={lead.image}
+											alt={`${lead.name}, ${lead.title}`}
+											layout="constrained"
+											width={480}
+											height={600}
+											loading="lazy"
+											className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
+										/>
+										<span className="absolute left-4 top-4 border border-primary/60 bg-black/40 px-2.5 py-1 text-[10px] tracking-[0.16em] text-primary backdrop-blur-sm">
+											MEMBER &#8470; {lead.memberNo}
+										</span>
+									</div>
+									<CardContent className="relative flex flex-1 flex-col justify-between p-8">
+										<GuildSeal className="pointer-events-none absolute -bottom-8 -right-8 h-32 w-32 text-primary/5" />
+										<div className="relative">
+											<h3 className="font-heading text-2xl font-medium text-foreground">
+												{lead.name}
+											</h3>
+											<p className="mt-1 text-sm text-primary">{lead.title}</p>
+											<p className="mt-1 text-[11px] tracking-widest text-muted-foreground/60">
+												{lead.years}+ YEARS EXPERIENCE
+											</p>
+											<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+												{lead.bio}
+											</p>
+											<ul className="mt-5 flex flex-wrap gap-2">
+												{lead.specialties.map((s) => (
+													<li key={s}>
+														<Badge
+															variant="outline"
+															className="rounded-none border-border text-[10px] font-normal tracking-[0.06em] text-muted-foreground"
+														>
+															{s}
+														</Badge>
+													</li>
+												))}
+											</ul>
+										</div>
+										<div className="relative mt-6">
+											<Link
+												to={lead.teaches.to}
+												className="group/link inline-flex items-center gap-1.5 text-[12px] font-medium tracking-widest text-primary"
+											>
+												TEACHES {lead.teaches.program.toUpperCase()}
+												<IconArrowRight
+													className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-1"
+													stroke={1.75}
 												/>
-												<span>{lead.quote}</span>
-											</blockquote>
-										)}
-										<ul className="mt-5 flex flex-wrap gap-2">
-											{lead.specialties.map((s) => (
-												<li
-													key={s}
-													className="border border-border px-2.5 py-1 text-[10px] tracking-[0.06em] text-muted-foreground"
-												>
-													{s}
-												</li>
-											))}
-										</ul>
-									</div>
-									<div className="relative mt-6 flex items-center justify-between gap-4">
-										<Link
-											to={lead.teaches.to}
-											className="group/link inline-flex items-center gap-1.5 text-[12px] font-medium tracking-[0.1em] text-primary"
-										>
-											TEACHES {lead.teaches.program.toUpperCase()}
-											<IconArrowRight
-												className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-1"
-												stroke={1.75}
-											/>
-										</Link>
-										<a
-											href={lead.instagram}
-											target="_blank"
-											rel="noreferrer"
-											aria-label={`${lead.name} on Instagram`}
-											className="flex h-8 w-8 shrink-0 items-center justify-center border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-										>
-											<IconBrandInstagram className="h-4 w-4" stroke={1.75} />
-										</a>
-									</div>
+											</Link>
+										</div>
+									</CardContent>
 								</div>
-							</article>
+							</Card>
 						</Reveal>
 					))}
 				</div>
@@ -311,12 +227,15 @@ function FacultyGroup({
 
 function MembershipCard({ instructor }: { instructor: Instructor }) {
 	return (
-		<div className="group flex h-full flex-col overflow-hidden border border-border bg-background transition-colors hover:border-primary/40">
-			<div className="relative aspect-[4/5] overflow-hidden">
+		<Card className="group h-full gap-0 overflow-hidden rounded-none border-border bg-background p-0 transition-colors hover:border-primary/40">
+			<div className="relative aspect-4/5 overflow-hidden">
 				<span className="absolute inset-x-0 top-0 z-10 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
-				<img
+				<Image
 					src={instructor.image}
 					alt={`${instructor.name}, ${instructor.title}`}
+					layout="constrained"
+					width={480}
+					height={600}
 					loading="lazy"
 					className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
 				/>
@@ -324,41 +243,28 @@ function MembershipCard({ instructor }: { instructor: Instructor }) {
 					MEMBER &#8470; {instructor.memberNo}
 				</span>
 			</div>
-			<div className="flex flex-1 flex-col p-6">
-				<div className="flex items-start justify-between gap-3">
-					<div>
-						<h3 className="font-heading text-lg font-medium text-foreground">
-							{instructor.name}
-						</h3>
-						<p className="mt-1 text-sm text-muted-foreground">
-							{instructor.title}
-						</p>
-					</div>
-					<a
-						href={instructor.instagram}
-						target="_blank"
-						rel="noreferrer"
-						aria-label={`${instructor.name} on Instagram`}
-						className="flex h-8 w-8 shrink-0 items-center justify-center border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-					>
-						<IconBrandInstagram className="h-4 w-4" stroke={1.75} />
-					</a>
-				</div>
+			<CardContent className="flex flex-1 flex-col p-6">
+				<h3 className="font-heading text-lg font-medium text-foreground">
+					{instructor.name}
+				</h3>
+				<p className="mt-1 text-sm text-muted-foreground">{instructor.title}</p>
 				<p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
 					{instructor.bio}
 				</p>
 				<ul className="mt-4 flex flex-wrap gap-2">
 					{instructor.specialties.map((s) => (
-						<li
-							key={s}
-							className="border border-border px-2.5 py-1 text-[10px] tracking-[0.06em] text-muted-foreground"
-						>
-							{s}
+						<li key={s}>
+							<Badge
+								variant="outline"
+								className="rounded-none border-border text-[10px] font-normal tracking-[0.06em] text-muted-foreground"
+							>
+								{s}
+							</Badge>
 						</li>
 					))}
 				</ul>
 				<div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
-					<span className="flex items-center gap-1.5 text-[11px] tracking-[0.1em] text-primary">
+					<span className="flex items-center gap-1.5 text-[11px] tracking-widest text-primary">
 						<IconAward className="h-3.5 w-3.5" stroke={1.75} />
 						{instructor.years}+ YEARS
 					</span>
@@ -373,8 +279,8 @@ function MembershipCard({ instructor }: { instructor: Instructor }) {
 						/>
 					</Link>
 				</div>
-			</div>
-		</div>
+			</CardContent>
+		</Card>
 	);
 }
 

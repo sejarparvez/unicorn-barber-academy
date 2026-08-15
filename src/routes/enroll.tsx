@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
 import {
@@ -129,10 +128,12 @@ function EnrollPage() {
 		<main>
 			<script
 				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
 			/>
 			<script
 				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(ENROLL_JSON_LD) }}
 			/>
 			<EnrollHero />
@@ -250,8 +251,9 @@ function EnrollForm() {
 		setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
+	// Replace handleSubmit with two functions:
+
+	const submitApplication = async () => {
 		setSubmitting(true);
 		setError(null);
 
@@ -266,6 +268,15 @@ function EnrollForm() {
 		}
 	};
 
+	const handleFormSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (step === 1) {
+			nextStep();
+		} else {
+			submitApplication();
+		}
+	};
+
 	const nextStep = () => {
 		if (step === 1 && formData.name && formData.email && formData.phone) {
 			setStep(2);
@@ -275,7 +286,7 @@ function EnrollForm() {
 			formData.program &&
 			formData.cohort
 		) {
-			handleSubmit();
+			submitApplication();
 		}
 	};
 
@@ -334,7 +345,7 @@ function EnrollForm() {
 						<motion.div
 							key={s}
 							className={cn(
-								"relative flex h-10 w-10 items-center justify-center rounded-full border-2 text-[12px] font-medium tracking-[0.1em] transition-all",
+								"relative flex h-10 w-10 items-center justify-center rounded-full border-2 text-[12px] font-medium tracking-widest transition-all",
 								s === step
 									? "border-primary bg-primary text-primary-foreground"
 									: s < step
@@ -357,7 +368,7 @@ function EnrollForm() {
 					{step === 1 && (
 						<motion.form
 							key="step1"
-							onSubmit={nextStep}
+							onSubmit={handleFormSubmit}
 							initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={shouldReduceMotion ? undefined : { opacity: 0, x: -20 }}
@@ -446,7 +457,7 @@ function EnrollForm() {
 					{step === 2 && (
 						<motion.form
 							key="step2"
-							onSubmit={handleSubmit}
+							onSubmit={handleFormSubmit}
 							initial={shouldReduceMotion ? false : { opacity: 0, x: -20 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={shouldReduceMotion ? undefined : { opacity: 0, x: 20 }}
@@ -455,12 +466,12 @@ function EnrollForm() {
 						>
 							<div className="space-y-6">
 								<div>
-									<label className="block text-sm font-medium text-foreground">
+									<p className="block text-sm font-medium text-foreground">
 										Track{" "}
 										<span className="text-destructive" aria-hidden="true">
 											*
 										</span>
-									</label>
+									</p>
 									<div
 										className="mt-3 grid grid-cols-2 gap-4"
 										role="radiogroup"
@@ -527,12 +538,12 @@ function EnrollForm() {
 								</div>
 
 								<div>
-									<label className="block text-sm font-medium text-foreground">
+									<p className="block text-sm font-medium text-foreground">
 										Cohort{" "}
 										<span className="text-destructive" aria-hidden="true">
 											*
 										</span>
-									</label>
+									</p>
 									<div
 										className="mt-3 grid grid-cols-2 gap-4"
 										role="radiogroup"

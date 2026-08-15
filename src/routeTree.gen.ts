@@ -17,16 +17,11 @@ import { Route as EnrollRouteImport } from './routes/enroll'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as InstructorsRouteImport } from './routes/instructors'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as StudentLifeRouteImport } from './routes/student-life'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiEnrollRouteImport } from './routes/api/enroll'
-import { Route as ProgramsBeardSculptingRouteImport } from './routes/programs/beard-sculpting'
-import { Route as ProgramsBridalAndEditorialMakeupRouteImport } from './routes/programs/bridal-and-editorial-makeup'
-import { Route as ProgramsClassicBarberingRouteImport } from './routes/programs/classic-barbering'
-import { Route as ProgramsCosmetologyFundamentalsRouteImport } from './routes/programs/cosmetology-fundamentals'
-import { Route as ProgramsFadesAndTapersRouteImport } from './routes/programs/fades-and-tapers'
-import { Route as ProgramsHairStylingAndColouringRouteImport } from './routes/programs/hair-styling-and-colouring'
+import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
+import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -68,11 +63,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramsRoute = ProgramsRouteImport.update({
-  id: '/programs',
-  path: '/programs',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StudentLifeRoute = StudentLifeRouteImport.update({
   id: '/student-life',
   path: '/student-life',
@@ -88,40 +78,16 @@ const ApiEnrollRoute = ApiEnrollRouteImport.update({
   path: '/api/enroll',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramsBeardSculptingRoute = ProgramsBeardSculptingRouteImport.update({
-  id: '/beard-sculpting',
-  path: '/beard-sculpting',
-  getParentRoute: () => ProgramsRoute,
+const ProgramsIndexRoute = ProgramsIndexRouteImport.update({
+  id: '/programs/',
+  path: '/programs/',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramsBridalAndEditorialMakeupRoute =
-  ProgramsBridalAndEditorialMakeupRouteImport.update({
-    id: '/bridal-and-editorial-makeup',
-    path: '/bridal-and-editorial-makeup',
-    getParentRoute: () => ProgramsRoute,
-  } as any)
-const ProgramsClassicBarberingRoute =
-  ProgramsClassicBarberingRouteImport.update({
-    id: '/classic-barbering',
-    path: '/classic-barbering',
-    getParentRoute: () => ProgramsRoute,
-  } as any)
-const ProgramsCosmetologyFundamentalsRoute =
-  ProgramsCosmetologyFundamentalsRouteImport.update({
-    id: '/cosmetology-fundamentals',
-    path: '/cosmetology-fundamentals',
-    getParentRoute: () => ProgramsRoute,
-  } as any)
-const ProgramsFadesAndTapersRoute = ProgramsFadesAndTapersRouteImport.update({
-  id: '/fades-and-tapers',
-  path: '/fades-and-tapers',
-  getParentRoute: () => ProgramsRoute,
+const ProgramsSlugRoute = ProgramsSlugRouteImport.update({
+  id: '/programs/$slug',
+  path: '/programs/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramsHairStylingAndColouringRoute =
-  ProgramsHairStylingAndColouringRouteImport.update({
-    id: '/hair-styling-and-colouring',
-    path: '/hair-styling-and-colouring',
-    getParentRoute: () => ProgramsRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -132,16 +98,11 @@ export interface FileRoutesByFullPath {
   '/gallery': typeof GalleryRoute
   '/instructors': typeof InstructorsRoute
   '/privacy': typeof PrivacyRoute
-  '/programs': typeof ProgramsRouteWithChildren
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/enroll': typeof ApiEnrollRoute
-  '/programs/beard-sculpting': typeof ProgramsBeardSculptingRoute
-  '/programs/bridal-and-editorial-makeup': typeof ProgramsBridalAndEditorialMakeupRoute
-  '/programs/classic-barbering': typeof ProgramsClassicBarberingRoute
-  '/programs/cosmetology-fundamentals': typeof ProgramsCosmetologyFundamentalsRoute
-  '/programs/fades-and-tapers': typeof ProgramsFadesAndTapersRoute
-  '/programs/hair-styling-and-colouring': typeof ProgramsHairStylingAndColouringRoute
+  '/programs/$slug': typeof ProgramsSlugRoute
+  '/programs/': typeof ProgramsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -152,16 +113,11 @@ export interface FileRoutesByTo {
   '/gallery': typeof GalleryRoute
   '/instructors': typeof InstructorsRoute
   '/privacy': typeof PrivacyRoute
-  '/programs': typeof ProgramsRouteWithChildren
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/enroll': typeof ApiEnrollRoute
-  '/programs/beard-sculpting': typeof ProgramsBeardSculptingRoute
-  '/programs/bridal-and-editorial-makeup': typeof ProgramsBridalAndEditorialMakeupRoute
-  '/programs/classic-barbering': typeof ProgramsClassicBarberingRoute
-  '/programs/cosmetology-fundamentals': typeof ProgramsCosmetologyFundamentalsRoute
-  '/programs/fades-and-tapers': typeof ProgramsFadesAndTapersRoute
-  '/programs/hair-styling-and-colouring': typeof ProgramsHairStylingAndColouringRoute
+  '/programs/$slug': typeof ProgramsSlugRoute
+  '/programs': typeof ProgramsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -173,16 +129,11 @@ export interface FileRoutesById {
   '/gallery': typeof GalleryRoute
   '/instructors': typeof InstructorsRoute
   '/privacy': typeof PrivacyRoute
-  '/programs': typeof ProgramsRouteWithChildren
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/enroll': typeof ApiEnrollRoute
-  '/programs/beard-sculpting': typeof ProgramsBeardSculptingRoute
-  '/programs/bridal-and-editorial-makeup': typeof ProgramsBridalAndEditorialMakeupRoute
-  '/programs/classic-barbering': typeof ProgramsClassicBarberingRoute
-  '/programs/cosmetology-fundamentals': typeof ProgramsCosmetologyFundamentalsRoute
-  '/programs/fades-and-tapers': typeof ProgramsFadesAndTapersRoute
-  '/programs/hair-styling-and-colouring': typeof ProgramsHairStylingAndColouringRoute
+  '/programs/$slug': typeof ProgramsSlugRoute
+  '/programs/': typeof ProgramsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -195,16 +146,11 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/instructors'
     | '/privacy'
-    | '/programs'
     | '/student-life'
     | '/terms'
     | '/api/enroll'
-    | '/programs/beard-sculpting'
-    | '/programs/bridal-and-editorial-makeup'
-    | '/programs/classic-barbering'
-    | '/programs/cosmetology-fundamentals'
-    | '/programs/fades-and-tapers'
-    | '/programs/hair-styling-and-colouring'
+    | '/programs/$slug'
+    | '/programs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -215,16 +161,11 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/instructors'
     | '/privacy'
-    | '/programs'
     | '/student-life'
     | '/terms'
     | '/api/enroll'
-    | '/programs/beard-sculpting'
-    | '/programs/bridal-and-editorial-makeup'
-    | '/programs/classic-barbering'
-    | '/programs/cosmetology-fundamentals'
-    | '/programs/fades-and-tapers'
-    | '/programs/hair-styling-and-colouring'
+    | '/programs/$slug'
+    | '/programs'
   id:
     | '__root__'
     | '/'
@@ -235,16 +176,11 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/instructors'
     | '/privacy'
-    | '/programs'
     | '/student-life'
     | '/terms'
     | '/api/enroll'
-    | '/programs/beard-sculpting'
-    | '/programs/bridal-and-editorial-makeup'
-    | '/programs/classic-barbering'
-    | '/programs/cosmetology-fundamentals'
-    | '/programs/fades-and-tapers'
-    | '/programs/hair-styling-and-colouring'
+    | '/programs/$slug'
+    | '/programs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -256,10 +192,11 @@ export interface RootRouteChildren {
   GalleryRoute: typeof GalleryRoute
   InstructorsRoute: typeof InstructorsRoute
   PrivacyRoute: typeof PrivacyRoute
-  ProgramsRoute: typeof ProgramsRouteWithChildren
   StudentLifeRoute: typeof StudentLifeRoute
   TermsRoute: typeof TermsRoute
   ApiEnrollRoute: typeof ApiEnrollRoute
+  ProgramsSlugRoute: typeof ProgramsSlugRoute
+  ProgramsIndexRoute: typeof ProgramsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -320,13 +257,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/programs': {
-      id: '/programs'
-      path: '/programs'
-      fullPath: '/programs'
-      preLoaderRoute: typeof ProgramsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/student-life': {
       id: '/student-life'
       path: '/student-life'
@@ -348,72 +278,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEnrollRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/programs/beard-sculpting': {
-      id: '/programs/beard-sculpting'
-      path: '/beard-sculpting'
-      fullPath: '/programs/beard-sculpting'
-      preLoaderRoute: typeof ProgramsBeardSculptingRouteImport
-      parentRoute: typeof ProgramsRoute
+    '/programs/': {
+      id: '/programs/'
+      path: '/programs'
+      fullPath: '/programs/'
+      preLoaderRoute: typeof ProgramsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/programs/bridal-and-editorial-makeup': {
-      id: '/programs/bridal-and-editorial-makeup'
-      path: '/bridal-and-editorial-makeup'
-      fullPath: '/programs/bridal-and-editorial-makeup'
-      preLoaderRoute: typeof ProgramsBridalAndEditorialMakeupRouteImport
-      parentRoute: typeof ProgramsRoute
-    }
-    '/programs/classic-barbering': {
-      id: '/programs/classic-barbering'
-      path: '/classic-barbering'
-      fullPath: '/programs/classic-barbering'
-      preLoaderRoute: typeof ProgramsClassicBarberingRouteImport
-      parentRoute: typeof ProgramsRoute
-    }
-    '/programs/cosmetology-fundamentals': {
-      id: '/programs/cosmetology-fundamentals'
-      path: '/cosmetology-fundamentals'
-      fullPath: '/programs/cosmetology-fundamentals'
-      preLoaderRoute: typeof ProgramsCosmetologyFundamentalsRouteImport
-      parentRoute: typeof ProgramsRoute
-    }
-    '/programs/fades-and-tapers': {
-      id: '/programs/fades-and-tapers'
-      path: '/fades-and-tapers'
-      fullPath: '/programs/fades-and-tapers'
-      preLoaderRoute: typeof ProgramsFadesAndTapersRouteImport
-      parentRoute: typeof ProgramsRoute
-    }
-    '/programs/hair-styling-and-colouring': {
-      id: '/programs/hair-styling-and-colouring'
-      path: '/hair-styling-and-colouring'
-      fullPath: '/programs/hair-styling-and-colouring'
-      preLoaderRoute: typeof ProgramsHairStylingAndColouringRouteImport
-      parentRoute: typeof ProgramsRoute
+    '/programs/$slug': {
+      id: '/programs/$slug'
+      path: '/programs/$slug'
+      fullPath: '/programs/$slug'
+      preLoaderRoute: typeof ProgramsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface ProgramsRouteChildren {
-  ProgramsBeardSculptingRoute: typeof ProgramsBeardSculptingRoute
-  ProgramsBridalAndEditorialMakeupRoute: typeof ProgramsBridalAndEditorialMakeupRoute
-  ProgramsClassicBarberingRoute: typeof ProgramsClassicBarberingRoute
-  ProgramsCosmetologyFundamentalsRoute: typeof ProgramsCosmetologyFundamentalsRoute
-  ProgramsFadesAndTapersRoute: typeof ProgramsFadesAndTapersRoute
-  ProgramsHairStylingAndColouringRoute: typeof ProgramsHairStylingAndColouringRoute
-}
-
-const ProgramsRouteChildren: ProgramsRouteChildren = {
-  ProgramsBeardSculptingRoute: ProgramsBeardSculptingRoute,
-  ProgramsBridalAndEditorialMakeupRoute: ProgramsBridalAndEditorialMakeupRoute,
-  ProgramsClassicBarberingRoute: ProgramsClassicBarberingRoute,
-  ProgramsCosmetologyFundamentalsRoute: ProgramsCosmetologyFundamentalsRoute,
-  ProgramsFadesAndTapersRoute: ProgramsFadesAndTapersRoute,
-  ProgramsHairStylingAndColouringRoute: ProgramsHairStylingAndColouringRoute,
-}
-
-const ProgramsRouteWithChildren = ProgramsRoute._addFileChildren(
-  ProgramsRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -424,10 +304,11 @@ const rootRouteChildren: RootRouteChildren = {
   GalleryRoute: GalleryRoute,
   InstructorsRoute: InstructorsRoute,
   PrivacyRoute: PrivacyRoute,
-  ProgramsRoute: ProgramsRouteWithChildren,
   StudentLifeRoute: StudentLifeRoute,
   TermsRoute: TermsRoute,
   ApiEnrollRoute: ApiEnrollRoute,
+  ProgramsSlugRoute: ProgramsSlugRoute,
+  ProgramsIndexRoute: ProgramsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
