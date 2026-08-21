@@ -93,24 +93,23 @@ Current state: `src/lib/auth.ts` is imported nowhere, uses undeclared `pg` depen
 ## Phase 4 — SEO & accessibility (medium)
 
 ### SEO
-- [ ] **4.1 Default og:image** — no `og:image` anywhere; homepage declares `twitter:card: summary_large_image` with no image → blank social cards. Add default in `__root.tsx` head, override per page where assets exist.
-- [ ] **4.2 programs.$slug 404 head** — `head()` returns `{}` when loaderData absent → 404 response has no title/description (`programs.$slug.tsx:28`). Return "Program not found" title.
-- [ ] **4.3 About JSON-LD NAP** — `ORG_JSON_LD` hardcodes address/phone inline (`about.tsx:70-77`); import shared contact constants instead (with Phase 5.2).
+- [x] **4.1 Default og:image** ✅ 2026-08-21 — `public/banner.png` (copied from `src/assets/logo/banner.png`, 4001×2001) + default og/twitter meta in root head; homepage's duplicate twitter:card removed. Also copied `public/logo.png` for footer JSON-LD.
+- [x] **4.2 programs.$slug 404 head** ✅ 2026-08-21 — "Program not found" title + `robots: noindex`.
+- [ ] **4.3 About JSON-LD NAP** — deferred to Phase 5.2 (CONTACT constants).
 
 ### Accessibility
-- [ ] **4.4 Missing `<h1>`** — about.tsx (first heading is h2 at ~line 224) and instructors.tsx (first heading h2 at ~line 128). Convert hero statements to `<h1>`.
-- [ ] **4.5 Heading order violation** — `programs.index.tsx:114-115`: eyebrow renders `<h2>` before the page's `<h1>`. Reorder or drop eyebrow there.
-- [ ] **4.6 Fake ARIA tabs patterns** — gallery.tsx:128-161 and programs.index.tsx:233-266 use `role="tablist"/"tab"` + `aria-selected` with no tabpanels, no keyboard nav. Downgrade to plain buttons with `aria-pressed`.
-- [ ] **4.7 Gallery lightbox dialog** — `gallery.tsx:220-293`: `role="dialog" aria-modal="true"` without focus trap, focus move/restore, or scroll lock. Wrap in Base UI Dialog (already a dependency) or add focus-trap + body scroll lock.
-- [ ] **4.8 Skip link broken/duplicated** — header skip link targets `#main-content` but only home route has that id; home also ends up with two skip links. Put `id="main-content"` on the wrapper div in `__root.tsx:40`, remove per-route skip links/duplicates.
-- [ ] **4.9 Contrast failures** — bump low-opacity small text (~WCAG AA fails/borderlines):
-  - footer:259 (`/50`), testimonials:93 (`/50`), stats:35 (`/55`), hero:116 (`/55`), contact:569 (`/55`), about:386 / instructors:155 / programs.$slug:368 (`text-muted-foreground/60` ≈ 2.2:1)
-- [ ] **4.10 Copy-to-clipboard announcement** — contact.tsx CopyRow "copied" state is visual only; add `aria-live="polite"` region.
+- [x] **4.4 Missing `<h1>`** ✅ 2026-08-21 — sr-only h1s added to about + instructors heroes (quote-led design kept intact).
+- [x] **4.5 Heading order violation** ✅ 2026-08-21 — `SectionEyebrow` gained optional `as` prop; rendered as `p` on programs.index so the h1 leads.
+- [x] **4.6 Fake ARIA tabs patterns** ✅ 2026-08-21 — converted to semantic `<fieldset>` + sr-only `<legend>` with `aria-pressed` buttons (Biome-enforced).
+- [x] **4.7 Gallery lightbox dialog** ✅ 2026-08-21 — rebuilt on Base UI Dialog: focus trap, focus restore, scroll lock, Escape, backdrop click. Reduced-motion respected.
+- [x] **4.8 Skip link broken/duplicated** ✅ 2026-08-21 — `id="main-content"` moved to root wrapper div; home's duplicate skip-link removed.
+- [x] **4.9 Contrast failures** ✅ 2026-08-21 — bumped all `/50`–`/60` small-text opacities to `/65`+ across 14 files (incl. repeated breadcrumb pattern).
+- [x] **4.10 Copy-to-clipboard announcement** ✅ 2026-08-21 — semantic `<output>` live region.
 
 ### Bugs
-- [ ] **4.11 Attribute typo** — `components/pages/home/programs.tsx:138`: `aia-labelledby={trackId}` → `aria-labelledby`.
-- [ ] **4.12 Embla listener leak** — `components/ui/carousel.tsx:93-102`: cleanup calls `api.off("select", onSelect)` but not `api.off("reInit", onSelect)`. Add missing off.
-- [ ] **4.13 Invalid figcaption** — `testimonials.tsx:79`: `<figcaption>` with no ancestor `<figure>`. Wrap card in `<figure>`.
+- [x] **4.11 Attribute typo** ✅ 2026-08-21 — fixed to `aria-labelledby`; container upgraded to semantic `<ul>` list (Biome flagged the roleless-div ARIA).
+- [x] **4.12 Embla listener leak** ✅ 2026-08-21
+- [x] **4.13 Invalid figcaption** ✅ 2026-08-21 — blockquote + figcaption wrapped in `<figure>`.
 
 ---
 

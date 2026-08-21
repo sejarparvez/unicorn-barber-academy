@@ -25,7 +25,14 @@ export const Route = createFileRoute("/programs/$slug")({
 		return { program };
 	},
 	head: ({ loaderData }) => {
-		if (!loaderData) return {};
+		if (!loaderData) {
+			return {
+				meta: [
+					{ title: "Program not found | Unicorn Barber Training Academy" },
+					{ name: "robots", content: "noindex" },
+				],
+			};
+		}
 		const { program } = loaderData;
 		const url = `${SITE_URL}${program.to}`;
 		return {
@@ -365,7 +372,7 @@ function ProgramDetailPage() {
 											<span className="block text-xs text-muted-foreground">
 												{instructor.title}
 											</span>
-											<span className="mt-1 block text-[11px] tracking-widest text-muted-foreground/60">
+											<span className="mt-1 block text-[11px] tracking-widest text-muted-foreground">
 												{instructor.years} YRS EXPERIENCE
 											</span>
 										</span>

@@ -3,6 +3,7 @@ import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import Footer from "#/components/layout/footer";
 import Header from "#/components/layout/header";
+import { SITE_URL } from "#/lib/site-data";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -19,6 +20,16 @@ export const Route = createRootRoute({
 				title:
 					"Unicorn Barber Training Academy | Barbering & Beauty Courses in Dhaka",
 			},
+			// Default social-card image; individual routes override og:* as needed
+			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{ property: "og:image:width", content: "4001" },
+			{ property: "og:image:height", content: "2001" },
+			{
+				property: "og:image:alt",
+				content: "Unicorn Barber Training Academy banner",
+			},
+			{ name: "twitter:card", content: "summary_large_image" },
+			{ name: "twitter:image", content: `${SITE_URL}/banner.png` },
 		],
 		links: [
 			{
@@ -38,7 +49,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<Header />
-				<div className="md:mt-16 mt-15 min-h-screen">{children}</div>
+				<div id="main-content" className="md:mt-16 mt-15 min-h-screen">
+					{children}
+				</div>
 				<Footer />
 				{import.meta.env.DEV && (
 					<TanStackDevtools

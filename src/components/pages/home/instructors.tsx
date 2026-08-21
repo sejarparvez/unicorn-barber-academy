@@ -54,7 +54,7 @@ function InstructorCard({ instructor }: { instructor: Instructor }) {
 					{instructor.name}
 				</h3>
 				<p className="mt-1 text-sm text-muted-foreground">{instructor.title}</p>
-				<p className="mt-1 text-[11px] tracking-widest text-muted-foreground/60">
+				<p className="mt-1 text-[11px] tracking-widest text-muted-foreground">
 					{instructor.years} YRS EXPERIENCE
 				</p>
 

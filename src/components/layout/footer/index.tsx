@@ -157,7 +157,7 @@ export default function Footer() {
 								>
 									UNICORN
 								</span>
-								<span className="mt-1 text-[8px] sm:text-[10px] text-secondary-foreground/60 truncate">
+								<span className="mt-1 text-[8px] sm:text-[10px] text-secondary-foreground/65 truncate">
 									BARBER TRAINING ACADEMY
 								</span>
 							</span>
@@ -252,7 +252,7 @@ export default function Footer() {
 
 			{/* Bottom bar */}
 			<div className="relative border-t border-primary/15">
-				<div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-secondary-foreground/50 sm:flex-row lg:px-10">
+				<div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-secondary-foreground/65 sm:flex-row lg:px-10">
 					<p>
 						&copy; {new Date().getFullYear()} Unicorn Barber Training Academy.
 						All rights reserved.

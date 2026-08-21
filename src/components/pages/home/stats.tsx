@@ -32,7 +32,7 @@ export default function Stats() {
 						>
 							{stat.value}
 						</span>
-						<span className="text-[11px] tracking-[0.2em] text-secondary-foreground/55">
+						<span className="text-[11px] tracking-[0.2em] text-secondary-foreground/70">
 							{stat.label.toUpperCase()}
 						</span>
 					</div>

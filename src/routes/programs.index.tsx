@@ -111,7 +111,12 @@ function ProgramsHero() {
 				<div className="mt-10 grid grid-cols-1 gap-14 lg:grid-cols-2 lg:items-start">
 					{/* Left: statement */}
 					<div>
-						<SectionEyebrow id="program" guard="1" title="The Catalogue" />
+						<SectionEyebrow
+							id="program"
+							guard="1"
+							title="The Catalogue"
+							as="p"
+						/>
 						<h1 className="mt-6 font-heading text-5xl font-medium leading-[1.08] sm:text-6xl">
 							Every program,{" "}
 							<span className={cn("italic font-normal", GOLD_TEXT)}>
@@ -230,17 +235,13 @@ function ProgramCatalogue() {
 					id="catalogue-heading"
 				/>
 
-				<div
-					role="tablist"
-					aria-label="Filter programs by track"
-					className="mt-10 flex flex-wrap gap-x-8 gap-y-3 border-b border-border"
-				>
+				<fieldset className="mt-10 flex flex-wrap gap-x-8 gap-y-3 border-b border-border p-0 m-0">
+					<legend className="sr-only">Filter programs by track</legend>
 					{FILTERS.map((f) => (
 						<button
 							key={f.key}
 							type="button"
-							role="tab"
-							aria-selected={active === f.key}
+							aria-pressed={active === f.key}
 							onClick={() => setActive(f.key)}
 							className={cn(
 								"relative pb-4 text-[13px] font-medium tracking-widest transition-colors",
@@ -263,7 +264,7 @@ function ProgramCatalogue() {
 							)}
 						</button>
 					))}
-				</div>
+				</fieldset>
 
 				<motion.div
 					layout

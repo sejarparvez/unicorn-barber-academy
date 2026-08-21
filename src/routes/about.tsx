@@ -121,8 +121,9 @@ function AboutHero() {
 
 	return (
 		<section className="border-b border-border bg-secondary px-6 pt-28 pb-20 text-secondary-foreground lg:px-10 lg:pt-36 lg:pb-24">
+			<h1 className="sr-only">About Unicorn Barber Training Academy</h1>
 			<div className="mx-auto max-w-7xl">
-				<div className="flex items-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/50">
+				<div className="flex items-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/65">
 					<Link to="/" className="hover:text-primary">
 						HOME
 					</Link>
@@ -141,7 +142,7 @@ function AboutHero() {
 							&ldquo;We didn&rsquo;t set out to build a classroom. We built the
 							shop we wished we&rsquo;d trained in &mdash; small cohorts, real
 							clients, and instructors who still work the chair.&rdquo;
-							<footer className="mt-6 text-base font-normal text-secondary-foreground/60">
+							<footer className="mt-6 text-base font-normal text-secondary-foreground/70">
 								<cite className="not-italic">
 									&mdash; {primaryLead ? primaryLead.name : "Our Founders"}
 									{secondaryLead ? ` & ${secondaryLead.name}` : ""}, Founding
@@ -181,7 +182,7 @@ function AboutHero() {
 								/>
 								<span className="absolute inset-x-0 bottom-0 bg-secondary/85 px-3 py-2 text-[10px] tracking-[0.14em] text-secondary-foreground/80 backdrop-blur-sm">
 									{secondaryLead.name.toUpperCase()}
-									<span className="block text-secondary-foreground/50">
+									<span className="block text-secondary-foreground/70">
 										{secondaryLead.title}
 									</span>
 								</span>
@@ -383,7 +384,7 @@ function LedBy() {
 									<span className="mt-1 block text-sm text-muted-foreground">
 										{lead.title}
 									</span>
-									<span className="mt-1 block text-[11px] tracking-widest text-muted-foreground/60">
+									<span className="mt-1 block text-[11px] tracking-widest text-muted-foreground">
 										{lead.years}+ YRS EXPERIENCE
 									</span>
 								</span>

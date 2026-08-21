@@ -114,7 +114,7 @@ export default function Hero() {
 									key={row.label}
 									className="flex items-baseline justify-between gap-2 text-[11px]"
 								>
-									<span className="whitespace-nowrap tracking-[0.06em] text-secondary-foreground/55">
+									<span className="whitespace-nowrap tracking-[0.06em] text-secondary-foreground/70">
 										{row.label}
 									</span>
 									<span

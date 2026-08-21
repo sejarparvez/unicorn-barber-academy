@@ -131,11 +131,15 @@ export function SectionEyebrow({
 	guard,
 	title,
 	id,
+	as = "h2",
 }: {
 	guard: string;
 	title: string;
 	id: string;
+	/** Render the title as a different element when a page <h1> leads the outline */
+	as?: "h2" | "p";
 }) {
+	const Title = as;
 	return (
 		<div className="flex items-center gap-4">
 			<span
@@ -146,12 +150,12 @@ export function SectionEyebrow({
 				<p className="text-[11px] tracking-[0.28em] text-primary">
 					GUARD &#8470; {guard}
 				</p>
-				<h2
+				<Title
 					id={id}
 					className="mt-1 font-heading text-3xl font-medium text-foreground sm:text-4xl"
 				>
 					{title}
-				</h2>
+				</Title>
 			</div>
 		</div>
 	);

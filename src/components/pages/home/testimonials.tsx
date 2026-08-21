@@ -73,28 +73,30 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 					stroke={1.5}
 					aria-hidden="true"
 				/>
-				<blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-secondary-foreground/80">
-					&ldquo;{testimonial.quote}&rdquo;
-				</blockquote>
-				<figcaption className="mt-6 flex items-center gap-3">
-					<Image
-						src={testimonial.image}
-						alt=""
-						layout="constrained"
-						width={40}
-						height={40}
-						loading="lazy"
-						className="h-10 w-10 shrink-0 rounded-full object-cover"
-					/>
-					<span>
-						<span className="block text-sm font-semibold">
-							{testimonial.name}
+				<figure className="mt-4 flex flex-1 flex-col">
+					<blockquote className="flex-1 text-[15px] leading-relaxed text-secondary-foreground/80">
+						&ldquo;{testimonial.quote}&rdquo;
+					</blockquote>
+					<figcaption className="mt-6 flex items-center gap-3">
+						<Image
+							src={testimonial.image}
+							alt=""
+							layout="constrained"
+							width={40}
+							height={40}
+							loading="lazy"
+							className="h-10 w-10 shrink-0 rounded-full object-cover"
+						/>
+						<span>
+							<span className="block text-sm font-semibold">
+								{testimonial.name}
+							</span>
+							<span className="block text-xs text-secondary-foreground/65">
+								{testimonial.program}, {testimonial.cohort}
+							</span>
 						</span>
-						<span className="block text-xs text-secondary-foreground/50">
-							{testimonial.program}, {testimonial.cohort}
-						</span>
-					</span>
-				</figcaption>
+					</figcaption>
+				</figure>
 			</CardContent>
 		</Card>
 	);

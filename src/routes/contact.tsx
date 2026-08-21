@@ -147,7 +147,7 @@ function ContactHero() {
 			<div className="relative mx-auto max-w-3xl px-6 py-24 text-center lg:py-28">
 				<motion.div
 					{...fadeUp(0)}
-					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/50"
+					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/65"
 				>
 					<Link to="/" className="hover:text-primary">
 						HOME
@@ -468,6 +468,7 @@ function CopyRow({
 					/>
 				)}
 			</span>
+			<output className="sr-only">{copied ? "Copied to clipboard" : ""}</output>
 		</button>
 	);
 }
@@ -566,7 +567,7 @@ function VisitStudio() {
 									className="flex items-baseline justify-between gap-4 text-secondary-foreground/75"
 								>
 									<dt>{h.day}</dt>
-									<dd className="text-right text-secondary-foreground/55">
+									<dd className="text-right text-secondary-foreground/70">
 										{h.time}
 									</dd>
 								</div>

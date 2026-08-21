@@ -134,14 +134,16 @@ function ProgramTrack({
 				</p>
 			</div>
 
-			<div
-				aia-labelledby={trackId}
+			<ul
+				aria-labelledby={trackId}
 				className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
 			>
 				{programs.map((program) => (
-					<ProgramCard key={program.title} program={program} />
+					<li key={program.title}>
+						<ProgramCard program={program} />
+					</li>
 				))}
-			</div>
+			</ul>
 		</div>
 	);
 }

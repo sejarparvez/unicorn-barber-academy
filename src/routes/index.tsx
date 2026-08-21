@@ -34,7 +34,6 @@ export const Route = createFileRoute("/")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: SITE_URL },
-			{ name: "twitter:card", content: "summary_large_image" },
 		],
 		links: [{ rel: "canonical", href: SITE_URL }],
 	}),
@@ -45,26 +44,18 @@ const pic = (seed: string, w: number, h: number) =>
 
 function Home() {
 	return (
-		<>
-			<a
-				href="#main-content"
-				className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-100 focus:border focus:border-primary focus:bg-secondary focus:px-4 focus:py-2 focus:text-sm focus:text-secondary-foreground"
-			>
-				Skip to content
-			</a>
-			<main id="main-content">
-				<Hero />
-				<WhyUnicorn />
-				<Stats />
-				<Programs />
-				<StudentLife />
-				<Instructors />
-				<Testimonials />
-				<Faq />
-				<VisitUs />
-				<FinalCta />
-			</main>
-		</>
+		<main>
+			<Hero />
+			<WhyUnicorn />
+			<Stats />
+			<Programs />
+			<StudentLife />
+			<Instructors />
+			<Testimonials />
+			<Faq />
+			<VisitUs />
+			<FinalCta />
+		</main>
 	);
 }
 

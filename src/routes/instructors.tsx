@@ -124,6 +124,7 @@ function Spotlight({ leads }: { leads: Instructor[] }) {
 			className="bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="leads-heading"
 		>
+			<h1 className="sr-only">Meet the Instructors</h1>
 			<div className="mx-auto max-w-7xl">
 				<SectionEyebrow guard="1" title="Lead Instructors" id="leads-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -152,7 +153,7 @@ function Spotlight({ leads }: { leads: Instructor[] }) {
 												{lead.name}
 											</h3>
 											<p className="mt-1 text-sm text-primary">{lead.title}</p>
-											<p className="mt-1 text-[11px] tracking-widest text-muted-foreground/60">
+											<p className="mt-1 text-[11px] tracking-widest text-muted-foreground">
 												{lead.years}+ YEARS EXPERIENCE
 											</p>
 											<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
