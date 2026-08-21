@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "motion/react";
+import { Image } from "@unpic/react";
+import { motion } from "motion/react";
 import {
 	FinalCta,
 	GOLD_TEXT,
@@ -7,6 +8,7 @@ import {
 	GuildSeal,
 	Reveal,
 	SectionEyebrow,
+	useFadeUp,
 } from "@/components/site/decor";
 import { pic, SITE_URL } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
@@ -74,31 +76,22 @@ function CareersPage() {
 }
 
 function CareersHero() {
-	const shouldReduceMotion = useReducedMotion();
-	const fadeUp = (delay = 0) =>
-		shouldReduceMotion
-			? {}
-			: {
-					initial: { opacity: 0, y: 18 },
-					animate: { opacity: 1, y: 0 },
-					transition: {
-						duration: 0.7,
-						delay,
-						ease: [0.16, 1, 0.3, 1] as const,
-					},
-				};
+	const fadeUp = useFadeUp();
 
 	return (
 		<section className="relative overflow-hidden bg-secondary text-secondary-foreground">
 			<div className="absolute inset-0 grid grid-cols-2">
-				<img
+				<Image
 					src={pic("unicorn-careers-hero-1", 900, 1100)}
 					alt=""
+					layout="fullWidth"
+					priority
 					className="h-full w-full object-cover opacity-40"
 				/>
-				<img
+				<Image
 					src={pic("unicorn-careers-hero-2", 900, 1100)}
 					alt=""
+					layout="fullWidth"
 					className="h-full w-full object-cover opacity-40"
 				/>
 			</div>

@@ -1,6 +1,6 @@
 /* ------------------------------- FAQ ------------------------------- */
 
-import { SectionEyebrow } from "#/components/site/decor";
+import { SectionEyebrow } from "@/components/site/decor";
 import {
 	Accordion,
 	AccordionContent,

@@ -2,8 +2,8 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import { BARBERING_PROGRAMS, INSTRUCTORS, pic } from "#/lib/site-data";
 import { buttonVariants } from "@/components/ui/button";
+import { BARBERING_PROGRAMS, INSTRUCTORS, pic } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 /* ----------------------------- Hero ----------------------------- */

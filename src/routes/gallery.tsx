@@ -1,6 +1,7 @@
 import { Dialog } from "@base-ui/react/dialog";
 import { IconChevronLeft, IconChevronRight, IconX } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Image } from "@unpic/react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { FinalCta, Reveal, SectionEyebrow } from "@/components/site/decor";
@@ -96,10 +97,6 @@ function MasonryGallery() {
 	);
 
 	useEffect(() => {
-		setSelected(null);
-	}, []);
-
-	useEffect(() => {
 		if (selected === null) return;
 		const onKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") setSelected(null);
@@ -169,11 +166,13 @@ function MasonryGallery() {
 								onClick={() => setSelected(i)}
 								className="group relative block w-full overflow-hidden text-left focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-primary"
 							>
-								<img
+								<Image
 									src={pic(item.seed, item.w, item.h)}
 									alt={item.alt}
+									width={item.w}
+									height={item.h}
 									loading="lazy"
-									className="w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
+									className="h-auto w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
 								/>
 								<div className="absolute inset-0 bg-primary/0 transition-colors duration-300 group-hover:bg-secondary/10" />
 							</button>

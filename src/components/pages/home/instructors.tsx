@@ -3,10 +3,10 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import { SectionEyebrow } from "#/components/site/decor";
-import { INSTRUCTORS, type Instructor, SITE_URL } from "#/lib/site-data";
+import { SectionEyebrow } from "@/components/site/decor";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { INSTRUCTORS, type Instructor, SITE_URL } from "@/lib/site-data";
 
 const INSTRUCTORS_JSON_LD = {
 	"@context": "https://schema.org",

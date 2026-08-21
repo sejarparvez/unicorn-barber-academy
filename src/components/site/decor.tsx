@@ -40,6 +40,25 @@ export function Reveal({
 	);
 }
 
+/** Hero entrance helper: motion props for a fade-up, disabled when the user
+    prefers reduced motion. Spread onto `motion.*` elements with a staggered
+    `delay`. Shared by every page hero so timing stays consistent. */
+export function useFadeUp() {
+	const shouldReduceMotion = useReducedMotion();
+	return (delay = 0) =>
+		shouldReduceMotion
+			? {}
+			: {
+					initial: { opacity: 0, y: 18 },
+					animate: { opacity: 1, y: 0 },
+					transition: {
+						duration: 0.7,
+						delay,
+						ease: [0.16, 1, 0.3, 1] as const,
+					},
+				};
+}
+
 export function Grain({ className }: { className?: string }) {
 	return (
 		<div

@@ -7,15 +7,15 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import { SectionEyebrow } from "#/components/site/decor";
+import { SectionEyebrow } from "@/components/site/decor";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
 	BARBERING_PROGRAMS,
 	BEAUTY_PROGRAMS,
 	type Program,
 	SITE_URL,
-} from "#/lib/site-data";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+} from "@/lib/site-data";
 
 /** "14 weeks" -> "P14W" (ISO 8601 duration, for Course schema) */
 const toIsoWeeks = (duration: string) => {

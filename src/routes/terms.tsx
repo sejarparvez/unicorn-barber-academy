@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "motion/react";
-import { Grain, GuildSeal } from "@/components/site/decor";
-import { SITE_URL } from "@/lib/site-data";
+import { LegalContent, LegalHero } from "@/components/site/legal";
+import { CONTACT, SITE_URL } from "@/lib/site-data";
 
 export const Route = createFileRoute("/terms")({
 	component: TermsPage,
@@ -201,82 +200,25 @@ function TermsPage() {
 					</p>
 					<address className="mt-3 not-italic text-base leading-relaxed text-muted-foreground">
 						<p>Unicorn Barber Training Academy</p>
-						<p>123 Fade Street, Gulshan, Dhaka 1212, Bangladesh</p>
+						<p>{CONTACT.addressDisplay}</p>
 						<p>
 							Email:{" "}
 							<a
-								href="mailto:hello@unicornbta.com"
+								href={`mailto:${CONTACT.email}`}
 								className="text-primary underline"
 							>
-								hello@unicornbta.com
+								{CONTACT.email}
 							</a>
 						</p>
 						<p>
 							Phone:{" "}
-							<a href="tel:+8801234567890" className="text-primary underline">
-								+880 1234-567890
+							<a href={CONTACT.phoneHref} className="text-primary underline">
+								{CONTACT.phoneDisplay}
 							</a>
 						</p>
 					</address>
 				</section>
 			</LegalContent>
 		</main>
-	);
-}
-
-function LegalHero({ title }: { title: string }) {
-	const shouldReduceMotion = useReducedMotion();
-	const fadeUp = (delay = 0) =>
-		shouldReduceMotion
-			? {}
-			: {
-					initial: { opacity: 0, y: 18 },
-					animate: { opacity: 1, y: 0 },
-					transition: {
-						duration: 0.7,
-						delay,
-						ease: [0.16, 1, 0.3, 1] as const,
-					},
-				};
-
-	return (
-		<section className="relative overflow-hidden bg-secondary text-secondary-foreground">
-			<div className="absolute inset-0 bg-black/60" />
-			<Grain />
-
-			<div className="relative mx-auto max-w-3xl px-6 py-24 text-center lg:py-32">
-				<motion.div
-					{...fadeUp(0)}
-					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/65"
-				>
-					<a href="/" className="hover:text-primary">
-						HOME
-					</a>
-					<span aria-hidden="true">/</span>
-					<span className="text-primary">{title.toUpperCase()}</span>
-				</motion.div>
-
-				<motion.div {...fadeUp(0.06)}>
-					<GuildSeal className="mx-auto mb-6 mt-6 h-12 w-12 text-primary/85" />
-				</motion.div>
-
-				<motion.h1
-					{...fadeUp(0.12)}
-					className="font-heading text-5xl font-medium leading-[1.08] sm:text-6xl"
-				>
-					{title}
-				</motion.h1>
-			</div>
-		</section>
-	);
-}
-
-function LegalContent({ children }: { children: React.ReactNode }) {
-	return (
-		<div className="bg-background px-6 py-16 lg:px-10">
-			<div className="mx-auto max-w-3xl">
-				<div className="prose prose-neutral max-w-none">{children}</div>
-			</div>
-		</div>
 	);
 }

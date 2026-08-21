@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "motion/react";
+import { Image } from "@unpic/react";
+import { motion } from "motion/react";
 import {
 	FinalCta,
 	GOLD_TEXT,
@@ -7,6 +8,7 @@ import {
 	GuildSeal,
 	Reveal,
 	SectionEyebrow,
+	useFadeUp,
 } from "@/components/site/decor";
 import { GALLERY_ITEMS, pic, SITE_URL } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
@@ -76,36 +78,28 @@ function StudentLifePage() {
 }
 
 function StudentLifeHero() {
-	const shouldReduceMotion = useReducedMotion();
-	const fadeUp = (delay = 0) =>
-		shouldReduceMotion
-			? {}
-			: {
-					initial: { opacity: 0, y: 18 },
-					animate: { opacity: 1, y: 0 },
-					transition: {
-						duration: 0.7,
-						delay,
-						ease: [0.16, 1, 0.3, 1] as const,
-					},
-				};
+	const fadeUp = useFadeUp();
 
 	return (
 		<section className="relative overflow-hidden bg-secondary text-secondary-foreground">
 			<div className="absolute inset-0 grid grid-cols-3">
-				<img
+				<Image
 					src={pic("unicorn-student-hero-1", 700, 1100)}
 					alt=""
+					layout="fullWidth"
+					priority
 					className="h-full w-full object-cover opacity-40"
 				/>
-				<img
+				<Image
 					src={pic("unicorn-student-hero-2", 700, 1100)}
 					alt=""
+					layout="fullWidth"
 					className="hidden h-full w-full object-cover opacity-40 sm:block"
 				/>
-				<img
+				<Image
 					src={pic("unicorn-student-hero-3", 700, 1100)}
 					alt=""
+					layout="fullWidth"
 					className="hidden h-full w-full object-cover opacity-40 lg:block"
 				/>
 			</div>
@@ -180,11 +174,13 @@ function StudioFloor() {
 							delay={(i % 8) * 0.04}
 							className="mb-4 break-inside-avoid"
 						>
-							<img
+							<Image
 								src={pic(item.seed, item.w, item.h)}
 								alt={item.alt}
+								width={item.w}
+								height={item.h}
 								loading="lazy"
-								className="w-full object-cover rounded-none border border-border"
+								className="h-auto w-full rounded-none border border-border object-cover"
 							/>
 						</Reveal>
 					))}
@@ -267,11 +263,13 @@ function GraduationDays() {
 							delay={(i % 8) * 0.04}
 							className="mb-4 break-inside-avoid"
 						>
-							<img
+							<Image
 								src={pic(item.seed, item.w, item.h)}
 								alt={item.alt}
+								width={item.w}
+								height={item.h}
 								loading="lazy"
-								className="w-full object-cover rounded-none border border-border"
+								className="h-auto w-full rounded-none border border-border object-cover"
 							/>
 						</Reveal>
 					))}

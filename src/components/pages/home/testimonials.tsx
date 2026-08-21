@@ -2,8 +2,7 @@
 
 import { IconQuote } from "@tabler/icons-react";
 import { Image } from "@unpic/react";
-import { SectionEyebrow } from "#/components/site/decor";
-import { pic, SITE_URL } from "#/lib/site-data";
+import { SectionEyebrow } from "@/components/site/decor";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	Carousel,
@@ -12,6 +11,7 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from "@/components/ui/carousel";
+import { pic, SITE_URL } from "@/lib/site-data";
 
 type Testimonial = {
 	quote: string;

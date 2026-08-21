@@ -23,6 +23,7 @@ import {
 	GuildSeal,
 	Reveal,
 	SectionEyebrow,
+	useFadeUp,
 } from "@/components/site/decor";
 import {
 	Accordion,
@@ -41,7 +42,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ALL_PROGRAMS, pic, SITE_URL } from "@/lib/site-data";
+import { ALL_PROGRAMS, CONTACT, pic, SITE_URL } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/contact")({
@@ -103,19 +104,7 @@ function ContactPage() {
 /* ----------------------------- Hero ----------------------------- */
 
 function ContactHero() {
-	const shouldReduceMotion = useReducedMotion();
-	const fadeUp = (delay = 0) =>
-		shouldReduceMotion
-			? {}
-			: {
-					initial: { opacity: 0, y: 18 },
-					animate: { opacity: 1, y: 0 },
-					transition: {
-						duration: 0.7,
-						delay,
-						ease: [0.16, 1, 0.3, 1] as const,
-					},
-				};
+	const fadeUp = useFadeUp();
 
 	return (
 		<section className="relative overflow-hidden bg-secondary text-secondary-foreground">
@@ -181,14 +170,14 @@ function ContactHero() {
 					className="mt-9 flex flex-wrap items-center justify-center gap-3"
 				>
 					<a
-						href="tel:+8801234567890"
+						href={CONTACT.phoneHref}
 						className="inline-flex items-center gap-2 border border-white/15 bg-white/5 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-secondary-foreground/85 backdrop-blur-sm transition-colors hover:border-primary hover:text-primary"
 					>
 						<IconPhone className="h-3.5 w-3.5" stroke={1.75} />
 						CALL
 					</a>
 					<a
-						href="https://wa.me/8801234567890"
+						href={CONTACT.whatsapp}
 						target="_blank"
 						rel="noreferrer"
 						className="inline-flex items-center gap-2 border border-white/15 bg-white/5 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-secondary-foreground/85 backdrop-blur-sm transition-colors hover:border-primary hover:text-primary"
@@ -361,9 +350,7 @@ function ContactForm() {
 										<div className="flex flex-wrap items-center justify-between gap-4 pt-2">
 											<p className="text-xs text-muted-foreground">
 												Sent to{" "}
-												<span className="text-foreground">
-													hello@unicornbta.com
-												</span>{" "}
+												<span className="text-foreground">{CONTACT.email}</span>{" "}
 												&middot; we typically reply within 1&ndash;2 business
 												days
 											</p>
@@ -394,8 +381,8 @@ function ContactForm() {
 								</p>
 
 								<div className="mt-6 space-y-3">
-									<CopyRow icon={IconMail} value="hello@unicornbta.com" />
-									<CopyRow icon={IconPhone} value="+880 1234-567890" />
+									<CopyRow icon={IconMail} value={CONTACT.email} />
+									<CopyRow icon={IconPhone} value={CONTACT.phoneDisplay} />
 								</div>
 
 								<ul className="mt-8 space-y-4 border-t border-border pt-6">
@@ -516,12 +503,6 @@ function SealedConfirmation({ onReset }: { onReset: () => void }) {
 
 /* ----------------------------- Visit studio ----------------------------- */
 
-const HOURS = [
-	{ day: "Sunday – Thursday", time: "9:00 AM – 9:00 PM" },
-	{ day: "Friday", time: "9:00 AM – 12:30 PM, 2:30 PM – 9:00 PM" },
-	{ day: "Saturday", time: "9:00 AM – 7:00 PM" },
-];
-
 function VisitStudio() {
 	return (
 		<section
@@ -542,7 +523,7 @@ function VisitStudio() {
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
 							/>
-							<span>123 Fade Street, Gulshan, Dhaka 1212, Bangladesh</span>
+							<span>{CONTACT.addressDisplay}</span>
 						</p>
 						<p className="flex items-start gap-3">
 							<IconParking
@@ -561,7 +542,7 @@ function VisitStudio() {
 							STUDIO HOURS
 						</p>
 						<dl className="mt-4 space-y-2.5 text-sm">
-							{HOURS.map((h) => (
+							{CONTACT.hours.map((h) => (
 								<div
 									key={h.day}
 									className="flex items-baseline justify-between gap-4 text-secondary-foreground/75"

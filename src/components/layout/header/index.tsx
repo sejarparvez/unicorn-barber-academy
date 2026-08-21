@@ -38,8 +38,12 @@ const NAV_LINKS: NavLink[] = [
 const SITE_NAV_JSON_LD = {
 	"@context": "https://schema.org",
 	"@type": "SiteNavigationElement",
-	name: NAV_LINKS.map((link) => link.label),
-	url: NAV_LINKS.map((link) => `${SITE_URL}${link.to === "/" ? "" : link.to}`),
+	itemListElement: NAV_LINKS.map((link, i) => ({
+		"@type": "ListItem",
+		position: i + 1,
+		name: link.label,
+		url: `${SITE_URL}${link.to === "/" ? "" : link.to}`,
+	})),
 };
 
 export default function Header() {

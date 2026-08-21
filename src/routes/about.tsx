@@ -14,7 +14,7 @@ import {
 	SectionEyebrow,
 } from "@/components/site/decor";
 import { Card, CardContent } from "@/components/ui/card";
-import { INSTRUCTORS, pic, SITE_URL } from "@/lib/site-data";
+import { CONTACT, INSTRUCTORS, pic, SITE_URL } from "@/lib/site-data";
 import { SOCIAL_URLS } from "@/lib/social";
 
 export const Route = createFileRoute("/about")({
@@ -67,14 +67,14 @@ const ORG_JSON_LD = {
 	sameAs: [SOCIAL_URLS.instagram, SOCIAL_URLS.facebook, SOCIAL_URLS.youtube],
 	address: {
 		"@type": "PostalAddress",
-		streetAddress: "123 Fade Street",
-		addressLocality: "Gulshan, Dhaka",
-		postalCode: "1212",
-		addressCountry: "BD",
+		streetAddress: CONTACT.streetAddress,
+		addressLocality: CONTACT.addressLocality,
+		postalCode: CONTACT.postalCode,
+		addressCountry: CONTACT.addressCountry,
 	},
 	contactPoint: {
 		"@type": "ContactPoint",
-		telephone: "+880-1234-567890",
+		telephone: CONTACT.phoneE164,
 		contactType: "admissions",
 		availableLanguage: ["Bengali", "English"],
 	},

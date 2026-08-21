@@ -14,7 +14,7 @@ import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { SITE_URL } from "@/lib/site-data";
+import { CONTACT, OPENING_HOURS_SPEC, SITE_URL } from "@/lib/site-data";
 import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
@@ -23,7 +23,6 @@ const PROGRAMS: FooterLink[] = [
 	{ label: "Classic Barbering", to: "/programs/classic-barbering" },
 	{ label: "Beard Sculpting", to: "/programs/beard-sculpting" },
 	{ label: "Fades & Tapers", to: "/programs/fades-and-tapers" },
-	{ label: "Business of Barbering", to: "/programs/business-of-barbering" },
 ];
 
 const ACADEMY: FooterLink[] = [
@@ -36,7 +35,6 @@ const ACADEMY: FooterLink[] = [
 const LEGAL_LINKS: FooterLink[] = [
 	{ label: "Privacy", to: "/privacy" },
 	{ label: "Terms", to: "/terms" },
-	{ label: "Sitemap", to: "/sitemap" },
 ];
 
 /**
@@ -55,29 +53,17 @@ const LOCAL_BUSINESS_JSON_LD = {
 	url: SITE_URL,
 	logo: `${SITE_URL}/logo.png`,
 	image: `${SITE_URL}/logo.png`,
-	telephone: "+880-1234-567890",
-	email: "hello@unicornbta.com",
+	telephone: CONTACT.phoneE164,
+	email: CONTACT.email,
 	address: {
 		"@type": "PostalAddress",
-		streetAddress: "123 Fade Street",
-		addressLocality: "Gulshan, Dhaka",
-		postalCode: "1212",
-		addressCountry: "BD",
+		streetAddress: CONTACT.streetAddress,
+		addressLocality: CONTACT.addressLocality,
+		postalCode: CONTACT.postalCode,
+		addressCountry: CONTACT.addressCountry,
 	},
 	areaServed: "Dhaka, Bangladesh",
-	openingHoursSpecification: {
-		"@type": "OpeningHoursSpecification",
-		dayOfWeek: [
-			"Monday",
-			"Tuesday",
-			"Wednesday",
-			"Thursday",
-			"Friday",
-			"Saturday",
-		],
-		opens: "09:00",
-		closes: "19:00",
-	},
+	openingHoursSpecification: OPENING_HOURS_SPEC,
 	sameAs: [SOCIAL_URLS.instagram, SOCIAL_URLS.facebook, SOCIAL_URLS.youtube],
 	hasOfferCatalog: {
 		"@type": "OfferCatalog",
@@ -215,15 +201,15 @@ export default function Footer() {
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<span>123 Fade Street, Gulshan, Dhaka 1212</span>
+								<span>{CONTACT.addressDisplay}</span>
 							</p>
 							<p className="flex items-start gap-3">
 								<IconPhone
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<a href="tel:+8801234567890" className="hover:text-primary">
-									+880 1234-567890
+								<a href={CONTACT.phoneHref} className="hover:text-primary">
+									{CONTACT.phoneDisplay}
 								</a>
 							</p>
 							<p className="flex items-start gap-3">
@@ -232,10 +218,10 @@ export default function Footer() {
 									stroke={1.75}
 								/>
 								<a
-									href="mailto:hello@unicornbta.com"
+									href={`mailto:${CONTACT.email}`}
 									className="hover:text-primary"
 								>
-									hello@unicornbta.com
+									{CONTACT.email}
 								</a>
 							</p>
 							<p className="flex items-start gap-3">
@@ -243,7 +229,7 @@ export default function Footer() {
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<span>Mon&ndash;Sat, 9AM&ndash;7PM</span>
+								<span>{CONTACT.hoursSummary}</span>
 							</p>
 						</address>
 					</div>
@@ -254,8 +240,11 @@ export default function Footer() {
 			<div className="relative border-t border-primary/15">
 				<div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-secondary-foreground/65 sm:flex-row lg:px-10">
 					<p>
-						&copy; {new Date().getFullYear()} Unicorn Barber Training Academy.
-						All rights reserved.
+						&copy;{" "}
+						{/* Server and client can straddle a year boundary — suppress the
+					    harmless hydration mismatch on the year text only. */}
+						<span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
+						Unicorn Barber Training Academy. All rights reserved.
 					</p>
 					<nav className="flex items-center gap-6" aria-label="Legal">
 						<ul className="flex items-center gap-6">

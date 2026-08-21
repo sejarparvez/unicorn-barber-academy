@@ -2,8 +2,8 @@
 
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import { pic } from "#/lib/site-data";
-import { cn } from "#/lib/utils";
+import { pic } from "@/lib/site-data";
+import { cn } from "@/lib/utils";
 
 const GALLERY_ITEMS = [
 	{

@@ -7,6 +7,8 @@ import {
 	IconUsers,
 } from "@tabler/icons-react";
 
+import { SectionEyebrow } from "@/components/site/decor";
+
 const FEATURES = [
 	{
 		icon: IconScissors,
@@ -33,37 +35,6 @@ const FEATURES = [
 			"Train around a job or family. Same curriculum, same instructors, your schedule.",
 	},
 ];
-
-function SectionEyebrow({
-	guard,
-	title,
-	id,
-}: {
-	guard: string;
-	title: string;
-	id: string;
-}) {
-	return (
-		<div className="flex items-center gap-4">
-			<span
-				className="h-6 w-px bg-linear-to-b from-[#F4C430] via-primary to-[#8B6914]"
-				aria-hidden="true"
-			/>
-			<div>
-				<p className="text-[11px] tracking-[0.28em] text-primary">
-					GUARD &#8470; {guard}
-				</p>
-				<h2
-					id={id}
-					className="mt-1 text-3xl text-foreground sm:text-4xl"
-					style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
-				>
-					{title}
-				</h2>
-			</div>
-		</div>
-	);
-}
 
 export default function WhyUnicorn() {
 	return (

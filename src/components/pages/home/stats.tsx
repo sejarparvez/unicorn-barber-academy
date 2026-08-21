@@ -1,6 +1,6 @@
 /* ----------------------------- Stats ----------------------------- */
 
-import { cn } from "#/lib/utils";
+import { cn } from "@/lib/utils";
 
 const STATS = [
 	{ value: "1,200+", label: "Graduates Placed" },

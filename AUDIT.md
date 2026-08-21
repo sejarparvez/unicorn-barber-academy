@@ -83,7 +83,7 @@ Current state: `src/lib/auth.ts` is imported nowhere, uses undeclared `pg` depen
   - `src/routes/contact.tsx:333-347` — Program select has no `defaultValue`; untouched submissions send empty string.
   - **Fix:** set `defaultValue="not-applicable"` matching the placeholder option.
 
-- [ ] **3.3 Unify contradictory business hours**
+- [x] **3.3 Unify contradictory business hours** ✅ 2026-08-21 (landed with 5.2) — canonical schedule is the detailed one from /contact (`CONTACT.hours` in site-data.ts); home VisitUs + footer now show `CONTACT.hoursSummary`, footer JSON-LD uses `OPENING_HOURS_SPEC` derived from the same data.
   - Homepage (`index.tsx:108`): "Monday–Saturday, 9AM–7PM"
   - Contact page (`contact.tsx:518-522`): Sun–Thu 9–9, split Friday, Sat 9–7
   - **Fix:** single source of truth constant in `site-data.ts` (done together with Phase 5.2).
@@ -95,7 +95,7 @@ Current state: `src/lib/auth.ts` is imported nowhere, uses undeclared `pg` depen
 ### SEO
 - [x] **4.1 Default og:image** ✅ 2026-08-21 — `public/banner.png` (copied from `src/assets/logo/banner.png`, 4001×2001) + default og/twitter meta in root head; homepage's duplicate twitter:card removed. Also copied `public/logo.png` for footer JSON-LD.
 - [x] **4.2 programs.$slug 404 head** ✅ 2026-08-21 — "Program not found" title + `robots: noindex`.
-- [ ] **4.3 About JSON-LD NAP** — deferred to Phase 5.2 (CONTACT constants).
+- [x] **4.3 About JSON-LD NAP** ✅ 2026-08-21 — `about.tsx` ORG_JSON_LD address + contactPoint now read from `CONTACT` (landed with 5.2).
 
 ### Accessibility
 - [x] **4.4 Missing `<h1>`** ✅ 2026-08-21 — sr-only h1s added to about + instructors heroes (quote-led design kept intact).
@@ -116,24 +116,22 @@ Current state: `src/lib/auth.ts` is imported nowhere, uses undeclared `pg` depen
 ## Phase 5 — Performance & DRY polish
 
 ### Performance
-- [ ] **5.1 Image CLS fixes** — raw `<img>` without width/height on LCP/masonry images:
-  - careers.tsx:94-103, student-life.tsx:96-110 + masonry 183-188/270-275, index.tsx:122-126, gallery.tsx:175-180
-  - Data (`w`/`h`) already exists in `GalleryItem`. Migrate to `@unpic/react <Image>` (pattern already used on contact/about heroes) or add intrinsic dimensions.
+- [x] **5.1 Image CLS fixes** ✅ 2026-08-21 — migrated to `@unpic/react <Image>`: hero backgrounds use `layout="fullWidth"` (+`priority` on the first tile), masonry images use constrained `width={item.w} height={item.h}` (careers, student-life hero + both masonry sections, home map, gallery grid).
 
 ### DRY refactor
-- [ ] **5.2 Centralize CONTACT constants** — phone/email/address/hours hardcoded ~25× across 6+ files (index, contact ×5 formats, terms, privacy, about, enroll FinalCta copy, footer, header TODO comments). Export `CONTACT = { phoneDisplay, phoneTel, whatsapp, email, address, hours }` from `site-data.ts`; replace all occurrences.
-- [ ] **5.3 Extract legal page scaffolding** — `LegalHero` + `LegalContent` duplicated byte-for-byte between terms.tsx:227-282 and privacy.tsx:216-271 → move to `components/site/legal.tsx`.
-- [ ] **5.4 Extract `useFadeUp()` hook** — identical motion helper copy-pasted in careers.tsx:78-89, contact.tsx:107-118, student-life.tsx:80-91, terms.tsx:229-240, privacy.tsx:218-229 → put in `decor.tsx`.
-- [ ] **5.5 Dedupe home sections** — index.tsx:136-187 re-implements shared `FinalCta` (decor.tsx:220-266); why-us.tsx:37-66 and student-life.tsx:43-60 re-inline `SectionEyebrow` (decor.tsx:130). Use shared components.
-- [ ] **5.6 Move ProgramCard out of route file** — exported from `programs.index.tsx` for cross-route reuse (unconventional for file-based routing); imports sit at bottom of file. Move to `components/site/program-card.tsx`, hoist imports.
+- [x] **5.2 Centralize CONTACT constants** ✅ 2026-08-21 — `CONTACT` (email, phoneDisplay/Href/E164, whatsapp, address parts/display, hoursSummary, hours) + `OPENING_HOURS_SPEC` in `site-data.ts`; replaced hardcoded NAP in index VisitUs, contact ×5 spots, terms §11, privacy §5/§9, about JSON-LD, footer markup + LocalBusiness JSON-LD. Resolves 4.3 + 3.3.
+- [x] **5.3 Extract legal page scaffolding** ✅ 2026-08-21 — `LegalHero`/`LegalContent` now in `components/site/legal.tsx`; terms/privacy import them.
+- [x] **5.4 Extract `useFadeUp()` hook** ✅ 2026-08-21 — lives in `decor.tsx`; careers/contact/student-life heroes and the shared legal hero all consume it.
+- [x] **5.5 Dedupe home sections** ✅ 2026-08-21 — home renders shared `<FinalCta>` with props; why-us's local `SectionEyebrow` copy deleted (student-life already used the shared one).
+- [x] **5.6 Move ProgramCard out of route file** ✅ 2026-08-21 — now `components/site/program-card.tsx`; imported by programs.index + programs.$slug. Home's Card-based variant is intentionally different and stays put.
 
 ### Small stuff
-- [ ] **5.7 Footer year hydration guard** — `footer/index.tsx:259` `new Date().getFullYear()` can mismatch between SSR and client around New Year → compute once or `suppressHydrationWarning`.
-- [ ] **5.8 Header JSON-LD shape** — header:40-45 uses parallel arrays for name/url in `SiteNavigationElement`; schema.org reads them as unrelated values. Use `itemListElement: [{ "@type": "ListItem", ... }]`.
-- [ ] **5.9 Legal breadcrumbs** — terms.tsx:252, privacy.tsx:241 use raw `<a href="/">` (full reload) → TanStack `<Link to="/">`.
-- [ ] **5.10 Gallery dead code** — gallery.tsx:97-99 `useEffect(() => { setSelected(null); }, [])` resets already-null state → delete.
-- [ ] **5.11 Footer dead links** — footer:28 "Business of Barbering" → nonexistent slug; footer:41 "Sitemap" → no such route. Repoint/remove.
-- [ ] **5.12 Optional cleanups** — pin `"latest"` versions of @tanstack deps in package.json; standardize mixed `#/` vs `@/` import style.
+- [x] **5.7 Footer year hydration guard** ✅ 2026-08-21 — year wrapped in `<span suppressHydrationWarning>`.
+- [x] **5.8 Header JSON-LD shape** ✅ 2026-08-21 — `itemListElement: [{ "@type": "ListItem", position, name, url }]`.
+- [x] **5.9 Legal breadcrumbs** ✅ 2026-08-21 — shared LegalHero uses TanStack `<Link to="/">`.
+- [x] **5.10 Gallery dead code** ✅ 2026-08-21 — mount-only `setSelected(null)` effect deleted.
+- [x] **5.11 Footer dead links** ✅ 2026-08-21 — removed "Business of Barbering" (nonexistent slug; also dropped from OfferCatalog JSON-LD) and "Sitemap" (no such route).
+- [x] **5.12 Optional cleanups** ◑ 2026-08-21 — import style standardized (`#/` → `@/`, 9 files). Version pinning of `"latest"` @tanstack deps still open (needs a deliberate upgrade pass, not a blind pin).
 
 ---
 

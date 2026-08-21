@@ -8,6 +8,7 @@ import {
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import { FinalCta, Reveal, SectionEyebrow } from "@/components/site/decor";
+import { ProgramCard } from "@/components/site/program-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -16,7 +17,6 @@ import {
 	INSTRUCTORS,
 	SITE_URL,
 } from "@/lib/site-data";
-import { ProgramCard } from "./programs.index";
 
 export const Route = createFileRoute("/programs/$slug")({
 	loader: ({ params }) => {
