@@ -3,6 +3,7 @@ import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { SITE_URL } from "@/lib/site-data";
 import appCss from "../styles.css?url";
 
@@ -50,7 +51,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body>
 				<Header />
 				<div id="main-content" className="md:mt-16 mt-15 min-h-screen">
-					{children}
+					<QueryProvider>{children}</QueryProvider>
 				</div>
 				<Footer />
 				{import.meta.env.DEV && (

@@ -49,27 +49,42 @@
 
 Current state: `src/lib/auth.ts` is imported nowhere, uses undeclared `pg` dependency, no `/api/auth/*` handler exists, no auth client, signin/signup pages are placeholders (`Hello "/auth/signin"!`). Prisma schema already has matching User/Session/Account/Verification tables.
 
-- [ ] **2.1 Add missing dependencies**
-  - `pg` is used in `lib/auth.ts` but not declared in `package.json` (only present as transitive dep).
+**Decisions** (confirmed with owner):
+- Driver: plain `pg` Pool as drafted — better-auth's Prisma adapter targets classic Prisma Client, incompatible with this project's prisma-next 8 RC API.
+- Live Neon auth tables exist and **may be altered/recreated** (no data to preserve).
+- **IDs stay `Int autoincrement()`** (schema came from the better-auth CLI) — paired with `advanced.database.generateId: "serial"` in `auth.ts`, verified against installed better-auth 1.6.29 source (`create-context.mjs:117` skips id generation; `get-migration.mjs:227` emits identity columns for this mode). Trade-off: better-auth returns numeric ids as strings in API responses (documented in better-auth#2349).
+- Header gets a **session-aware** state (SIGN IN ↔ name + SIGN OUT).
+- Signin/signup pages are **branded** like the rest of the site (dark/gold, guild-seal accent).
+- Scope stays at working email/password flow — no protected routes in this phase (enroll gating = follow-up).
+
+- [x] **2.1 Add missing dependencies** ✅ 2026-08-21 — `pg@8.23.0` + `@types/pg@8.23.1`.
+  - `pg` is used in `lib/auth.ts` but not declared in `package.json` (only resolvable transitively).
   - **Fix:** `bun add pg` + `bun add -d @types/pg`.
 
-- [ ] **2.2 Mount better-auth API handler**
-  - Create `src/routes/api/auth/$.tsx` — TanStack Start API route that forwards all methods/paths to `auth.handler` converted via `toNodeHandler` (or nitro-equivalent).
+- [x] **2.2 Align DB schema with better-auth** ✅ 2026-08-21 — tables recreated via `db:emit` + `db:migrate`, introspection confirms `integer` PKs backed by sequences.
+  - ~~better-auth generates UUID *string* ids~~ → only true by default; with `generateId: "serial"` it omits `id` on INSERT and the DB sequence fills it, matching the CLI-generated `Int autoincrement()` schema exactly (kept after cross-checking installed source + docs).
+  - Added `advanced.database.generateId: "serial"` to `src/lib/auth.ts`; added explicit `import "dotenv/config"` there so `DATABASE_URL`/`BETTER_AUTH_SECRET` load under Vite+Nitro regardless of import order.
 
-- [ ] **2.3 Create auth client**
+- [x] **2.3 Mount better-auth API handler** ✅ 2026-08-21 — `src/routes/api/auth/$.tsx` forwards GET/POST to `auth.handler(request)`; route generated. No `trustedOrigins` needed (same-origin requests pass origin checks as configured).
+  - Create `src/routes/api/auth/$.tsx` — catch-all forwarding GET/POST to `auth.handler(request)`; web Request/Response passes straight through Nitro, so no `toNodeHandler` needed. Pattern follows `api/enroll.tsx` (`server.handlers`). Run `bun run generate-routes`.
+
+- [x] **2.4 Create auth client** ✅ 2026-08-21 — `src/lib/auth-client.ts`. Gotcha fixed en route: `baseURL` must be **absolute** (better-auth validates with `new URL()`, relative path throws during SSR); resolved per-environment (`window.location.origin` in browser, `BETTER_AUTH_URL` on server).
   - Create `src/lib/auth-client.ts` using `createAuthClient` from `better-auth/react`, base URL `/api/auth`.
 
-- [ ] **2.4 Build real signin page**
+- [x] **2.5 Build real signin page** ✅ 2026-08-21
   - Replace placeholder in `src/routes/auth/signin.tsx`.
-  - Email/password form via `authClient.signIn.email`, loading state, error display, redirect on success, link to signup.
+  - Branded layout consistent with site (dark backdrop, Grain/GuildSeal accent, font-heading title, centered card form).
+  - Email/password form via `authClient.signIn.email`; loading state on submit button, inline error display, redirect on success honoring `?redirect=` (validated to same-origin paths), link to signup.
 
-- [ ] **2.5 Build real signup page**
+- [x] **2.6 Build real signup page** ✅ 2026-08-21 — shared shell extracted to `src/components/site/auth.tsx` (AuthHero/AuthCard/AuthAlert).
   - Replace placeholder in `src/routes/auth/signup.tsx`.
-  - Email/password/name via `authClient.signUp.email`, same UX contract as signin, link back to signin.
+  - Name/email/password (+confirm password, min length per better-auth default 8) via `authClient.signUp.email`; same UX contract as signin, link back to signin.
 
-- [ ] **2.6 Header auth link**
-  - Point header CTA/link to working `/auth/signin` (or show signed-in state later).
-  - *Acceptance: full signup → signout → signin flow works against the Neon DB in `.env`.*
+- [x] **2.7 Session-aware header entry point** ✅ 2026-08-21 — desktop SIGN IN / HI, NAME + SIGN OUT beside CTA; mobile sheet equivalent; nothing rendered while session is loading (no flash).
+  - Desktop nav area (beside ENROLL CTA) + mobile sheet: when signed out show SIGN IN link; when signed in show user name + SIGN OUT button (`authClient.useSession()`, `authClient.signOut()`).
+  - Keep it lightweight — a small client component so the header bundle isn't affected elsewhere.
+
+**Acceptance:** ✅ full flow E2E-tested against Neon via curl on the dev server: sign-up (200, user `id:"1"` from sequence) → get-session (200 w/ user) → sign-out (200) → get-session (null) → sign-in (200, new token). Test data cleaned up. tsc / biome / build all green.
 
 ---
 
@@ -131,7 +146,7 @@ Current state: `src/lib/auth.ts` is imported nowhere, uses undeclared `pg` depen
 - [x] **5.9 Legal breadcrumbs** ✅ 2026-08-21 — shared LegalHero uses TanStack `<Link to="/">`.
 - [x] **5.10 Gallery dead code** ✅ 2026-08-21 — mount-only `setSelected(null)` effect deleted.
 - [x] **5.11 Footer dead links** ✅ 2026-08-21 — removed "Business of Barbering" (nonexistent slug; also dropped from OfferCatalog JSON-LD) and "Sitemap" (no such route).
-- [x] **5.12 Optional cleanups** ◑ 2026-08-21 — import style standardized (`#/` → `@/`, 9 files). Version pinning of `"latest"` @tanstack deps still open (needs a deliberate upgrade pass, not a blind pin).
+- [x] **5.12 Optional cleanups** ◑ 2026-08-21 — import style standardized (`#/` → `@/`, 9 files), then the `#` alias removed entirely: dropped `"#/*"` from `tsconfig.json` paths and the Node subpath `"imports"` map from `package.json` — `@/*` is now the only path alias. Version pinning of `"latest"` @tanstack deps still open (needs a deliberate upgrade pass, not a blind pin).
 
 ---
 

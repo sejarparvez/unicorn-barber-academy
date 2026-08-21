@@ -19,11 +19,13 @@ import { Route as InstructorsRouteImport } from './routes/instructors'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as StudentLifeRouteImport } from './routes/student-life'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as ApiEnrollRouteImport } from './routes/api/enroll'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
 import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -75,6 +77,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiContactRoute = ApiContactRouteImport.update({
+  id: '/api/contact',
+  path: '/api/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiEnrollRoute = ApiEnrollRouteImport.update({
   id: '/api/enroll',
   path: '/api/enroll',
@@ -100,6 +107,11 @@ const ProgramsSlugRoute = ProgramsSlugRouteImport.update({
   path: '/programs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -112,11 +124,13 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
+  '/api/contact': typeof ApiContactRoute
   '/api/enroll': typeof ApiEnrollRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/programs/': typeof ProgramsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -129,11 +143,13 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
+  '/api/contact': typeof ApiContactRoute
   '/api/enroll': typeof ApiEnrollRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/programs': typeof ProgramsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -147,11 +163,13 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
+  '/api/contact': typeof ApiContactRoute
   '/api/enroll': typeof ApiEnrollRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/programs/': typeof ProgramsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -166,11 +184,13 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/student-life'
     | '/terms'
+    | '/api/contact'
     | '/api/enroll'
     | '/auth/signin'
     | '/auth/signup'
     | '/programs/$slug'
     | '/programs/'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -183,11 +203,13 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/student-life'
     | '/terms'
+    | '/api/contact'
     | '/api/enroll'
     | '/auth/signin'
     | '/auth/signup'
     | '/programs/$slug'
     | '/programs'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
@@ -200,11 +222,13 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/student-life'
     | '/terms'
+    | '/api/contact'
     | '/api/enroll'
     | '/auth/signin'
     | '/auth/signup'
     | '/programs/$slug'
     | '/programs/'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,11 +242,13 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   StudentLifeRoute: typeof StudentLifeRoute
   TermsRoute: typeof TermsRoute
+  ApiContactRoute: typeof ApiContactRoute
   ApiEnrollRoute: typeof ApiEnrollRoute
   AuthSigninRoute: typeof AuthSigninRoute
   AuthSignupRoute: typeof AuthSignupRoute
   ProgramsSlugRoute: typeof ProgramsSlugRoute
   ProgramsIndexRoute: typeof ProgramsIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -297,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/contact': {
+      id: '/api/contact'
+      path: '/api/contact'
+      fullPath: '/api/contact'
+      preLoaderRoute: typeof ApiContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/enroll': {
       id: '/api/enroll'
       path: '/api/enroll'
@@ -332,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgramsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -346,11 +386,13 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   StudentLifeRoute: StudentLifeRoute,
   TermsRoute: TermsRoute,
+  ApiContactRoute: ApiContactRoute,
   ApiEnrollRoute: ApiEnrollRoute,
   AuthSigninRoute: AuthSigninRoute,
   AuthSignupRoute: AuthSignupRoute,
   ProgramsSlugRoute: ProgramsSlugRoute,
   ProgramsIndexRoute: ProgramsIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

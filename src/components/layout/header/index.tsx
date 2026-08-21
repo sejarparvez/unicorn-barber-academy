@@ -13,6 +13,7 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
+import { authClient } from "@/lib/auth-client";
 import { SITE_URL } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +46,102 @@ const SITE_NAV_JSON_LD = {
 		url: `${SITE_URL}${link.to === "/" ? "" : link.to}`,
 	})),
 };
+
+const accountLinkClassName = cn(
+	"whitespace-nowrap py-2",
+	"text-[12px] font-medium tracking-[0.14em]",
+	"text-secondary-foreground/70",
+	"transition-colors duration-200",
+	"hover:text-primary",
+	"xl:text-[13px] xl:tracking-[0.18em]",
+);
+
+/** Desktop: SIGN IN when signed out, "HI, NAME" + SIGN OUT when signed in. */
+function AccountLinks() {
+	const { data: session, isPending } = authClient.useSession();
+
+	if (isPending) return null;
+
+	if (!session?.user) {
+		return (
+			<Link
+				to="/auth/signin"
+				preload="intent"
+				className={cn(accountLinkClassName, "hidden md:block")}
+			>
+				SIGN IN
+			</Link>
+		);
+	}
+
+	return (
+		<div className="hidden min-w-0 items-center gap-3 md:flex">
+			<span className="max-w-[12ch] truncate text-[12px] font-medium tracking-[0.14em] text-secondary-foreground/85 xl:text-[13px]">
+				HI, {(session.user.name ?? "THERE").split(" ")[0].toUpperCase()}
+			</span>
+			<button
+				type="button"
+				onClick={() => {
+					void authClient.signOut();
+				}}
+				className={accountLinkClassName}
+			>
+				SIGN OUT
+			</button>
+		</div>
+	);
+}
+
+/** Mobile sheet equivalent of AccountLinks. */
+function MobileAccountLinks() {
+	const { data: session, isPending } = authClient.useSession();
+
+	if (isPending) return null;
+
+	if (!session?.user) {
+		return (
+			<SheetClose
+				render={
+					<Link
+						to="/auth/signin"
+						preload="intent"
+						className={cn(
+							"flex items-center py-3",
+							"text-sm font-medium tracking-[0.18em]",
+							"text-secondary-foreground/80",
+							"transition-colors duration-200",
+							"hover:text-primary",
+						)}
+					/>
+				}
+			>
+				SIGN IN
+			</SheetClose>
+		);
+	}
+
+	return (
+		<div className="flex items-center justify-between gap-4 border-t border-secondary-foreground/15 pt-4">
+			<span className="truncate text-sm tracking-[0.14em] text-secondary-foreground">
+				HI, {(session.user.name ?? "THERE").split(" ")[0].toUpperCase()}
+			</span>
+			<SheetClose
+				render={
+					<Button
+						variant="ghost"
+						size="sm"
+						className="text-secondary-foreground/70 hover:bg-transparent hover:text-primary"
+						onClick={() => {
+							void authClient.signOut();
+						}}
+					/>
+				}
+			>
+				SIGN OUT
+			</SheetClose>
+		</div>
+	);
+}
 
 export default function Header() {
 	return (
@@ -159,8 +256,10 @@ export default function Header() {
 						</ul>
 					</nav>
 
-					{/* CTA + mobile menu */}
+					{/* Account + CTA + mobile menu */}
 					<div className="flex shrink-0 items-center gap-2 sm:gap-4">
+						<AccountLinks />
+
 						<Link
 							to="/enroll"
 							preload="intent"
@@ -237,6 +336,8 @@ export default function Header() {
 											</li>
 										))}
 									</ul>
+
+									<MobileAccountLinks />
 
 									<SheetClose
 										render={

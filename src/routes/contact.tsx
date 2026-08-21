@@ -13,6 +13,7 @@ import {
 	IconSchool,
 	IconSend,
 } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -42,6 +43,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { submitContactMessage } from "@/lib/api/contact";
 import { ALL_PROGRAMS, CONTACT, pic, SITE_URL } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
@@ -226,11 +228,21 @@ const DESKS = [
 ];
 
 function ContactForm() {
-	const [submitted, setSubmitted] = useState(false);
+	const submitMessage = useMutation({
+		mutationFn: submitContactMessage,
+	});
 
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		setSubmitted(true);
+		const data = new FormData(e.currentTarget);
+		submitMessage.mutate({
+			name: String(data.get("name") ?? "").trim(),
+			email: String(data.get("email") ?? "").trim(),
+			phone: String(data.get("phone") ?? "").trim() || undefined,
+			subject: String(data.get("subject") ?? ""),
+			program: String(data.get("program") ?? "") || undefined,
+			message: String(data.get("message") ?? "").trim(),
+		});
 	};
 
 	return (
@@ -246,10 +258,10 @@ function ContactForm() {
 					<Reveal className="lg:col-span-3">
 						<div className="relative overflow-hidden border border-border p-8 sm:p-10">
 							<AnimatePresence mode="wait">
-								{submitted ? (
+								{submitMessage.isSuccess && !submitMessage.isPending ? (
 									<SealedConfirmation
 										key="confirmation"
-										onReset={() => setSubmitted(false)}
+										onReset={() => submitMessage.reset()}
 									/>
 								) : (
 									<motion.form
@@ -319,7 +331,7 @@ function ContactForm() {
 													(if applicable)
 												</span>
 											</Label>
-											<Select name="program">
+											<Select name="program" defaultValue="not-applicable">
 												<SelectTrigger id="program">
 													<SelectValue placeholder="Not applicable" />
 												</SelectTrigger>
@@ -347,6 +359,17 @@ function ContactForm() {
 											/>
 										</div>
 
+										{submitMessage.isError ? (
+											<div
+												role="alert"
+												className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+											>
+												{submitMessage.error instanceof Error
+													? "We couldn't send your message. Please try again, or email us directly."
+													: "Something went wrong. Please try again."}
+											</div>
+										) : null}
+
 										<div className="flex flex-wrap items-center justify-between gap-4 pt-2">
 											<p className="text-xs text-muted-foreground">
 												Sent to{" "}
@@ -357,8 +380,9 @@ function ContactForm() {
 											<Button
 												type="submit"
 												className="rounded-none px-7 py-5 text-[12px] font-semibold tracking-[0.14em]"
+												disabled={submitMessage.isPending}
 											>
-												SEND MESSAGE
+												{submitMessage.isPending ? "SENDING…" : "SEND MESSAGE"}
 												<IconSend className="ml-2 h-3.5 w-3.5" stroke={1.75} />
 											</Button>
 										</div>
