@@ -72,7 +72,8 @@ export default function Hero() {
 						</Link>
 
 						<Link
-							to="/programs/barbering"
+							to="/programs/$slug"
+							params={{ slug: "classic-barbering" }}
 							className="group inline-flex items-center gap-1.5 text-[12px] font-medium tracking-[0.12em] text-secondary-foreground/70 hover:text-primary"
 						>
 							VIEW THE PROGRAM

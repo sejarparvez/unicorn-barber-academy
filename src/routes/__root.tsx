@@ -16,7 +16,8 @@ export const Route = createRootRoute({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "TanStack Start Starter",
+				title:
+					"Unicorn Barber Training Academy | Barbering & Beauty Courses in Dhaka",
 			},
 		],
 		links: [
@@ -39,17 +40,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<Header />
 				<div className="md:mt-16 mt-15 min-h-screen">{children}</div>
 				<Footer />
-				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
-					plugins={[
-						{
-							name: "Tanstack Router",
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-					]}
-				/>
+				{import.meta.env.DEV && (
+					<TanStackDevtools
+						config={{
+							position: "bottom-right",
+						}}
+						plugins={[
+							{
+								name: "Tanstack Router",
+								render: <TanStackRouterDevtoolsPanel />,
+							},
+						]}
+					/>
+				)}
 				<Scripts />
 			</body>
 		</html>

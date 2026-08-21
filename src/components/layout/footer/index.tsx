@@ -14,12 +14,10 @@ import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { SITE_URL } from "@/lib/site-data";
 import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
-
-// TODO: move to a shared site-config module and reuse in Header.tsx too
-const SITE_URL = "https://unicornbta.com";
 
 const PROGRAMS: FooterLink[] = [
 	{ label: "Classic Barbering", to: "/programs/classic-barbering" },

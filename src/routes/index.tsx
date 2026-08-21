@@ -10,9 +10,9 @@ import Testimonials from "#/components/pages/home/testimonials";
 import WhyUnicorn from "#/components/pages/home/why-us";
 import { SectionEyebrow } from "#/components/site/decor";
 import { buttonVariants } from "@/components/ui/button";
+import { SITE_URL } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
-const SITE_URL = "https://unicornbarbertrainingacademy.com";
 export const Route = createFileRoute("/")({
 	component: Home,
 	head: () => ({

@@ -13,10 +13,8 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
+import { SITE_URL } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
-
-// TODO: move to a shared site-config module and reuse in Footer.tsx too
-const SITE_URL = "https://unicornbta.com";
 
 const ctaClassName = cn(buttonVariants({ variant: "default" }), "px-4");
 
