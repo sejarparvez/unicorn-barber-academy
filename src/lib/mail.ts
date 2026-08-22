@@ -80,20 +80,35 @@ function shell(title: string, body: string): string {
 </html>`;
 }
 
+/**
+ * Escapes HTML entities so user-supplied values (the signup name is free
+ * text) can't inject markup into email bodies — content spoofing, phishing
+ * links, broken layouts. Also used for href attributes since better-auth
+ * URLs carry query params (& must be entity-encoded in HTML anyway).
+ */
+function escapeHtml(value: string): string {
+	return value
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#39;");
+}
+
 function button(url: string, label: string): string {
-	return `<a href="${url}" style="display:inline-block;margin-top:8px;padding:12px 28px;background:#c9a227;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">${label}</a>`;
+	return `<a href="${escapeHtml(url)}" style="display:inline-block;margin-top:8px;padding:12px 28px;background:#c9a227;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">${label}</a>`;
 }
 
 export function verificationEmail(name: string, url: string): string {
 	return shell(
 		"Confirm your email",
-		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${name || "there"}, welcome to Unicorn Barber Training Academy. Confirm your email address to finish setting up your account.</p>${button(url, "Verify Email")}`,
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(name) || "there"}, welcome to Unicorn Barber Training Academy. Confirm your email address to finish setting up your account.</p>${button(url, "Verify Email")}`,
 	);
 }
 
 export function resetPasswordEmail(name: string, url: string): string {
 	return shell(
 		"Reset your password",
-		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${name || "there"}, we received a request to reset your password. This link expires in one hour and can only be used once.</p>${button(url, "Choose a New Password")}`,
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(name) || "there"}, we received a request to reset your password. This link expires in one hour and can only be used once.</p>${button(url, "Choose a New Password")}`,
 	);
 }

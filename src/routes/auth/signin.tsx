@@ -1,5 +1,10 @@
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useRouter,
+} from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
 import {
 	AuthAlert,
@@ -12,11 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/server-session";
 import { safeRedirect } from "@/lib/utils";
 
 type SignInSearch = {
 	redirect?: string;
-	verified?: string;
+	reset?: string;
 };
 
 export const Route = createFileRoute("/auth/signin")({
@@ -27,8 +33,12 @@ export const Route = createFileRoute("/auth/signin")({
 			typeof search.redirect === "string"
 				? safeRedirect(search.redirect)
 				: undefined,
-		verified: search.verified === "1" ? "1" : undefined,
+		reset: search.reset === "1" ? "1" : undefined,
 	}),
+	// Already signed in? There is nothing to do on this page.
+	beforeLoad: async () => {
+		if (await getSession()) throw redirect({ to: "/dashboard" });
+	},
 	component: RouteComponent,
 	head: () => ({
 		meta: [
@@ -127,7 +137,10 @@ function RouteComponent() {
 							onClick={() =>
 								router.navigate({
 									to: "/auth/verify-email",
-									search: { email: unverifiedEmail },
+									search: {
+										email: unverifiedEmail,
+										redirect: search.redirect,
+									},
 								})
 							}
 						>
@@ -136,11 +149,11 @@ function RouteComponent() {
 					</div>
 				) : null}
 
-				{search.verified === "1" && !error && !unverifiedEmail ? (
+				{search.reset === "1" && !error && !unverifiedEmail ? (
 					<div className="mb-5">
 						<AuthAlert
 							tone="success"
-							message="Email verified — you're all set. Please sign in to continue."
+							message="Password updated. Sign in with your new password to continue."
 						/>
 					</div>
 				) : null}

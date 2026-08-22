@@ -1,10 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
+import { clientIp, isSameOrigin, overRateLimit } from "@/lib/api-guard";
 
 export const Route = createFileRoute("/api/enroll")({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
+				// Unauthenticated endpoint: block cross-site submissions and cap
+				// per-IP volume so this can't be used as a spam/log-flooding vector.
+				if (!isSameOrigin(request)) {
+					return json({ message: "Forbidden" }, { status: 403 });
+				}
+				if (overRateLimit(`enroll:${clientIp(request)}`, 5, 60_000)) {
+					return json(
+						{ message: "Too many requests. Please try again later." },
+						{ status: 429 },
+					);
+				}
 				try {
 					const body = await request.json();
 					const { name, email, phone, track, program, cohort, message } = body;

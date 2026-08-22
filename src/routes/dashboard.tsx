@@ -8,9 +8,18 @@ export const Route = createFileRoute("/dashboard")({
 	beforeLoad: async ({ location }) => {
 		const session = await getSession();
 		if (!session) {
+			// Keep the full destination (path + query) so post-sign-in navigation
+			// restores exactly where the visitor was headed.
+			const search = new URLSearchParams(
+				location.search as Record<string, string>,
+			).toString();
 			throw redirect({
 				to: "/auth/signin",
-				search: { redirect: location.pathname },
+				search: {
+					redirect: search
+						? `${location.pathname}?${search}`
+						: location.pathname,
+				},
 			});
 		}
 		return { session };

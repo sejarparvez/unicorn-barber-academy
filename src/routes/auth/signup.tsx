@@ -1,5 +1,10 @@
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useRouter,
+} from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
 import {
 	AuthAlert,
@@ -12,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/server-session";
 import { safeRedirect } from "@/lib/utils";
 
 type SignUpSearch = {
@@ -25,6 +31,10 @@ export const Route = createFileRoute("/auth/signup")({
 				? safeRedirect(search.redirect)
 				: undefined,
 	}),
+	// Already signed in? There is nothing to do on this page.
+	beforeLoad: async () => {
+		if (await getSession()) throw redirect({ to: "/dashboard" });
+	},
 	component: RouteComponent,
 	head: () => ({
 		meta: [
@@ -67,10 +77,17 @@ function RouteComponent() {
 
 		setPending(true);
 		try {
+			// callbackURL rides along so the EMAILED verification link lands the
+			// user on /auth/verify-email?state=success — keeping any original
+			// destination alive through the whole verify → sign-in chain.
+			const successSearch = new URLSearchParams({ state: "success" });
+			if (search.redirect) successSearch.set("redirect", search.redirect);
+			const email = String(data.get("email") ?? "").trim();
 			const res = await authClient.signUp.email({
-				name: String(data.get("name") ?? ""),
-				email: String(data.get("email") ?? ""),
+				name: String(data.get("name") ?? "").trim(),
+				email,
 				password,
+				callbackURL: `/auth/verify-email?${successSearch.toString()}`,
 			});
 			if (res.error) {
 				setError(
@@ -84,7 +101,7 @@ function RouteComponent() {
 			router.navigate({
 				to: "/auth/verify-email",
 				search: {
-					email: String(data.get("email") ?? "").trim(),
+					email,
 					redirect: search.redirect,
 				},
 			});

@@ -73,7 +73,9 @@ function RouteComponent() {
 				return;
 			}
 			// Password changed — send them to sign in with the success banner.
-			router.navigate({ to: "/auth/signin", search: { verified: "1" } });
+			// Note: better-auth's reset does NOT set emailVerified, so this must
+			// not claim anything about verification.
+			router.navigate({ to: "/auth/signin", search: { reset: "1" } });
 		} catch (_err) {
 			setError(
 				"Network error while resetting your password. Please try again.",

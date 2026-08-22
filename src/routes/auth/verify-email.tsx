@@ -44,6 +44,9 @@ function RouteComponent() {
 	const [sent, setSent] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [cooldown, setCooldown] = useState(0);
+	// Only used when the page is opened without ?email= (e.g. from a bookmark).
+	const [manualEmail, setManualEmail] = useState("");
+	const emailValue = search.email ?? manualEmail.trim();
 
 	useEffect(() => {
 		if (cooldown <= 0) return;
@@ -88,7 +91,7 @@ function RouteComponent() {
 	async function handleResend(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		await resend(String(data.get("email") ?? search.email ?? ""));
+		await resend(String(data.get("email") ?? emailValue).trim());
 	}
 
 	if (search.state === "success") {
@@ -142,6 +145,8 @@ function RouteComponent() {
 								required
 								autoComplete="email"
 								placeholder="you@example.com"
+								value={manualEmail}
+								onChange={(e) => setManualEmail(e.target.value)}
 							/>
 						</div>
 					) : (
@@ -161,7 +166,7 @@ function RouteComponent() {
 						variant="outline"
 						size="lg"
 						className="w-full"
-						disabled={pending || cooldown > 0 || !search.email}
+						disabled={pending || cooldown > 0 || !emailValue}
 					>
 						{cooldown > 0
 							? `Resend available in ${cooldown}s`
