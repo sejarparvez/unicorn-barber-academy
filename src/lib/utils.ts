@@ -6,6 +6,23 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Validates a user-supplied redirect path so it can never leave the site.
+ * Accepts only same-origin relative paths: a single leading "/", no
+ * protocol-relative "//host", no backslash tricks ("/\\evil.com"), and no
+ * control characters. Anything else falls back to `fallback`.
+ */
+export function safeRedirect(path?: string | null, fallback = "/"): string {
+	if (!path || typeof path !== "string") return fallback;
+	if (!path.startsWith("/")) return fallback;
+	if (path.startsWith("//") || path.startsWith("/\\")) return fallback;
+	for (const ch of path) {
+		const code = ch.codePointAt(0);
+		if (code !== undefined && (code <= 0x1f || code === 0x7f)) return fallback;
+	}
+	return path;
+}
+
+/**
  * The function `getInitials` takes a name as input and returns the initials of the name in uppercase.
  * @param {string | null} [name] - The `getInitials` function takes an optional `name` parameter of
  * type string or null. It returns the initials of the name provided. If the name is null or an empty

@@ -1,17 +1,6 @@
-import {
-	IconBell,
-	IconCalendar,
-	IconHeadphones,
-	IconHeart,
-	IconLayoutDashboard,
-	IconMapPin,
-	IconPlus,
-	IconStar,
-	IconUserCog,
-} from "@tabler/icons-react";
+import { IconLayoutDashboard } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -22,22 +11,15 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
-import { authClient } from "@/lib/auth-client";
+import type { SessionPayload } from "@/lib/server-session";
 import { cn, getInitials } from "@/lib/utils";
 import { SignOut } from "./logout";
 
-export default function UserDropDown() {
-	const { data: session, isPending } = authClient.useSession();
-
-	if (isPending) {
-		return (
-			<div className="flex items-center gap-2">
-				<Skeleton className="h-9 w-9 rounded-full" />
-			</div>
-		);
-	}
-
+export default function UserDropDown({
+	session,
+}: {
+	session: SessionPayload | null;
+}) {
 	if (!session?.user) {
 		return (
 			// Quiet auth action — lets the gold Enroll CTA own the bar's hierarchy
@@ -88,8 +70,14 @@ export default function UserDropDown() {
 								<p className="text-sm font-semibold leading-none truncate">
 									{session.user.name}
 								</p>
-								<p className="text-xs text-muted-foreground leading-none truncate">
-									{session.user.email}
+								<p className="text-xs text-muted-foreground leading-none truncate flex items-center gap-1.5">
+									<span className="truncate">{session.user.email}</span>
+									{session.user.emailVerified && (
+										<span
+											title="Email verified"
+											className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
+										/>
+									)}
 								</p>
 							</div>
 						</div>
@@ -112,128 +100,6 @@ export default function UserDropDown() {
 								stroke={1.75}
 							/>
 							<span className="font-medium">Dashboard</span>
-						</DropdownMenuItem>
-
-						<DropdownMenuItem
-							render={
-								<Link
-									to="/dashboard/my-bookings"
-									className="flex w-full cursor-pointer items-center gap-3 py-2.5"
-								/>
-							}
-						>
-							<IconCalendar className="h-4 w-4 text-primary" stroke={1.75} />
-							<span className="font-medium">My Bookings</span>
-						</DropdownMenuItem>
-
-						<DropdownMenuItem
-							render={
-								<Link
-									to="/dashboard/wishlist"
-									className="flex w-full cursor-pointer items-center gap-3 py-2.5"
-								/>
-							}
-						>
-							<IconHeart className="h-4 w-4 text-primary" stroke={1.75} />
-							<span className="font-medium">Wishlist</span>
-						</DropdownMenuItem>
-
-						<DropdownMenuItem
-							render={
-								<Link
-									to="/dashboard/my-reviews"
-									className="flex w-full cursor-pointer items-center gap-3 py-2.5"
-								/>
-							}
-						>
-							<IconStar className="h-4 w-4 text-primary" stroke={1.75} />
-							<span className="font-medium">My Reviews</span>
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
-
-					<DropdownMenuSeparator />
-
-					{/* Tour Provider Section (if applicable) */}
-					{session.user.role === "PROVIDER" || session.user.role === "ADMIN" ? (
-						<>
-							<DropdownMenuGroup>
-								<DropdownMenuItem
-									render={
-										<Link
-											to="/list-tour"
-											className="flex w-full cursor-pointer items-center gap-3 py-2.5"
-										/>
-									}
-								>
-									<IconPlus className="h-4 w-4 text-primary" stroke={1.75} />
-									<span className="font-medium">List a Tour</span>
-								</DropdownMenuItem>
-
-								<DropdownMenuItem
-									render={
-										<Link
-											to="/my-tours"
-											className="flex w-full cursor-pointer items-center gap-3 py-2.5"
-										/>
-									}
-								>
-									<IconMapPin className="h-4 w-4 text-primary" stroke={1.75} />
-									<span className="font-medium">My Tours</span>
-								</DropdownMenuItem>
-							</DropdownMenuGroup>
-
-							<DropdownMenuSeparator />
-						</>
-					) : null}
-
-					{/* Account Settings Group */}
-					<DropdownMenuGroup>
-						<DropdownMenuItem
-							render={
-								<Link
-									to="/dashboard/account/settings"
-									className="flex w-full cursor-pointer items-center gap-3 py-2.5"
-								/>
-							}
-						>
-							<IconUserCog className="h-4 w-4 text-primary" stroke={1.75} />
-							<span className="font-medium">Account Settings</span>
-						</DropdownMenuItem>
-
-						<DropdownMenuItem
-							render={
-								<Link
-									to="/dashboard/notifications"
-									className="flex w-full cursor-pointer items-center justify-between py-2.5"
-								/>
-							}
-						>
-							<div className="flex items-center gap-3">
-								<IconBell className="h-4 w-4 text-primary" stroke={1.75} />
-								<span className="font-medium">Notifications</span>
-							</div>
-							<Badge variant="secondary" className="h-5 px-1.5 text-xs">
-								3
-							</Badge>
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
-
-					<DropdownMenuSeparator />
-
-					{/* Support & Help */}
-					<DropdownMenuGroup>
-						<DropdownMenuItem
-							render={
-								<Link
-									to={
-										session.user.role === "ADMIN" ? "/support/agent" : "/help"
-									}
-									className="flex w-full cursor-pointer items-center gap-3 py-2.5"
-								/>
-							}
-						>
-							<IconHeadphones className="h-4 w-4 text-primary" stroke={1.75} />
-							<span className="font-medium">Help Center</span>
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 

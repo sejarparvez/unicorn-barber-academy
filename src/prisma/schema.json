@@ -283,6 +283,27 @@
 					},
 					"User": {
 						"fields": {
+							"banExpires": {
+								"nullable": true,
+								"type": {
+									"codecId": "pg/timestamptz@1",
+									"kind": "scalar"
+								}
+							},
+							"banReason": {
+								"nullable": true,
+								"type": {
+									"codecId": "pg/text@1",
+									"kind": "scalar"
+								}
+							},
+							"banned": {
+								"nullable": false,
+								"type": {
+									"codecId": "pg/bool@1",
+									"kind": "scalar"
+								}
+							},
 							"createdAt": {
 								"nullable": false,
 								"type": {
@@ -320,6 +341,13 @@
 							},
 							"name": {
 								"nullable": true,
+								"type": {
+									"codecId": "pg/text@1",
+									"kind": "scalar"
+								}
+							},
+							"role": {
+								"nullable": false,
 								"type": {
 									"codecId": "pg/text@1",
 									"kind": "scalar"
@@ -366,6 +394,15 @@
 						},
 						"storage": {
 							"fields": {
+								"banExpires": {
+									"column": "banExpires"
+								},
+								"banReason": {
+									"column": "banReason"
+								},
+								"banned": {
+									"column": "banned"
+								},
 								"createdAt": {
 									"column": "createdAt"
 								},
@@ -383,6 +420,9 @@
 								},
 								"name": {
 									"column": "name"
+								},
+								"role": {
+									"column": "role"
 								},
 								"updatedAt": {
 									"column": "updatedAt"
@@ -664,6 +704,25 @@
 						},
 						"user": {
 							"columns": {
+								"banExpires": {
+									"codecId": "pg/timestamptz@1",
+									"nativeType": "timestamptz",
+									"nullable": true
+								},
+								"banReason": {
+									"codecId": "pg/text@1",
+									"nativeType": "text",
+									"nullable": true
+								},
+								"banned": {
+									"codecId": "pg/bool@1",
+									"default": {
+										"kind": "literal",
+										"value": false
+									},
+									"nativeType": "bool",
+									"nullable": false
+								},
 								"createdAt": {
 									"codecId": "pg/timestamptz@1",
 									"default": {
@@ -705,6 +764,15 @@
 									"codecId": "pg/text@1",
 									"nativeType": "text",
 									"nullable": true
+								},
+								"role": {
+									"codecId": "pg/text@1",
+									"default": {
+										"kind": "literal",
+										"value": "user"
+									},
+									"nativeType": "text",
+									"nullable": false
 								},
 								"updatedAt": {
 									"codecId": "pg/timestamptz@1",
@@ -789,7 +857,7 @@
 				"kind": "postgres-schema"
 			}
 		},
-		"storageHash": "d04ccf113e3a2833d7443496c456c88da99838adaa1a0b1fe401ccce60bb472d"
+		"storageHash": "7378c90b9e9a38593e50d77e709561b54daf963f6d2bcd4ebe04cd01b6b3d865"
 	},
 	"execution": {
 		"executionHash": "484b719bfdff19d6ce7e0dc1c95bf0969731d7dcc65da7e9222619917e5768bf",

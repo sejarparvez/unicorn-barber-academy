@@ -11,6 +11,7 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
+import type { SessionPayload } from "@/lib/server-session";
 import { cn } from "@/lib/utils";
 import UserDropDown from "./user";
 
@@ -24,7 +25,11 @@ const navItems = [
 	{ name: "Contact", href: "/contact" },
 ];
 
-export default function Header() {
+export default function Header({
+	session,
+}: {
+	session: SessionPayload | null;
+}) {
 	// TanStack Router equivalent of next/navigation's usePathname().
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const [isVisible, setIsVisible] = useState(true);
@@ -204,7 +209,7 @@ export default function Header() {
 
 				{/* ── Right: actions ── */}
 				<div className="flex items-center gap-5">
-					<UserDropDown />
+					<UserDropDown session={session} />
 					{/* Book Now — primary, drives conversion; solid gold on both mobile drawer and desktop bar */}
 					<Button
 						render={<Link to="/enroll" />}

@@ -19,27 +19,33 @@ export function SignOut() {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [isSigningOut, setIsSigningOut] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const handleSignOut = async () => {
 		setIsSigningOut(true);
+		setError(null);
 		try {
 			await authClient.signOut({
 				fetchOptions: {
 					onSuccess: () => {
 						setOpen(false);
 						router.navigate({ to: "/" });
-						// TanStack Router equivalent of Next's router.refresh(): re-run
-						// route loaders/beforeLoad so any session-dependent data (and the
-						// /enroll-style auth gates) reflect the now-signed-out state.
+						// Re-run loaders so session-dependent UI (header, /dashboard
+						// guard) reflects the now-signed-out state.
 						router.invalidate();
 					},
-					onError: (_error) => {
+					onError: (ctx) => {
 						setIsSigningOut(false);
+						setError(
+							ctx.error.message ??
+								"Could not sign out. Please try again in a moment.",
+						);
 					},
 				},
 			});
 		} catch (_error) {
 			setIsSigningOut(false);
+			setError("Network error while signing out. Please try again.");
 		}
 	};
 
@@ -66,6 +72,11 @@ export function SignOut() {
 						You will be redirected to the home page and will need to sign in
 						again to access your account.
 					</AlertDialogDescription>
+					{error ? (
+						<p role="alert" className="text-sm text-destructive">
+							{error}
+						</p>
+					) : null}
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel disabled={isSigningOut}>Cancel</AlertDialogCancel>

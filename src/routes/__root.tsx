@@ -1,13 +1,25 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import {
+	createRootRoute,
+	HeadContent,
+	Outlet,
+	Scripts,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { QueryProvider } from "@/components/providers/query-provider";
+import type { SessionPayload } from "@/lib/server-session";
+import { getSession } from "@/lib/server-session";
 import { SITE_URL } from "@/lib/site-data";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
+	// Fetched on every document load so <Header/> renders the correct
+	// signed-in/out state during SSR — no hydration flicker.
+	loader: async (): Promise<{ session: SessionPayload }> => ({
+		session: await getSession(),
+	}),
 	head: () => ({
 		meta: [
 			{
@@ -39,19 +51,22 @@ export const Route = createRootRoute({
 			},
 		],
 	}),
-	shellComponent: RootDocument,
+	component: RootDocument,
 });
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument() {
+	const { session } = Route.useLoaderData();
 	return (
 		<html lang="en">
 			<head>
 				<HeadContent />
 			</head>
 			<body>
-				<Header />
+				<Header session={session} />
 				<div id="main-content" className=" min-h-screen">
-					<QueryProvider>{children}</QueryProvider>
+					<QueryProvider>
+						<Outlet />
+					</QueryProvider>
 				</div>
 				<Footer />
 				{import.meta.env.DEV && (

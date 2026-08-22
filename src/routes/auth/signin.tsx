@@ -12,17 +12,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import { safeRedirect } from "@/lib/utils";
 
 type SignInSearch = {
 	redirect?: string;
+	verified?: string;
 };
 
 export const Route = createFileRoute("/auth/signin")({
+	// safeRedirect here means the typed search param can never carry an
+	// off-site target (protocol-relative "//host", backslash tricks, etc.).
 	validateSearch: (search: Record<string, unknown>): SignInSearch => ({
 		redirect:
-			typeof search.redirect === "string" && search.redirect.startsWith("/")
-				? search.redirect
+			typeof search.redirect === "string"
+				? safeRedirect(search.redirect)
 				: undefined,
+		verified: search.verified === "1" ? "1" : undefined,
 	}),
 	component: RouteComponent,
 	head: () => ({
@@ -44,39 +49,64 @@ function RouteComponent() {
 	const [googlePending, setGooglePending] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		setError(null);
+		setUnverifiedEmail(null);
 		setPending(true);
 
-		const data = new FormData(event.currentTarget);
-		const res = await authClient.signIn.email({
-			email: String(data.get("email") ?? ""),
-			password: String(data.get("password") ?? ""),
-		});
-
-		setPending(false);
-		if (res.error) {
-			setError(res.error.message ?? "Unable to sign in. Please try again.");
-			return;
+		try {
+			const data = new FormData(event.currentTarget);
+			const email = String(data.get("email") ?? "").trim();
+			const res = await authClient.signIn.email({
+				email,
+				password: String(data.get("password") ?? ""),
+			});
+			if (res.error) {
+				if (
+					res.error.code === "EMAIL_NOT_VERIFIED" ||
+					/not verified/i.test(res.error.message ?? "")
+				) {
+					setUnverifiedEmail(email);
+					return;
+				}
+				setError(res.error.message ?? "Unable to sign in. Please try again.");
+				return;
+			}
+			// Refresh loaders so the SSR-fetched header session updates too.
+			router.invalidate();
+			router.history.push(search.redirect ?? "/");
+		} catch (_err) {
+			setError(
+				"Network error while signing in. Check your connection and try again.",
+			);
+		} finally {
+			setPending(false);
 		}
-		router.history.push(search.redirect ?? "/");
 	}
 
 	async function handleGoogle() {
 		setError(null);
 		setGooglePending(true);
-		const res = await authClient.signIn.social({
-			provider: "google",
-			callbackURL: search.redirect ?? "/",
-		});
-		if (res.error) {
+		try {
+			const res = await authClient.signIn.social({
+				provider: "google",
+				callbackURL: search.redirect ?? "/",
+			});
+			if (res.error) {
+				setError(friendlyAuthError(res.error.message));
+				setGooglePending(false);
+			}
+			// On success better-auth redirects the whole browser to Google —
+			// nothing to do here.
+		} catch (_err) {
+			setError(
+				"Network error while starting Google sign-in. Please try again.",
+			);
 			setGooglePending(false);
-			setError(friendlyAuthError(res.error.message));
 		}
-		// On success better-auth redirects the whole browser to Google —
-		// nothing to do here.
 	}
 
 	return (
@@ -85,6 +115,36 @@ function RouteComponent() {
 			subtitle="Sign in to continue your training at Unicorn Barber Training Academy."
 		>
 			<div className="mt-6">
+				{unverifiedEmail ? (
+					<div className="mb-5 space-y-3">
+						<AuthAlert message="Please verify your email before signing in — we sent a link when you created your account." />
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							className="w-full"
+							disabled={pending}
+							onClick={() =>
+								router.navigate({
+									to: "/auth/verify-email",
+									search: { email: unverifiedEmail },
+								})
+							}
+						>
+							Resend verification email
+						</Button>
+					</div>
+				) : null}
+
+				{search.verified === "1" && !error && !unverifiedEmail ? (
+					<div className="mb-5">
+						<AuthAlert
+							tone="success"
+							message="Email verified — you're all set. Please sign in to continue."
+						/>
+					</div>
+				) : null}
+
 				<Button
 					type="button"
 					variant="outline"
@@ -113,7 +173,15 @@ function RouteComponent() {
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="password">Password</Label>
+						<div className="flex items-center justify-between">
+							<Label htmlFor="password">Password</Label>
+							<Link
+								to="/auth/forgot-password"
+								className="text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+							>
+								Forgot password?
+							</Link>
+						</div>
 						<div className="relative">
 							<Input
 								id="password"
@@ -150,6 +218,7 @@ function RouteComponent() {
 					New to the academy?{" "}
 					<Link
 						to="/auth/signup"
+						search={{ redirect: search.redirect }}
 						className="font-medium text-primary underline-offset-4 hover:underline"
 					>
 						Create an account

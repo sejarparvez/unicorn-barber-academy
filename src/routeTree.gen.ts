@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EnrollRouteImport } from './routes/enroll'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as InstructorsRouteImport } from './routes/instructors'
@@ -21,8 +22,12 @@ import { Route as StudentLifeRouteImport } from './routes/student-life'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as ApiEnrollRouteImport } from './routes/api/enroll'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
+import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
 import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -45,6 +50,11 @@ const CareersRoute = CareersRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnrollRoute = EnrollRouteImport.update({
@@ -87,6 +97,16 @@ const ApiEnrollRoute = ApiEnrollRouteImport.update({
   path: '/api/enroll',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthSigninRoute = AuthSigninRouteImport.update({
   id: '/auth/signin',
   path: '/auth/signin',
@@ -96,6 +116,16 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
   path: '/auth/signup',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
+  id: '/auth/verify-email',
+  path: '/auth/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const ProgramsIndexRoute = ProgramsIndexRouteImport.update({
   id: '/programs/',
@@ -118,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/enroll': typeof EnrollRoute
   '/gallery': typeof GalleryRoute
   '/instructors': typeof InstructorsRoute
@@ -126,9 +157,13 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/api/contact': typeof ApiContactRoute
   '/api/enroll': typeof ApiEnrollRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/programs/$slug': typeof ProgramsSlugRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/programs/': typeof ProgramsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -145,9 +180,13 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/api/contact': typeof ApiContactRoute
   '/api/enroll': typeof ApiEnrollRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/programs/$slug': typeof ProgramsSlugRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/programs': typeof ProgramsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -157,6 +196,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/enroll': typeof EnrollRoute
   '/gallery': typeof GalleryRoute
   '/instructors': typeof InstructorsRoute
@@ -165,9 +205,13 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/api/contact': typeof ApiContactRoute
   '/api/enroll': typeof ApiEnrollRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/programs/$slug': typeof ProgramsSlugRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/programs/': typeof ProgramsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -178,6 +222,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/careers'
     | '/contact'
+    | '/dashboard'
     | '/enroll'
     | '/gallery'
     | '/instructors'
@@ -186,9 +231,13 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/contact'
     | '/api/enroll'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/verify-email'
     | '/programs/$slug'
+    | '/dashboard/'
     | '/programs/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
@@ -205,9 +254,13 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/contact'
     | '/api/enroll'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/verify-email'
     | '/programs/$slug'
+    | '/dashboard'
     | '/programs'
     | '/api/auth/$'
   id:
@@ -216,6 +269,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/careers'
     | '/contact'
+    | '/dashboard'
     | '/enroll'
     | '/gallery'
     | '/instructors'
@@ -224,9 +278,13 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/contact'
     | '/api/enroll'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/verify-email'
     | '/programs/$slug'
+    | '/dashboard/'
     | '/programs/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -236,6 +294,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   EnrollRoute: typeof EnrollRoute
   GalleryRoute: typeof GalleryRoute
   InstructorsRoute: typeof InstructorsRoute
@@ -244,8 +303,11 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ApiContactRoute: typeof ApiContactRoute
   ApiEnrollRoute: typeof ApiEnrollRoute
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSigninRoute: typeof AuthSigninRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
   ProgramsSlugRoute: typeof ProgramsSlugRoute
   ProgramsIndexRoute: typeof ProgramsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -279,6 +341,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/enroll': {
@@ -337,6 +406,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEnrollRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/signin': {
       id: '/auth/signin'
       path: '/auth/signin'
@@ -350,6 +433,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/signup'
       preLoaderRoute: typeof AuthSignupRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/verify-email': {
+      id: '/auth/verify-email'
+      path: '/auth/verify-email'
+      fullPath: '/auth/verify-email'
+      preLoaderRoute: typeof AuthVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/programs/': {
       id: '/programs/'
@@ -375,11 +472,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   EnrollRoute: EnrollRoute,
   GalleryRoute: GalleryRoute,
   InstructorsRoute: InstructorsRoute,
@@ -388,8 +498,11 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ApiContactRoute: ApiContactRoute,
   ApiEnrollRoute: ApiEnrollRoute,
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSigninRoute: AuthSigninRoute,
   AuthSignupRoute: AuthSignupRoute,
+  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
   ProgramsSlugRoute: ProgramsSlugRoute,
   ProgramsIndexRoute: ProgramsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

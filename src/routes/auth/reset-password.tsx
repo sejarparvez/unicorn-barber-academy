@@ -1,39 +1,27 @@
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
-import {
-	AuthAlert,
-	AuthCard,
-	AuthDivider,
-	friendlyAuthError,
-	GoogleIcon,
-} from "@/components/site/auth";
+import { AuthAlert, AuthCard } from "@/components/site/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
-import { safeRedirect } from "@/lib/utils";
 
-type SignUpSearch = {
-	redirect?: string;
+type ResetSearch = {
+	token?: string;
 };
 
-export const Route = createFileRoute("/auth/signup")({
-	validateSearch: (search: Record<string, unknown>): SignUpSearch => ({
-		redirect:
-			typeof search.redirect === "string"
-				? safeRedirect(search.redirect)
+export const Route = createFileRoute("/auth/reset-password")({
+	validateSearch: (search: Record<string, unknown>): ResetSearch => ({
+		token:
+			typeof search.token === "string" && search.token.length > 0
+				? search.token
 				: undefined,
 	}),
 	component: RouteComponent,
 	head: () => ({
 		meta: [
-			{ title: "Create Account | Unicorn Barber Training Academy" },
-			{
-				name: "description",
-				content:
-					"Create your Unicorn Barber Training Academy account to enroll and manage your training.",
-			},
+			{ title: "Set a New Password | Unicorn Barber Training Academy" },
 			{ name: "robots", content: "noindex" },
 		],
 	}),
@@ -43,7 +31,6 @@ function RouteComponent() {
 	const router = useRouter();
 	const search = Route.useSearch();
 	const [pending, setPending] = useState(false);
-	const [googlePending, setGooglePending] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirm, setShowConfirm] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -51,6 +38,13 @@ function RouteComponent() {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		setError(null);
+
+		if (!search.token) {
+			setError(
+				"This reset link is missing its token. Request a fresh link and try again.",
+			);
+			return;
+		}
 
 		const data = new FormData(event.currentTarget);
 		const password = String(data.get("password") ?? "");
@@ -67,104 +61,37 @@ function RouteComponent() {
 
 		setPending(true);
 		try {
-			const res = await authClient.signUp.email({
-				name: String(data.get("name") ?? ""),
-				email: String(data.get("email") ?? ""),
-				password,
+			const res = await authClient.resetPassword({
+				newPassword: password,
+				token: search.token,
 			});
 			if (res.error) {
 				setError(
-					res.error.message ?? "Unable to create account. Please try again.",
+					res.error.message ??
+						"This reset link is invalid or has expired. Please request a new one.",
 				);
 				return;
 			}
-			// Verification is mandatory (requireEmailVerification): no session is
-			// issued until the emailed link is clicked. Route to the check-your-
-			// inbox flow, keeping the original destination for afterwards.
-			router.navigate({
-				to: "/auth/verify-email",
-				search: {
-					email: String(data.get("email") ?? "").trim(),
-					redirect: search.redirect,
-				},
-			});
+			// Password changed — send them to sign in with the success banner.
+			router.navigate({ to: "/auth/signin", search: { verified: "1" } });
 		} catch (_err) {
 			setError(
-				"Network error while creating your account. Check your connection and try again.",
+				"Network error while resetting your password. Please try again.",
 			);
 		} finally {
 			setPending(false);
 		}
 	}
 
-	async function handleGoogle() {
-		setError(null);
-		setGooglePending(true);
-		try {
-			const res = await authClient.signIn.social({
-				provider: "google",
-				callbackURL: search.redirect ?? "/",
-			});
-			if (res.error) {
-				setError(friendlyAuthError(res.error.message));
-				setGooglePending(false);
-			}
-			// On success better-auth redirects the whole browser to Google.
-		} catch (_err) {
-			setError(
-				"Network error while starting Google sign-up. Please try again.",
-			);
-			setGooglePending(false);
-		}
-	}
-
 	return (
 		<AuthCard
-			title="Create your account"
-			subtitle="Enroll in programs and manage your training journey."
+			title="Set a new password"
+			subtitle="Choose a strong password you haven't used elsewhere."
 		>
 			<div className="mt-6">
-				<Button
-					type="button"
-					variant="outline"
-					size="lg"
-					className="w-full gap-2.5 font-medium"
-					onClick={handleGoogle}
-					disabled={googlePending || pending}
-				>
-					<GoogleIcon className="h-4 w-4 shrink-0" />
-					{googlePending ? "Redirecting…" : "Continue with Google"}
-				</Button>
-
-				<AuthDivider />
-
 				<form onSubmit={handleSubmit} className="space-y-5">
 					<div className="space-y-2">
-						<Label htmlFor="name">Full Name</Label>
-						<Input
-							id="name"
-							name="name"
-							type="text"
-							required
-							autoComplete="name"
-							placeholder="Your name"
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
-						<Input
-							id="email"
-							name="email"
-							type="email"
-							required
-							autoComplete="email"
-							placeholder="you@example.com"
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="password">Password</Label>
+						<Label htmlFor="password">New Password</Label>
 						<div className="relative">
 							<Input
 								id="password"
@@ -192,7 +119,7 @@ function RouteComponent() {
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="confirmPassword">Confirm Password</Label>
+						<Label htmlFor="confirmPassword">Confirm New Password</Label>
 						<div className="relative">
 							<Input
 								id="confirmPassword"
@@ -201,7 +128,7 @@ function RouteComponent() {
 								required
 								minLength={8}
 								autoComplete="new-password"
-								placeholder="Repeat your password"
+								placeholder="Repeat your new password"
 								className="pr-10"
 							/>
 							<button
@@ -219,21 +146,27 @@ function RouteComponent() {
 						</div>
 					</div>
 
+					{!search.token ? (
+						<AuthAlert message="No reset token found in this link. Request a fresh password reset email." />
+					) : null}
 					{error ? <AuthAlert message={error} /> : null}
 
-					<Button type="submit" size="lg" className="w-full" disabled={pending}>
-						{pending ? "Creating account…" : "Create Account"}
+					<Button
+						type="submit"
+						size="lg"
+						className="w-full"
+						disabled={pending || !search.token}
+					>
+						{pending ? "Updating…" : "Update Password"}
 					</Button>
 				</form>
 
 				<p className="mt-6 text-center text-sm text-muted-foreground">
-					Already have an account?{" "}
 					<Link
-						to="/auth/signin"
-						search={{ redirect: search.redirect }}
+						to="/auth/forgot-password"
 						className="font-medium text-primary underline-offset-4 hover:underline"
 					>
-						Sign in
+						Request a new reset link
 					</Link>
 				</p>
 			</div>

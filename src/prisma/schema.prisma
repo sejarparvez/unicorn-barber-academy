@@ -15,6 +15,11 @@ model User {
   image         String?
   createdAt     DateTime             @default(now())
   updatedAt     temporal.updatedAt()
+  // better-auth `admin` plugin fields (src/lib/auth.ts)
+  role          String               @default("user")
+  banned        Boolean              @default(false)
+  banReason     String?
+  banExpires    DateTime?
   sessions      Session[]
   accounts      Account[]
 
