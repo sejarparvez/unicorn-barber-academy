@@ -196,7 +196,8 @@ function AboutHero() {
 									layout="constrained"
 									width={420}
 									height={520}
-									priority
+									fetchPriority="high"
+									loading="eager"
 									className="h-full w-full object-cover"
 								/>
 								<span className="absolute inset-x-0 bottom-0 bg-secondary/85 px-3 py-2 text-[10px] tracking-[0.14em] text-primary backdrop-blur-sm">

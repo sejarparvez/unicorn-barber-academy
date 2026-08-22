@@ -87,7 +87,8 @@ function StudentLifeHero() {
 					src={pic("unicorn-student-hero-1", 700, 1100)}
 					alt=""
 					layout="fullWidth"
-					priority
+					fetchPriority="high"
+					loading="eager"
 					className="h-full w-full object-cover opacity-40"
 				/>
 				<Image

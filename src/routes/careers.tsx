@@ -85,7 +85,8 @@ function CareersHero() {
 					src={pic("unicorn-careers-hero-1", 900, 1100)}
 					alt=""
 					layout="fullWidth"
-					priority
+					fetchPriority="high"
+					loading="eager"
 					className="h-full w-full object-cover opacity-40"
 				/>
 				<Image

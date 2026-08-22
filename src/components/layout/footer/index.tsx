@@ -308,6 +308,7 @@ function SocialIcon({
 	return (
 		<Button
 			size="icon"
+			nativeButton={false}
 			render={
 				// biome-ignore lint/a11y/useAnchorContent: this is fine
 				<a

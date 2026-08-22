@@ -115,7 +115,8 @@ function ContactHero() {
 					src={pic("unicorn-contact-hero-1", 900, 1000)}
 					alt=""
 					layout="fullWidth"
-					priority
+					fetchPriority="high"
+					loading="eager"
 					className="h-full w-full object-cover opacity-40"
 				/>
 				<Image

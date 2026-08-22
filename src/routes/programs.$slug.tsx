@@ -232,7 +232,8 @@ function ProgramDetailPage() {
 								layout="constrained"
 								width={640}
 								height={800}
-								priority
+								fetchPriority="high"
+								loading="eager"
 								className="h-full w-full object-cover"
 							/>
 						</div>

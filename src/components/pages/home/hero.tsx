@@ -92,7 +92,8 @@ export default function Hero() {
 						alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
 						layout="fullWidth"
 						sizes="(min-width: 1024px) 50vw, 100vw"
-						priority
+						fetchPriority="high"
+						loading="eager"
 						className="h-full w-full object-cover"
 					/>
 					{/* Thin gold edge where the photo meets the text column */}
