@@ -12,7 +12,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
-import { getInitials } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { SignOut } from "./logout";
 
 export default function UserDropDown() {
@@ -41,9 +41,17 @@ export default function UserDropDown() {
 	if (!session?.user) {
 		return (
 			// Quiet auth action — lets the gold Enroll CTA own the bar's hierarchy
-			<Button variant="ghost" render={<Link to="/auth/signin" />}>
+			<Link
+				to="/auth/signin"
+				className={cn(
+					buttonVariants({
+						variant: "default", // default for mobile
+					}),
+					"md:border-border md:bg-background md:text-foreground md:shadow-xs md:hover:bg-muted md:hover:text-foreground md:aria-expanded:bg-muted md:aria-expanded:text-foreground md:dark:border-input md:dark:bg-input/30 md:dark:hover:bg-input/50", // overrides for desktop (default variant styles)
+				)}
+			>
 				Sign in
-			</Button>
+			</Link>
 		);
 	}
 

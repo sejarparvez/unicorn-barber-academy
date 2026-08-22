@@ -1,8 +1,13 @@
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { motion } from "motion/react";
 import { type FormEvent, useState } from "react";
-import { AuthAlert, AuthCard, AuthHero } from "@/components/site/auth";
-import { useFadeUp } from "@/components/site/decor";
+import {
+	AuthAlert,
+	AuthCard,
+	AuthDivider,
+	friendlyAuthError,
+	GoogleIcon,
+} from "@/components/site/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,10 +38,11 @@ export const Route = createFileRoute("/auth/signin")({
 });
 
 function RouteComponent() {
-	const fadeUp = useFadeUp();
 	const router = useRouter();
 	const search = Route.useSearch();
 	const [pending, setPending] = useState(false);
+	const [googlePending, setGooglePending] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -58,69 +64,98 @@ function RouteComponent() {
 		router.history.push(search.redirect ?? "/");
 	}
 
+	async function handleGoogle() {
+		setError(null);
+		setGooglePending(true);
+		const res = await authClient.signIn.social({
+			provider: "google",
+			callbackURL: search.redirect ?? "/",
+		});
+		if (res.error) {
+			setGooglePending(false);
+			setError(friendlyAuthError(res.error.message));
+		}
+		// On success better-auth redirects the whole browser to Google —
+		// nothing to do here.
+	}
+
 	return (
-		<main className="min-h-screen">
-			<AuthHero
-				crumb="SIGN IN"
-				title={
-					<>
-						Welcome back,{" "}
-						<span className="text-primary italic">craftsman.</span>
-					</>
-				}
-				subtitle="Sign in to continue your training at Unicorn Barber Training Academy."
-			/>
+		<AuthCard
+			title="Welcome back"
+			subtitle="Sign in to continue your training at Unicorn Barber Training Academy."
+		>
+			<div className="mt-6">
+				<Button
+					type="button"
+					variant="outline"
+					size="lg"
+					className="w-full gap-2.5 font-medium"
+					onClick={handleGoogle}
+					disabled={googlePending || pending}
+				>
+					<GoogleIcon className="h-4 w-4 shrink-0" />
+					{googlePending ? "Redirecting…" : "Continue with Google"}
+				</Button>
 
-			<AuthCard>
-				<motion.div {...fadeUp(0)}>
-					<form onSubmit={handleSubmit} className="space-y-5">
-						<div className="space-y-2">
-							<Label htmlFor="email">Email</Label>
-							<Input
-								id="email"
-								name="email"
-								type="email"
-								required
-								autoComplete="email"
-								placeholder="you@example.com"
-							/>
-						</div>
+				<AuthDivider />
 
-						<div className="space-y-2">
-							<Label htmlFor="password">Password</Label>
+				<form onSubmit={handleSubmit} className="space-y-5">
+					<div className="space-y-2">
+						<Label htmlFor="email">Email</Label>
+						<Input
+							id="email"
+							name="email"
+							type="email"
+							required
+							autoComplete="email"
+							placeholder="you@example.com"
+						/>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor="password">Password</Label>
+						<div className="relative">
 							<Input
 								id="password"
 								name="password"
-								type="password"
+								type={showPassword ? "text" : "password"}
 								required
 								autoComplete="current-password"
 								placeholder="••••••••"
+								className="pr-10"
 							/>
+							<button
+								type="button"
+								onClick={() => setShowPassword((v) => !v)}
+								aria-label={showPassword ? "Hide password" : "Show password"}
+								className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-md text-muted-foreground transition-colors hover:text-foreground"
+							>
+								{showPassword ? (
+									<IconEyeOff className="h-4 w-4" stroke={1.75} />
+								) : (
+									<IconEye className="h-4 w-4" stroke={1.75} />
+								)}
+							</button>
 						</div>
+					</div>
 
-						{error ? <AuthAlert message={error} /> : null}
+					{error ? <AuthAlert message={error} /> : null}
 
-						<Button
-							type="submit"
-							size="lg"
-							className="w-full"
-							disabled={pending}
-						>
-							{pending ? "Signing in…" : "Sign In"}
-						</Button>
-					</form>
+					<Button type="submit" size="lg" className="w-full" disabled={pending}>
+						{pending ? "Signing in…" : "Sign In"}
+					</Button>
+				</form>
 
-					<p className="mt-6 text-center text-sm text-muted-foreground">
-						New to the academy?{" "}
-						<Link
-							to="/auth/signup"
-							className="font-medium text-primary underline-offset-4 hover:underline"
-						>
-							Create an account
-						</Link>
-					</p>
-				</motion.div>
-			</AuthCard>
-		</main>
+				<p className="mt-6 text-center text-sm text-muted-foreground">
+					New to the academy?{" "}
+					<Link
+						to="/auth/signup"
+						className="font-medium text-primary underline-offset-4 hover:underline"
+					>
+						Create an account
+					</Link>
+				</p>
+			</div>
+		</AuthCard>
 	);
 }

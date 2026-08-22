@@ -203,10 +203,10 @@ export default function Header() {
 				</div>
 
 				{/* ── Right: actions ── */}
-				<div className="flex items-center gap-1.5">
+				<div className="flex items-center gap-5">
+					<UserDropDown />
 					{/* Book Now — primary, drives conversion; solid gold on both mobile drawer and desktop bar */}
 					<Button
-						size="sm"
 						render={<Link to="/enroll" />}
 						className="hidden gap-2 sm:flex"
 					>
@@ -215,7 +215,6 @@ export default function Header() {
 					</Button>
 
 					{/* Ghost mode toggle — no border box */}
-					<UserDropDown />
 				</div>
 			</div>
 		</nav>
