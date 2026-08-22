@@ -35,7 +35,7 @@ const GALLERY_ITEMS = [
 export default function StudentLife() {
 	return (
 		<section
-			className="border-t border-primary/15 bg-secondary px-6 py-24 text-secondary-foreground lg:px-10"
+			className="border-t border-primary/15  px-6 py-24  lg:px-10"
 			aria-labelledby="academy-heading"
 		>
 			<div className="mx-auto max-w-7xl">
@@ -46,9 +46,6 @@ export default function StudentLife() {
 							aria-hidden="true"
 						/>
 						<div>
-							<p className="text-[11px] tracking-[0.28em] text-primary">
-								GUARD &#8470; 3
-							</p>
 							<h2
 								id="academy-heading"
 								className="mt-1 text-3xl sm:text-4xl"

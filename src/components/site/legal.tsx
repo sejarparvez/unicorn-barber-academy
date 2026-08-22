@@ -40,7 +40,7 @@ export function LegalHero({ title }: { title: string }) {
 
 export function LegalContent({ children }: { children: ReactNode }) {
 	return (
-		<div className="bg-background px-6 py-16 lg:px-10">
+		<div className="section-light bg-background px-6 py-16 lg:px-10">
 			<div className="mx-auto max-w-3xl">
 				<div className="prose prose-neutral max-w-none">{children}</div>
 			</div>

@@ -39,7 +39,7 @@ const FEATURES = [
 export default function WhyUnicorn() {
 	return (
 		<section
-			className="bg-background px-6 py-24 lg:px-10"
+			className="section-light bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="why-heading"
 		>
 			<div className="mx-auto max-w-7xl">
@@ -48,7 +48,7 @@ export default function WhyUnicorn() {
 					{FEATURES.map((feature) => (
 						<div
 							key={feature.title}
-							className="bg-background p-8 transition-colors hover:bg-accent"
+							className="bg-background p-8 transition-colors hover:bg-primary/5"
 						>
 							<feature.icon
 								className="h-7 w-7 text-primary"

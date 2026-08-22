@@ -151,7 +151,7 @@ function ProgramTrack({
 export default function Programs() {
 	return (
 		<section
-			className="border-t border-border bg-background px-6 py-24 lg:px-10"
+			className="section-light border-t border-border bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="programs-heading"
 		>
 			<script

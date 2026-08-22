@@ -61,7 +61,7 @@ export function AuthHero({
 
 export function AuthCard({ children }: { children: ReactNode }) {
 	return (
-		<section className="bg-background px-6 py-16 lg:py-20">
+		<section className="section-light bg-background px-6 py-16 lg:py-20">
 			<div className="mx-auto max-w-md rounded-lg border border-border bg-card p-8 text-card-foreground shadow-sm">
 				{children}
 			</div>

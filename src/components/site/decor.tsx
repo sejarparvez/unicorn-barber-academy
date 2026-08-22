@@ -147,7 +147,6 @@ export function GuildSeal({ className }: { className?: string }) {
 }
 
 export function SectionEyebrow({
-	guard,
 	title,
 	id,
 	as = "h2",
@@ -166,9 +165,6 @@ export function SectionEyebrow({
 				aria-hidden="true"
 			/>
 			<div>
-				<p className="text-[11px] tracking-[0.28em] text-primary">
-					GUARD &#8470; {guard}
-				</p>
 				<Title
 					id={id}
 					className="mt-1 font-heading text-3xl font-medium text-foreground sm:text-4xl"
@@ -256,7 +252,7 @@ export function FinalCta({
 	const shouldReduceMotion = useReducedMotion();
 
 	return (
-		<section className="relative overflow-hidden border-t border-primary/15 bg-secondary px-6 py-28 text-center text-secondary-foreground lg:px-10">
+		<section className="relative overflow-hidden border-t border-primary/15 px-6 py-28 text-center lg:px-10">
 			<Grain />
 			<motion.div
 				aria-hidden="true"

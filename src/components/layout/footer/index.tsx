@@ -82,7 +82,7 @@ const LOCAL_BUSINESS_JSON_LD = {
 
 export default function Footer() {
 	return (
-		<footer className="relative overflow-hidden bg-secondary text-secondary-foreground">
+		<footer className="relative overflow-hidden">
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine

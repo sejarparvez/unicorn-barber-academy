@@ -2,20 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
-* {
-  box-sizing: border-box;
-}
-html,
-body,
-#app {
-  min-height: 100%;
-}
-body {
-  margin: 0;
-}
 @theme inline {
-  --font-heading:
-    "Inter Variable", ui-serif, Georgia, serif; /* ← changed from var(--font-sans) */
+  --font-heading: var(--font-sans);
   --font-sans: "Inter Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -57,38 +45,84 @@ body {
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.77 0.15 85);
-  --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.145 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.97 0.005 85);
-  --muted-foreground: oklch(0.45 0.01 85);
-  --accent: oklch(0.94 0.04 85);
-  --accent-foreground: oklch(0.25 0.02 85);
+  /* Near-black background, warm undertone to match logo backdrop */
+  --background: oklch(0.13 0.006 85);
+  --foreground: oklch(0.93 0.03 85);
+
+  --card: oklch(0.17 0.01 85);
+  --card-foreground: oklch(0.93 0.03 85);
+
+  --popover: oklch(0.17 0.01 85);
+  --popover-foreground: oklch(0.93 0.03 85);
+
+  /* Gold, pulled from the brighter end of the logo's gradient */
+  --primary: oklch(0.74 0.15 85);
+  --primary-foreground: oklch(0.13 0.006 85);
+
+  /* Deep bronze/charcoal secondary surfaces */
+  --secondary: oklch(0.24 0.015 85);
+  --secondary-foreground: oklch(0.87 0.05 85);
+
+  --muted: oklch(0.21 0.012 85);
+  --muted-foreground: oklch(0.64 0.03 85);
+
+  /* Deeper amber-gold accent, from the darker end of the gradient */
+  --accent: oklch(0.62 0.14 78);
+  --accent-foreground: oklch(0.1 0.005 85);
+
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.02 85);
-  --input: oklch(0.9 0.02 85);
-  --ring: oklch(0.77 0.15 85);
-  --chart-1: oklch(0.83 0.17 90);
-  --chart-2: oklch(0.77 0.15 85);
-  --chart-3: oklch(0.6 0.13 80);
-  --chart-4: oklch(0.42 0.09 75);
-  --chart-5: oklch(0.25 0.02 85);
+
+  --border: oklch(0.32 0.025 85);
+  --input: oklch(0.26 0.02 85);
+  --ring: oklch(0.74 0.15 85);
+
+  /* Chart palette: a gold ramp, light to dark */
+  --chart-1: oklch(0.82 0.12 88);
+  --chart-2: oklch(0.74 0.15 85);
+  --chart-3: oklch(0.62 0.14 78);
+  --chart-4: oklch(0.48 0.11 72);
+  --chart-5: oklch(0.34 0.07 68);
+
   --radius: 0.625rem;
-  --sidebar: oklch(0.145 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.77 0.15 85);
-  --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(0.25 0.02 85);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.77 0.15 85);
+
+  --sidebar: oklch(0.11 0.006 85);
+  --sidebar-foreground: oklch(0.93 0.03 85);
+  --sidebar-primary: oklch(0.74 0.15 85);
+  --sidebar-primary-foreground: oklch(0.13 0.006 85);
+  --sidebar-accent: oklch(0.21 0.012 85);
+  --sidebar-accent-foreground: oklch(0.87 0.05 85);
+  --sidebar-border: oklch(0.28 0.02 85);
+  --sidebar-ring: oklch(0.74 0.15 85);
+}
+/* Scoped light band: re-maps the theme tokens for an entire subtree, so any
+   component inside (cards, badges, accordion…) adapts automatically — the same
+   cascade trick shadcn's `.dark` class uses. No breakpoint classes needed,
+   so it is mobile-safe by construction. */
+@layer components {
+  .section-light {
+    /* warm white */
+    --background: oklch(0.985 0.004 85);
+    /* warm near-black */
+    --foreground: oklch(0.24 0.015 85);
+
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.24 0.015 85);
+
+    --muted: oklch(0.95 0.006 85);
+    --muted-foreground: oklch(0.46 0.02 85);
+
+    --border: oklch(0.88 0.01 85);
+    --input: oklch(0.88 0.01 85);
+
+    /* bronze → soft warm gray */
+    --secondary: oklch(0.94 0.008 85);
+    --secondary-foreground: oklch(0.3 0.02 85);
+
+    /* deeper gold so accents/text stay readable on white */
+    --primary: oklch(0.62 0.14 80);
+    /* near-white text on deep-gold fills */
+    --primary-foreground: oklch(0.99 0.002 85);
+  }
 }
 @layer base {
   * {

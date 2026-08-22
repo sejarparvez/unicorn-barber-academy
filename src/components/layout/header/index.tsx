@@ -1,181 +1,149 @@
-// components/Header.tsx
-import { IconMenu2 } from "@tabler/icons-react";
-import { Link } from "@tanstack/react-router";
+import { IconMenu2, IconPlus } from "@tabler/icons-react";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import logo from "@/assets/logo/logo.png";
-import { Button, buttonVariants } from "@/components/ui/button";
-
+import { useEffect, useState } from "react";
+import Logo from "@/assets/logo/logo.png";
+import { Button } from "@/components/ui/button";
 import {
 	Sheet,
-	SheetClose,
 	SheetContent,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import { authClient } from "@/lib/auth-client";
-import { SITE_URL } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
+import UserDropDown from "./user";
 
-const ctaClassName = cn(buttonVariants({ variant: "default" }), "px-4");
-
-type NavLink = {
-	label: string;
-	to: string;
-};
-
-const NAV_LINKS: NavLink[] = [
-	{ label: "Home", to: "/" },
-	{ label: "Programs", to: "/programs" },
-	{ label: "Instructors", to: "/instructors" },
-	{ label: "Gallery", to: "/gallery" },
-	{ label: "Contact", to: "/contact" },
+const navItems = [
+	{ name: "Home", href: "/" },
+	{ name: "About", href: "/about" },
+	{ name: "Programs", href: "/programs" },
+	{ name: "Instractors", href: "/instructors" },
+	{ name: "Gallery", href: "/gallery" },
+	{ name: "Blog", href: "/blog" },
+	{ name: "Contact", href: "/contact" },
 ];
 
-/**
- * Helps search/answer engines enumerate the primary site sections directly
- * (e.g. AI answer engines listing "what pages does this site have").
- */
-const SITE_NAV_JSON_LD = {
-	"@context": "https://schema.org",
-	"@type": "SiteNavigationElement",
-	itemListElement: NAV_LINKS.map((link, i) => ({
-		"@type": "ListItem",
-		position: i + 1,
-		name: link.label,
-		url: `${SITE_URL}${link.to === "/" ? "" : link.to}`,
-	})),
-};
-
-const accountLinkClassName = cn(
-	"whitespace-nowrap py-2",
-	"text-[12px] font-medium tracking-[0.14em]",
-	"text-secondary-foreground/70",
-	"transition-colors duration-200",
-	"hover:text-primary",
-	"xl:text-[13px] xl:tracking-[0.18em]",
-);
-
-/** Desktop: SIGN IN when signed out, "HI, NAME" + SIGN OUT when signed in. */
-function AccountLinks() {
-	const { data: session, isPending } = authClient.useSession();
-
-	if (isPending) return null;
-
-	if (!session?.user) {
-		return (
-			<Link
-				to="/auth/signin"
-				preload="intent"
-				className={cn(accountLinkClassName, "hidden md:block")}
-			>
-				SIGN IN
-			</Link>
-		);
-	}
-
-	return (
-		<div className="hidden min-w-0 items-center gap-3 md:flex">
-			<span className="max-w-[12ch] truncate text-[12px] font-medium tracking-[0.14em] text-secondary-foreground/85 xl:text-[13px]">
-				HI, {(session.user.name ?? "THERE").split(" ")[0].toUpperCase()}
-			</span>
-			<button
-				type="button"
-				onClick={() => {
-					void authClient.signOut();
-				}}
-				className={accountLinkClassName}
-			>
-				SIGN OUT
-			</button>
-		</div>
-	);
-}
-
-/** Mobile sheet equivalent of AccountLinks. */
-function MobileAccountLinks() {
-	const { data: session, isPending } = authClient.useSession();
-
-	if (isPending) return null;
-
-	if (!session?.user) {
-		return (
-			<SheetClose
-				render={
-					<Link
-						to="/auth/signin"
-						preload="intent"
-						className={cn(
-							"flex items-center py-3",
-							"text-sm font-medium tracking-[0.18em]",
-							"text-secondary-foreground/80",
-							"transition-colors duration-200",
-							"hover:text-primary",
-						)}
-					/>
-				}
-			>
-				SIGN IN
-			</SheetClose>
-		);
-	}
-
-	return (
-		<div className="flex items-center justify-between gap-4 border-t border-secondary-foreground/15 pt-4">
-			<span className="truncate text-sm tracking-[0.14em] text-secondary-foreground">
-				HI, {(session.user.name ?? "THERE").split(" ")[0].toUpperCase()}
-			</span>
-			<SheetClose
-				render={
-					<Button
-						variant="ghost"
-						size="sm"
-						className="text-secondary-foreground/70 hover:bg-transparent hover:text-primary"
-						onClick={() => {
-							void authClient.signOut();
-						}}
-					/>
-				}
-			>
-				SIGN OUT
-			</SheetClose>
-		</div>
-	);
-}
-
 export default function Header() {
+	// TanStack Router equivalent of next/navigation's usePathname().
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const [isVisible, setIsVisible] = useState(true);
+	const [lastScrollY, setLastScrollY] = useState(0);
+
+	useEffect(() => {
+		const controlNavbar = () => {
+			const currentScrollY = window.scrollY;
+			if (currentScrollY < 10) {
+				setIsVisible(true);
+			} else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+				setIsVisible(false);
+			} else if (currentScrollY < lastScrollY) {
+				setIsVisible(true);
+			}
+			setLastScrollY(currentScrollY);
+		};
+
+		window.addEventListener("scroll", controlNavbar, { passive: true });
+		return () => window.removeEventListener("scroll", controlNavbar);
+	}, [lastScrollY]);
+
 	return (
-		<>
-			{/* Skip link: first focusable element on the page for keyboard/screen-reader users */}
-			<Link
-				to="."
-				hash="main-content"
-				className={cn(
-					"sr-only focus:not-sr-only",
-					"focus:fixed focus:top-2 focus:left-2 focus:z-60",
-					"focus:rounded-none focus:bg-primary focus:px-4 focus:py-2",
-					"focus:text-primary-foreground focus:text-sm focus:font-medium",
-				)}
-			>
-				Skip to content
-			</Link>
+		<nav
+			className={cn(
+				"sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-transform duration-300",
+				isVisible ? "translate-y-0" : "-translate-y-full",
+			)}
+		>
+			<div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
+				{/* ── Left: mobile menu + logo ── */}
+				<div className="flex items-center gap-2">
+					{/* Mobile hamburger */}
+					<div className="lg:hidden">
+						<Sheet>
+							<SheetTrigger
+								render={
+									<Button variant="ghost" size="icon" className="shrink-0" />
+								}
+							>
+								<IconMenu2 className="h-5 w-5" stroke={1.75} />
+								<span className="sr-only">Toggle navigation menu</span>
+							</SheetTrigger>
+							<SheetContent side="left" className="w-72 p-0">
+								<SheetHeader className="border-b border-border px-6 py-5">
+									{/* Logo — matches footer logo treatment */}
+									<SheetTitle>
+										{/* Brand */}
+										<Link
+											to="/"
+											preload="intent"
+											className="flex min-w-0 shrink-0 items-center gap-2.5 sm:gap-4"
+											aria-label="Unicorn Barber Training Academy, home"
+										>
+											<Image
+												src={Logo}
+												alt="Unicorn Barber Training Academy logo"
+												className="h-8 w-8 shrink-0 sm:h-10 sm:w-10"
+												width={400}
+												height={400}
+											/>
 
-			<header
-				className={cn(
-					"fixed top-0 z-50 w-full",
-					"bg-secondary text-secondary-foreground",
-					"transition-shadow",
-				)}
-			>
-				<script
-					type="application/ld+json"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-					dangerouslySetInnerHTML={{
-						__html: JSON.stringify(SITE_NAV_JSON_LD),
-					}}
-				/>
+											<span
+												aria-hidden="true"
+												className="h-7 w-px shrink-0 bg-foreground sm:h-8"
+											/>
 
-				<div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-6 lg:px-8">
+											<span className="flex min-w-0 flex-col leading-none">
+												<span className="font-bold text-primary text-xl md:text-2xl tracking-widest">
+													UNICORN
+												</span>
+
+												<span className="mt-1 truncate text-[6px] tracking-[0.2em] text-secondary-foreground/65 sm:text-[10px] sm:tracking-[0.32em]">
+													BARBER TRAINING ACADEMY
+												</span>
+											</span>
+										</Link>
+									</SheetTitle>
+								</SheetHeader>
+
+								{/* Nav links */}
+								<div className="flex flex-col px-4 py-4 gap-1">
+									{navItems.map((item) => {
+										const active = pathname === item.href;
+										return (
+											<Link
+												key={item.name}
+												to={item.href}
+												className={cn(
+													"flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200",
+													active
+														? "bg-primary/10 text-primary"
+														: "text-foreground/70 hover:text-primary hover:bg-primary/5",
+												)}
+											>
+												{active && (
+													<span className="w-1 h-4 rounded-full bg-primary shrink-0" />
+												)}
+												{item.name}
+											</Link>
+										);
+									})}
+								</div>
+
+								{/* Mobile Book Now */}
+								<div className="px-4 pt-2 mt-auto border-t border-border">
+									<Button
+										render={<Link to="/enroll" />}
+										className="w-full gap-2 mt-4 mb-4"
+									>
+										<IconPlus className="w-4 h-4" stroke={1.75} />
+										Enroll Now
+									</Button>
+								</div>
+							</SheetContent>
+						</Sheet>
+					</div>
+
+					{/* Logo */}
 					{/* Brand */}
 					<Link
 						to="/"
@@ -184,7 +152,7 @@ export default function Header() {
 						aria-label="Unicorn Barber Training Academy, home"
 					>
 						<Image
-							src={logo}
+							src={Logo}
 							alt="Unicorn Barber Training Academy logo"
 							className="h-8 w-8 shrink-0 sm:h-10 sm:w-10"
 							width={400}
@@ -193,178 +161,63 @@ export default function Header() {
 
 						<span
 							aria-hidden="true"
-							className="h-7 w-px shrink-0 bg-linear-to-b from-[#F4C430] via-primary to-[#8B6914] sm:h-8"
+							className="h-7 w-px shrink-0 bg-foreground sm:h-8"
 						/>
 
 						<span className="flex min-w-0 flex-col leading-none">
-							<span
-								className="truncate bg-linear-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-base tracking-[0.12em] text-transparent sm:text-xl sm:tracking-[0.14em]"
-								style={{
-									fontFamily: "var(--font-heading)",
-									fontWeight: 600,
-								}}
-							>
+							<span className="font-bold text-primary text-xl md:text-2xl tracking-widest">
 								UNICORN
 							</span>
 
-							<span className="mt-1 truncate text-[8px] tracking-[0.2em] text-secondary-foreground/65 sm:text-[10px] sm:tracking-[0.32em]">
+							<span className="mt-1 truncate text-[6px] tracking-[0.2em] text-secondary-foreground/65 sm:text-[10px] sm:tracking-[0.32em]">
 								BARBER TRAINING ACADEMY
 							</span>
 						</span>
 					</Link>
-
-					<nav
-						className="hidden items-center gap-6 lg:flex xl:gap-9"
-						aria-label="Primary"
-					>
-						<ul className="flex items-center gap-6 xl:gap-9">
-							{NAV_LINKS.map((link) => (
-								<li key={link.label}>
-									<Link
-										to={link.to}
-										preload="intent"
-										activeOptions={{ exact: link.to === "/" }}
-										className={cn(
-											"group relative whitespace-nowrap py-2",
-											"text-[12px] font-medium tracking-[0.14em]",
-											"text-secondary-foreground/70",
-											"transition-colors duration-200",
-											"hover:text-primary",
-											"xl:text-[13px] xl:tracking-[0.18em]",
-										)}
-										activeProps={{
-											className: "text-primary active",
-											"aria-current": "page",
-										}}
-									>
-										{link.label.toUpperCase()}
-
-										{/* Single active / hover indicator */}
-										<span
-											aria-hidden="true"
-											className={cn(
-												"absolute -bottom-0.5 left-0",
-												"h-px w-0 bg-primary",
-												"transition-[width] duration-300 ease-out",
-												"group-hover:w-full",
-												"group-[.active]:w-full",
-											)}
-										/>
-									</Link>
-								</li>
-							))}
-						</ul>
-					</nav>
-
-					{/* Account + CTA + mobile menu */}
-					<div className="flex shrink-0 items-center gap-2 sm:gap-4">
-						<AccountLinks />
-
-						<Link
-							to="/enroll"
-							preload="intent"
-							className={cn(
-								ctaClassName,
-								"hidden rounded-none text-xs sm:inline-flex xl:text-sm",
-							)}
-						>
-							ENROLL NOW
-						</Link>
-
-						<Sheet>
-							<SheetTrigger
-								render={
-									<Button
-										variant="ghost"
-										size="icon"
-										aria-label="Open menu"
-										className="text-secondary-foreground hover:bg-transparent hover:text-primary lg:hidden"
-									/>
-								}
-							>
-								<IconMenu2 className="h-6 w-6" stroke={1.75} />
-							</SheetTrigger>
-
-							<SheetContent
-								side="right"
-								className="w-70 max-w-[85vw] border-l border-primary/20 bg-secondary p-6 text-secondary-foreground"
-							>
-								<SheetHeader className="sr-only">
-									<SheetTitle>Navigation Menu</SheetTitle>
-								</SheetHeader>
-
-								<nav className="mt-8 flex flex-col gap-2" aria-label="Mobile">
-									<ul className="flex flex-col gap-2">
-										{NAV_LINKS.map((link) => (
-											<li key={link.label}>
-												<SheetClose
-													render={
-														<Link
-															to={link.to}
-															preload="intent"
-															activeOptions={{
-																exact: link.to === "/",
-															}}
-															className={cn(
-																"group relative flex items-center",
-																"py-3",
-																"text-sm font-medium tracking-[0.18em]",
-																"text-secondary-foreground/80",
-																"transition-colors duration-200",
-																"hover:text-primary",
-															)}
-															activeProps={{
-																className: "text-primary active",
-																"aria-current": "page",
-															}}
-														/>
-													}
-												>
-													{/* Mobile active indicator */}
-													<span
-														aria-hidden="true"
-														className={cn(
-															"mr-3 h-px w-0 bg-primary",
-															"transition-all duration-300 ease-out",
-															"group-hover:w-5",
-															"group-[.active]:w-5",
-														)}
-													/>
-
-													{link.label.toUpperCase()}
-												</SheetClose>
-											</li>
-										))}
-									</ul>
-
-									<MobileAccountLinks />
-
-									<SheetClose
-										render={
-											<Link
-												to="/enroll"
-												preload="intent"
-												className={cn(
-													ctaClassName,
-													"mt-4 w-full justify-center",
-												)}
-											/>
-										}
-									>
-										ENROLL NOW
-									</SheetClose>
-								</nav>
-							</SheetContent>
-						</Sheet>
-					</div>
 				</div>
 
-				{/* Hairline divider */}
-				<div
-					aria-hidden="true"
-					className="h-px w-full bg-linear-to-r from-transparent via-primary to-transparent opacity-70"
-				/>
-			</header>
-		</>
+				{/* ── Center: desktop nav ── */}
+				<div className="hidden lg:flex items-center gap-1">
+					{navItems.map((item) => {
+						const active = pathname === item.href;
+						return (
+							<Link
+								key={item.name}
+								to={item.href}
+								className={cn(
+									"relative px-3 py-2 text-sm font-medium transition-colors duration-200 hover:text-primary group",
+									active ? "text-primary" : "text-muted-foreground",
+								)}
+							>
+								{item.name}
+								{/* Active underline — h-px rule from design system */}
+								<span
+									className={cn(
+										"absolute bottom-0 left-3 right-3 h-px bg-primary transition-all duration-200",
+										active ? "opacity-100" : "opacity-0 group-hover:opacity-40",
+									)}
+								/>
+							</Link>
+						);
+					})}
+				</div>
+
+				{/* ── Right: actions ── */}
+				<div className="flex items-center gap-1.5">
+					{/* Book Now — primary, drives conversion; solid gold on both mobile drawer and desktop bar */}
+					<Button
+						size="sm"
+						render={<Link to="/enroll" />}
+						className="hidden gap-2 sm:flex"
+					>
+						<IconPlus className="w-4 h-4" stroke={1.75} />
+						Enroll Now
+					</Button>
+
+					{/* Ghost mode toggle — no border box */}
+					<UserDropDown />
+				</div>
+			</div>
+		</nav>
 	);
 }

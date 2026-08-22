@@ -29,11 +29,15 @@ export const Route = createFileRoute("/enroll")({
 
 function EnrollPage() {
 	return (
-		<main className="mx-auto max-w-3xl px-6 py-24 text-center">
-			<h1 className="font-heading text-4xl font-medium sm:text-5xl">Enroll</h1>
-			<p className="mt-4 text-muted-foreground">
-				This is the enroll page. The application experience is being rebuilt.
-			</p>
+		<main className="section-light bg-background px-6 py-24">
+			<div className="mx-auto max-w-3xl text-center">
+				<h1 className="font-heading text-4xl font-medium sm:text-5xl">
+					Enroll
+				</h1>
+				<p className="mt-4 text-muted-foreground">
+					This is the enroll page. The application experience is being rebuilt.
+				</p>
+			</div>
 		</main>
 	);
 }

@@ -226,7 +226,7 @@ function ProgramCatalogue() {
 
 	return (
 		<section
-			className="bg-background px-6 py-24 lg:px-10"
+			className="section-light bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="catalogue-heading"
 		>
 			<div className="mx-auto max-w-7xl">

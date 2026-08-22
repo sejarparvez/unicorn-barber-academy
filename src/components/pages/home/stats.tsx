@@ -11,10 +11,7 @@ const STATS = [
 
 export default function Stats() {
 	return (
-		<section
-			className="bg-secondary text-secondary-foreground"
-			aria-label="Academy statistics"
-		>
+		<section className="" aria-label="Academy statistics">
 			<div className="mx-auto grid max-w-7xl grid-cols-2 lg:grid-cols-4 lg:px-10">
 				{STATS.map((stat, i) => (
 					<div

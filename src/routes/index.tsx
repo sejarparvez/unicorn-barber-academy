@@ -66,7 +66,7 @@ function Home() {
 function VisitUs() {
 	return (
 		<section
-			className="border-t border-primary/15 bg-secondary text-secondary-foreground"
+			className="border-t border-primary/15"
 			aria-labelledby="visit-heading"
 		>
 			<div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">

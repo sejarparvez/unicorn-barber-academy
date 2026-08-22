@@ -120,7 +120,7 @@ function AboutHero() {
 	const [primaryLead, secondaryLead] = leads;
 
 	return (
-		<section className="border-b border-border bg-secondary px-6 pt-28 pb-20 text-secondary-foreground lg:px-10 lg:pt-36 lg:pb-24">
+		<section className="border-b border-border px-6 pt-28 pb-20 lg:px-10 lg:pt-36 lg:pb-24">
 			<h1 className="sr-only">About Unicorn Barber Training Academy</h1>
 			<div className="mx-auto max-w-7xl">
 				<div className="flex items-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/65">
@@ -219,7 +219,7 @@ function AboutHero() {
 function OurStory() {
 	return (
 		<section
-			className="bg-background px-6 py-24 lg:px-10"
+			className="section-light bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="story-heading"
 		>
 			<div className="mx-auto max-w-7xl">
@@ -345,7 +345,7 @@ function LedBy() {
 
 	return (
 		<section
-			className="bg-background px-6 py-24 lg:px-10"
+			className="section-light bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="led-by-heading"
 		>
 			<div className="mx-auto max-w-7xl">

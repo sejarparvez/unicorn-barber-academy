@@ -121,7 +121,7 @@ function InstructorsPage() {
 function Spotlight({ leads }: { leads: Instructor[] }) {
 	return (
 		<section
-			className="bg-background px-6 py-24 lg:px-10"
+			className="section-light bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="leads-heading"
 		>
 			<h1 className="sr-only">Meet the Instructors</h1>
@@ -291,7 +291,7 @@ function MembershipCard({ instructor }: { instructor: Instructor }) {
 
 function OpenChair() {
 	return (
-		<section className="border-t border-border bg-background px-6 py-20 lg:px-10">
+		<section className="section-light border-t border-border bg-background px-6 py-20 lg:px-10">
 			<div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border border-dashed border-primary/30 px-8 py-10 text-center lg:flex-row lg:text-left">
 				<div className="flex items-center gap-4">
 					<IconBriefcase

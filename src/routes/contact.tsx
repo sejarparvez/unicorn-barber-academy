@@ -248,7 +248,7 @@ function ContactForm() {
 
 	return (
 		<section
-			className="bg-background px-6 py-24 lg:px-10"
+			className="section-light bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="contact-heading"
 		>
 			<div className="mx-auto max-w-7xl">
@@ -530,10 +530,7 @@ function SealedConfirmation({ onReset }: { onReset: () => void }) {
 
 function VisitStudio() {
 	return (
-		<section
-			id="visit"
-			className="scroll-mt-20 border-t border-border bg-secondary text-secondary-foreground"
-		>
+		<section id="visit" className="scroll-mt-20 border-t border-border">
 			<div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
 				<Reveal className="flex flex-col justify-center px-6 py-24 lg:px-10">
 					<SectionEyebrow
@@ -634,7 +631,7 @@ const CONTACT_FAQ_JSON_LD = {
 function ContactFaq() {
 	return (
 		<section
-			className="border-t border-border bg-background px-6 py-24 lg:px-10"
+			className="section-light border-t border-border bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="contact-faq-heading"
 		>
 			<script

@@ -50,7 +50,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<Header />
-				<div id="main-content" className="md:mt-16 mt-15 min-h-screen">
+				<div id="main-content" className=" min-h-screen">
 					<QueryProvider>{children}</QueryProvider>
 				</div>
 				<Footer />
