@@ -3,10 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { MyApplicationsCard } from "@/features/enrollment/my-applications-card";
 import { isStaff, parseRole, ROLE_LABELS, type Role } from "@/lib/roles";
 import { cn, getInitials } from "@/lib/utils";
+import { listMyApplicationsFn } from "@/server/enrollment-fns";
 
 export const Route = createFileRoute("/dashboard/")({
+	loader: () => listMyApplicationsFn(),
 	component: DashboardIndex,
 	head: () => ({
 		meta: [
@@ -20,6 +23,7 @@ function DashboardIndex() {
 	const { session } = Route.useRouteContext();
 	const role = parseRole(session.user.role);
 	const firstName = session.user.name?.split(" ")[0] || "";
+	const applications = Route.useLoaderData();
 
 	return (
 		<div className="space-y-8">
@@ -50,8 +54,13 @@ function DashboardIndex() {
 			<AccountCard role={role} />
 
 			{/* Role-aware body: each account sees exactly what applies to them. */}
-			{role === undefined || role === "user" ? <NotEnrolledCard /> : null}
+			{role === undefined || role === "user" ? (
+				<MyApplicationsCard applications={applications} />
+			) : null}
 			{role === "student" ? <StudentSections /> : null}
+			{role === "student" ? (
+				<MyApplicationsCard applications={applications} />
+			) : null}
 			{isStaff(role) && role !== undefined ? (
 				<StaffSection role={role} />
 			) : null}
@@ -99,47 +108,10 @@ function AccountCard({ role }: { role?: Role }) {
 	);
 }
 
-/** Registered account with no enrollment yet — nudge toward programs. */
-function NotEnrolledCard() {
-	return (
-		<section className="rounded-xl border border-primary/30 bg-primary/5 p-6 sm:p-8">
-			<h2 className="font-heading text-xl font-semibold">
-				You&rsquo;re registered — not enrolled yet
-			</h2>
-			<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-				Your account is ready whenever you are. Browse the programs, pick a
-				track, and hold your seat — enrollment takes a couple of minutes and
-				your details are already saved.
-			</p>
-			<div className="mt-6 flex flex-wrap items-center gap-3">
-				<Link
-					to="/programs"
-					className={cn(buttonVariants({ size: "lg" }), "gap-2")}
-				>
-					Browse programs
-					<IconArrowRight className="h-4 w-4" stroke={1.75} />
-				</Link>
-				<Link
-					to="/enroll"
-					className={buttonVariants({ variant: "outline", size: "lg" })}
-				>
-					Start enrollment
-				</Link>
-			</div>
-		</section>
-	);
-}
-
-/** Enrolled trainee: application/cohort tracking (data model coming soon). */
+/** Enrolled trainee: bookings/reviews tracking (data model coming soon). */
 function StudentSections() {
 	return (
 		<section className="grid gap-4 sm:grid-cols-2">
-			<div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
-				<h3 className="font-medium">Enrollments</h3>
-				<p className="mt-2 text-sm text-muted-foreground">
-					Application tracking and cohort details are coming soon.
-				</p>
-			</div>
 			<div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
 				<h3 className="font-medium">Bookings &amp; Reviews</h3>
 				<p className="mt-2 text-sm text-muted-foreground">
@@ -154,7 +126,12 @@ function StudentSections() {
 function StaffSection({ role }: { role: Role }) {
 	return (
 		<section className="space-y-4">
-			{role === "admin" ? <AdminBlogCard /> : null}
+			{role === "admin" ? (
+				<>
+					<AdminBlogCard />
+					<AdminAdmissionsCard />
+				</>
+			) : null}
 			<div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
 				<h3 className="font-medium">Staff tools</h3>
 				<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
@@ -181,6 +158,28 @@ function AdminBlogCard() {
 			</div>
 			<Link to="/dashboard/blog" className={cn(buttonVariants(), "gap-2")}>
 				Manage posts
+				<IconArrowRight className="h-4 w-4" stroke={1.75} />
+			</Link>
+		</section>
+	);
+}
+
+/** Admin-only entry into the admissions pipeline. */
+function AdminAdmissionsCard() {
+	return (
+		<section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-primary/30 bg-primary/5 p-6 sm:p-8">
+			<div>
+				<h3 className="font-heading text-xl font-semibold">Admissions</h3>
+				<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+					Review applications, decide approvals, track registration fees, and
+					manage program intakes.
+				</p>
+			</div>
+			<Link
+				to="/dashboard/enrollments"
+				className={cn(buttonVariants(), "gap-2")}
+			>
+				Review applications
 				<IconArrowRight className="h-4 w-4" stroke={1.75} />
 			</Link>
 		</section>

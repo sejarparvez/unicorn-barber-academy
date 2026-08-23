@@ -42,11 +42,17 @@ import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$sl
 import { Route as DashboardBlogIndexRouteImport } from './routes/dashboard/blog.index'
 import { Route as DashboardBlogCategoriesRouteImport } from './routes/dashboard/blog.categories'
 import { Route as DashboardBlogNewRouteImport } from './routes/dashboard/blog.new'
+import { Route as DashboardEnrollmentsIndexRouteImport } from './routes/dashboard/enrollments.index'
+import { Route as DashboardEnrollmentsIdRouteImport } from './routes/dashboard/enrollments/$id'
+import { Route as DashboardEnrollmentsIntakesRouteImport } from './routes/dashboard/enrollments/intakes'
 import { Route as MdBlogSlugRouteImport } from './routes/md/blog.$slug'
 import { Route as ApiAdminBlogIdRouteImport } from './routes/api/admin/blog/$id'
 import { Route as ApiAdminBlogCategoriesRouteImport } from './routes/api/admin/blog/categories'
+import { Route as ApiAdminEnrollmentsIdRouteImport } from './routes/api/admin/enrollments/$id'
+import { Route as ApiAdminEnrollmentsIntakesRouteImport } from './routes/api/admin/enrollments/intakes'
 import { Route as DashboardBlogIdEditRouteImport } from './routes/dashboard/blog.$id.edit'
 import { Route as ApiAdminBlogCategoriesIdRouteImport } from './routes/api/admin/blog/categories/$id'
+import { Route as ApiAdminEnrollmentsIntakesIdRouteImport } from './routes/api/admin/enrollments/intakes/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -213,6 +219,23 @@ const DashboardBlogNewRoute = DashboardBlogNewRouteImport.update({
   path: '/blog/new',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardEnrollmentsIndexRoute =
+  DashboardEnrollmentsIndexRouteImport.update({
+    id: '/enrollments/',
+    path: '/enrollments/',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardEnrollmentsIdRoute = DashboardEnrollmentsIdRouteImport.update({
+  id: '/enrollments/$id',
+  path: '/enrollments/$id',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardEnrollmentsIntakesRoute =
+  DashboardEnrollmentsIntakesRouteImport.update({
+    id: '/enrollments/intakes',
+    path: '/enrollments/intakes',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const MdBlogSlugRoute = MdBlogSlugRouteImport.update({
   id: '/md/blog/$slug',
   path: '/md/blog/$slug',
@@ -228,6 +251,17 @@ const ApiAdminBlogCategoriesRoute = ApiAdminBlogCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => ApiAdminBlogRoute,
 } as any)
+const ApiAdminEnrollmentsIdRoute = ApiAdminEnrollmentsIdRouteImport.update({
+  id: '/api/admin/enrollments/$id',
+  path: '/api/admin/enrollments/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminEnrollmentsIntakesRoute =
+  ApiAdminEnrollmentsIntakesRouteImport.update({
+    id: '/api/admin/enrollments/intakes',
+    path: '/api/admin/enrollments/intakes',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardBlogIdEditRoute = DashboardBlogIdEditRouteImport.update({
   id: '/blog/$id/edit',
   path: '/blog/$id/edit',
@@ -238,6 +272,12 @@ const ApiAdminBlogCategoriesIdRoute =
     id: '/$id',
     path: '/$id',
     getParentRoute: () => ApiAdminBlogCategoriesRoute,
+  } as any)
+const ApiAdminEnrollmentsIntakesIdRoute =
+  ApiAdminEnrollmentsIntakesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiAdminEnrollmentsIntakesRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -273,12 +313,18 @@ export interface FileRoutesByFullPath {
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
+  '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
   '/md/blog/$slug': typeof MdBlogSlugRoute
   '/dashboard/blog/': typeof DashboardBlogIndexRoute
+  '/dashboard/enrollments/': typeof DashboardEnrollmentsIndexRoute
   '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
   '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
+  '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
+  '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
   '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
   '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
+  '/api/admin/enrollments/intakes/$id': typeof ApiAdminEnrollmentsIntakesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -312,12 +358,18 @@ export interface FileRoutesByTo {
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
+  '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
   '/md/blog/$slug': typeof MdBlogSlugRoute
   '/dashboard/blog': typeof DashboardBlogIndexRoute
+  '/dashboard/enrollments': typeof DashboardEnrollmentsIndexRoute
   '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
   '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
+  '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
+  '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
   '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
   '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
+  '/api/admin/enrollments/intakes/$id': typeof ApiAdminEnrollmentsIntakesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -353,12 +405,18 @@ export interface FileRoutesById {
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
+  '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
   '/md/blog/$slug': typeof MdBlogSlugRoute
   '/dashboard/blog/': typeof DashboardBlogIndexRoute
+  '/dashboard/enrollments/': typeof DashboardEnrollmentsIndexRoute
   '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
   '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
+  '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
+  '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
   '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
   '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
+  '/api/admin/enrollments/intakes/$id': typeof ApiAdminEnrollmentsIntakesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -395,12 +453,18 @@ export interface FileRouteTypes {
     | '/blog/category/$slug'
     | '/dashboard/blog/categories'
     | '/dashboard/blog/new'
+    | '/dashboard/enrollments/$id'
+    | '/dashboard/enrollments/intakes'
     | '/md/blog/$slug'
     | '/dashboard/blog/'
+    | '/dashboard/enrollments/'
     | '/api/admin/blog/$id'
     | '/api/admin/blog/categories'
+    | '/api/admin/enrollments/$id'
+    | '/api/admin/enrollments/intakes'
     | '/dashboard/blog/$id/edit'
     | '/api/admin/blog/categories/$id'
+    | '/api/admin/enrollments/intakes/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -434,12 +498,18 @@ export interface FileRouteTypes {
     | '/blog/category/$slug'
     | '/dashboard/blog/categories'
     | '/dashboard/blog/new'
+    | '/dashboard/enrollments/$id'
+    | '/dashboard/enrollments/intakes'
     | '/md/blog/$slug'
     | '/dashboard/blog'
+    | '/dashboard/enrollments'
     | '/api/admin/blog/$id'
     | '/api/admin/blog/categories'
+    | '/api/admin/enrollments/$id'
+    | '/api/admin/enrollments/intakes'
     | '/dashboard/blog/$id/edit'
     | '/api/admin/blog/categories/$id'
+    | '/api/admin/enrollments/intakes/$id'
   id:
     | '__root__'
     | '/'
@@ -474,12 +544,18 @@ export interface FileRouteTypes {
     | '/blog/category/$slug'
     | '/dashboard/blog/categories'
     | '/dashboard/blog/new'
+    | '/dashboard/enrollments/$id'
+    | '/dashboard/enrollments/intakes'
     | '/md/blog/$slug'
     | '/dashboard/blog/'
+    | '/dashboard/enrollments/'
     | '/api/admin/blog/$id'
     | '/api/admin/blog/categories'
+    | '/api/admin/enrollments/$id'
+    | '/api/admin/enrollments/intakes'
     | '/dashboard/blog/$id/edit'
     | '/api/admin/blog/categories/$id'
+    | '/api/admin/enrollments/intakes/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -513,6 +589,8 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   BlogCategorySlugRoute: typeof BlogCategorySlugRoute
   MdBlogSlugRoute: typeof MdBlogSlugRoute
+  ApiAdminEnrollmentsIdRoute: typeof ApiAdminEnrollmentsIdRoute
+  ApiAdminEnrollmentsIntakesRoute: typeof ApiAdminEnrollmentsIntakesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -748,6 +826,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBlogNewRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/enrollments/': {
+      id: '/dashboard/enrollments/'
+      path: '/enrollments'
+      fullPath: '/dashboard/enrollments/'
+      preLoaderRoute: typeof DashboardEnrollmentsIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/enrollments/$id': {
+      id: '/dashboard/enrollments/$id'
+      path: '/enrollments/$id'
+      fullPath: '/dashboard/enrollments/$id'
+      preLoaderRoute: typeof DashboardEnrollmentsIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/enrollments/intakes': {
+      id: '/dashboard/enrollments/intakes'
+      path: '/enrollments/intakes'
+      fullPath: '/dashboard/enrollments/intakes'
+      preLoaderRoute: typeof DashboardEnrollmentsIntakesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/md/blog/$slug': {
       id: '/md/blog/$slug'
       path: '/md/blog/$slug'
@@ -769,6 +868,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminBlogCategoriesRouteImport
       parentRoute: typeof ApiAdminBlogRoute
     }
+    '/api/admin/enrollments/$id': {
+      id: '/api/admin/enrollments/$id'
+      path: '/api/admin/enrollments/$id'
+      fullPath: '/api/admin/enrollments/$id'
+      preLoaderRoute: typeof ApiAdminEnrollmentsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/enrollments/intakes': {
+      id: '/api/admin/enrollments/intakes'
+      path: '/api/admin/enrollments/intakes'
+      fullPath: '/api/admin/enrollments/intakes'
+      preLoaderRoute: typeof ApiAdminEnrollmentsIntakesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/blog/$id/edit': {
       id: '/dashboard/blog/$id/edit'
       path: '/blog/$id/edit'
@@ -783,6 +896,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminBlogCategoriesIdRouteImport
       parentRoute: typeof ApiAdminBlogCategoriesRoute
     }
+    '/api/admin/enrollments/intakes/$id': {
+      id: '/api/admin/enrollments/intakes/$id'
+      path: '/$id'
+      fullPath: '/api/admin/enrollments/intakes/$id'
+      preLoaderRoute: typeof ApiAdminEnrollmentsIntakesIdRouteImport
+      parentRoute: typeof ApiAdminEnrollmentsIntakesRoute
+    }
   }
 }
 
@@ -790,7 +910,10 @@ interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardBlogCategoriesRoute: typeof DashboardBlogCategoriesRoute
   DashboardBlogNewRoute: typeof DashboardBlogNewRoute
+  DashboardEnrollmentsIdRoute: typeof DashboardEnrollmentsIdRoute
+  DashboardEnrollmentsIntakesRoute: typeof DashboardEnrollmentsIntakesRoute
   DashboardBlogIndexRoute: typeof DashboardBlogIndexRoute
+  DashboardEnrollmentsIndexRoute: typeof DashboardEnrollmentsIndexRoute
   DashboardBlogIdEditRoute: typeof DashboardBlogIdEditRoute
 }
 
@@ -798,7 +921,10 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardBlogCategoriesRoute: DashboardBlogCategoriesRoute,
   DashboardBlogNewRoute: DashboardBlogNewRoute,
+  DashboardEnrollmentsIdRoute: DashboardEnrollmentsIdRoute,
+  DashboardEnrollmentsIntakesRoute: DashboardEnrollmentsIntakesRoute,
   DashboardBlogIndexRoute: DashboardBlogIndexRoute,
+  DashboardEnrollmentsIndexRoute: DashboardEnrollmentsIndexRoute,
   DashboardBlogIdEditRoute: DashboardBlogIdEditRoute,
 }
 
@@ -834,6 +960,20 @@ const ApiAdminBlogRouteWithChildren = ApiAdminBlogRoute._addFileChildren(
   ApiAdminBlogRouteChildren,
 )
 
+interface ApiAdminEnrollmentsIntakesRouteChildren {
+  ApiAdminEnrollmentsIntakesIdRoute: typeof ApiAdminEnrollmentsIntakesIdRoute
+}
+
+const ApiAdminEnrollmentsIntakesRouteChildren: ApiAdminEnrollmentsIntakesRouteChildren =
+  {
+    ApiAdminEnrollmentsIntakesIdRoute: ApiAdminEnrollmentsIntakesIdRoute,
+  }
+
+const ApiAdminEnrollmentsIntakesRouteWithChildren =
+  ApiAdminEnrollmentsIntakesRoute._addFileChildren(
+    ApiAdminEnrollmentsIntakesRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -865,6 +1005,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   BlogCategorySlugRoute: BlogCategorySlugRoute,
   MdBlogSlugRoute: MdBlogSlugRoute,
+  ApiAdminEnrollmentsIdRoute: ApiAdminEnrollmentsIdRoute,
+  ApiAdminEnrollmentsIntakesRoute: ApiAdminEnrollmentsIntakesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

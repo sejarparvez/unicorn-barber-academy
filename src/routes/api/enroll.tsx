@@ -1,13 +1,18 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
+import { formatStartsOn } from "@/lib/enrollment";
+import { auth } from "@/server/auth";
+import { listOpenIntakes, submitApplication } from "@/server/enrollment-db";
+import { validateApplicationPayload } from "@/server/enrollment-validate";
+import { applicationReceivedEmail, sendMail } from "@/server/mail";
 import { clientIp, isSameOrigin, overRateLimit } from "@/server/rate-limit";
 
 export const Route = createFileRoute("/api/enroll")({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
-				// Unauthenticated endpoint: block cross-site submissions and cap
-				// per-IP volume so this can't be used as a spam/log-flooding vector.
+				// Same-origin + per-IP cap stay on even though the endpoint now
+				// requires a session — cheap defense against scripted abuse.
 				if (!isSameOrigin(request)) {
 					return json({ message: "Forbidden" }, { status: 403 });
 				}
@@ -17,69 +22,79 @@ export const Route = createFileRoute("/api/enroll")({
 						{ status: 429 },
 					);
 				}
-				try {
-					const body = await request.json();
-					const { name, email, phone, track, program, cohort, message } = body;
 
-					// Validate required fields
-					if (!name || !email || !phone || !track || !program || !cohort) {
-						return json(
-							{ message: "All required fields must be filled" },
-							{ status: 400 },
-						);
-					}
-
-					// Validate email format
-					const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-					if (!emailRegex.test(email)) {
-						return json({ message: "Invalid email format" }, { status: 400 });
-					}
-
-					// Validate phone format (basic check)
-					const phoneRegex = /^[+]?[\d\s\-()]{10,}$/;
-					if (!phoneRegex.test(phone)) {
-						return json({ message: "Invalid phone number" }, { status: 400 });
-					}
-
-					// Validate track
-					if (!["barbering", "beauty"].includes(track)) {
-						return json({ message: "Invalid track" }, { status: 400 });
-					}
-
-					// Validate cohort
-					if (!["day", "evening"].includes(cohort)) {
-						return json({ message: "Invalid cohort" }, { status: 400 });
-					}
-
-					// In a real application, you would:
-					// 1. Save to database
-					// 2. Send confirmation email
-					// 3. Notify admissions team
-					// 4. Integrate with CRM
-
-					console.log("New enrollment application:", {
-						name,
-						email,
-						phone,
-						track,
-						program,
-						cohort,
-						message,
-						submittedAt: new Date().toISOString(),
-					});
-
-					// Simulate processing delay
-					await new Promise((resolve) => setTimeout(resolve, 500));
-
-					return json({
-						success: true,
-						message: "Application submitted successfully",
-						applicationId: `ENR-${Date.now()}`,
-					});
-				} catch (error) {
-					console.error("Enrollment submission error:", error);
-					return json({ message: "Internal server error" }, { status: 500 });
+				const session = await auth.api.getSession({
+					headers: request.headers,
+				});
+				if (!session) {
+					return json({ message: "Sign in to apply" }, { status: 401 });
 				}
+
+				let body: unknown;
+				try {
+					body = await request.json();
+				} catch {
+					return json({ message: "Invalid JSON body" }, { status: 400 });
+				}
+				const parsed = validateApplicationPayload(body);
+				if (!parsed.ok) {
+					return json({ message: parsed.message }, { status: 400 });
+				}
+
+				const result = await submitApplication({
+					userId: Number(session.user.id),
+					intakeId: parsed.value.intakeId,
+					fullName: session.user.name || "Applicant",
+					email: session.user.email,
+					phone: parsed.value.phone,
+					experienceNote: parsed.value.experienceNote,
+					hearAbout: parsed.value.hearAbout,
+				});
+
+				if (!result.ok) {
+					const messages = {
+						full: "That cohort just filled up — please pick another intake.",
+						closed: "That cohort is no longer accepting applications.",
+						duplicate:
+							"You already have an active application for this cohort.",
+						past: "That cohort has already started.",
+					} as const;
+					return json(
+						{ message: messages[result.reason] },
+						{ status: result.reason === "duplicate" ? 409 : 400 },
+					);
+				}
+
+				// Confirmation email with the reference (non-fatal on failure).
+				try {
+					const intakes = await listOpenIntakes();
+					const intake = intakes.find((i) => i.id === parsed.value.intakeId);
+					if (intake) {
+						await sendMail({
+							to: session.user.email,
+							subject: `Application received (${result.reference}) | Unicorn Barber Training Academy`,
+							html: applicationReceivedEmail({
+								reference: result.reference,
+								fullName: session.user.name || "there",
+								programTitle: intake.programTitle,
+								cohortLabel:
+									intake.cohort === "day" ? "Day cohort" : "Evening cohort",
+								startsOnDisplay: formatStartsOn(intake.startsOn),
+							}),
+						});
+					}
+				} catch (error) {
+					console.error("[enroll] confirmation email failed:", error);
+				}
+
+				return json(
+					{
+						success: true,
+						reference: result.reference,
+						message: "Application submitted successfully",
+					},
+					{ status: 201 },
+				);
 			},
 		},
 	},

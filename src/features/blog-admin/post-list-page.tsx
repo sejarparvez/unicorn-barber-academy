@@ -1,29 +1,20 @@
 // src/features/blog-admin/post-list-page.tsx
 // Admin listing of every post with status filter tabs and quick actions
-// (publish / unpublish / archive / delete). Data arrives via the route
-// loader; mutations go through lib/api/blog-admin.
+// (publish / unpublish / archive / delete). Reads + mutations flow through
+// the service layer (src/service/blog.ts).
 import { IconEye, IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-	deletePost,
-	formatPostDate,
-	setPostStatus,
-} from "@/lib/api/blog-admin";
+import { formatPostDate } from "@/lib/api/blog-admin";
 import {
 	BLOG_STATUS_LABELS,
 	type BlogPostSummary,
 	type BlogStatus,
-	type Paginated,
 } from "@/lib/blog";
 import { cn } from "@/lib/utils";
-
-type Props = {
-	data: Paginated<BlogPostSummary>;
-	statusFilter?: BlogStatus;
-};
+import { useAdminPosts, useDeletePost, useSetPostStatus } from "@/service/blog";
 
 const TABS: Array<{ label: string; status?: BlogStatus }> = [
 	{ label: "All", status: undefined },
@@ -32,14 +23,17 @@ const TABS: Array<{ label: string; status?: BlogStatus }> = [
 	{ label: "Archived", status: "archived" },
 ];
 
-export function PostListPage({ data, statusFilter }: Props) {
-	const router = useRouter();
-	const [busyId, setBusyId] = useState<number | null>(null);
+export function PostListPage({ statusFilter }: { statusFilter?: BlogStatus }) {
+	const { data, isPending } = useAdminPosts({ status: statusFilter });
+	const setStatusMutation = useSetPostStatus();
+	const deleteMutation = useDeletePost();
+	const mutatingId: number | undefined =
+		(setStatusMutation.variables as { id?: number } | undefined)?.id ??
+		(deleteMutation.variables as number | undefined);
 	const [error, setError] = useState<string | null>(null);
 	const [confirmId, setConfirmId] = useState<number | null>(null);
 
 	async function setStatus(post: BlogPostSummary, status: BlogStatus) {
-		setBusyId(post.id);
 		setError(null);
 		try {
 			const action =
@@ -48,12 +42,9 @@ export function PostListPage({ data, statusFilter }: Props) {
 					: status === "draft"
 						? "unpublish"
 						: "archive";
-			await setPostStatus(post.id, action);
-			setBusyId(null);
-			await router.invalidate();
+			await setStatusMutation.mutateAsync({ id: post.id, action });
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Action failed");
-			setBusyId(null);
 		}
 	}
 
@@ -62,16 +53,12 @@ export function PostListPage({ data, statusFilter }: Props) {
 			setConfirmId(id);
 			return;
 		}
-		setBusyId(id);
 		setError(null);
 		try {
-			await deletePost(id);
+			await deleteMutation.mutateAsync(id);
 			setConfirmId(null);
-			setBusyId(null);
-			await router.invalidate();
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Delete failed");
-			setBusyId(null);
 		}
 	}
 
@@ -85,7 +72,9 @@ export function PostListPage({ data, statusFilter }: Props) {
 					<h1 className="mt-1 font-heading text-2xl font-semibold tracking-tight">
 						Blog posts
 					</h1>
-					<p className="text-sm text-muted-foreground">{data.total} total</p>
+					<p className="text-sm text-muted-foreground">
+						{data ? `${data.total} total` : "Loading…"}
+					</p>
 				</div>
 				<Link
 					to="/dashboard/blog/new"
@@ -124,7 +113,11 @@ export function PostListPage({ data, statusFilter }: Props) {
 				</p>
 			) : null}
 
-			{data.items.length === 0 ? (
+			{isPending ? (
+				<section className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
+					<p className="text-sm text-muted-foreground">Loading posts…</p>
+				</section>
+			) : (data?.items.length ?? 0) === 0 ? (
 				<section className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
 					<h2 className="font-heading text-lg font-semibold">
 						No posts here yet
@@ -145,7 +138,7 @@ export function PostListPage({ data, statusFilter }: Props) {
 				</section>
 			) : (
 				<ul className="divide-y divide-border rounded-xl border border-border bg-card">
-					{data.items.map((post) => (
+					{(data?.items ?? []).map((post) => (
 						<li
 							key={post.id}
 							className="flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap"
@@ -203,7 +196,7 @@ export function PostListPage({ data, statusFilter }: Props) {
 								<Button
 									variant="outline"
 									size="sm"
-									disabled={busyId === post.id || !post.slug}
+									disabled={mutatingId === post.id || !post.slug}
 									onClick={() =>
 										setStatus(
 											post,
@@ -211,7 +204,7 @@ export function PostListPage({ data, statusFilter }: Props) {
 										)
 									}
 								>
-									{busyId === post.id
+									{mutatingId === post.id
 										? "…"
 										: post.status === "published"
 											? "Unpublish"
@@ -224,7 +217,7 @@ export function PostListPage({ data, statusFilter }: Props) {
 										confirmId === post.id ? "Confirm delete" : "Delete"
 									}
 									className={cn(confirmId === post.id && "text-destructive")}
-									disabled={busyId === post.id}
+									disabled={mutatingId === post.id}
 									onClick={() => onDelete(post.id)}
 								>
 									<IconTrash className="h-4 w-4" />
@@ -235,40 +228,11 @@ export function PostListPage({ data, statusFilter }: Props) {
 				</ul>
 			)}
 
-			{data.totalPages > 1 ? (
-				<footer className="flex items-center justify-between text-sm">
-					{data.page > 1 ? (
-						<Link
-							to="/dashboard/blog"
-							search={{
-								...(statusFilter ? { status: statusFilter } : {}),
-								page: Math.max(1, data.page - 1),
-							}}
-							className={buttonVariants({ variant: "outline", size: "sm" })}
-						>
-							Previous
-						</Link>
-					) : (
-						<span className="text-muted-foreground">Previous</span>
-					)}
-					<span className="text-muted-foreground">
-						Page {data.page} of {data.totalPages}
-					</span>
-					{data.page < data.totalPages ? (
-						<Link
-							to="/dashboard/blog"
-							search={{
-								...(statusFilter ? { status: statusFilter } : {}),
-								page: data.page + 1,
-							}}
-							className={buttonVariants({ variant: "outline", size: "sm" })}
-						>
-							Next
-						</Link>
-					) : (
-						<span className="text-muted-foreground">Next</span>
-					)}
-				</footer>
+			{data && data.total > data.items.length ? (
+				<p className="text-xs text-muted-foreground">
+					Showing the {data.items.length} most recently updated of {data.total}{" "}
+					posts.
+				</p>
 			) : null}
 		</div>
 	);

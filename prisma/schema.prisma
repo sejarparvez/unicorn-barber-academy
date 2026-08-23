@@ -29,6 +29,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   blogPosts     BlogPost[]
+  applications  EnrollmentApplication[]
 
   @@map("user")
 }
@@ -145,4 +146,54 @@ model BlogSlugRedirect {
 
   @@index([postId])
   @@map("blog_slug_redirect")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Enrollment system (scripts/sql/003_enrollment.sql). Same contract-only rule:
+// writes go through the app's pg pool (src/server/enrollment-db.ts).
+//
+// program_slug references src/data/programs.ts by convention — the program
+// catalog stays single-sourced in code, not duplicated in the DB.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ProgramIntake {
+  id          Int      @id @default(autoincrement())
+  programSlug String   @map("program_slug") @db.VarChar(120)
+  cohort      String   @db.VarChar(16) // day | evening
+  startsOn    DateTime @map("starts_on") @db.Date
+  seatsTotal  Int      @default(12) @map("seats_total")
+  isOpen      Boolean  @default(true) @map("is_open")
+  createdAt   DateTime @default(now()) @map("created_at")
+  applications EnrollmentApplication[]
+
+  @@unique([programSlug, cohort, startsOn])
+  @@index([programSlug, isOpen, startsOn])
+  @@map("program_intake")
+}
+
+model EnrollmentApplication {
+  id             Int           @id @default(autoincrement())
+  reference      String        @unique @db.VarChar(20) // ENR-XXXXXX
+  userId         Int           @map("user_id")
+  user           User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  intakeId       Int           @map("intake_id")
+  intake         ProgramIntake @relation(fields: [intakeId], references: [id], onDelete: Restrict)
+  status         String        @default("pending") @db.VarChar(16) // pending|reviewing|approved|waitlisted|rejected
+  fullName       String        @map("full_name") @db.VarChar(160)
+  email          String        @db.VarChar(200)
+  phone          String        @db.VarChar(40)
+  experienceNote String?       @map("experience_note")
+  hearAbout      String?       @map("hear_about") @db.VarChar(80)
+  decidedAt      DateTime?     @map("decided_at")
+  decidedBy      Int?          @map("decided_by")
+  decisionNote   String?
+  feeStatus      String        @default("unpaid") @map("fee_status") @db.VarChar(16) // unpaid | paid
+  feePaidAt      DateTime?     @map("fee_paid_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([userId])
+  @@index([intakeId])
+  @@map("enrollment_application")
 }

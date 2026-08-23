@@ -4,7 +4,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PostListPage } from "@/features/blog-admin/post-list-page";
 import { parseBlogStatus } from "@/lib/blog";
-import { listAdminPostsFn } from "@/server/blog-fns";
 import { requireRoles } from "@/server/guards";
 
 type BlogSearch = {
@@ -28,13 +27,8 @@ export const Route = createFileRoute("/dashboard/blog/")({
 			allowed: ["admin"],
 		});
 	},
-	loader: ({ location }) =>
-		listAdminPostsFn({
-			data: {
-				status: (location.search as BlogSearch).status,
-				page: (location.search as BlogSearch).page,
-			},
-		}),
+	// Reads flow through useAdminPosts (src/service/blog.ts) so post
+	// mutations invalidate precisely — no loader to double-fetch.
 	head: () => ({
 		meta: [
 			{ title: "Blog posts | Dashboard" },
@@ -45,7 +39,6 @@ export const Route = createFileRoute("/dashboard/blog/")({
 });
 
 function PostListRoute() {
-	const data = Route.useLoaderData();
 	const { status } = Route.useSearch();
-	return <PostListPage data={data} statusFilter={status} />;
+	return <PostListPage statusFilter={status} />;
 }

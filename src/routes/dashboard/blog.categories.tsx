@@ -1,8 +1,7 @@
 // routes/dashboard/blog.categories.tsx
-// Category manager. Admin-only.
+// Category manager. Admin-only. Reads via useBlogCategories (service layer).
 import { createFileRoute } from "@tanstack/react-router";
 import { CategoriesPage } from "@/features/blog-admin/categories-page";
-import { listCategoriesFn } from "@/server/blog-fns";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/blog/categories")({
@@ -13,7 +12,6 @@ export const Route = createFileRoute("/dashboard/blog/categories")({
 			allowed: ["admin"],
 		});
 	},
-	loader: () => listCategoriesFn(),
 	head: () => ({
 		meta: [
 			{ title: "Blog categories | Dashboard" },
@@ -24,6 +22,5 @@ export const Route = createFileRoute("/dashboard/blog/categories")({
 });
 
 function CategoriesRoute() {
-	const categories = Route.useLoaderData();
-	return <CategoriesPage categories={categories} />;
+	return <CategoriesPage />;
 }

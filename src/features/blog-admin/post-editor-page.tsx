@@ -16,12 +16,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-	createPost,
-	deletePost,
-	updatePost,
-	uploadImage,
-} from "@/lib/api/blog-admin";
+import { uploadImage } from "@/lib/api/blog-admin";
 import {
 	BLOG_STATUS_LABELS,
 	BLOG_STATUSES,
@@ -33,6 +28,7 @@ import {
 	slugify,
 } from "@/lib/blog";
 import { cn } from "@/lib/utils";
+import { useDeletePost, useSavePost } from "@/service/blog";
 import { MarkdownEditor } from "./markdown-editor";
 import { SeoPanel } from "./seo-panel";
 import { formRowsFromPost, type PostFormState } from "./types";
@@ -77,7 +73,9 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 	const [savedSnapshot, setSavedSnapshot] = useState(() =>
 		JSON.stringify(formFromPost(post)),
 	);
-	const [saving, setSaving] = useState(false);
+	const save = useSavePost(mode === "edit" ? post?.id : undefined);
+	const deleteMutation = useDeletePost();
+	const saving = save.isPending || deleteMutation.isPending;
 	const [error, setError] = useState<string | null>(null);
 	const [savedAt, setSavedAt] = useState<string | null>(null);
 	const [confirmDelete, setConfirmDelete] = useState(false);
@@ -129,7 +127,6 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 			);
 			return;
 		}
-		setSaving(true);
 		setError(null);
 		const status = nextStatus ?? form.status;
 		const payload = {
@@ -159,7 +156,7 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 		};
 		try {
 			if (mode === "new") {
-				const created = await createPost(payload);
+				const created = await save.mutateAsync(payload);
 				// Freshly saved — disarm the unsaved-changes blocker for the
 				// redirect into edit mode.
 				setSavedSnapshot(JSON.stringify(form));
@@ -169,7 +166,10 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 					replace: true,
 				});
 			} else if (post) {
-				const saved = await updatePost(post.id, payload);
+				const saved = await save.mutateAsync({
+					...payload,
+					slug: form.slugTouched ? form.slug : undefined,
+				});
 				// Adopt the server's view: slug collisions resolve to e.g.
 				// "slug-2", and the status may have been normalized.
 				const next = { ...form, slug: saved.slug, status: saved.status };
@@ -179,22 +179,18 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Save failed");
-		} finally {
-			setSaving(false);
 		}
 	}
 
 	async function onDelete() {
 		if (!post || !confirmDelete) return;
-		setSaving(true);
 		try {
-			await deletePost(post.id);
+			await deleteMutation.mutateAsync(post.id);
 			// Post is gone — disarm the unsaved-changes blocker for this nav.
 			setSavedSnapshot(JSON.stringify(form));
 			await navigate({ to: "/dashboard/blog", replace: true });
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Delete failed");
-			setSaving(false);
 		}
 	}
 

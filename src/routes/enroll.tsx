@@ -1,8 +1,21 @@
+// routes/enroll.tsx
+// Application page. Sign-in required: anonymous visitors bounce to
+// /auth/signin?redirect=/enroll (requireRoles preserves the destination).
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
+import { EnrollPage } from "@/features/enrollment/enroll-page";
+import { listOpenIntakesFn } from "@/server/enrollment-fns";
+import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/enroll")({
-	component: EnrollPage,
+	beforeLoad: async ({ location }) => {
+		const session = await requireRoles({
+			pathname: location.pathname,
+			search: location.search as Record<string, string>,
+		});
+		return { session };
+	},
+	loader: () => listOpenIntakesFn(),
 	head: () => ({
 		meta: [
 			{ title: "Enroll | Unicorn Barber Training Academy" },
@@ -25,19 +38,11 @@ export const Route = createFileRoute("/enroll")({
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/enroll` }],
 	}),
+	component: EnrollRoute,
 });
 
-function EnrollPage() {
-	return (
-		<main className="section-light bg-background px-6 py-24">
-			<div className="mx-auto max-w-3xl text-center">
-				<h1 className="font-heading text-4xl font-medium sm:text-5xl">
-					Enroll
-				</h1>
-				<p className="mt-4 text-muted-foreground">
-					This is the enroll page. The application experience is being rebuilt.
-				</p>
-			</div>
-		</main>
-	);
+function EnrollRoute() {
+	const intakes = Route.useLoaderData();
+	const { session } = Route.useRouteContext();
+	return <EnrollPage intakes={intakes} session={session} />;
 }

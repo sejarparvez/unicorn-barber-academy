@@ -112,3 +112,66 @@ export function resetPasswordEmail(name: string, url: string): string {
 		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(name) || "there"}, we received a request to reset your password. This link expires in one hour and can only be used once.</p>${button(url, "Choose a New Password")}`,
 	);
 }
+
+/* ----------------------------- enrollment ------------------------------- */
+
+function detailTable(rows: Array<[string, string]>): string {
+	return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;background:#faf9f5;border-radius:8px;border:1px solid #e7e5df;">${rows
+		.map(
+			([label, value]) =>
+				`<tr><td style="padding:10px 16px;font-size:12px;color:#8b8b85;width:40%;">${label}</td><td style="padding:10px 16px;font-size:13px;font-weight:bold;">${escapeHtml(value)}</td></tr>`,
+		)
+		.join("")}</table>`;
+}
+
+export type ApplicationEmailData = {
+	reference: string;
+	fullName: string;
+	programTitle: string;
+	cohortLabel: string;
+	startsOnDisplay: string;
+};
+
+export function applicationReceivedEmail(data: ApplicationEmailData): string {
+	return shell(
+		"Application received",
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(data.fullName.split(" ")[0]) || "there"}, thanks for applying to Unicorn Barber Training Academy. Our admissions team reviews applications within 2–3 working days and will contact you about the next steps.</p>
+${detailTable([
+	["Reference", data.reference],
+	["Program", data.programTitle],
+	["Cohort", `${data.cohortLabel} · starts ${data.startsOnDisplay}`],
+])}
+<p style="margin:0 0 8px;font-size:13px;line-height:1.6;">Keep your reference number — quoting it lets us find your application instantly.</p>`,
+	);
+}
+
+export function applicationApprovedEmail(
+	data: ApplicationEmailData,
+	dashboardUrl: string,
+): string {
+	return shell(
+		"You're in — welcome to the cohort!",
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Congratulations ${escapeHtml(data.fullName.split(" ")[0]) || "there"} — your application has been approved.</p>
+${detailTable([
+	["Reference", data.reference],
+	["Program", data.programTitle],
+	["Cohort", `${data.cohortLabel} · starts ${data.startsOnDisplay}`],
+])}
+<p style="margin:0 0 8px;font-size:13px;line-height:1.6;"><strong>Next steps:</strong> visit the academy before your start date to complete your registration fee payment and pick up your professional kit. Bring a valid ID and this reference number.</p>
+${button(dashboardUrl, "View My Applications")}`,
+	);
+}
+
+export function applicationWaitlistedEmail(data: ApplicationEmailData): string {
+	return shell(
+		"You're on the waitlist",
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(data.fullName.split(" ")[0]) || "there"}, the ${escapeHtml(data.cohortLabel.toLowerCase())} for ${escapeHtml(data.programTitle)} is currently full, so we've placed you on the waitlist (reference ${escapeHtml(data.reference)}). We'll contact you the moment a seat opens up — no action needed from you right now.</p>`,
+	);
+}
+
+export function applicationRejectedEmail(data: ApplicationEmailData): string {
+	return shell(
+		"Update on your application",
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(data.fullName.split(" ")[0]) || "there"}, thank you for applying to Unicorn Barber Training Academy. Unfortunately we're unable to offer you a seat in this cohort (reference ${escapeHtml(data.reference)}). Seats are limited and decisions are tough — but our future intakes would love to see your application again.</p>`,
+	);
+}
