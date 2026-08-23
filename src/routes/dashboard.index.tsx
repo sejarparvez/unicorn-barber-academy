@@ -153,12 +153,36 @@ function StudentSections() {
 /** Instructor / admin surface — staff tooling lands with the admin area. */
 function StaffSection({ role }: { role: Role }) {
 	return (
-		<section className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
-			<h3 className="font-medium">Staff tools</h3>
-			<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-				Class rosters, student progress, and enrollment approvals for{" "}
-				{ROLE_LABELS[role]} accounts are coming soon.
-			</p>
+		<section className="space-y-4">
+			{role === "admin" ? <AdminBlogCard /> : null}
+			<div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
+				<h3 className="font-medium">Staff tools</h3>
+				<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+					Class rosters, student progress, and enrollment approvals for{" "}
+					{ROLE_LABELS[role]} accounts are coming soon.
+				</p>
+			</div>
+		</section>
+	);
+}
+
+/** Admin-only entry into the journal management surface. */
+function AdminBlogCard() {
+	return (
+		<section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-primary/30 bg-primary/5 p-6 sm:p-8">
+			<div>
+				<h3 className="font-heading text-xl font-semibold">
+					Blog &amp; journal
+				</h3>
+				<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+					Write articles, manage categories, and publish — every post ships with
+					full SEO and AI-engine structured data.
+				</p>
+			</div>
+			<Link to="/dashboard/blog" className={cn(buttonVariants(), "gap-2")}>
+				Manage posts
+				<IconArrowRight className="h-4 w-4" stroke={1.75} />
+			</Link>
 		</section>
 	);
 }

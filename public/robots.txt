@@ -6,6 +6,9 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+# Raw-markdown mirrors of blog posts are for AI answer engines only;
+# search engines get the canonical HTML page instead.
+Disallow: /md/
 
 # ── AI / LLM crawlers explicitly welcomed (AIO) ──
 User-agent: GPTBot

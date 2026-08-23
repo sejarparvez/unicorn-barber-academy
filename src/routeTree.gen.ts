@@ -11,14 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EnrollRouteImport } from './routes/enroll'
+import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as InstructorsRouteImport } from './routes/instructors'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StudentLifeRouteImport } from './routes/student-life'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
@@ -28,10 +30,23 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-passw
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
 import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
+import { Route as ApiAdminBlogRouteImport } from './routes/api/admin/blog'
+import { Route as ApiAdminUploadRouteImport } from './routes/api/admin/upload'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
+import { Route as DashboardBlogIndexRouteImport } from './routes/dashboard/blog.index'
+import { Route as DashboardBlogCategoriesRouteImport } from './routes/dashboard/blog.categories'
+import { Route as DashboardBlogNewRouteImport } from './routes/dashboard/blog.new'
+import { Route as MdBlogSlugRouteImport } from './routes/md/blog.$slug'
+import { Route as ApiAdminBlogIdRouteImport } from './routes/api/admin/blog/$id'
+import { Route as ApiAdminBlogCategoriesRouteImport } from './routes/api/admin/blog/categories'
+import { Route as DashboardBlogIdEditRouteImport } from './routes/dashboard/blog.$id.edit'
+import { Route as ApiAdminBlogCategoriesIdRouteImport } from './routes/api/admin/blog/categories/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,11 +56,6 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CareersRoute = CareersRouteImport.update({
@@ -68,6 +78,11 @@ const EnrollRoute = EnrollRouteImport.update({
   path: '/enroll',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
+  id: '/feed.xml',
+  path: '/feed.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -78,9 +93,19 @@ const InstructorsRoute = InstructorsRouteImport.update({
   path: '/instructors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudentLifeRoute = StudentLifeRouteImport.update({
@@ -128,6 +153,16 @@ const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
   path: '/auth/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -143,23 +178,81 @@ const ProgramsSlugRoute = ProgramsSlugRouteImport.update({
   path: '/programs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminBlogRoute = ApiAdminBlogRouteImport.update({
+  id: '/api/admin/blog',
+  path: '/api/admin/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminUploadRoute = ApiAdminUploadRouteImport.update({
+  id: '/api/admin/upload',
+  path: '/api/admin/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogCategorySlugRoute = BlogCategorySlugRouteImport.update({
+  id: '/blog/category/$slug',
+  path: '/blog/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardBlogIndexRoute = DashboardBlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBlogCategoriesRoute = DashboardBlogCategoriesRouteImport.update({
+  id: '/blog/categories',
+  path: '/blog/categories',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBlogNewRoute = DashboardBlogNewRouteImport.update({
+  id: '/blog/new',
+  path: '/blog/new',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const MdBlogSlugRoute = MdBlogSlugRouteImport.update({
+  id: '/md/blog/$slug',
+  path: '/md/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminBlogIdRoute = ApiAdminBlogIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiAdminBlogRoute,
+} as any)
+const ApiAdminBlogCategoriesRoute = ApiAdminBlogCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => ApiAdminBlogRoute,
+} as any)
+const DashboardBlogIdEditRoute = DashboardBlogIdEditRouteImport.update({
+  id: '/blog/$id/edit',
+  path: '/blog/$id/edit',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const ApiAdminBlogCategoriesIdRoute =
+  ApiAdminBlogCategoriesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiAdminBlogCategoriesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/enroll': typeof EnrollRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/gallery': typeof GalleryRoute
   '/instructors': typeof InstructorsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/contact': typeof ApiContactRoute
@@ -169,21 +262,36 @@ export interface FileRoutesByFullPath {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/programs/$slug': typeof ProgramsSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/programs/': typeof ProgramsIndexRoute
+  '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
+  '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
+  '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/md/blog/$slug': typeof MdBlogSlugRoute
+  '/dashboard/blog/': typeof DashboardBlogIndexRoute
+  '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
+  '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
+  '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
+  '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/enroll': typeof EnrollRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/gallery': typeof GalleryRoute
   '/instructors': typeof InstructorsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/contact': typeof ApiContactRoute
@@ -193,23 +301,38 @@ export interface FileRoutesByTo {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/programs/$slug': typeof ProgramsSlugRoute
+  '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/programs': typeof ProgramsIndexRoute
+  '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
+  '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
+  '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/md/blog/$slug': typeof MdBlogSlugRoute
+  '/dashboard/blog': typeof DashboardBlogIndexRoute
+  '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
+  '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
+  '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
+  '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/enroll': typeof EnrollRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/gallery': typeof GalleryRoute
   '/instructors': typeof InstructorsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/student-life': typeof StudentLifeRoute
   '/terms': typeof TermsRoute
   '/api/contact': typeof ApiContactRoute
@@ -219,24 +342,39 @@ export interface FileRoutesById {
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/programs/$slug': typeof ProgramsSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/programs/': typeof ProgramsIndexRoute
+  '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
+  '/api/admin/upload': typeof ApiAdminUploadRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
+  '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/md/blog/$slug': typeof MdBlogSlugRoute
+  '/dashboard/blog/': typeof DashboardBlogIndexRoute
+  '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
+  '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
+  '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
+  '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
-    | '/blog'
     | '/careers'
     | '/contact'
     | '/dashboard'
     | '/enroll'
+    | '/feed.xml'
     | '/gallery'
     | '/instructors'
+    | '/llms.txt'
     | '/privacy'
+    | '/sitemap.xml'
     | '/student-life'
     | '/terms'
     | '/api/contact'
@@ -246,21 +384,36 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify-email'
+    | '/blog/$slug'
     | '/programs/$slug'
+    | '/blog/'
     | '/dashboard/'
     | '/programs/'
+    | '/api/admin/blog'
+    | '/api/admin/upload'
     | '/api/auth/$'
+    | '/blog/category/$slug'
+    | '/dashboard/blog/categories'
+    | '/dashboard/blog/new'
+    | '/md/blog/$slug'
+    | '/dashboard/blog/'
+    | '/api/admin/blog/$id'
+    | '/api/admin/blog/categories'
+    | '/dashboard/blog/$id/edit'
+    | '/api/admin/blog/categories/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/blog'
     | '/careers'
     | '/contact'
     | '/enroll'
+    | '/feed.xml'
     | '/gallery'
     | '/instructors'
+    | '/llms.txt'
     | '/privacy'
+    | '/sitemap.xml'
     | '/student-life'
     | '/terms'
     | '/api/contact'
@@ -270,22 +423,37 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify-email'
+    | '/blog/$slug'
     | '/programs/$slug'
+    | '/blog'
     | '/dashboard'
     | '/programs'
+    | '/api/admin/blog'
+    | '/api/admin/upload'
     | '/api/auth/$'
+    | '/blog/category/$slug'
+    | '/dashboard/blog/categories'
+    | '/dashboard/blog/new'
+    | '/md/blog/$slug'
+    | '/dashboard/blog'
+    | '/api/admin/blog/$id'
+    | '/api/admin/blog/categories'
+    | '/dashboard/blog/$id/edit'
+    | '/api/admin/blog/categories/$id'
   id:
     | '__root__'
     | '/'
     | '/about'
-    | '/blog'
     | '/careers'
     | '/contact'
     | '/dashboard'
     | '/enroll'
+    | '/feed.xml'
     | '/gallery'
     | '/instructors'
+    | '/llms.txt'
     | '/privacy'
+    | '/sitemap.xml'
     | '/student-life'
     | '/terms'
     | '/api/contact'
@@ -295,23 +463,38 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify-email'
+    | '/blog/$slug'
     | '/programs/$slug'
+    | '/blog/'
     | '/dashboard/'
     | '/programs/'
+    | '/api/admin/blog'
+    | '/api/admin/upload'
     | '/api/auth/$'
+    | '/blog/category/$slug'
+    | '/dashboard/blog/categories'
+    | '/dashboard/blog/new'
+    | '/md/blog/$slug'
+    | '/dashboard/blog/'
+    | '/api/admin/blog/$id'
+    | '/api/admin/blog/categories'
+    | '/dashboard/blog/$id/edit'
+    | '/api/admin/blog/categories/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  BlogRoute: typeof BlogRoute
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   EnrollRoute: typeof EnrollRoute
+  FeedDotxmlRoute: typeof FeedDotxmlRoute
   GalleryRoute: typeof GalleryRoute
   InstructorsRoute: typeof InstructorsRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   PrivacyRoute: typeof PrivacyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StudentLifeRoute: typeof StudentLifeRoute
   TermsRoute: typeof TermsRoute
   ApiContactRoute: typeof ApiContactRoute
@@ -321,9 +504,15 @@ export interface RootRouteChildren {
   AuthSigninRoute: typeof AuthSigninRoute
   AuthSignupRoute: typeof AuthSignupRoute
   AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   ProgramsSlugRoute: typeof ProgramsSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ProgramsIndexRoute: typeof ProgramsIndexRoute
+  ApiAdminBlogRoute: typeof ApiAdminBlogRouteWithChildren
+  ApiAdminUploadRoute: typeof ApiAdminUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  BlogCategorySlugRoute: typeof BlogCategorySlugRoute
+  MdBlogSlugRoute: typeof MdBlogSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -340,13 +529,6 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/careers': {
@@ -377,6 +559,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnrollRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feed.xml': {
+      id: '/feed.xml'
+      path: '/feed.xml'
+      fullPath: '/feed.xml'
+      preLoaderRoute: typeof FeedDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gallery': {
       id: '/gallery'
       path: '/gallery'
@@ -391,11 +580,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InstructorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/student-life': {
@@ -461,6 +664,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthVerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
@@ -482,6 +699,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgramsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/blog': {
+      id: '/api/admin/blog'
+      path: '/api/admin/blog'
+      fullPath: '/api/admin/blog'
+      preLoaderRoute: typeof ApiAdminBlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/upload': {
+      id: '/api/admin/upload'
+      path: '/api/admin/upload'
+      fullPath: '/api/admin/upload'
+      preLoaderRoute: typeof ApiAdminUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -489,32 +720,133 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/category/$slug': {
+      id: '/blog/category/$slug'
+      path: '/blog/category/$slug'
+      fullPath: '/blog/category/$slug'
+      preLoaderRoute: typeof BlogCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/blog/': {
+      id: '/dashboard/blog/'
+      path: '/blog'
+      fullPath: '/dashboard/blog/'
+      preLoaderRoute: typeof DashboardBlogIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/blog/categories': {
+      id: '/dashboard/blog/categories'
+      path: '/blog/categories'
+      fullPath: '/dashboard/blog/categories'
+      preLoaderRoute: typeof DashboardBlogCategoriesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/blog/new': {
+      id: '/dashboard/blog/new'
+      path: '/blog/new'
+      fullPath: '/dashboard/blog/new'
+      preLoaderRoute: typeof DashboardBlogNewRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/md/blog/$slug': {
+      id: '/md/blog/$slug'
+      path: '/md/blog/$slug'
+      fullPath: '/md/blog/$slug'
+      preLoaderRoute: typeof MdBlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/blog/$id': {
+      id: '/api/admin/blog/$id'
+      path: '/$id'
+      fullPath: '/api/admin/blog/$id'
+      preLoaderRoute: typeof ApiAdminBlogIdRouteImport
+      parentRoute: typeof ApiAdminBlogRoute
+    }
+    '/api/admin/blog/categories': {
+      id: '/api/admin/blog/categories'
+      path: '/categories'
+      fullPath: '/api/admin/blog/categories'
+      preLoaderRoute: typeof ApiAdminBlogCategoriesRouteImport
+      parentRoute: typeof ApiAdminBlogRoute
+    }
+    '/dashboard/blog/$id/edit': {
+      id: '/dashboard/blog/$id/edit'
+      path: '/blog/$id/edit'
+      fullPath: '/dashboard/blog/$id/edit'
+      preLoaderRoute: typeof DashboardBlogIdEditRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/api/admin/blog/categories/$id': {
+      id: '/api/admin/blog/categories/$id'
+      path: '/$id'
+      fullPath: '/api/admin/blog/categories/$id'
+      preLoaderRoute: typeof ApiAdminBlogCategoriesIdRouteImport
+      parentRoute: typeof ApiAdminBlogCategoriesRoute
+    }
   }
 }
 
 interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardBlogCategoriesRoute: typeof DashboardBlogCategoriesRoute
+  DashboardBlogNewRoute: typeof DashboardBlogNewRoute
+  DashboardBlogIndexRoute: typeof DashboardBlogIndexRoute
+  DashboardBlogIdEditRoute: typeof DashboardBlogIdEditRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardBlogCategoriesRoute: DashboardBlogCategoriesRoute,
+  DashboardBlogNewRoute: DashboardBlogNewRoute,
+  DashboardBlogIndexRoute: DashboardBlogIndexRoute,
+  DashboardBlogIdEditRoute: DashboardBlogIdEditRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface ApiAdminBlogCategoriesRouteChildren {
+  ApiAdminBlogCategoriesIdRoute: typeof ApiAdminBlogCategoriesIdRoute
+}
+
+const ApiAdminBlogCategoriesRouteChildren: ApiAdminBlogCategoriesRouteChildren =
+  {
+    ApiAdminBlogCategoriesIdRoute: ApiAdminBlogCategoriesIdRoute,
+  }
+
+const ApiAdminBlogCategoriesRouteWithChildren =
+  ApiAdminBlogCategoriesRoute._addFileChildren(
+    ApiAdminBlogCategoriesRouteChildren,
+  )
+
+interface ApiAdminBlogRouteChildren {
+  ApiAdminBlogIdRoute: typeof ApiAdminBlogIdRoute
+  ApiAdminBlogCategoriesRoute: typeof ApiAdminBlogCategoriesRouteWithChildren
+}
+
+const ApiAdminBlogRouteChildren: ApiAdminBlogRouteChildren = {
+  ApiAdminBlogIdRoute: ApiAdminBlogIdRoute,
+  ApiAdminBlogCategoriesRoute: ApiAdminBlogCategoriesRouteWithChildren,
+}
+
+const ApiAdminBlogRouteWithChildren = ApiAdminBlogRoute._addFileChildren(
+  ApiAdminBlogRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  BlogRoute: BlogRoute,
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   EnrollRoute: EnrollRoute,
+  FeedDotxmlRoute: FeedDotxmlRoute,
   GalleryRoute: GalleryRoute,
   InstructorsRoute: InstructorsRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   PrivacyRoute: PrivacyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StudentLifeRoute: StudentLifeRoute,
   TermsRoute: TermsRoute,
   ApiContactRoute: ApiContactRoute,
@@ -524,9 +856,15 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSigninRoute: AuthSigninRoute,
   AuthSignupRoute: AuthSignupRoute,
   AuthVerifyEmailRoute: AuthVerifyEmailRoute,
+  BlogSlugRoute: BlogSlugRoute,
   ProgramsSlugRoute: ProgramsSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ProgramsIndexRoute: ProgramsIndexRoute,
+  ApiAdminBlogRoute: ApiAdminBlogRouteWithChildren,
+  ApiAdminUploadRoute: ApiAdminUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  BlogCategorySlugRoute: BlogCategorySlugRoute,
+  MdBlogSlugRoute: MdBlogSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

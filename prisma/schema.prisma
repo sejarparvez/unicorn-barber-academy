@@ -28,6 +28,7 @@ model User {
   banExpires    DateTime?
   sessions      Session[]
   accounts      Account[]
+  blogPosts     BlogPost[]
 
   @@map("user")
 }
@@ -77,4 +78,71 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Blog system (scripts/sql/001_blog.sql). Contract documentation only — the
+// application's own pg pool (src/server/db.ts) owns these writes, same rule
+// as the better-auth tables above. Column names match SQL exactly.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model BlogCategory {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(80)
+  slug      String    @unique @db.VarChar(120)
+  createdAt DateTime  @default(now()) @map("created_at")
+  posts     BlogPost[]
+
+  @@map("blog_category")
+}
+
+model BlogPost {
+  id                  Int       @id @default(autoincrement())
+  slug                String    @unique @db.VarChar(220)
+  title               String    @db.VarChar(200)
+  excerpt             String?   @db.VarChar(400)
+  contentMd           String    @default("") @map("content_md")
+  coverImageUrl       String?   @map("cover_image_url")
+  coverImageAlt       String?   @map("cover_image_alt")
+  // SEO block — public head() falls back to title/excerpt/cover when null.
+  metaTitle           String?   @map("meta_title")
+  metaDescription     String?   @map("meta_description")
+  focusKeyword        String?   @map("focus_keyword")
+  seoKeywords         String[]  @default([]) @map("seo_keywords")
+  canonicalUrl        String?   @map("canonical_url")
+  ogImageUrl          String?   @map("og_image_url")
+  noindex             Boolean   @default(false)
+  // AIO block — shaped for AI/LLM extraction.
+  keyTakeaways        String[]  @default([]) @map("key_takeaways")
+  faq                 Json      @default("[]") // [{ q: String, a: String }]
+  relatedProgramSlugs String[]  @default([]) @map("related_program_slugs")
+  tags                String[]  @default([])
+  status              String    @default("draft") @db.VarChar(16) // draft | published | archived
+  categoryId          Int?      @map("category_id")
+  category            BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  authorId            Int?      @map("author_id")
+  author              User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  redirectsFrom       BlogSlugRedirect[]
+  readingMinutes      Int       @default(1) @map("reading_minutes")
+  publishedAt         DateTime? @map("published_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId])
+  @@map("blog_post")
+}
+
+// Old slug → live post. Maintained automatically on slug renames
+// (src/server/blog-db.ts); lookups resolve chains in one hop by joining the
+// post's CURRENT slug.
+model BlogSlugRedirect {
+  id        Int       @id @default(autoincrement())
+  oldSlug   String    @unique @map("old_slug") @db.VarChar(220)
+  postId    Int       @map("post_id")
+  post      BlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([postId])
+  @@map("blog_slug_redirect")
 }
