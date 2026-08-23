@@ -15,7 +15,7 @@
 			"!**/src/routeTree.gen.ts",
 			"!**/src/components/ui/**/*",
 			"!**/src/styles.css",
-			"!**/src/prisma/schema.d.ts"
+			"!**/prisma/schema.d.ts"
 		]
 	},
 	"formatter": {
@@ -29,6 +29,28 @@
 			"recommended": true
 		}
 	},
+	"overrides": [
+		{
+			"includes": ["src/features/**", "src/components/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": ["@/server", "@/server/**"],
+										"message": "Server-only module. Import types from @/lib/types, or fetch via a route loader/server function."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		}
+	],
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"

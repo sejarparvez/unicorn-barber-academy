@@ -12,6 +12,7 @@
     "lint": "biome lint",
     "check": "biome check . --write",
     "db:emit": "bun prisma-next contract emit",
+    "seo:generate": "bun scripts/generate-seo.ts",
     "db:migrate": "bun prisma-next db init",
     "db:status": "bun prisma-next migration status"
   },

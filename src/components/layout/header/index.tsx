@@ -11,7 +11,7 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import type { SessionPayload } from "@/lib/server-session";
+import type { SessionPayload } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import UserDropDown from "./user";
 
@@ -138,6 +138,7 @@ export default function Header({
 								<div className="px-4 pt-2 mt-auto border-t border-border">
 									<Button
 										render={<Link to="/enroll" />}
+										nativeButton={false}
 										className="w-full gap-2 mt-4 mb-4"
 									>
 										<IconPlus className="w-4 h-4" stroke={1.75} />
@@ -213,6 +214,7 @@ export default function Header({
 					{/* Book Now — primary, drives conversion; solid gold on both mobile drawer and desktop bar */}
 					<Button
 						render={<Link to="/enroll" />}
+						nativeButton={false}
 						className="hidden gap-2 sm:flex"
 					>
 						<IconPlus className="w-4 h-4" stroke={1.75} />

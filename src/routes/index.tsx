@@ -1,17 +1,18 @@
 import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import Faq from "@/components/pages/home/faq";
-import Hero from "@/components/pages/home/hero";
-import Instructors from "@/components/pages/home/instructors";
-import Programs from "@/components/pages/home/programs";
-import Stats from "@/components/pages/home/stats";
-import StudentLife from "@/components/pages/home/student-life";
-import Testimonials from "@/components/pages/home/testimonials";
-import WhyUnicorn from "@/components/pages/home/why-us";
-import { FinalCta, SectionEyebrow } from "@/components/site/decor";
+import { FinalCta, SectionEyebrow } from "@/components/effects";
 import { buttonVariants } from "@/components/ui/button";
-import { CONTACT, pic, SITE_URL } from "@/lib/site-data";
+import { pic } from "@/data/images";
+import { CONTACT, SITE_URL } from "@/data/site";
+import Faq from "@/features/home/sections/faq";
+import Hero from "@/features/home/sections/hero";
+import Instructors from "@/features/home/sections/instructors";
+import Programs from "@/features/home/sections/programs";
+import Stats from "@/features/home/sections/stats";
+import StudentLife from "@/features/home/sections/student-life";
+import Testimonials from "@/features/home/sections/testimonials";
+import WhyUnicorn from "@/features/home/sections/why-us";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -126,4 +127,4 @@ function VisitUs() {
 }
 
 /* ----------------------------- Final CTA -----------------------------
-   Shared FinalCta from @/components/site/decor — see top of file. */
+   Shared FinalCta from @/components/effects — see top of file. */

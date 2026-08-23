@@ -1,10 +1,11 @@
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
-import { AuthAlert, AuthCard } from "@/components/site/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AuthAlert } from "@/features/auth/components/auth-alert";
+import { AuthCard } from "@/features/auth/components/auth-card";
 import { authClient } from "@/lib/auth-client";
 
 type ResetSearch = {

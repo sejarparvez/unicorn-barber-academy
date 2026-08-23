@@ -1,0 +1,47 @@
+# unicornbarberacademy.com — robots.txt
+# Search engines and AI answer engines are welcome. Private/app areas are
+# protected by meta robots noindex (auth, dashboard) rather than Disallow,
+# so crawlers can still see the noindex directives.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# ── AI / LLM crawlers explicitly welcomed (AIO) ──
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+Sitemap: https://unicornbarberacademy.com/sitemap.xml

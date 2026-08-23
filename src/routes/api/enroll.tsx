@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
-import { clientIp, isSameOrigin, overRateLimit } from "@/lib/api-guard";
+import { clientIp, isSameOrigin, overRateLimit } from "@/server/rate-limit";
 
 export const Route = createFileRoute("/api/enroll")({
 	server: {

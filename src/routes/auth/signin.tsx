@@ -6,19 +6,17 @@ import {
 	useRouter,
 } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
-import {
-	AuthAlert,
-	AuthCard,
-	AuthDivider,
-	friendlyAuthError,
-	GoogleIcon,
-} from "@/components/site/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AuthAlert } from "@/features/auth/components/auth-alert";
+import { AuthCard } from "@/features/auth/components/auth-card";
+import { AuthDivider } from "@/features/auth/components/auth-divider";
+import { GoogleIcon } from "@/features/auth/components/google-icon";
 import { authClient } from "@/lib/auth-client";
-import { getSession } from "@/lib/server-session";
-import { safeRedirect } from "@/lib/utils";
+import { friendlyAuthError } from "@/lib/auth-errors";
+import { safeRedirect } from "@/lib/redirect";
+import { getSession } from "@/server/session";
 
 type SignInSearch = {
 	redirect?: string;

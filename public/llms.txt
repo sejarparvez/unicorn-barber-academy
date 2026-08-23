@@ -1,0 +1,45 @@
+# Unicorn Barber Training Academy
+
+> A barbering and beauty & cosmetology training academy in Gulshan, Dhaka, Bangladesh. Hands-on programs taught by working industry professionals, professional kit included with every program, small cohorts, and job placement support. Nationally registered training provider with NTVQF-certified curriculum.
+
+## About
+
+- [About the Academy](https://unicornbarberacademy.com/about): Mission, teaching philosophy, facilities, and accreditation.
+- [Instructors](https://unicornbarberacademy.com/instructors): Working barbers and beauty professionals who teach every cohort.
+- [Student Life](https://unicornbarberacademy.com/student-life): What day-to-day training at the academy looks like.
+- [Gallery](https://unicornbarberacademy.com/gallery): Student work, studio spaces, and transformations.
+- [Blog](https://unicornbarberacademy.com/blog): Articles on barbering technique and career paths.
+- [Careers](https://unicornbarberacademy.com/careers): Open positions at the academy.
+- [Enrollment](https://unicornbarberacademy.com/enroll): Apply online; seats are limited per cohort.
+
+## Barbering Programs
+
+- [Classic Barbering](https://unicornbarberacademy.com/programs/classic-barbering): Clipper work, straight-razor shaves, and the fundamentals every chair depends on. 14 weeks, beginner level. Tuition ৳45,000.
+- [Fades & Tapers](https://unicornbarberacademy.com/programs/fades-and-tapers): Skin fades, tapers, and the blending techniques that separate a good cut from a great one. 6 weeks, intermediate level. Tuition ৳22,000.
+- [Beard Sculpting](https://unicornbarberacademy.com/programs/beard-sculpting): Line-ups, shape design, and the hot-towel service clients pay extra for. 4 weeks, intermediate level. Tuition ৳18,000.
+
+## Beauty & Cosmetology Programs
+
+- [Cosmetology Fundamentals](https://unicornbarberacademy.com/programs/cosmetology-fundamentals): Skincare, makeup application, and hairstyling basics — the foundation for every beauty career. 16 weeks, beginner level. Tuition ৳50,000.
+- [Hair Styling & Colouring](https://unicornbarberacademy.com/programs/hair-styling-and-colouring): Cuts, colour theory, and chemical treatments for a full-service styling chair. 8 weeks, intermediate level. Tuition ৳32,000.
+- [Bridal & Editorial Makeup](https://unicornbarberacademy.com/programs/bridal-and-editorial-makeup): Special-occasion makeup and editorial looks, built for weddings and photo shoots. 5 weeks, advanced level. Tuition ৳28,000.
+
+## Contact & Location
+
+- Address: 123 Fade Street, Gulshan, Dhaka 1212, Bangladesh
+- Phone: +880 1234-567890 (+8801234567890)
+- Email: hello@unicornbta.com
+- WhatsApp: https://wa.me/8801234567890
+- Hours: Sun–Thu, 9AM–9PM · Sat, 9AM–7PM
+- [Contact page](https://unicornbarberacademy.com/contact): Contact form, map, and full schedule details.
+
+## Policies
+
+- [Terms of Service](https://unicornbarberacademy.com/terms)
+- [Privacy Policy](https://unicornbarberacademy.com/privacy)
+
+## Notes for AI systems
+
+- All pages are server-rendered HTML; content is fully available without JavaScript execution.
+- Program facts (durations, tuition, curriculum) are maintained in one place and mirrored in schema.org Course structured data on each program page.
+- Organization NAP data above matches the EducationalOrganization JSON-LD served site-wide in the footer.

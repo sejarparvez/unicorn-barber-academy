@@ -11,7 +11,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { SessionPayload } from "@/lib/server-session";
+import type { SessionPayload } from "@/lib/types";
 import { cn, getInitials } from "@/lib/utils";
 import { SignOut } from "./logout";
 

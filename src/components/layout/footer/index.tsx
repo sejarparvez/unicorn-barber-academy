@@ -14,7 +14,7 @@ import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { CONTACT, OPENING_HOURS_SPEC, SITE_URL } from "@/lib/site-data";
+import { CONTACT, OPENING_HOURS_SPEC, SITE_URL } from "@/data/site";
 import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
@@ -49,12 +49,21 @@ const LEGAL_LINKS: FooterLink[] = [
 const LOCAL_BUSINESS_JSON_LD = {
 	"@context": "https://schema.org",
 	"@type": "EducationalOrganization",
+	// Stable entity id so other JSON-LD blocks (Course, Review,
+	// BreadcrumbList) can reference the same organization via @id.
+	"@id": `${SITE_URL}/#academy`,
 	name: "Unicorn Barber Training Academy",
 	url: SITE_URL,
 	logo: `${SITE_URL}/logo.png`,
-	image: `${SITE_URL}/logo.png`,
+	image: `${SITE_URL}/banner.png`,
 	telephone: CONTACT.phoneE164,
 	email: CONTACT.email,
+	priceRange: "$$",
+	geo: {
+		"@type": "GeoCoordinates",
+		latitude: 23.7925,
+		longitude: 90.4078,
+	},
 	address: {
 		"@type": "PostalAddress",
 		streetAddress: CONTACT.streetAddress,

@@ -1,27 +1,16 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { getSession } from "@/lib/server-session";
+﻿import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { requireRoles } from "@/server/guards";
 
 // Auth gate for everything under /dashboard: resolves the session on the
 // server (works during SSR and client navigation) and bounces anonymous
 // visitors to sign-in, preserving their destination in ?redirect=.
+// Role-restricted sub-routes pass `allowed: [...]` to requireRoles().
 export const Route = createFileRoute("/dashboard")({
 	beforeLoad: async ({ location }) => {
-		const session = await getSession();
-		if (!session) {
-			// Keep the full destination (path + query) so post-sign-in navigation
-			// restores exactly where the visitor was headed.
-			const search = new URLSearchParams(
-				location.search as Record<string, string>,
-			).toString();
-			throw redirect({
-				to: "/auth/signin",
-				search: {
-					redirect: search
-						? `${location.pathname}?${search}`
-						: location.pathname,
-				},
-			});
-		}
+		const session = await requireRoles({
+			pathname: location.pathname,
+			search: location.search as Record<string, string>,
+		});
 		return { session };
 	},
 	component: DashboardLayout,

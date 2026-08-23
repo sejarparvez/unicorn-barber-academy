@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE_URL } from "@/lib/site-data";
+import { SITE_URL } from "@/data/site";
 
 export const Route = createFileRoute("/enroll")({
 	component: EnrollPage,
