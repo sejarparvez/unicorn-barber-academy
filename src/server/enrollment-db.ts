@@ -17,7 +17,7 @@ import type {
 	IntakePublic,
 	MyApplication,
 } from "@/lib/enrollment";
-import { generateReference } from "@/lib/enrollment";
+import { generateReference, parseApplicationStatus } from "@/lib/enrollment";
 import { db } from "./db";
 
 const PG_UNIQUE_VIOLATION = "23505";
@@ -231,6 +231,11 @@ export async function listMyApplications(
 
 /* -------------------------------- admin --------------------------------- */
 
+/** Escape LIKE/ILIKE metacharacters so user input can't inject wildcards. */
+function escapeLike(term: string): string {
+	return term.replace(/[\\%_]/g, "\\$&");
+}
+
 export async function listApplicationsAdmin(options: {
 	status?: ApplicationStatus;
 	search?: string;
@@ -253,7 +258,7 @@ export async function listApplicationsAdmin(options: {
 		conditions.push(`a.status = $${countParams.length}`);
 	}
 	if (options.search?.trim()) {
-		countParams.push(`%${options.search.trim()}%`);
+		countParams.push(`%${escapeLike(options.search.trim())}%`);
 		const n = countParams.length;
 		conditions.push(
 			`(a.reference ILIKE $${n} OR a.full_name ILIKE $${n} OR a.email ILIKE $${n} OR a.phone ILIKE $${n})`,
@@ -419,7 +424,12 @@ export async function updateApplicationStatus(options: {
 	adminUserId: number;
 	note: string | null;
 }): Promise<StatusUpdateResult> {
-	const TERMINAL: readonly string[] = ["approved", "waitlisted", "rejected"];
+	const TERMINAL: readonly string[] = [
+		"approved",
+		"waitlisted",
+		"rejected",
+		"completed",
+	];
 
 	return withTransaction(async (tx) => {
 		const currentRes = await tx.query<{
@@ -467,9 +477,14 @@ export async function updateApplicationStatus(options: {
 			userRoleUpgraded = true;
 		}
 
-		const emailKind = TERMINAL.includes(options.status)
-			? (options.status as "approved" | "waitlisted" | "rejected")
-			: null;
+		// 'completed' is terminal but silent — the graduation itself is
+		// communicated by issuing a certificate, not a form email.
+		const emailKind =
+			options.status === "approved" ||
+			options.status === "waitlisted" ||
+			options.status === "rejected"
+				? options.status
+				: null;
 
 		return { ok: true as const, emailKind, userRoleUpgraded };
 	});
@@ -637,4 +652,46 @@ export async function deleteIntake(id: number): Promise<IntakeMutationResult> {
 		}
 		throw error;
 	}
+}
+
+/* ------------------------------ admin: stats ----------------------------- */
+
+export type AdmissionsStats = {
+	byStatus: Record<ApplicationStatus, number>;
+	total: number;
+	/** Open intakes that have not started yet, soonest first. */
+	upcomingOpenIntakes: IntakeAdmin[];
+};
+
+export async function getAdmissionsStats(): Promise<AdmissionsStats> {
+	const res = await db().query<{ status: string; n: number }>(
+		"SELECT status, count(*)::int AS n FROM enrollment_application GROUP BY status",
+	);
+	const byStatus: Record<ApplicationStatus, number> = {
+		pending: 0,
+		reviewing: 0,
+		approved: 0,
+		waitlisted: 0,
+		rejected: 0,
+		completed: 0,
+	};
+	let total = 0;
+	for (const row of res.rows) {
+		const status = parseApplicationStatus(row.status);
+		if (!status) continue;
+		byStatus[status] = row.n;
+		total += row.n;
+	}
+
+	const intakes = await listIntakesAdmin();
+	const today = startOfToday();
+	const upcomingOpenIntakes = intakes
+		.filter(
+			(intake) =>
+				intake.isOpen && new Date(`${intake.startsOn}T00:00:00`) >= today,
+		)
+		.sort((a, b) => a.startsOn.localeCompare(b.startsOn))
+		.slice(0, 6);
+
+	return { byStatus, total, upcomingOpenIntakes };
 }

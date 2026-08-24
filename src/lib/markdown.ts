@@ -68,12 +68,13 @@ export function renderMarkdown(markdown: string): string {
 		},
 		transformTags: {
 			// Never let authored links create new top-level browsing contexts
-			// without rel hygiene.
+			// without rel hygiene. Protocol-relative hrefs ("//host") are
+			// external too, so the check can't rely on a leading scheme.
 			a: (tagName, attribs) => ({
 				tagName,
 				attribs: {
 					...attribs,
-					...(attribs.href?.startsWith("http")
+					...(attribs.href?.includes("://") || attribs.href?.startsWith("//")
 						? { rel: "noopener noreferrer nofollow" }
 						: {}),
 				},

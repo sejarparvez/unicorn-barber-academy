@@ -9,7 +9,12 @@ import { cn, getInitials } from "@/lib/utils";
 import { listMyApplicationsFn } from "@/server/enrollment-fns";
 
 export const Route = createFileRoute("/dashboard/")({
-	loader: () => listMyApplicationsFn(),
+	// Staff never render MyApplicationsCard — skip the query for them.
+	loader: async ({ context }) => {
+		const role = parseRole(context.session.user.role);
+		if (role !== undefined && isStaff(role)) return [];
+		return listMyApplicationsFn();
+	},
 	component: DashboardIndex,
 	head: () => ({
 		meta: [
@@ -122,23 +127,44 @@ function StudentSections() {
 	);
 }
 
-/** Instructor / admin surface — staff tooling lands with the admin area. */
+/** Instructor / admin surface — role-aware quick links into staff tools. */
 function StaffSection({ role }: { role: Role }) {
 	return (
 		<section className="space-y-4">
+			{role === "admin" ? <AdminConsoleCard /> : null}
 			{role === "admin" ? (
 				<>
 					<AdminBlogCard />
 					<AdminAdmissionsCard />
 				</>
 			) : null}
-			<div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
-				<h3 className="font-medium">Staff tools</h3>
+			{role !== "admin" ? (
+				<div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
+					<h3 className="font-medium">Staff tools</h3>
+					<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+						Class rosters and student progress tools are coming soon.
+					</p>
+				</div>
+			) : null}
+		</section>
+	);
+}
+
+/** Admin-only entry into the console overview (stats + latest activity). */
+function AdminConsoleCard() {
+	return (
+		<section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-primary/30 bg-primary/5 p-6 sm:p-8">
+			<div>
+				<h3 className="font-heading text-xl font-semibold">Admin console</h3>
 				<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-					Class rosters, student progress, and enrollment approvals for{" "}
-					{ROLE_LABELS[role]} accounts are coming soon.
+					Pipeline health at a glance: pending reviews, upcoming intake fill
+					rates, certificates issued, and the latest applications.
 				</p>
 			</div>
+			<Link to="/dashboard/admin" className={cn(buttonVariants(), "gap-2")}>
+				Open console
+				<IconArrowRight className="h-4 w-4" stroke={1.75} />
+			</Link>
 		</section>
 	);
 }

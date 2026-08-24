@@ -12,6 +12,8 @@ export type MailInput = {
 	to: string;
 	subject: string;
 	html: string;
+	/** Lets staff hit "Reply" and answer the visitor directly. */
+	replyTo?: string;
 };
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
@@ -26,6 +28,7 @@ export async function sendMail({
 	to,
 	subject,
 	html,
+	replyTo,
 }: MailInput): Promise<boolean> {
 	const apiKey = process.env.RESEND_API_KEY;
 	if (!apiKey) {
@@ -47,6 +50,7 @@ export async function sendMail({
 				to: [to],
 				subject,
 				html,
+				...(replyTo ? { reply_to: replyTo } : {}),
 			}),
 		});
 		if (!res.ok) {
@@ -173,5 +177,32 @@ export function applicationRejectedEmail(data: ApplicationEmailData): string {
 	return shell(
 		"Update on your application",
 		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(data.fullName.split(" ")[0]) || "there"}, thank you for applying to Unicorn Barber Training Academy. Unfortunately we're unable to offer you a seat in this cohort (reference ${escapeHtml(data.reference)}). Seats are limited and decisions are tough — but our future intakes would love to see your application again.</p>`,
+	);
+}
+
+/* ------------------------------- contact -------------------------------- */
+
+export type ContactInquiryData = {
+	name: string;
+	email: string;
+	phone?: string;
+	topicLabel: string;
+	program?: string;
+	message: string;
+};
+
+/** Staff-facing notification for website contact-form submissions. */
+export function contactInquiryEmail(data: ContactInquiryData): string {
+	return shell(
+		"New website inquiry",
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">A new message was submitted through the website contact form. Reply directly to this email to answer the sender.</p>
+${detailTable([
+	["Name", data.name],
+	["Email", data.email],
+	["Phone", data.phone ?? "—"],
+	["Topic", data.topicLabel],
+	...(data.program ? [["Program", data.program] as [string, string]] : []),
+])}
+<div style="margin:16px 0;padding:16px;background:#faf9f5;border-radius:8px;border:1px solid #e7e5df;font-size:13px;line-height:1.6;white-space:pre-wrap;">${escapeHtml(data.message)}</div>`,
 	);
 }

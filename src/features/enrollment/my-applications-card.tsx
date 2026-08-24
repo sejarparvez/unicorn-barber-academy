@@ -23,6 +23,7 @@ const STATUS_BADGE: Record<MyApplication["status"], string> = {
 	approved: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
 	waitlisted: "bg-purple-500/15 text-purple-700 dark:text-purple-400",
 	rejected: "bg-muted text-muted-foreground",
+	completed: "bg-primary/15 text-primary",
 };
 
 export function MyApplicationsCard({

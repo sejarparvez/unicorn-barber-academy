@@ -62,6 +62,22 @@ export function validateApplicationPayload(body: unknown): ValidationResult<{
 	};
 }
 
+// yyyy-mm-dd only; must not be in the past. Shared by intake create and
+// PATCH so an edit can't move a live cohort into the past.
+export function isValidFutureStartDate(value: string): boolean {
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+	const [y, m, d] = value.split("-").map(Number.parseInt);
+	const start = new Date(Date.UTC(y, m - 1, d));
+	const today = new Date();
+	today.setUTCHours(0, 0, 0, 0);
+	return (
+		start.getUTCFullYear() === y &&
+		start.getUTCMonth() === m - 1 &&
+		start.getUTCDate() === d &&
+		start >= today
+	);
+}
+
 export function parseIntakePayload(body: unknown): ValidationResult<{
 	programSlug: string;
 	cohort: Cohort;
@@ -85,19 +101,7 @@ export function parseIntakePayload(body: unknown): ValidationResult<{
 
 	// yyyy-mm-dd only; must not be in the past.
 	const startsOn = str(b.startsOn);
-	if (!/^\d{4}-\d{2}-\d{2}$/.test(startsOn)) {
-		return { ok: false, message: "Start date must be YYYY-MM-DD" };
-	}
-	const [y, m, d] = startsOn.split("-").map(Number.parseInt);
-	const start = new Date(Date.UTC(y, m - 1, d));
-	const today = new Date();
-	today.setUTCHours(0, 0, 0, 0);
-	if (
-		start.getUTCFullYear() !== y ||
-		start.getUTCMonth() !== m - 1 ||
-		start.getUTCDate() !== d ||
-		start < today
-	) {
+	if (!isValidFutureStartDate(startsOn)) {
 		return { ok: false, message: "Start date must be a valid future date" };
 	}
 

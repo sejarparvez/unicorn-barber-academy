@@ -30,6 +30,7 @@ model User {
   accounts      Account[]
   blogPosts     BlogPost[]
   applications  EnrollmentApplication[]
+  certificates  Certificate[]
 
   @@map("user")
 }
@@ -178,7 +179,7 @@ model EnrollmentApplication {
   user           User          @relation(fields: [userId], references: [id], onDelete: Restrict)
   intakeId       Int           @map("intake_id")
   intake         ProgramIntake @relation(fields: [intakeId], references: [id], onDelete: Restrict)
-  status         String        @default("pending") @db.VarChar(16) // pending|reviewing|approved|waitlisted|rejected
+  status         String        @default("pending") @db.VarChar(16) // pending|reviewing|approved|waitlisted|rejected|completed
   fullName       String        @map("full_name") @db.VarChar(160)
   email          String        @db.VarChar(200)
   phone          String        @db.VarChar(40)
@@ -191,9 +192,38 @@ model EnrollmentApplication {
   feePaidAt      DateTime?     @map("fee_paid_at")
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @default(now()) @updatedAt @map("updated_at")
+  certificate    Certificate?
 
   @@index([status, createdAt(sort: Desc)])
   @@index([userId])
   @@index([intakeId])
   @@map("enrollment_application")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Certificates (scripts/sql/004_certificates.sql). Contract documentation
+// only — writes go through the app's pg pool (src/server/certificate-db.ts).
+//
+// Codes (UBT-YYYY-NNNN) are public: /verify/<code> resolves them and the QR
+// on the printable certificate points there. Revocation is a soft flag so
+// verification keeps an audit trail.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Certificate {
+  id            Int                    @id @default(autoincrement())
+  code          String                 @unique @db.VarChar(24) // UBT-YYYY-NNNN
+  userId        Int                    @map("user_id")
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId Int?                   @unique @map("application_id")
+  application   EnrollmentApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  programSlug   String                 @map("program_slug") @db.VarChar(120)
+  cohort        String                 @db.VarChar(16) // day | evening
+  issuedOn      DateTime               @default(now()) @map("issued_on") @db.Date
+  revokedAt     DateTime?              @map("revoked_at")
+  revokedReason String?                @map("revoked_reason")
+  createdAt     DateTime               @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([programSlug])
+  @@map("certificate")
 }

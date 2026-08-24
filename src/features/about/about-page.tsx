@@ -36,12 +36,21 @@ const BREADCRUMB_JSON_LD = {
 
 const ORG_JSON_LD = {
 	"@context": "https://schema.org",
-	"@type": "EducationalOrganization",
+	// Same @id as the footer's LocalBusiness block — one merged entity for
+	// search engines, not two competing organizations.
+	"@id": `${SITE_URL}/#academy`,
+	"@type": ["EducationalOrganization", "LocalBusiness"],
 	name: "Unicorn Barber Training Academy",
 	url: SITE_URL,
 	logo: `${SITE_URL}/logo.png`,
 	foundingDate: "2016",
-	sameAs: [SOCIAL_URLS.instagram, SOCIAL_URLS.facebook, SOCIAL_URLS.youtube],
+	sameAs: [
+		SOCIAL_URLS.instagram,
+		SOCIAL_URLS.facebook,
+		SOCIAL_URLS.youtube,
+		SOCIAL_URLS.tiktok,
+		SOCIAL_URLS.x,
+	],
 	address: {
 		"@type": "PostalAddress",
 		streetAddress: CONTACT.streetAddress,

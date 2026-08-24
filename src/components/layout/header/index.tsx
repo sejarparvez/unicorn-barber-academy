@@ -19,11 +19,19 @@ const navItems = [
 	{ name: "Home", href: "/" },
 	{ name: "About", href: "/about" },
 	{ name: "Programs", href: "/programs" },
-	{ name: "Instractors", href: "/instructors" },
+	{ name: "Instructors", href: "/instructors" },
 	{ name: "Gallery", href: "/gallery" },
 	{ name: "Blog", href: "/blog" },
 	{ name: "Contact", href: "/contact" },
 ];
+
+// Section pages stay active on child routes (/blog/<slug>, /programs/<slug>);
+// the home link matches exactly so it isn't lit for every path.
+function isActiveNav(pathname: string, href: string) {
+	return href === "/"
+		? pathname === "/"
+		: pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function Header({
 	session,
@@ -113,7 +121,7 @@ export default function Header({
 								{/* Nav links */}
 								<div className="flex flex-col px-4 py-4 gap-1">
 									{navItems.map((item) => {
-										const active = pathname === item.href;
+										const active = isActiveNav(pathname, item.href);
 										return (
 											<Link
 												key={item.name}
@@ -185,7 +193,7 @@ export default function Header({
 				{/* ── Center: desktop nav ── */}
 				<div className="hidden lg:flex items-center gap-1">
 					{navItems.map((item) => {
-						const active = pathname === item.href;
+						const active = isActiveNav(pathname, item.href);
 						return (
 							<Link
 								key={item.name}

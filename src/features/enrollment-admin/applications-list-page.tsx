@@ -19,6 +19,7 @@ const TABS: Array<{ label: string; status?: ApplicationStatus }> = [
 	{ label: "Pending", status: "pending" },
 	{ label: "In review", status: "reviewing" },
 	{ label: "Approved", status: "approved" },
+	{ label: "Completed", status: "completed" },
 	{ label: "Waitlisted", status: "waitlisted" },
 	{ label: "Rejected", status: "rejected" },
 ];
@@ -34,7 +35,7 @@ export function ApplicationsListPage({
 }) {
 	const navigate = useNavigate();
 	const [searchInput, setSearchInput] = useState(search ?? "");
-	const filters = { status: statusFilter, search };
+	const filters = { status: statusFilter, search, page };
 	const { data, isPending } = useApplicationsList(filters);
 
 	function navigateWith(next: {

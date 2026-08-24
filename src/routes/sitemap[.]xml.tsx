@@ -24,26 +24,33 @@ export const Route = createFileRoute("/sitemap.xml")({
 				]);
 
 				const today = new Date().toISOString().slice(0, 10);
+				// /enroll is intentionally absent: it sits behind sign-in and
+				// redirects crawlers to the noindex auth page. Static routes omit
+				// lastmod — a per-request "today" value is noise crawlers learn
+				// to ignore (and Google then distrusts for every URL).
 				const staticRoutes = [
-					{ loc: "/", lastmod: today, priority: "1.0" },
-					{ loc: "/about", lastmod: today, priority: "0.7" },
-					{ loc: "/programs", lastmod: today, priority: "0.9" },
-					{ loc: "/instructors", lastmod: today, priority: "0.7" },
-					{ loc: "/gallery", lastmod: today, priority: "0.6" },
-					{ loc: "/student-life", lastmod: today, priority: "0.6" },
+					{ loc: "/", priority: "1.0" },
+					{ loc: "/about", priority: "0.7" },
+					{ loc: "/programs", priority: "0.9" },
+					{ loc: "/instructors", priority: "0.7" },
+					{ loc: "/gallery", priority: "0.6" },
+					{ loc: "/student-life", priority: "0.6" },
+					{ loc: "/media", priority: "0.5" },
 					{ loc: "/blog", lastmod: today, priority: "0.7" },
-					{ loc: "/contact", lastmod: today, priority: "0.8" },
-					{ loc: "/enroll", lastmod: today, priority: "0.9" },
-					{ loc: "/careers", lastmod: today, priority: "0.5" },
-					{ loc: "/terms", lastmod: today, priority: "0.2" },
-					{ loc: "/privacy", lastmod: today, priority: "0.2" },
+					{ loc: "/contact", priority: "0.8" },
+					{ loc: "/careers", priority: "0.5" },
+					{ loc: "/terms", priority: "0.2" },
+					{ loc: "/privacy", priority: "0.2" },
 				];
 
-				const entries = [
+				const entries: Array<{
+					loc: string;
+					lastmod?: string;
+					priority: string;
+				}> = [
 					...staticRoutes,
 					...ALL_PROGRAMS.map((p) => ({
 						loc: p.to,
-						lastmod: today,
 						priority: "0.8",
 					})),
 					...categories.map((c) => ({
@@ -64,8 +71,7 @@ ${entries
 	.map(
 		(entry) => `  <url>
     <loc>${SITE_URL}${entry.loc === "/" ? "" : entry.loc}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
-${entry.loc.startsWith("/blog/") ? "    <changefreq>monthly</changefreq>\n" : ""}    <priority>${entry.priority}</priority>
+${entry.lastmod ? `    <lastmod>${entry.lastmod}</lastmod>\n` : ""}${entry.loc.startsWith("/blog/") ? "    <changefreq>monthly</changefreq>\n" : ""}    <priority>${entry.priority}</priority>
   </url>`,
 	)
 	.join("\n")}

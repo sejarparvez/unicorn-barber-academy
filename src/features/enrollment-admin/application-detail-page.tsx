@@ -1,20 +1,28 @@
 // src/features/enrollment-admin/application-detail-page.tsx
 // Admissions decision surface: applicant info, status transitions with an
-// optional decision note, offline fee toggle. Approving upgrades the
-// applicant's role to student (server-side) and emails them.
+// optional decision note, offline fee toggle, and certificate issuance for
+// graduates. Approving upgrades the applicant's role to student (server-side).
 //
 // Data comes from useApplicationDetail (service layer), primed with the
-// route loader's snapshot; status/fee mutations invalidate precisely.
+// route loader's snapshot; status/fee/certificate mutations invalidate
+// precisely.
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { ApplicationDetail } from "@/lib/enrollment";
+import type { ApplicationDetail, ApplicationStatus } from "@/lib/enrollment";
 import { APPLICATION_STATUS_LABELS, formatStartsOn } from "@/lib/enrollment";
+import { APP_ORIGIN } from "@/lib/env";
 import { cn } from "@/lib/utils";
+import {
+	useApplicationCertificate,
+	useIssueCertificate,
+	useSetCertificateRevocation,
+} from "@/service/certificate";
 import {
 	useApplicationDetail,
 	useSetApplicationFee,
@@ -22,7 +30,7 @@ import {
 } from "@/service/enrollment";
 
 const STATUS_FLOW: Array<{
-	status: "reviewing" | "approved" | "waitlisted" | "rejected";
+	status: ApplicationStatus;
 	label: string;
 	tone: string;
 }> = [
@@ -37,6 +45,11 @@ const STATUS_FLOW: Array<{
 		status: "rejected",
 		label: "Reject",
 		tone: "bg-destructive hover:bg-destructive/90",
+	},
+	{
+		status: "completed",
+		label: "Mark completed (graduated)",
+		tone: "bg-primary hover:bg-primary/90",
 	},
 ];
 
@@ -208,6 +221,7 @@ export function ApplicationDetailPage({
 						</h2>
 						<Textarea
 							rows={3}
+							aria-label="Decision note (optional)"
 							value={note}
 							onChange={(e) => setNote(e.target.value)}
 							placeholder="Recorded with the decision; included in the admin trail only."
@@ -247,6 +261,8 @@ export function ApplicationDetailPage({
 								: "Mark as paid"}
 						</Button>
 					</section>
+
+					<CertificatePanel applicationId={application.id} />
 				</aside>
 			</div>
 		</div>
@@ -259,5 +275,98 @@ function Row({ label, value }: { label: string; value: string }) {
 			<dt className="text-xs text-muted-foreground">{label}</dt>
 			<dd className="mt-0.5 font-medium break-all">{value}</dd>
 		</div>
+	);
+}
+
+/** Issue / manage the certificate minted from this application. */
+function CertificatePanel({ applicationId }: { applicationId: number }) {
+	const { data: certificate } = useApplicationCertificate(applicationId);
+	const issue = useIssueCertificate();
+	const revoke = useSetCertificateRevocation();
+
+	const canIssue = !certificate;
+
+	async function onIssue() {
+		try {
+			const code = await issue.mutateAsync(applicationId);
+			toast.success(`Certificate ${code} issued`);
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : "Issuance failed");
+		}
+	}
+
+	async function onToggleRevocation() {
+		if (!certificate) return;
+		const next = !certificate.revokedAt;
+		try {
+			await revoke.mutateAsync({
+				id: certificate.id,
+				revoked: next,
+				reason: next ? "Revoked from application detail" : null,
+			});
+			toast.success(next ? "Certificate revoked" : "Certificate restored");
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : "Update failed");
+		}
+	}
+
+	return (
+		<section className="space-y-3 rounded-xl border border-border bg-card p-5">
+			<h2 className="font-heading text-sm font-semibold">Certificate</h2>
+
+			{certificate ? (
+				<div className="space-y-2 text-sm">
+					<p className="flex items-center justify-between gap-2">
+						<span className="text-muted-foreground">Code</span>
+						<Badge
+							variant={certificate.revokedAt ? "destructive" : "default"}
+							className="h-5 px-1.5 text-[10px]"
+						>
+							{certificate.revokedAt ? "Revoked" : "Active"}
+						</Badge>
+					</p>
+					<p className="font-mono text-sm font-semibold tracking-wider">
+						{certificate.code}
+					</p>
+					<a
+						href={`${APP_ORIGIN}/verify/${certificate.code}`}
+						target="_blank"
+						rel="noreferrer"
+						className={cn(
+							buttonVariants({ variant: "outline", size: "sm" }),
+							"w-full",
+						)}
+					>
+						Open verification page
+					</a>
+					<Button
+						variant="ghost"
+						size="sm"
+						className="w-full"
+						disabled={issue.isPending || revoke.isPending}
+						onClick={onToggleRevocation}
+					>
+						{certificate.revokedAt ? "Restore certificate" : "Revoke…"}
+					</Button>
+				</div>
+			) : (
+				<div className="space-y-2">
+					<p className="text-[11px] leading-relaxed text-muted-foreground">
+						Issuing requires the application to be <strong>completed</strong>{" "}
+						and the registration fee <strong>paid</strong>. The graduate finds
+						the certificate in their dashboard.
+					</p>
+					<Button
+						variant="outline"
+						size="sm"
+						className="w-full"
+						disabled={!canIssue || issue.isPending}
+						onClick={onIssue}
+					>
+						{issue.isPending ? "Issuing…" : "Issue certificate"}
+					</Button>
+				</div>
+			)}
+		</section>
 	);
 }

@@ -13,7 +13,7 @@ import {
 	setPostStatus,
 	updatePost,
 } from "@/lib/api/blog-admin";
-import type { BlogCategory, BlogPostFull, BlogPostSummary } from "@/lib/blog";
+import type { BlogCategory, BlogPostSummary } from "@/lib/blog";
 import { queryKeys } from "./query-keys";
 
 /* -------------------------------- reads --------------------------------- */
@@ -27,7 +27,7 @@ type ListPage = {
 };
 
 export function useAdminPosts(
-	filters: { status?: string },
+	filters: { status?: string; page?: number },
 	options?: { initialData?: ListPage },
 ) {
 	return useQuery({
@@ -35,24 +35,10 @@ export function useAdminPosts(
 		queryFn: async (): Promise<ListPage> => {
 			const { listAdminPostsFn } = await import("@/server/blog-fns");
 			return listAdminPostsFn({
-				data: { status: filters.status as never, page: 1 },
+				data: { status: filters.status as never, page: filters.page ?? 1 },
 			});
 		},
 		initialData: options?.initialData,
-	});
-}
-
-export function useAdminPost(
-	id: number,
-	options?: { initialData?: BlogPostFull | null },
-) {
-	return useQuery({
-		queryKey: queryKeys.adminPost(id),
-		queryFn: async (): Promise<BlogPostFull | null> => {
-			const { getAdminPostFn } = await import("@/server/blog-fns");
-			return getAdminPostFn({ data: { id } });
-		},
-		initialData: options?.initialData ?? undefined,
 	});
 }
 

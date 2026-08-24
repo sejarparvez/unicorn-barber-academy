@@ -87,13 +87,14 @@ function client(): S3Client {
 
 /**
  * Uploads an image buffer and returns its public URL.
- * Key scheme: blog/<yyyy>/<mm>/<name>-<rand6>.<ext> — stable, sortable,
+ * Key scheme: <folder>/<yyyy>/<mm>/<name>-<rand6>.<ext> — stable, sortable,
  * collision-safe, and cache-friendly once uploaded (immutable content).
  */
 export async function uploadImage(options: {
 	buffer: Buffer;
 	mime: string;
 	namePrefix: string;
+	folder?: string;
 }): Promise<{ url: string; key: string }> {
 	const ext = EXT_BY_MIME[options.mime];
 	if (!ext) throw new Error(`Unsupported image type: ${options.mime}`);
@@ -108,7 +109,7 @@ export async function uploadImage(options: {
 			.replace(/[^a-z0-9]+/g, "-")
 			.replace(/^-+|-+$/g, "")
 			.slice(0, 60) || "img";
-	const key = `blog/${yyyy}/${mm}/${safeName}-${rand}.${ext}`;
+	const key = `${options.folder ?? "blog"}/${yyyy}/${mm}/${safeName}-${rand}.${ext}`;
 
 	await client().send(
 		new PutObjectCommand({

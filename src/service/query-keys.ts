@@ -12,15 +12,27 @@
 
 export const queryKeys = {
 	/* ------------------------------ enrollment ----------------------------- */
-	applications: (filters?: { status?: string; search?: string }) =>
-		["applications", filters ?? {}] as const,
+	applications: (filters?: {
+		status?: string;
+		search?: string;
+		page?: number;
+	}) => ["applications", filters ?? {}] as const,
 	application: (id: number) => ["applications", "detail", id] as const,
 	intakes: () => ["intakes"] as const,
 	myApplications: () => ["my-applications"] as const,
 	openIntakes: () => ["open-intakes"] as const,
 
+	/* ----------------------------- certificates ----------------------------- */
+	certificates: () => ["certificates"] as const,
+	certificate: (id: number) => ["certificates", "detail", id] as const,
+	applicationCertificate: (applicationId: number) =>
+		["certificates", "application", applicationId] as const,
+
+	/* -------------------------------- console ------------------------------- */
+	consoleOverview: () => ["console-overview"] as const,
+
 	/* -------------------------------- blog --------------------------------- */
-	adminPosts: (filters?: { status?: string }) =>
+	adminPosts: (filters?: { status?: string; page?: number }) =>
 		["admin-posts", filters ?? {}] as const,
 	adminPost: (id: number) => ["admin-posts", "detail", id] as const,
 	blogCategories: () => ["blog-categories"] as const,

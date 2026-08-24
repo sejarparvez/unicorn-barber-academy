@@ -1,7 +1,7 @@
 // routes/blog.index.tsx
 // Public journal index. Loader pulls published posts from the DB; search
 // param ?page=N drives crawlable pagination.
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { BlogPage } from "@/features/blog/blog-page";
 import { listCategoriesFn, listPublishedPostsFn } from "@/server/blog-fns";
@@ -20,6 +20,11 @@ export const Route = createFileRoute("/blog/")({
 			listPublishedPostsFn({ data: { page: search.page ?? 1 } }),
 			listCategoriesFn(),
 		]);
+		// Out-of-range ?page= is a bad URL, not an empty journal — 404 it
+		// instead of rendering "coming soon" copy under a canonical /blog.
+		if (search.page && posts.page !== search.page) {
+			throw notFound();
+		}
 		return { posts, categories };
 	},
 	head: ({ loaderData }) => {

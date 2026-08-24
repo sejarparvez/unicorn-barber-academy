@@ -36,7 +36,7 @@ export const Route = createFileRoute("/llms.txt")({
 
 				const llmsTxt = `# Unicorn Barber Training Academy
 
-> A barbering and beauty & cosmetology training academy in Gulshan, Dhaka, Bangladesh. Hands-on programs taught by working industry professionals, professional kit included with every program, small cohorts, and job placement support. Nationally registered training provider with NTVQF-certified curriculum.
+> A barbering and beauty & cosmetology training academy in Banasree, Rampura, Dhaka, Bangladesh. Hands-on programs taught by working industry professionals, professional kit included with every program, small cohorts, and job placement support. Nationally registered training provider with NTVQF-certified curriculum.
 
 ## About
 

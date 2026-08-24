@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
 import { deleteIntake, updateIntake } from "@/server/enrollment-db";
+import { isValidFutureStartDate } from "@/server/enrollment-validate";
 
 type Params = { id: string };
 
@@ -44,9 +45,14 @@ export const Route = createFileRoute("/api/admin/enrollments/intakes/$id")({
 				} = {};
 				if (
 					typeof body.startsOn === "string" &&
-					/^\d{4}-\d{2}-\d{2}$/.test(body.startsOn)
+					isValidFutureStartDate(body.startsOn)
 				) {
 					patch.startsOn = body.startsOn;
+				} else if (body.startsOn !== undefined) {
+					return json(
+						{ message: "Start date must be a valid future date" },
+						{ status: 400 },
+					);
 				}
 				const seats = Number.parseInt(String(body.seatsTotal ?? ""), 10);
 				if (Number.isInteger(seats)) patch.seatsTotal = seats;

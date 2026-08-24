@@ -3,7 +3,7 @@
 // (publish / unpublish / archive / delete). Reads + mutations flow through
 // the service layer (src/service/blog.ts).
 import { IconEye, IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -23,10 +23,29 @@ const TABS: Array<{ label: string; status?: BlogStatus }> = [
 	{ label: "Archived", status: "archived" },
 ];
 
-export function PostListPage({ statusFilter }: { statusFilter?: BlogStatus }) {
-	const { data, isPending } = useAdminPosts({ status: statusFilter });
+export function PostListPage({
+	statusFilter,
+	page = 1,
+}: {
+	statusFilter?: BlogStatus;
+	page?: number;
+}) {
+	const navigate = useNavigate();
+	const { data, isPending } = useAdminPosts({ status: statusFilter, page });
 	const setStatusMutation = useSetPostStatus();
 	const deleteMutation = useDeletePost();
+
+	function navigateWith(next: { status?: BlogStatus; page?: number }) {
+		void navigate({
+			to: "/dashboard/blog",
+			search: {
+				...(next.status ? { status: next.status } : {}),
+				...(next.page && next.page > 1 ? { page: next.page } : {}),
+			},
+		});
+	}
+
+	const totalPages = data?.totalPages ?? 1;
 	const mutatingId: number | undefined =
 		(setStatusMutation.variables as { id?: number } | undefined)?.id ??
 		(deleteMutation.variables as number | undefined);
@@ -228,11 +247,38 @@ export function PostListPage({ statusFilter }: { statusFilter?: BlogStatus }) {
 				</ul>
 			)}
 
-			{data && data.total > data.items.length ? (
-				<p className="text-xs text-muted-foreground">
-					Showing the {data.items.length} most recently updated of {data.total}{" "}
-					posts.
-				</p>
+			{totalPages > 1 ? (
+				<footer className="flex items-center justify-between text-sm">
+					{page > 1 ? (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() =>
+								navigateWith({ status: statusFilter, page: page - 1 })
+							}
+						>
+							Previous
+						</Button>
+					) : (
+						<span className="text-muted-foreground">Previous</span>
+					)}
+					<span className="text-muted-foreground">
+						Page {page} of {totalPages}
+					</span>
+					{data && page < totalPages ? (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() =>
+								navigateWith({ status: statusFilter, page: page + 1 })
+							}
+						>
+							Next
+						</Button>
+					) : (
+						<span className="text-muted-foreground">Next</span>
+					)}
+				</footer>
 			) : null}
 		</div>
 	);

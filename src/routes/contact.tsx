@@ -10,7 +10,7 @@ export const Route = createFileRoute("/contact")({
 			{
 				name: "description",
 				content:
-					"Get in touch with Unicorn Barber Training Academy in Gulshan, Dhaka — admissions, salon partnerships, press, or a studio visit.",
+					"Get in touch with Unicorn Barber Training Academy in Banasree, Rampura, Dhaka — admissions, salon partnerships, press, or a studio visit.",
 			},
 			{
 				property: "og:title",

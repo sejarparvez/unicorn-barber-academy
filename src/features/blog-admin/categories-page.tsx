@@ -100,6 +100,7 @@ export function CategoriesPage() {
 				<Input
 					value={newName}
 					placeholder="New category name…"
+					aria-label="New category name"
 					onChange={(e) => setNewName(e.target.value)}
 					onKeyDown={(e) => e.key === "Enter" && void onAdd()}
 				/>

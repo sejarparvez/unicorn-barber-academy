@@ -11,13 +11,16 @@ import type {
 	ApplicationDetail,
 	ApplicationStatus,
 	IntakeAdmin,
-	MyApplication,
 } from "@/lib/enrollment";
 import { queryKeys } from "./query-keys";
 
 /* -------------------------------- reads --------------------------------- */
 
-type ListFilters = { status?: ApplicationStatus; search?: string };
+type ListFilters = {
+	status?: ApplicationStatus;
+	search?: string;
+	page?: number;
+};
 type ListPage = {
 	items: import("@/lib/enrollment").ApplicationSummary[];
 	total: number;
@@ -33,10 +36,7 @@ export function useApplicationsList(
 	options?: { initialData?: ListPage },
 ) {
 	return useQuery({
-		queryKey: queryKeys.applications({
-			status: filters.status,
-			search: filters.search,
-		}),
+		queryKey: queryKeys.applications(filters),
 		queryFn: async (): Promise<ListPage> => {
 			const { listApplicationsAdminFn } = await import(
 				"@/server/enrollment-fns"
@@ -70,17 +70,6 @@ export function useIntakesAdmin(options?: { initialData?: IntakeAdmin[] }) {
 		queryFn: async (): Promise<IntakeAdmin[]> => {
 			const { listIntakesAdminFn } = await import("@/server/enrollment-fns");
 			return listIntakesAdminFn();
-		},
-		initialData: options?.initialData,
-	});
-}
-
-export function useMyApplications(options?: { initialData?: MyApplication[] }) {
-	return useQuery({
-		queryKey: queryKeys.myApplications(),
-		queryFn: async (): Promise<MyApplication[]> => {
-			const { listMyApplicationsFn } = await import("@/server/enrollment-fns");
-			return listMyApplicationsFn();
 		},
 		initialData: options?.initialData,
 	});

@@ -3,6 +3,7 @@
 // program detail page; keep slugs in sync with data/programs.ts.
 
 import { pic } from "@/data/images";
+import { SOCIAL_URLS } from "@/lib/social";
 import type { Track } from "./programs";
 export type Instructor = {
 	name: string;
@@ -30,7 +31,7 @@ export const INSTRUCTORS: Instructor[] = [
 		bio: "Started cutting hair at his uncle's shop in Old Dhaka at fifteen. Fourteen years running his own chair before he ever taught a class.",
 		specialties: ["Clipper-over-comb", "Straight razor", "Client consultation"],
 		image: pic("unicorn-instructor-1", 700, 900),
-		instagram: "https://instagram.com",
+		instagram: SOCIAL_URLS.instagram,
 		teaches: {
 			program: "Classic Barbering",
 			to: "/programs/classic-barbering",
@@ -48,7 +49,7 @@ export const INSTRUCTORS: Instructor[] = [
 		bio: "Trained in Bangkok before returning to Dhaka to open a studio. Still takes bridal clients most weekends between teaching cohorts.",
 		specialties: ["Skincare fundamentals", "Colour theory", "Client rapport"],
 		image: pic("unicorn-instructor-2", 700, 900),
-		instagram: "https://instagram.com",
+		instagram: SOCIAL_URLS.instagram,
 		teaches: {
 			program: "Cosmetology Fundamentals",
 			to: "/programs/cosmetology-fundamentals",
@@ -62,10 +63,10 @@ export const INSTRUCTORS: Instructor[] = [
 		track: "barbering",
 		memberNo: "GM-03",
 		years: 9,
-		bio: "Known around Gulshan for skin fades sharp enough to see your reflection in. Trains every cohort's blending fundamentals.",
+		bio: "Known around Dhaka for skin fades sharp enough to see your reflection in. Trains every cohort's blending fundamentals.",
 		specialties: ["Skin fades", "Taper blending", "Texture finishing"],
 		image: pic("unicorn-instructor-3", 700, 900),
-		instagram: "https://instagram.com",
+		instagram: SOCIAL_URLS.instagram,
 		teaches: { program: "Fades & Tapers", to: "/programs/fades-and-tapers" },
 	},
 	{
@@ -81,7 +82,7 @@ export const INSTRUCTORS: Instructor[] = [
 			"Beard shape design",
 		],
 		image: pic("unicorn-instructor-5", 700, 900),
-		instagram: "https://instagram.com",
+		instagram: SOCIAL_URLS.instagram,
 		teaches: { program: "Beard Sculpting", to: "/programs/beard-sculpting" },
 	},
 	{
@@ -93,7 +94,7 @@ export const INSTRUCTORS: Instructor[] = [
 		bio: "Editorial makeup artist for two Dhaka fashion weeks running. Pushes students to build a portfolio, not just a certificate.",
 		specialties: ["Bridal looks", "Editorial styling", "Photo-ready finishing"],
 		image: pic("unicorn-instructor-4", 700, 900),
-		instagram: "https://instagram.com",
+		instagram: SOCIAL_URLS.instagram,
 		teaches: {
 			program: "Bridal & Editorial Makeup",
 			to: "/programs/bridal-and-editorial-makeup",
@@ -108,7 +109,7 @@ export const INSTRUCTORS: Instructor[] = [
 		bio: "Colour-corrects the cases other salons turn away. Teaches chemistry first, technique second — she says the order matters.",
 		specialties: ["Colour theory", "Chemical treatments", "Precision cutting"],
 		image: pic("unicorn-instructor-6", 700, 900),
-		instagram: "https://instagram.com",
+		instagram: SOCIAL_URLS.instagram,
 		teaches: {
 			program: "Hair Styling & Colouring",
 			to: "/programs/hair-styling-and-colouring",

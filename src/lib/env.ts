@@ -8,11 +8,20 @@
 
 function appUrlRaw(): string {
 	if (!import.meta.env.SSR) return window.location.origin;
+	const raw = process.env.BETTER_AUTH_URL;
+	// A silent localhost fallback in production breaks email verification
+	// links and trusted-origin checks — fail loudly instead.
+	if (!raw && process.env.NODE_ENV === "production") {
+		throw new Error(
+			"BETTER_AUTH_URL must be set to the app's absolute origin in production",
+		);
+	}
 	try {
-		return new URL(
-			process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
-		).toString();
+		return new URL(raw ?? "http://localhost:3000").toString();
 	} catch {
+		if (process.env.NODE_ENV === "production") {
+			throw new Error(`BETTER_AUTH_URL is not a valid URL: "${raw}"`);
+		}
 		return "http://localhost:3000";
 	}
 }

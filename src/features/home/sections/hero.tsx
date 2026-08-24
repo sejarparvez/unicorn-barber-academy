@@ -57,7 +57,7 @@ export default function Hero() {
 
 					<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-150 mt-7 max-w-sm text-base leading-relaxed text-foreground/65 sm:text-lg">
 						Fades, tapers, and straight-razor shaves — hands-on barbering
-						training in Gulshan, Dhaka, taught by working barbers, not
+						training in Banasree, Dhaka, taught by working barbers, not
 						textbooks.
 					</p>
 

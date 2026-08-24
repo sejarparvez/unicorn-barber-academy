@@ -45,3 +45,16 @@ export async function requireRoles(options: {
 
 	return session;
 }
+
+/**
+ * In-handler guard for createServerFn endpoints. Route beforeLoad guards do
+ * NOT protect server functions — each compiled server fn is its own public
+ * RPC endpoint — so any privileged fn must call this inside its handler.
+ */
+export async function requireAdminSession(): Promise<SessionPayload> {
+	const session = await getSession();
+	if (!session || parseRole(session.user.role) !== "admin") {
+		throw new Error("Admin access required");
+	}
+	return session;
+}

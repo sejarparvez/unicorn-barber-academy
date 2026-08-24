@@ -11,6 +11,8 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
 import type { SessionPayload } from "@/lib/types";
 import { getSession } from "@/server/session";
@@ -59,6 +61,7 @@ export const Route = createRootRoute({
 	}),
 	component: RootDocument,
 	notFoundComponent: RootNotFound,
+	errorComponent: RootError,
 });
 
 function RootNotFound() {
@@ -81,6 +84,33 @@ function RootNotFound() {
 	);
 }
 
+function RootError({ error }: { error: Error }) {
+	return (
+		<main className="mx-auto max-w-xl px-6 py-32 text-center">
+			<h1 className="font-heading text-3xl font-medium text-foreground">
+				Something went wrong
+			</h1>
+			<p className="mt-3 text-sm text-muted-foreground">
+				An unexpected error occurred while loading this page. Please try again —
+				if the problem persists, contact us.
+			</p>
+			{import.meta.env.DEV && error ? (
+				<pre className="mt-6 max-h-48 overflow-auto rounded-md border border-border bg-muted/40 p-4 text-left text-xs whitespace-pre-wrap text-muted-foreground">
+					{error.message}
+				</pre>
+			) : null}
+			<button
+				type="button"
+				onClick={() => window.location.reload()}
+				className="mt-8 inline-flex cursor-pointer items-center gap-2 border border-primary px-6 py-3 text-[12px] font-semibold tracking-[0.16em] text-primary hover:bg-primary hover:text-primary-foreground"
+			>
+				RELOAD PAGE
+				<IconArrowRight className="h-3.5 w-3.5" stroke={1.75} />
+			</button>
+		</main>
+	);
+}
+
 function RootDocument() {
 	const { session } = Route.useLoaderData();
 	return (
@@ -89,13 +119,21 @@ function RootDocument() {
 				<HeadContent />
 			</head>
 			<body>
-				<Header session={session} />
-				<div id="main-content" className=" min-h-screen">
-					<QueryProvider>
-						<Outlet />
-					</QueryProvider>
+				{/* Site chrome never prints — certificate pages rely on this. */}
+				<div className="print:hidden">
+					<Header session={session} />
 				</div>
-				<Footer />
+				<div id="main-content" className=" min-h-screen">
+					<TooltipProvider>
+						<QueryProvider>
+							<Outlet />
+						</QueryProvider>
+					</TooltipProvider>
+				</div>
+				<div className="print:hidden">
+					<Footer />
+				</div>
+				<Toaster position="bottom-right" richColors closeButton />
 				{import.meta.env.DEV && (
 					<TanStackDevtools
 						config={{

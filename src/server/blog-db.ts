@@ -13,7 +13,7 @@ import type {
 	FaqItem,
 	Paginated,
 } from "@/lib/blog";
-import { estimateReadingMinutes } from "@/lib/blog";
+import { estimateReadingMinutes, parseBlogStatus } from "@/lib/blog";
 import { q } from "./db";
 
 /* ------------------------------ row mapping ----------------------------- */
@@ -662,4 +662,20 @@ export async function renameCategory(
 export async function deleteCategory(id: number): Promise<boolean> {
 	const res = await q("DELETE FROM blog_category WHERE id = $1", [id]);
 	return (res.rowCount ?? 0) > 0;
+}
+
+/* --------------------------------- stats --------------------------------- */
+
+export type BlogStats = { draft: number; published: number; archived: number };
+
+export async function getPostCountsByStatus(): Promise<BlogStats> {
+	const res = await q<{ status: string; n: number }>(
+		"SELECT status, count(*)::int AS n FROM blog_post GROUP BY status",
+	);
+	const counts: BlogStats = { draft: 0, published: 0, archived: 0 };
+	for (const row of res.rows) {
+		const status = parseBlogStatus(row.status);
+		if (status) counts[status] = row.n;
+	}
+	return counts;
 }

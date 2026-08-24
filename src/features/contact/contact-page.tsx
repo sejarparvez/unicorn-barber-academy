@@ -46,7 +46,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { pic } from "@/data/images";
 import { ALL_PROGRAMS } from "@/data/programs";
-import { CONTACT, SITE_URL } from "@/data/site";
+import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
 import { submitContactMessage } from "@/lib/api/contact";
 import { cn } from "@/lib/utils";
 
@@ -166,7 +166,9 @@ function ContactHero() {
 						WHATSAPP
 					</a>
 					<a
-						href="#visit"
+						href={CONTACT.mapsUrl}
+						target="_blank"
+						rel="noreferrer"
 						className="inline-flex items-center gap-2 border border-white/15 bg-white/5 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-secondary-foreground/85 backdrop-blur-sm transition-colors hover:border-primary hover:text-primary"
 					>
 						<IconMapPin className="h-3.5 w-3.5" stroke={1.75} />
@@ -530,10 +532,17 @@ function VisitStudio() {
 								stroke={1.75}
 							/>
 							<span>
-								Free parking behind the building, entrance on Fade Street
+								Entrance on Main Road — the academy is on the 1st floor
 							</span>
 						</p>
 					</address>
+
+					<div className="mt-6 text-sm text-secondary-foreground/75">
+						<p className="text-[11px] tracking-[0.18em] text-primary uppercase">
+							Convenient for students from
+						</p>
+						<p className="mt-2 leading-relaxed">{AREAS_SERVED.join(" · ")}</p>
+					</div>
 
 					<div className="mt-8 border-t border-white/10 pt-6">
 						<p className="flex items-center gap-2 text-[11px] tracking-[0.18em] text-primary">
@@ -565,13 +574,14 @@ function VisitStudio() {
 				</Reveal>
 
 				<Reveal delay={0.1} className="relative h-72 lg:h-auto">
-					<Image
-						src={pic("unicorn-contact-map", 1000, 900)}
-						alt="Street map showing the location of Unicorn Barber Training Academy in Gulshan, Dhaka"
-						layout="fullWidth"
-						className="h-full w-full object-cover opacity-70"
+					<iframe
+						title="Google Map showing the location of Unicorn Barber Training Academy in Banasree, Rampura, Dhaka"
+						src={CONTACT.mapsEmbedUrl}
+						loading="lazy"
+						referrerPolicy="no-referrer-when-downgrade"
+						allowFullScreen
+						className="h-full min-h-[18rem] w-full border-0"
 					/>
-					<div className="absolute inset-0 bg-secondary/30" />
 				</Reveal>
 			</div>
 		</section>
@@ -581,6 +591,14 @@ function VisitStudio() {
 /* ------------------------------- FAQ ------------------------------- */
 
 const CONTACT_FAQS = [
+	{
+		q: "Where exactly is the academy located?",
+		a: "House 04, Block F, Main Road, Banasree, Rampura, Dhaka 1219 — the academy is on the 1st floor, with the entrance on Main Road. There's a Google map on this page.",
+	},
+	{
+		q: "Which parts of Dhaka do students commute from?",
+		a: "Most students come from nearby Banasree, Rampura, Aftabnagar, Badda, Khilgaon, Gulshan and Mohakhali — but cohorts regularly include learners from across Dhaka.",
+	},
 	{
 		q: "Do I need an appointment to visit the studio?",
 		a: "Walk-ins are welcome during studio hours, but booking a visit means an instructor can actually walk you through a cohort in session.",

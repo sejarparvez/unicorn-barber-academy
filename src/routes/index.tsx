@@ -1,10 +1,8 @@
 import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
+import { createFileRoute } from "@tanstack/react-router";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
 import { buttonVariants } from "@/components/ui/button";
-import { pic } from "@/data/images";
-import { CONTACT, SITE_URL } from "@/data/site";
+import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
 import Faq from "@/features/home/sections/faq";
 import Hero from "@/features/home/sections/hero";
 import Instructors from "@/features/home/sections/instructors";
@@ -101,25 +99,38 @@ function VisitUs() {
 							/>
 							<span>{CONTACT.hoursSummary}</span>
 						</p>
+						<p className="flex items-start gap-3">
+							<IconMapPin
+								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
+								stroke={1.75}
+							/>
+							<span>
+								Convenient for students from{" "}
+								{AREAS_SERVED.slice(0, 5).join(", ")} and across Dhaka.
+							</span>
+						</p>
 					</address>
-					<Link
-						to="/contact"
+					<a
+						href={CONTACT.mapsUrl}
+						target="_blank"
+						rel="noreferrer"
 						className={cn(
 							buttonVariants({ variant: "outline" }),
 							"mt-9 w-fit rounded-none border-primary bg-transparent px-6 py-5 text-[12px] font-semibold tracking-[0.16em] text-primary hover:bg-primary hover:text-primary-foreground",
 						)}
 					>
 						GET DIRECTIONS
-					</Link>
+					</a>
 				</div>
 				<div className="relative h-72 lg:h-auto">
-					<Image
-						src={pic("unicorn-location-map", 1000, 900)}
-						alt="Street map showing the location of Unicorn Barber Training Academy in Gulshan, Dhaka"
-						layout="fullWidth"
-						className="h-full w-full object-cover opacity-70"
+					<iframe
+						title="Google Map showing the location of Unicorn Barber Training Academy in Banasree, Rampura, Dhaka"
+						src={CONTACT.mapsEmbedUrl}
+						loading="lazy"
+						referrerPolicy="no-referrer-when-downgrade"
+						allowFullScreen
+						className="h-full min-h-[18rem] w-full border-0 opacity-90"
 					/>
-					<div className="absolute inset-0 bg-secondary/30" />
 				</div>
 			</div>
 		</section>

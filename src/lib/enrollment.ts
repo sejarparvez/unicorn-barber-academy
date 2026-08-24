@@ -8,6 +8,7 @@ export const APPLICATION_STATUSES = [
 	"approved",
 	"waitlisted",
 	"rejected",
+	"completed",
 ] as const;
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 
@@ -26,6 +27,7 @@ export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
 	approved: "Approved",
 	waitlisted: "Waitlisted",
 	rejected: "Not accepted",
+	completed: "Completed",
 };
 
 /** Statuses that hold one of the intake's seats. */

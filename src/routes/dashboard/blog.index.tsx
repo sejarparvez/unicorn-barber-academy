@@ -39,6 +39,6 @@ export const Route = createFileRoute("/dashboard/blog/")({
 });
 
 function PostListRoute() {
-	const { status } = Route.useSearch();
-	return <PostListPage statusFilter={status} />;
+	const { status, page } = Route.useSearch();
+	return <PostListPage statusFilter={status} page={page ?? 1} />;
 }

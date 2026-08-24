@@ -2,6 +2,8 @@
 import {
 	IconBrandFacebook,
 	IconBrandInstagram,
+	IconBrandTiktok,
+	IconBrandX,
 	IconBrandYoutube,
 	IconClock,
 	IconMail,
@@ -14,7 +16,12 @@ import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { CONTACT, OPENING_HOURS_SPEC, SITE_URL } from "@/data/site";
+import {
+	AREAS_SERVED,
+	CONTACT,
+	OPENING_HOURS_SPEC,
+	SITE_URL,
+} from "@/data/site";
 import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
@@ -29,6 +36,7 @@ const ACADEMY: FooterLink[] = [
 	{ label: "About Us", to: "/about" },
 	{ label: "Instructors", to: "/instructors" },
 	{ label: "Student Life", to: "/student-life" },
+	{ label: "Press & Media", to: "/media" },
 	{ label: "Careers", to: "/careers" },
 ];
 
@@ -48,7 +56,9 @@ const LEGAL_LINKS: FooterLink[] = [
  */
 const LOCAL_BUSINESS_JSON_LD = {
 	"@context": "https://schema.org",
-	"@type": "EducationalOrganization",
+	// Dual-typed: EducationalOrganization describes what it is, LocalBusiness
+	// is what makes Google treat it as a local entity for map-pack results.
+	"@type": ["EducationalOrganization", "LocalBusiness"],
 	// Stable entity id so other JSON-LD blocks (Course, Review,
 	// BreadcrumbList) can reference the same organization via @id.
 	"@id": `${SITE_URL}/#academy`,
@@ -61,8 +71,8 @@ const LOCAL_BUSINESS_JSON_LD = {
 	priceRange: "$$",
 	geo: {
 		"@type": "GeoCoordinates",
-		latitude: 23.7925,
-		longitude: 90.4078,
+		latitude: 23.7536,
+		longitude: 90.4286,
 	},
 	address: {
 		"@type": "PostalAddress",
@@ -71,9 +81,26 @@ const LOCAL_BUSINESS_JSON_LD = {
 		postalCode: CONTACT.postalCode,
 		addressCountry: CONTACT.addressCountry,
 	},
-	areaServed: "Dhaka, Bangladesh",
+	hasMap: CONTACT.mapsUrl,
+	areaServed: [...AREAS_SERVED],
 	openingHoursSpecification: OPENING_HOURS_SPEC,
-	sameAs: [SOCIAL_URLS.instagram, SOCIAL_URLS.facebook, SOCIAL_URLS.youtube],
+	contactPoint: [
+		{
+			"@type": "ContactPoint",
+			telephone: CONTACT.phoneE164,
+			email: CONTACT.email,
+			contactType: "customer service",
+			areaServed: "BD",
+			availableLanguage: ["en", "bn"],
+		},
+	],
+	sameAs: [
+		SOCIAL_URLS.instagram,
+		SOCIAL_URLS.facebook,
+		SOCIAL_URLS.youtube,
+		SOCIAL_URLS.tiktok,
+		SOCIAL_URLS.x,
+	],
 	hasOfferCatalog: {
 		"@type": "OfferCatalog",
 		name: "Barbering Programs",
@@ -82,7 +109,8 @@ const LOCAL_BUSINESS_JSON_LD = {
 			name: program.label,
 			url: `${SITE_URL}${program.to}`,
 			provider: {
-				"@type": "EducationalOrganization",
+				"@type": ["EducationalOrganization", "LocalBusiness"],
+				"@id": `${SITE_URL}/#academy`,
 				name: "Unicorn Barber Training Academy",
 			},
 		})),
@@ -171,6 +199,12 @@ export default function Footer() {
 							</SocialIcon>
 							<SocialIcon href={SOCIAL_URLS.youtube} label="YouTube">
 								<IconBrandYoutube className="h-4 w-4" stroke={1.75} />
+							</SocialIcon>
+							<SocialIcon href={SOCIAL_URLS.tiktok} label="TikTok">
+								<IconBrandTiktok className="h-4 w-4" stroke={1.75} />
+							</SocialIcon>
+							<SocialIcon href={SOCIAL_URLS.x} label="X (Twitter)">
+								<IconBrandX className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
 						</div>
 					</div>

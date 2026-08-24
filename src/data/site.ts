@@ -6,6 +6,25 @@
 
 export const SITE_URL = "https://unicornbarberacademy.com";
 
+/** Query used for every Google Maps link/embed on the site. */
+const MAPS_QUERY =
+	"Unicorn Barber Training Academy, House 04, Block F, Main Road, Banasree, Rampura, Dhaka";
+
+/**
+ * Neighborhoods around the campus that make up the realistic catchment
+ * area. Used by visible copy ("areas we serve") and JSON-LD areaServed —
+ * local-pack relevance without pretending to be multiple locations.
+ */
+export const AREAS_SERVED = [
+	"Banasree",
+	"Rampura",
+	"Aftabnagar",
+	"Badda",
+	"Khilgaon",
+	"Gulshan",
+	"Mohakhali",
+] as const;
+
 /**
  * Single source of truth for name-address-phone-hours (NAP) data.
  * Used by visible UI (home/contact/footer/legal pages) and structured
@@ -14,15 +33,18 @@ export const SITE_URL = "https://unicornbarberacademy.com";
  */
 export const CONTACT = {
 	email: "hello@unicornbta.com",
-	phoneDisplay: "+880 1234-567890",
-	phoneHref: "tel:+8801234567890",
-	phoneE164: "+8801234567890",
-	whatsapp: "https://wa.me/8801234567890",
-	streetAddress: "123 Fade Street",
-	addressLocality: "Gulshan, Dhaka",
-	postalCode: "1212",
+	phoneDisplay: "01337-229944",
+	phoneHref: "tel:+8801337229944",
+	phoneE164: "+8801337229944",
+	whatsapp: "https://wa.me/8801337229944",
+	streetAddress: "House 04 (1st Floor), Block F, Main Road",
+	addressLocality: "Banasree, Rampura, Dhaka",
+	postalCode: "1219",
 	addressCountry: "BD",
-	addressDisplay: "123 Fade Street, Gulshan, Dhaka 1212, Bangladesh",
+	addressDisplay:
+		"House 04 (1st Floor), Block F, Main Road, Banasree, Rampura, Dhaka 1219, Bangladesh",
+	mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAPS_QUERY)}`,
+	mapsEmbedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(MAPS_QUERY)}&output=embed`,
 	hoursSummary: "Sun–Thu, 9AM–9PM · Sat, 9AM–7PM",
 	hours: [
 		{ day: "Sunday – Thursday", time: "9:00 AM – 9:00 PM" },

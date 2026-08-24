@@ -35,7 +35,14 @@ export const Route = createFileRoute("/programs/$slug")({
 				{ property: "og:description", content: program.description },
 				{ property: "og:type", content: "website" },
 				{ property: "og:url", content: url },
-				{ property: "og:image", content: program.image },
+				// program.image is a bundled asset path (/assets/...); scrapers need
+				// an absolute URL to resolve it.
+				{
+					property: "og:image",
+					content: program.image.startsWith("http")
+						? program.image
+						: `${SITE_URL}${program.image}`,
+				},
 			],
 			links: [{ rel: "canonical", href: url }],
 		};

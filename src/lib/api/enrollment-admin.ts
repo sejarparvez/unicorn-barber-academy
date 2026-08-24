@@ -90,8 +90,14 @@ export function downloadApplicationsCsv(
 		"Fee",
 		"Submitted",
 	];
-	const csvEscape = (value: string | number) =>
-		`"${String(value).replaceAll('"', '""')}"`;
+	// Quote for CSV and neutralize formula injection: spreadsheet apps
+	// execute cells starting with = + - @ as formulas, and applicant
+	// name/email/phone are attacker-controlled values.
+	const csvEscape = (value: string | number) => {
+		const text = String(value);
+		const safe = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+		return `"${safe.replaceAll('"', '""')}"`;
+	};
 	const lines = [
 		headers.join(","),
 		...rows.map((row) => Object.values(row).map(csvEscape).join(",")),

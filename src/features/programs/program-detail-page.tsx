@@ -78,7 +78,10 @@ export function ProgramDetailPage() {
 		educationalLevel: program.level,
 		url: `${SITE_URL}${program.to}`,
 		provider: {
-			"@type": "EducationalOrganization",
+			// References the academy entity defined by the sitewide footer
+			// JSON-LD so courses attach to the LocalBusiness node.
+			"@type": ["EducationalOrganization", "LocalBusiness"],
+			"@id": `${SITE_URL}/#academy`,
 			name: "Unicorn Barber Training Academy",
 			sameAs: SITE_URL,
 		},

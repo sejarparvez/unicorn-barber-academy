@@ -6,6 +6,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { parseApplicationStatus } from "@/lib/enrollment";
+import { APP_ORIGIN } from "@/lib/env";
 import { requireAdminApi } from "@/server/admin-api";
 import {
 	getApplicationDetail,
@@ -89,7 +90,7 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 								};
 								const html =
 									result.emailKind === "approved"
-										? applicationApprovedEmail(data, "/dashboard")
+										? applicationApprovedEmail(data, `${APP_ORIGIN}/dashboard`)
 										: result.emailKind === "waitlisted"
 											? applicationWaitlistedEmail(data)
 											: applicationRejectedEmail(data);

@@ -36,13 +36,89 @@ export function overRateLimit(
 	return bucket.count > max;
 }
 
+/**
+ * Client-IP resolution mirroring src/server/auth.ts (same env contract):
+ *   AUTH_IP_HEADERS  — platform-set single-value headers, priority order
+ *   TRUSTED_PROXIES  — proxy CIDRs; the X-Forwarded-For chain is stripped
+ *                      right-to-left past trusted hops
+ * With neither configured, the rightmost XFF entry is used: the nearest
+ * reverse proxy's view of the peer. Unlike the leftmost entry it cannot be
+ * overwritten by a spoofed client header when at least one honest proxy
+ * sits in front of the app.
+ */
 export function clientIp(request: Request): string {
-	const forwarded = request.headers.get("x-forwarded-for");
-	if (forwarded) {
-		const first = forwarded.split(",")[0]?.trim();
-		if (first) return first;
+	for (const name of configuredIpHeaders()) {
+		const value = request.headers.get(name)?.trim();
+		if (value) return value;
 	}
-	return request.headers.get("x-real-ip") ?? "unknown";
+
+	const chain = (request.headers.get("x-forwarded-for") ?? "")
+		.split(",")
+		.map((entry) => entry.trim())
+		.filter(Boolean);
+
+	const cidrs = trustedProxyCidrs();
+	if (cidrs.length > 0 && chain.length > 0) {
+		for (let i = chain.length - 1; i >= 0; i--) {
+			const entry = chain[i];
+			if (entry && !isTrustedProxyIp(entry, cidrs)) return entry;
+		}
+		return chain[0] ?? "unknown";
+	}
+
+	return (
+		chain[chain.length - 1] ??
+		request.headers.get("x-real-ip")?.trim() ??
+		"unknown"
+	);
+}
+
+function configuredIpHeaders(): string[] {
+	return (process.env.AUTH_IP_HEADERS ?? "")
+		.split(",")
+		.map((s) => s.trim().toLowerCase())
+		.filter(Boolean);
+}
+
+function trustedProxyCidrs(): string[] {
+	return (process.env.TRUSTED_PROXIES ?? "")
+		.split(",")
+		.map((s) => s.trim())
+		.filter(Boolean);
+}
+
+function isTrustedProxyIp(ip: string, cidrs: string[]): boolean {
+	return cidrs.some((cidr) => {
+		if (cidr === ip) return true;
+		const slash = cidr.lastIndexOf("/");
+		if (slash === -1) return false;
+		const base = ipv4ToLong(cidr.slice(0, slash));
+		const addr = ipv4ToLong(ip);
+		const bits = Number(cidr.slice(slash + 1));
+		if (base === null || addr === null || !Number.isInteger(bits)) return false;
+		if (bits <= 0) return true;
+		const mask = (0xffffffff << (32 - Math.min(bits, 32))) >>> 0;
+		return (addr & mask) === (base & mask);
+	});
+}
+
+function ipv4ToLong(ip: string): number | null {
+	const parts = ip.split(".");
+	if (parts.length !== 4) return null;
+	let out = 0;
+	for (const part of parts) {
+		const n = Number(part);
+		if (
+			!Number.isInteger(n) ||
+			n < 0 ||
+			n > 255 ||
+			!Number.isSafeInteger(out * 256 + n)
+		) {
+			return null;
+		}
+		out = out * 256 + n;
+	}
+	return out;
 }
 
 /**
