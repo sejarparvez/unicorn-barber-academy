@@ -14,6 +14,7 @@
 import { redirect } from "@tanstack/react-router";
 import { parseRole, type Role } from "@/lib/roles";
 import type { SessionPayload } from "@/lib/types";
+import { AdminAccessError } from "./admin-access-error";
 import { getSession } from "./session";
 
 export async function requireRoles(options: {
@@ -54,7 +55,7 @@ export async function requireRoles(options: {
 export async function requireAdminSession(): Promise<SessionPayload> {
 	const session = await getSession();
 	if (!session || parseRole(session.user.role) !== "admin") {
-		throw new Error("Admin access required");
+		throw new AdminAccessError();
 	}
 	return session;
 }

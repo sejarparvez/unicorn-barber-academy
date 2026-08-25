@@ -1,5 +1,6 @@
 // src/lib/api/enrollment-admin.ts
 // Browser-side client for the admissions endpoints.
+import { csvCell } from "@/lib/csv";
 import type { ApplicationStatus } from "@/lib/enrollment";
 import { http } from "./http";
 
@@ -90,17 +91,9 @@ export function downloadApplicationsCsv(
 		"Fee",
 		"Submitted",
 	];
-	// Quote for CSV and neutralize formula injection: spreadsheet apps
-	// execute cells starting with = + - @ as formulas, and applicant
-	// name/email/phone are attacker-controlled values.
-	const csvEscape = (value: string | number) => {
-		const text = String(value);
-		const safe = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
-		return `"${safe.replaceAll('"', '""')}"`;
-	};
 	const lines = [
 		headers.join(","),
-		...rows.map((row) => Object.values(row).map(csvEscape).join(",")),
+		...rows.map((row) => Object.values(row).map(csvCell).join(",")),
 	];
 	const blob = new Blob([lines.join("\n")], { type: "text/csv" });
 	const url = URL.createObjectURL(blob);

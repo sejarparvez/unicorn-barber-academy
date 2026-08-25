@@ -67,14 +67,16 @@ function AdminConsolePage() {
 					label="Needs review"
 					value={String(pending)}
 					hint={`${overview.admissions.total} applications total`}
-					to="/dashboard/enrollments?status=pending"
+					to="/dashboard/enrollments"
+					search={{ status: "pending" }}
 				/>
 				<StatCard
 					icon={IconUsersGroup}
 					label="Approved students"
 					value={String(overview.admissions.byStatus.approved)}
 					hint={`${overview.admissions.byStatus.completed} completed`}
-					to="/dashboard/enrollments?status=approved"
+					to="/dashboard/enrollments"
+					search={{ status: "approved" }}
 				/>
 				<StatCard
 					icon={IconCertificate}
@@ -105,16 +107,19 @@ function StatCard({
 	value,
 	hint,
 	to,
+	search,
 }: {
 	icon: React.ElementType;
 	label: string;
 	value: string;
 	hint: string;
 	to: string;
+	search?: Record<string, unknown>;
 }) {
 	return (
 		<Link
 			to={to}
+			{...(search ? { search } : {})}
 			className="group rounded-xl border border-border bg-card p-5 shadow-sm transition-colors hover:border-primary/40"
 		>
 			<div className="flex items-center justify-between">

@@ -64,7 +64,7 @@ const NAV_ITEMS: NavItem[] = [
 		label: "Admissions",
 		to: "/dashboard/enrollments",
 		icon: IconClipboardList,
-		visibleFor: "staff",
+		visibleFor: "admin",
 	},
 	{
 		label: "Console",

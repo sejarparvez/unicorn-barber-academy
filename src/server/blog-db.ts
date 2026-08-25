@@ -14,7 +14,7 @@ import type {
 	Paginated,
 } from "@/lib/blog";
 import { estimateReadingMinutes, parseBlogStatus } from "@/lib/blog";
-import { q } from "./db";
+import { q, withTransaction } from "./db";
 
 /* ------------------------------ row mapping ----------------------------- */
 
@@ -59,6 +59,32 @@ const POST_COLUMNS = `
 	p.author_id, u.name AS author_name,
 	p.reading_minutes, p.published_at, p.created_at, p.updated_at`;
 
+/** Slim projection for list views — skips content_md and SEO blobs so a
+    page of summaries doesn't transfer hundreds of KB of article bodies. */
+const SUMMARY_COLUMNS = `
+	p.id, p.slug, p.title, p.excerpt,
+	p.cover_image_url, p.cover_image_alt, p.tags,
+	p.status, p.category_id, c.name AS category_name, c.slug AS category_slug,
+	p.reading_minutes, p.published_at, p.updated_at`;
+
+type PostSummaryRow = Pick<
+	PostRow,
+	| "id"
+	| "slug"
+	| "title"
+	| "excerpt"
+	| "cover_image_url"
+	| "cover_image_alt"
+	| "tags"
+	| "status"
+	| "category_id"
+	| "category_name"
+	| "category_slug"
+	| "reading_minutes"
+	| "published_at"
+	| "updated_at"
+>;
+
 const POST_JOINS = `
 	FROM blog_post p
 	LEFT JOIN blog_category c ON c.id = p.category_id
@@ -79,7 +105,7 @@ function toDate(value: Date | string | null): string | null {
 	return value ? new Date(value).toISOString() : null;
 }
 
-function rowToSummary(row: PostRow): BlogPostSummary {
+function rowToSummary(row: PostSummaryRow): BlogPostSummary {
 	return {
 		id: row.id,
 		slug: row.slug,
@@ -144,8 +170,8 @@ export async function listPublishedPosts(options: {
 	const total = Number.parseInt(totalRes.rows[0]?.count ?? "0", 10);
 	const totalPages = Math.max(1, Math.ceil(total / perPage));
 
-	const res = await q<PostRow>(
-		`SELECT ${POST_COLUMNS} ${POST_JOINS}
+	const res = await q<PostSummaryRow>(
+		`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS}
 		 WHERE p.status = 'published'${filter}
 		 ORDER BY p.published_at DESC
 		 LIMIT $1 OFFSET $2`,
@@ -270,8 +296,8 @@ export async function listRelatedPosts(options: {
 	tags: string[];
 	limit?: number;
 }): Promise<BlogPostSummary[]> {
-	const res = await q<PostRow>(
-		`SELECT ${POST_COLUMNS} ${POST_JOINS}
+	const res = await q<PostSummaryRow>(
+		`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS}
 		 WHERE p.status = 'published' AND p.id <> $1
 		 ORDER BY
 			(p.category_id IS NOT NULL AND p.category_id = $2) DESC,
@@ -316,8 +342,8 @@ export async function listPublishedByCategory(options: {
 	const total = Number.parseInt(totalRes.rows[0]?.count ?? "0", 10);
 	const totalPages = Math.max(1, Math.ceil(total / perPage));
 
-	const res = await q<PostRow>(
-		`SELECT ${POST_COLUMNS} ${POST_JOINS}
+	const res = await q<PostSummaryRow>(
+		`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS}
 		 WHERE p.status = 'published' AND p.category_id = $1
 		 ORDER BY p.published_at DESC
 		 LIMIT $2 OFFSET $3`,
@@ -382,8 +408,8 @@ export async function listAllPosts(options: {
 	const total = Number.parseInt(totalRes.rows[0]?.count ?? "0", 10);
 	const totalPages = Math.max(1, Math.ceil(total / perPage));
 
-	const res = await q<PostRow>(
-		`SELECT ${POST_COLUMNS} ${POST_JOINS} ${listWhere}
+	const res = await q<PostSummaryRow>(
+		`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS} ${listWhere}
 		 ORDER BY p.updated_at DESC
 		 LIMIT $1 OFFSET $2`,
 		params,
@@ -448,8 +474,7 @@ export type NewPostInput = {
 	authorId: number | null;
 };
 
-function publishAt(status: BlogStatus, existing?: Date | null): Date | null {
-	if (existing) return existing;
+function publishAt(status: BlogStatus): Date | null {
 	return status === "published" ? new Date() : null;
 }
 
@@ -530,83 +555,103 @@ export async function updatePost(
 	id: number,
 	patch: Partial<Omit<NewPostInput, "slug">> & { slug?: string },
 ): Promise<BlogPostFull | null> {
-	const current = await getPostById(id);
-	if (!current) return null;
+	// Atomic read-modify-write: FOR UPDATE locks the row so two concurrent
+	// admin saves can't silently clobber each other's fields, and the
+	// redirect maintenance below can never leave half-applied state.
+	const updated = await withTransaction(async (tx) => {
+		const currentRes = await tx.query<{
+			slug: string;
+			published_at: Date | null;
+		}>("SELECT slug, published_at FROM blog_post WHERE id = $1 FOR UPDATE", [
+			id,
+		]);
+		const current = currentRes.rows[0];
+		if (!current) return false;
 
-	const sets: string[] = [];
-	const params: unknown[] = [id]; // $1 = id
-	let n = 1;
-	const bind = (value: unknown) => {
-		params.push(value);
-		n += 1;
-		return `$${n}`;
-	};
+		const sets: string[] = [];
+		const params: unknown[] = [id]; // $1 = id
+		let n = 1;
+		const bind = (value: unknown) => {
+			params.push(value);
+			n += 1;
+			return `$${n}`;
+		};
 
-	if (patch.slug !== undefined) {
-		sets.push(`slug = ${bind(patch.slug)}`);
-	}
-	if (patch.title !== undefined) sets.push(`title = ${bind(patch.title)}`);
-	if (patch.excerpt !== undefined)
-		sets.push(`excerpt = ${bind(patch.excerpt)}`);
-	if (patch.contentMd !== undefined) {
-		sets.push(`content_md = ${bind(patch.contentMd)}`);
-		sets.push(
-			`reading_minutes = ${bind(estimateReadingMinutes(patch.contentMd))}`,
+		if (patch.slug !== undefined) {
+			sets.push(`slug = ${bind(patch.slug)}`);
+		}
+		if (patch.title !== undefined) sets.push(`title = ${bind(patch.title)}`);
+		if (patch.excerpt !== undefined)
+			sets.push(`excerpt = ${bind(patch.excerpt)}`);
+		if (patch.contentMd !== undefined) {
+			sets.push(`content_md = ${bind(patch.contentMd)}`);
+			sets.push(
+				`reading_minutes = ${bind(estimateReadingMinutes(patch.contentMd))}`,
+			);
+		}
+		if (patch.coverImageUrl !== undefined)
+			sets.push(`cover_image_url = ${bind(patch.coverImageUrl)}`);
+		if (patch.coverImageAlt !== undefined)
+			sets.push(`cover_image_alt = ${bind(patch.coverImageAlt)}`);
+		if (patch.metaTitle !== undefined)
+			sets.push(`meta_title = ${bind(patch.metaTitle)}`);
+		if (patch.metaDescription !== undefined)
+			sets.push(`meta_description = ${bind(patch.metaDescription)}`);
+		if (patch.focusKeyword !== undefined)
+			sets.push(`focus_keyword = ${bind(patch.focusKeyword)}`);
+		if (patch.seoKeywords !== undefined)
+			sets.push(`seo_keywords = ${bind(patch.seoKeywords)}`);
+		if (patch.canonicalUrl !== undefined)
+			sets.push(`canonical_url = ${bind(patch.canonicalUrl)}`);
+		if (patch.ogImageUrl !== undefined)
+			sets.push(`og_image_url = ${bind(patch.ogImageUrl)}`);
+		if (patch.noindex !== undefined)
+			sets.push(`noindex = ${bind(patch.noindex)}`);
+		if (patch.keyTakeaways !== undefined)
+			sets.push(`key_takeaways = ${bind(patch.keyTakeaways)}`);
+		if (patch.faq !== undefined)
+			sets.push(`faq = ${bind(JSON.stringify(patch.faq))}`);
+		if (patch.relatedProgramSlugs !== undefined)
+			sets.push(`related_program_slugs = ${bind(patch.relatedProgramSlugs)}`);
+		if (patch.tags !== undefined) sets.push(`tags = ${bind(patch.tags)}`);
+		if (patch.status !== undefined) {
+			// First publish stamps published_at once; unpublish/republish and
+			// archiving keep the original date so sitemap lastmod and ordering
+			// never jump.
+			sets.push(`status = ${bind(patch.status)}`);
+			if (patch.status === "published" && !current.published_at) {
+				sets.push("published_at = now()");
+			}
+		}
+		if (patch.categoryId !== undefined)
+			sets.push(`category_id = ${bind(patch.categoryId)}`);
+
+		sets.push("updated_at = now()");
+
+		// Slug renames on previously-published URLs leave a 301 behind so
+		// indexed links keep their rankings (see scripts/sql/002).
+		const newSlug = patch.slug;
+		const slugChanged = newSlug !== undefined && newSlug !== current.slug;
+		if (slugChanged && newSlug) {
+			// The new slug is being claimed by this post.
+			await tx.query("DELETE FROM blog_slug_redirect WHERE old_slug = $1", [
+				newSlug,
+			]);
+		}
+		await tx.query(
+			`UPDATE blog_post SET ${sets.join(", ")} WHERE id = $1`,
+			params,
 		);
-	}
-	if (patch.coverImageUrl !== undefined)
-		sets.push(`cover_image_url = ${bind(patch.coverImageUrl)}`);
-	if (patch.coverImageAlt !== undefined)
-		sets.push(`cover_image_alt = ${bind(patch.coverImageAlt)}`);
-	if (patch.metaTitle !== undefined)
-		sets.push(`meta_title = ${bind(patch.metaTitle)}`);
-	if (patch.metaDescription !== undefined)
-		sets.push(`meta_description = ${bind(patch.metaDescription)}`);
-	if (patch.focusKeyword !== undefined)
-		sets.push(`focus_keyword = ${bind(patch.focusKeyword)}`);
-	if (patch.seoKeywords !== undefined)
-		sets.push(`seo_keywords = ${bind(patch.seoKeywords)}`);
-	if (patch.canonicalUrl !== undefined)
-		sets.push(`canonical_url = ${bind(patch.canonicalUrl)}`);
-	if (patch.ogImageUrl !== undefined)
-		sets.push(`og_image_url = ${bind(patch.ogImageUrl)}`);
-	if (patch.noindex !== undefined)
-		sets.push(`noindex = ${bind(patch.noindex)}`);
-	if (patch.keyTakeaways !== undefined)
-		sets.push(`key_takeaways = ${bind(patch.keyTakeaways)}`);
-	if (patch.faq !== undefined)
-		sets.push(`faq = ${bind(JSON.stringify(patch.faq))}`);
-	if (patch.relatedProgramSlugs !== undefined)
-		sets.push(`related_program_slugs = ${bind(patch.relatedProgramSlugs)}`);
-	if (patch.tags !== undefined) sets.push(`tags = ${bind(patch.tags)}`);
-	if (patch.status !== undefined) {
-		// First publish stamps published_at once; re-publishing keeps it.
-		sets.push(`status = ${bind(patch.status)}`);
-		sets.push(
-			`published_at = ${bind(publishAt(patch.status, current.publishedAt ? new Date(current.publishedAt) : null))}`,
-		);
-	}
-	if (patch.categoryId !== undefined)
-		sets.push(`category_id = ${bind(patch.categoryId)}`);
-
-	sets.push("updated_at = now()");
-
-	// Slug renames on previously-published URLs leave a 301 behind so
-	// indexed links keep their rankings (see scripts/sql/002).
-	const newSlug = patch.slug;
-	const slugChanged = newSlug !== undefined && newSlug !== current.slug;
-	if (slugChanged && newSlug) {
-		// The new slug is being claimed by this post.
-		await clearRedirectsToSlug(newSlug);
-	}
-	await q(`UPDATE blog_post SET ${sets.join(", ")} WHERE id = $1`, params);
-	if (slugChanged) {
-		await q(
-			`INSERT INTO blog_slug_redirect (old_slug, post_id) VALUES ($1, $2)
-			 ON CONFLICT (old_slug) DO UPDATE SET post_id = EXCLUDED.post_id`,
-			[current.slug, id],
-		);
-	}
+		if (slugChanged) {
+			await tx.query(
+				`INSERT INTO blog_slug_redirect (old_slug, post_id) VALUES ($1, $2)
+				 ON CONFLICT (old_slug) DO UPDATE SET post_id = EXCLUDED.post_id`,
+				[current.slug, id],
+			);
+		}
+		return true;
+	});
+	if (!updated) return null;
 	return getPostById(id);
 }
 
@@ -648,15 +693,26 @@ export async function createCategory(input: {
 	return check.rows[0] ?? null;
 }
 
+export type RenameCategoryResult = "ok" | "not-found" | "slug-taken";
+
 export async function renameCategory(
 	id: number,
 	input: { name: string; slug: string },
-): Promise<boolean> {
-	const res = await q(
-		"UPDATE blog_category SET name = $2, slug = $3 WHERE id = $1",
-		[id, input.name, input.slug],
-	);
-	return (res.rowCount ?? 0) > 0;
+): Promise<RenameCategoryResult> {
+	try {
+		const res = await q(
+			"UPDATE blog_category SET name = $2, slug = $3 WHERE id = $1",
+			[id, input.name, input.slug],
+		);
+		return (res.rowCount ?? 0) > 0 ? "ok" : "not-found";
+	} catch (error) {
+		// Concurrent rename raced us to the same slug — the unique index
+		// backs uniqueness; surface it instead of leaking a driver error.
+		if ((error as { code?: string }).code === PG_UNIQUE_VIOLATION) {
+			return "slug-taken";
+		}
+		throw error;
+	}
 }
 
 export async function deleteCategory(id: number): Promise<boolean> {

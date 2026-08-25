@@ -26,11 +26,8 @@ function appUrlRaw(): string {
 	}
 }
 
-/** Absolute origin of the running app (no path, no trailing slash). */
-export const APP_ORIGIN = (() => {
-	try {
-		return new URL(appUrlRaw()).origin;
-	} catch {
-		return "http://localhost:3000";
-	}
-})();
+/** Absolute origin of the running app (no path, no trailing slash).
+ *  Deliberately NOT wrapped in a catch: appUrlRaw's production fail-fast
+ *  must be able to stop boot when BETTER_AUTH_URL is missing/invalid —
+ *  swallowing it here silently poisoned every absolute URL we emit. */
+export const APP_ORIGIN = new URL(appUrlRaw()).origin;

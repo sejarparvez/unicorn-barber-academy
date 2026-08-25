@@ -81,7 +81,8 @@ export const getPostForPublicFn = createServerFn({ method: "GET" })
 	.handler(
 		async ({ data }): Promise<PublicPostResult> =>
 			runSafe(async () => {
-				const slug = clampSearchTerm(data.slug, 200);
+				// 220 = widest slug column (blog_slug_redirect.old_slug).
+				const slug = clampSearchTerm(data.slug, 220);
 				const published = await getPublishedBySlug(slug);
 				if (published)
 					return { kind: "post", post: published, isPreview: false };

@@ -66,7 +66,7 @@ export function validateApplicationPayload(body: unknown): ValidationResult<{
 // PATCH so an edit can't move a live cohort into the past.
 export function isValidFutureStartDate(value: string): boolean {
 	if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-	const [y, m, d] = value.split("-").map(Number.parseInt);
+	const [y, m, d] = value.split("-").map((part) => Number.parseInt(part, 10));
 	const start = new Date(Date.UTC(y, m - 1, d));
 	const today = new Date();
 	today.setUTCHours(0, 0, 0, 0);

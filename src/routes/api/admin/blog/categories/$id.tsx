@@ -4,6 +4,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
+import type { RenameCategoryResult } from "@/server/blog-db";
 import { deleteCategory, renameCategory } from "@/server/blog-db";
 import { parseCategoryPayload } from "@/server/blog-validate";
 
@@ -34,9 +35,24 @@ export const Route = createFileRoute("/api/admin/blog/categories/$id")({
 					return json({ message: parsed.message }, { status: 400 });
 				}
 
-				const updated = await renameCategory(id, parsed.value);
-				if (!updated) {
+				let updated: RenameCategoryResult;
+				try {
+					updated = await renameCategory(id, parsed.value);
+				} catch (error) {
+					console.error("[categories] rename failed:", error);
+					return json(
+						{ message: "Could not rename category" },
+						{ status: 500 },
+					);
+				}
+				if (updated === "not-found") {
 					return json({ message: "Category not found" }, { status: 404 });
+				}
+				if (updated === "slug-taken") {
+					return json(
+						{ message: "That slug is already in use." },
+						{ status: 409 },
+					);
 				}
 				return json({ ok: true });
 			},

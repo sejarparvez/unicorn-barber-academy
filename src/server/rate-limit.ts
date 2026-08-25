@@ -63,7 +63,11 @@ export function clientIp(request: Request): string {
 			const entry = chain[i];
 			if (entry && !isTrustedProxyIp(entry, cidrs)) return entry;
 		}
-		return chain[0] ?? "unknown";
+		// Every entry matched as trusted (or the CIDR list couldn't classify
+		// them, e.g. IPv6 hops against an IPv4-only matcher). Falling back to
+		// chain[0] would hand attackers a spoofable key, so degrade to the
+		// shared bucket instead — same philosophy as better-auth's config.
+		return request.headers.get("x-real-ip")?.trim() ?? "unknown";
 	}
 
 	return (
@@ -107,6 +111,7 @@ function ipv4ToLong(ip: string): number | null {
 	if (parts.length !== 4) return null;
 	let out = 0;
 	for (const part of parts) {
+		if (part === "") return null; // "1..2.3"
 		const n = Number(part);
 		if (
 			!Number.isInteger(n) ||

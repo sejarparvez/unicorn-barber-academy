@@ -55,7 +55,16 @@ export const Route = createFileRoute("/api/admin/enrollments/intakes/$id")({
 					);
 				}
 				const seats = Number.parseInt(String(body.seatsTotal ?? ""), 10);
-				if (Number.isInteger(seats)) patch.seatsTotal = seats;
+				if (Number.isInteger(seats)) {
+					// Same bounds as create — PATCH must not widen the range.
+					if (seats < 1 || seats > 200) {
+						return json(
+							{ message: "Seats must be between 1 and 200" },
+							{ status: 400 },
+						);
+					}
+					patch.seatsTotal = seats;
+				}
 				if (typeof body.isOpen === "boolean") patch.isOpen = body.isOpen;
 
 				if (Object.keys(patch).length === 0) {

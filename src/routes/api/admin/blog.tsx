@@ -37,16 +37,21 @@ export const Route = createFileRoute("/api/admin/blog")({
 					);
 				}
 
-				const slug = await uniqueSlug(input.slug ?? "post");
-				const post = await createPost({
-					...input,
-					slug,
-					authorId: guard.userId,
-				});
-				if (!post) {
+				try {
+					const slug = await uniqueSlug(input.slug ?? "post");
+					const post = await createPost({
+						...input,
+						slug,
+						authorId: guard.userId,
+					});
+					if (!post) {
+						return json({ message: "Could not create post" }, { status: 500 });
+					}
+					return json({ post }, { status: 201 });
+				} catch (error) {
+					console.error("[blog] create failed:", error);
 					return json({ message: "Could not create post" }, { status: 500 });
 				}
-				return json({ post }, { status: 201 });
 			},
 			// Convenience for the editor's slug field: ?slug-check=<value>
 			GET: async ({ request }) => {
@@ -55,12 +60,18 @@ export const Route = createFileRoute("/api/admin/blog")({
 					return json({ message: guard.message }, { status: guard.status });
 				}
 				const url = new URL(request.url);
-				const id = url.searchParams.get("id");
-				if (id) {
-					const post = await getPostById(Number.parseInt(id, 10));
-					return json({ post });
+				const idRaw = url.searchParams.get("id");
+				const id = Number.parseInt(idRaw ?? "", 10);
+				if (!Number.isInteger(id) || id < 1) {
+					return json({ message: "Nothing to fetch" }, { status: 400 });
 				}
-				return json({ message: "Nothing to fetch" }, { status: 400 });
+				try {
+					const post = await getPostById(id);
+					return json({ post });
+				} catch (error) {
+					console.error("[blog] fetch failed:", error);
+					return json({ message: "Request failed" }, { status: 500 });
+				}
 			},
 		},
 	},

@@ -38,17 +38,25 @@ export const Route = createFileRoute("/api/admin/certificates")({
 					return json({ message: "Invalid application id" }, { status: 400 });
 				}
 
-				const result = await issueCertificateForApplication(
-					applicationId,
-					guard.userId,
-				);
-				if (!result.ok) {
+				try {
+					const result = await issueCertificateForApplication(
+						applicationId,
+						guard.userId,
+					);
+					if (!result.ok) {
+						return json(
+							{ message: REASON_MESSAGES[result.reason] },
+							{ status: result.reason === "not-found" ? 404 : 409 },
+						);
+					}
+					return json({ ok: true, code: result.code });
+				} catch (error) {
+					console.error("[certificates] issue failed:", error);
 					return json(
-						{ message: REASON_MESSAGES[result.reason] },
-						{ status: result.reason === "not-found" ? 404 : 409 },
+						{ message: "Could not issue certificate. Please try again." },
+						{ status: 500 },
 					);
 				}
-				return json({ ok: true, code: result.code });
 			},
 		},
 	},

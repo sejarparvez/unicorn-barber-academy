@@ -35,6 +35,35 @@ export function q<T extends Record<string, unknown>>(
 	return db().query(text, params);
 }
 
+type TxClient = {
+	query: <R extends Record<string, unknown>>(
+		text: string,
+		params?: unknown[],
+	) => Promise<{ rows: R[]; rowCount: number | null }>;
+};
+
+/**
+ * Run multi-statement DB work atomically: BEGIN → fn(tx) → COMMIT, with
+ * ROLLBACK + rethrow on failure. Use for any write that spans several
+ * statements so a crash can never leave half-applied state behind.
+ */
+export async function withTransaction<T>(
+	fn: (tx: TxClient) => Promise<T>,
+): Promise<T> {
+	const client = await db().connect();
+	try {
+		await client.query("BEGIN");
+		const result = await fn(client);
+		await client.query("COMMIT");
+		return result;
+	} catch (error) {
+		await client.query("ROLLBACK");
+		throw error;
+	} finally {
+		client.release();
+	}
+}
+
 if (!process.env.DATABASE_URL && process.env.NODE_ENV === "production") {
 	throw new Error("DATABASE_URL is not set — cannot serve blog content.");
 }

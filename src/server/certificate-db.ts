@@ -8,34 +8,12 @@
 import { ALL_PROGRAMS } from "@/data/programs";
 import type { CertificateRecord } from "@/lib/certificates";
 import type { Cohort } from "@/lib/enrollment";
-import { db } from "./db";
+import { db, withTransaction } from "./db";
 
 const PG_UNIQUE_VIOLATION = "23505";
 
 function programTitle(slug: string): string | null {
 	return ALL_PROGRAMS.find((p) => p.slug === slug)?.title ?? null;
-}
-
-async function withTransaction<T>(
-	fn: (tx: {
-		query: <R extends Record<string, unknown>>(
-			text: string,
-			params?: unknown[],
-		) => Promise<{ rows: R[]; rowCount: number | null }>;
-	}) => Promise<T>,
-): Promise<T> {
-	const client = await db().connect();
-	try {
-		await client.query("BEGIN");
-		const result = await fn(client);
-		await client.query("COMMIT");
-		return result;
-	} catch (error) {
-		await client.query("ROLLBACK");
-		throw error;
-	} finally {
-		client.release();
-	}
 }
 
 type CertificateRow = {
@@ -118,10 +96,13 @@ export async function issueCertificateForApplication(
 			return { ok: false, reason: "already-issued" };
 		}
 
-		// Per-year sequence: UBT-YYYY-NNNN, padded to four digits.
+		// Per-year sequence: UBT-YYYY-NNNN, padded to four digits. Derived
+		// from max(serial), not count(*): deletions must not create gaps that
+		// collide with live codes.
 		const year = new Date().getFullYear();
 		const seqRes = await tx.query<{ n: number }>(
-			`SELECT count(*)::int AS n FROM certificate
+			`SELECT COALESCE(max(split_part(code, '-', 3)::int), 0) AS n
+			 FROM certificate
 			 WHERE code LIKE $1`,
 			[`UBT-${year}-%`],
 		);

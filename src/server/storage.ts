@@ -7,7 +7,11 @@
 // S3_* variable is present the module degrades gracefully — isStorageReady()
 // returns false and uploadImage() throws StorageNotConfiguredError, which
 // the upload endpoint converts into a clear 503 for the editor UI.
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+	DeleteObjectCommand,
+	PutObjectCommand,
+	S3Client,
+} from "@aws-sdk/client-s3";
 
 /** Whitelist — images only; anything else is rejected before upload. */
 const ALLOWED_MIME = new Set([
@@ -30,6 +34,49 @@ export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export function isAllowedImageMime(mime: string): boolean {
 	return ALLOWED_MIME.has(mime);
+}
+
+/**
+ * Detect the real image type from magic bytes. `file.type` from a multipart
+ * form is entirely client-declared — never trusted on its own; the sniffed
+ * type is what decides whether an upload ships to the bucket.
+ */
+export function sniffImageMime(buffer: Buffer): string | null {
+	if (buffer.length < 12) return null;
+	const ascii = (start: number, end: number) =>
+		buffer.subarray(start, end).toString("latin1");
+	if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff)
+		return "image/jpeg";
+	if (
+		buffer[0] === 0x89 &&
+		buffer[1] === 0x50 &&
+		buffer[2] === 0x4e &&
+		buffer[3] === 0x47
+	)
+		return "image/png";
+	if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46)
+		return "image/gif";
+	if (ascii(0, 4) === "RIFF" && ascii(8, 12) === "WEBP") return "image/webp";
+	if (ascii(4, 8) === "ftyp" && ascii(8, 11) === "avi") return "image/avif";
+	return null;
+}
+
+/**
+ * Best-effort reverse of uploadImage()'s URL scheme: map a public URL back
+ * to its bucket key. Returns null for URLs outside S3_PUBLIC_BASE_URL.
+ */
+export function keyFromUrl(url: string): string | null {
+	const base = env("S3_PUBLIC_BASE_URL");
+	if (!base) return null;
+	const prefix = `${base.replace(/\/+$/, "")}/`;
+	return url.startsWith(prefix) ? url.slice(prefix.length) : null;
+}
+
+/** Delete an object by key (used to clean up replaced avatars etc.). */
+export async function deleteImage(key: string): Promise<void> {
+	await client().send(
+		new DeleteObjectCommand({ Bucket: env("S3_BUCKET"), Key: key }),
+	);
 }
 
 function env(name: string): string | undefined {

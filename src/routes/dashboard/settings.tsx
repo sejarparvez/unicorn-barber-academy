@@ -4,7 +4,7 @@
 // better-auth's client APIs.
 import { IconDeviceLaptop, IconLogout, IconTrash } from "@tabler/icons-react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -37,9 +37,9 @@ function SettingsPage() {
 	const { session } = Route.useRouteContext();
 	const router = useRouter();
 
+	// Root loader re-reads the session server-side on invalidate.
 	async function refreshSession() {
-		await authClient.getSession();
-		void router.invalidate();
+		await router.invalidate();
 	}
 
 	return (
@@ -264,7 +264,16 @@ function PasswordCard({
 				newPassword,
 				revokeOtherSessions: true,
 			});
-			if (error) throw new Error(error.message ?? "Could not change password");
+			if (error) {
+				// Google-only accounts have no credential row to update.
+				if (error.code === "CREDENTIAL_ACCOUNT_NOT_FOUND") {
+					toast.error(
+						"Your account signs in with Google. Use 'Forgot password' on the sign-in page to set an email password.",
+					);
+					return;
+				}
+				throw new Error(error.message ?? "Could not change password");
+			}
 			toast.success("Password changed — other sessions were signed out");
 			setCurrentPassword("");
 			setNewPassword("");
@@ -283,8 +292,14 @@ function PasswordCard({
 		<section className="rounded-xl border border-border bg-card p-6 shadow-sm">
 			<h2 className="font-heading text-lg font-semibold">Password</h2>
 			<p className="mt-1 text-sm text-muted-foreground">
-				If you sign in with Google you can still set a password to enable email
-				sign-in.
+				Google-only accounts can set an email password via{" "}
+				<a
+					href="/auth/forgot-password"
+					className="text-primary underline underline-offset-2"
+				>
+					Forgot password
+				</a>{" "}
+				on the sign-in page.
 			</p>
 			<form onSubmit={changePassword} className="mt-4 grid gap-4 sm:max-w-md">
 				<div className="space-y-1.5">
@@ -350,29 +365,47 @@ function SessionsCard({
 	onChanged: () => Promise<void> | void;
 }) {
 	const [sessions, setSessions] = useState<SessionInfo[] | null>(null);
+	const [loadError, setLoadError] = useState<string | null>(null);
+	const [currentToken, setCurrentToken] = useState<string | null>(null);
 	const [busyToken, setBusyToken] = useState<string | null>(null);
+	const router = useRouter();
 
-	async function load() {
-		const { data, error } = await authClient.listSessions();
-		if (!error && data) {
-			setSessions(data as unknown as SessionInfo[]);
-		}
-	}
+	// listSessions requires a fresh (<24h) session and is NOT ordered with
+	// the current one first — identify "this device" by token instead.
+	useEffect(() => {
+		void (async () => {
+			const { data: active } = await authClient.getSession();
+			setCurrentToken(active?.session?.token ?? null);
 
-	if (sessions === null && typeof window !== "undefined") {
-		void load();
-	}
+			const { data, error } = await authClient.listSessions();
+			if (error) {
+				setLoadError(
+					error.status === 403
+						? "For security, session management needs a recent sign-in. Sign out and back in to view devices."
+						: (error.message ?? "Could not load sessions"),
+				);
+				setSessions([]);
+				return;
+			}
+			setSessions((data as unknown as SessionInfo[]) ?? []);
+		})();
+	}, []);
 
 	async function revoke(token: string) {
+		const isCurrent = token === currentToken;
 		setBusyToken(token);
 		try {
-			const { error } =
-				token === sessions?.[0]?.token
-					? await authClient.revokeSessions()
-					: await authClient.revokeSession({ token });
+			const { error } = await authClient.revokeSession({ token });
 			if (error) throw new Error(error.message ?? "Could not sign out");
+			if (isCurrent) {
+				toast.success("This device was signed out");
+				void router.navigate({ to: "/auth/signin" });
+				return;
+			}
 			toast.success("Session signed out");
-			await load();
+			setSessions((prev) =>
+				prev ? prev.filter((s) => s.token !== token) : prev,
+			);
 			await onChanged();
 		} catch (err) {
 			toast.error(err instanceof Error ? err.message : "Could not sign out");
@@ -387,45 +420,61 @@ function SessionsCard({
 			<p className="mt-1 text-sm text-muted-foreground">
 				Devices currently signed in to this account.
 			</p>
-			<ul className="mt-4 divide-y divide-border">
-				{(sessions ?? []).map((sessionItem, index) => (
-					<li key={sessionItem.token} className="flex items-center gap-3 py-3">
-						<IconDeviceLaptop
-							className="h-4 w-4 shrink-0 text-muted-foreground"
-							stroke={1.75}
-						/>
-						<div className="min-w-0 flex-1">
-							<p className="truncate text-sm font-medium">
-								{index === 0
-									? "This device"
-									: (sessionItem.userAgent ?? "Unknown device")}
-							</p>
-							<p className="truncate text-xs text-muted-foreground">
-								Expires {new Date(sessionItem.expiresAt).toLocaleDateString()}
-							</p>
-						</div>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="gap-1.5 text-destructive hover:text-destructive"
-							disabled={busyToken === sessionItem.token}
-							onClick={() => void revoke(sessionItem.token)}
-						>
-							{index === 0 ? (
-								<IconLogout className="h-3.5 w-3.5" stroke={1.75} />
-							) : (
-								<IconTrash className="h-3.5 w-3.5" stroke={1.75} />
-							)}
-							Sign out
-						</Button>
-					</li>
-				))}
-				{sessions !== null && sessions.length === 0 ? (
-					<li className="py-3 text-sm text-muted-foreground">
-						No other sessions found.
-					</li>
-				) : null}
-			</ul>
+			{loadError ? (
+				<p
+					role="alert"
+					className="mt-4 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-700"
+				>
+					{loadError}
+				</p>
+			) : (
+				<ul className="mt-4 divide-y divide-border">
+					{(sessions ?? []).map((sessionItem) => {
+						const isCurrent = sessionItem.token === currentToken;
+						return (
+							<li
+								key={sessionItem.token}
+								className="flex items-center gap-3 py-3"
+							>
+								<IconDeviceLaptop
+									className="h-4 w-4 shrink-0 text-muted-foreground"
+									stroke={1.75}
+								/>
+								<div className="min-w-0 flex-1">
+									<p className="truncate text-sm font-medium">
+										{isCurrent
+											? "This device"
+											: (sessionItem.userAgent ?? "Unknown device")}
+									</p>
+									<p className="truncate text-xs text-muted-foreground">
+										Expires{" "}
+										{new Date(sessionItem.expiresAt).toLocaleDateString()}
+									</p>
+								</div>
+								<Button
+									variant="ghost"
+									size="sm"
+									className="gap-1.5 text-destructive hover:text-destructive"
+									disabled={busyToken === sessionItem.token}
+									onClick={() => void revoke(sessionItem.token)}
+								>
+									{isCurrent ? (
+										<IconLogout className="h-3.5 w-3.5" stroke={1.75} />
+									) : (
+										<IconTrash className="h-3.5 w-3.5" stroke={1.75} />
+									)}
+									Sign out
+								</Button>
+							</li>
+						);
+					})}
+					{sessions !== null && sessions.length === 0 && !loadError ? (
+						<li className="py-3 text-sm text-muted-foreground">
+							No sessions found.
+						</li>
+					) : null}
+				</ul>
+			)}
 			<Separator className="mt-2" />
 		</section>
 	);

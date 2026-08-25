@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { formatStartsOn } from "@/lib/enrollment";
 import { auth } from "@/server/auth";
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/enroll")({
 		handlers: {
 			POST: async ({ request }) => {
 				// Same-origin + per-IP cap stay on even though the endpoint now
-				// requires a session — cheap defense against scripted abuse.
+				// requires a session � cheap defense against scripted abuse.
 				if (!isSameOrigin(request)) {
 					return json({ message: "Forbidden" }, { status: 403 });
 				}
@@ -41,19 +41,28 @@ export const Route = createFileRoute("/api/enroll")({
 					return json({ message: parsed.message }, { status: 400 });
 				}
 
-				const result = await submitApplication({
-					userId: Number(session.user.id),
-					intakeId: parsed.value.intakeId,
-					fullName: session.user.name || "Applicant",
-					email: session.user.email,
-					phone: parsed.value.phone,
-					experienceNote: parsed.value.experienceNote,
-					hearAbout: parsed.value.hearAbout,
-				});
+				let result: Awaited<ReturnType<typeof submitApplication>>;
+				try {
+					result = await submitApplication({
+						userId: Number(session.user.id),
+						intakeId: parsed.value.intakeId,
+						fullName: session.user.name || "Applicant",
+						email: session.user.email,
+						phone: parsed.value.phone,
+						experienceNote: parsed.value.experienceNote,
+						hearAbout: parsed.value.hearAbout,
+					});
+				} catch (error) {
+					console.error("[enroll] submit failed:", error);
+					return json(
+						{ message: "Could not submit application. Please try again." },
+						{ status: 500 },
+					);
+				}
 
 				if (!result.ok) {
 					const messages = {
-						full: "That cohort just filled up — please pick another intake.",
+						full: "That cohort just filled up � please pick another intake.",
 						closed: "That cohort is no longer accepting applications.",
 						duplicate:
 							"You already have an active application for this cohort.",
