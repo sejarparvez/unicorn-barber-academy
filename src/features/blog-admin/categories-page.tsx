@@ -7,6 +7,7 @@ import {
 	IconCheck,
 	IconPlus,
 	IconTrash,
+	IconX,
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -29,6 +30,7 @@ export function CategoriesPage() {
 	const [newName, setNewName] = useState("");
 	const [editingId, setEditingId] = useState<number | null>(null);
 	const [editValue, setEditValue] = useState("");
+	const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const busy =
 		createMutation.isPending ||
@@ -59,9 +61,14 @@ export function CategoriesPage() {
 
 	async function onDelete(id: number) {
 		if (busy) return;
+		if (confirmDeleteId !== id) {
+			setConfirmDeleteId(id);
+			return;
+		}
 		setError(null);
 		try {
 			await deleteMutation.mutateAsync(id);
+			setConfirmDeleteId(null);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Delete failed");
 		}
@@ -127,9 +134,10 @@ export function CategoriesPage() {
 										value={editValue}
 										autoFocus
 										onChange={(e) => setEditValue(e.target.value)}
-										onKeyDown={(e) =>
-											e.key === "Enter" && void onRename(category.id)
-										}
+										onKeyDown={(e) => {
+											if (e.key === "Enter") void onRename(category.id);
+											if (e.key === "Escape") setEditingId(null);
+										}}
 									/>
 									<Button
 										variant="outline"
@@ -139,6 +147,16 @@ export function CategoriesPage() {
 										onClick={() => onRename(category.id)}
 									>
 										<IconCheck className="h-4 w-4" />
+									</Button>
+									<Button
+										variant="ghost"
+										size="icon"
+										aria-label="Cancel rename"
+										className="text-muted-foreground"
+										disabled={busy}
+										onClick={() => setEditingId(null)}
+									>
+										<IconX className="h-4 w-4" />
 									</Button>
 								</>
 							) : (
@@ -160,10 +178,20 @@ export function CategoriesPage() {
 									<Button
 										variant="ghost"
 										size="icon"
-										aria-label={`Delete ${category.name}`}
-										className="text-muted-foreground hover:text-destructive"
+										aria-label={
+											confirmDeleteId === category.id
+												? `Confirm delete ${category.name}`
+												: `Delete ${category.name}`
+										}
+										className={cn(
+											"text-muted-foreground hover:text-destructive",
+											confirmDeleteId === category.id &&
+												"bg-destructive/10 text-destructive",
+										)}
 										disabled={busy}
-										onClick={() => onDelete(category.id)}
+										onClick={() => {
+											void onDelete(category.id);
+										}}
 									>
 										<IconTrash className="h-4 w-4" />
 									</Button>
@@ -175,6 +203,7 @@ export function CategoriesPage() {
 			</ul>
 			<p className="text-xs text-muted-foreground">
 				Deleting a category keeps its posts — they just become uncategorized.
+				The delete button asks for a second click to confirm.
 			</p>
 		</div>
 	);

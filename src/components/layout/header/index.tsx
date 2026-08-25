@@ -42,6 +42,9 @@ export default function Header({
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const [isVisible, setIsVisible] = useState(true);
 	const [lastScrollY, setLastScrollY] = useState(0);
+	// Controlled so nav links can close the drawer on tap — Base UI's Dialog
+	// does not auto-close when the route changes underneath it.
+	const [mobileOpen, setMobileOpen] = useState(false);
 
 	useEffect(() => {
 		const controlNavbar = () => {
@@ -72,7 +75,7 @@ export default function Header({
 				<div className="flex items-center gap-2">
 					{/* Mobile hamburger */}
 					<div className="lg:hidden">
-						<Sheet>
+						<Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
 							<SheetTrigger
 								render={
 									<Button variant="ghost" size="icon" className="shrink-0" />
@@ -89,6 +92,7 @@ export default function Header({
 										<Link
 											to="/"
 											preload="intent"
+											onClick={() => setMobileOpen(false)}
 											className="flex min-w-0 shrink-0 items-center gap-2.5 sm:gap-4"
 											aria-label="Unicorn Barber Training Academy, home"
 										>
@@ -126,6 +130,7 @@ export default function Header({
 											<Link
 												key={item.name}
 												to={item.href}
+												onClick={() => setMobileOpen(false)}
 												className={cn(
 													"flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200",
 													active
@@ -145,7 +150,9 @@ export default function Header({
 								{/* Mobile Book Now */}
 								<div className="px-4 pt-2 mt-auto border-t border-border">
 									<Button
-										render={<Link to="/enroll" />}
+										render={
+											<Link to="/enroll" onClick={() => setMobileOpen(false)} />
+										}
 										nativeButton={false}
 										className="w-full gap-2 mt-4 mb-4"
 									>

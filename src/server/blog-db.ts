@@ -362,14 +362,16 @@ export async function listPublishedByCategory(options: {
 /** Sitemap-facing: only categories rich enough to be indexable. */
 export async function listCategoriesWithCounts(
 	minPosts: number,
-): Promise<Array<BlogCategory & { postCount: number }>> {
+): Promise<Array<BlogCategory & { postCount: number; latestPostAt?: string }>> {
 	const res = await q<{
 		id: number;
 		name: string;
 		slug: string;
 		post_count: string;
+		latest_post_at: Date | null;
 	}>(
-		`SELECT c.id, c.name, c.slug, count(p.id)::text AS post_count
+		`SELECT c.id, c.name, c.slug, count(p.id)::text AS post_count,
+			max(p.updated_at) AS latest_post_at
 		 FROM blog_category c
 		 JOIN blog_post p ON p.category_id = c.id AND p.status = 'published'
 		 GROUP BY c.id
@@ -382,6 +384,9 @@ export async function listCategoriesWithCounts(
 		name: r.name,
 		slug: r.slug,
 		postCount: Number.parseInt(r.post_count, 10),
+		latestPostAt: r.latest_post_at
+			? new Date(r.latest_post_at).toISOString()
+			: undefined,
 	}));
 }
 

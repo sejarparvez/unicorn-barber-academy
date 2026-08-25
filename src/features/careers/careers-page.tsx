@@ -12,7 +12,8 @@ import {
 	useFadeUp,
 } from "@/components/effects";
 import { pic } from "@/data/images";
-import { SITE_URL } from "@/data/site";
+import { CONTACT, SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 const BREADCRUMB_JSON_LD = {
@@ -29,13 +30,112 @@ const BREADCRUMB_JSON_LD = {
 	],
 };
 
+/** Keep in sync with the visible roles in <OpenRoles /> below. */
+const OPEN_ROLES = [
+	{
+		title: "Instructor, Barbering",
+		type: "Part-time / Cohort-based",
+		description:
+			"Teach Classic Barbering, Fades & Tapers, or Beard Sculpting. Two cohorts per year (day & evening). You design your block, we handle the rest.",
+		requirements: [
+			"5+ years behind the chair",
+			"Current portfolio & client base",
+			"NTVQF certification (or willingness to obtain)",
+			"Guild membership preferred",
+		],
+	},
+	{
+		title: "Instructor, Beauty & Cosmetology",
+		type: "Part-time / Cohort-based",
+		description:
+			"Teach Cosmetology Fundamentals, Hair Styling & Colouring, or Bridal & Editorial Makeup. Same model: you teach what you practice.",
+		requirements: [
+			"5+ years professional experience",
+			"Current portfolio & client base",
+			"NTVQF certification (or willingness to obtain)",
+			"Guild membership preferred",
+		],
+	},
+	{
+		title: "Studio Coordinator",
+		type: "Full-time",
+		description:
+			"Run the floor: client scheduling, inventory, tool maintenance, cohort logistics. The engine that keeps the studio humming.",
+		requirements: [
+			"2+ years salon/barbershop operations",
+			"Booking software fluency (Vagaro, Booksy, etc.)",
+			"Retail & inventory management",
+			"Bilingual (Bengali/English)",
+		],
+	},
+] as const;
+
+function jobPostingsJsonLd() {
+	return {
+		"@context": "https://schema.org",
+		"@graph": OPEN_ROLES.map((role) => ({
+			"@type": "JobPosting",
+			title: role.title,
+			description: `${role.description} Requirements: ${role.requirements.join("; ")}.`,
+			employmentType: role.type.startsWith("Full-time")
+				? "FULL_TIME"
+				: "PART_TIME",
+			datePosted: "2026-01-01",
+			validThrough: "2026-12-31",
+			hiringOrganization: {
+				"@type": ["EducationalOrganization", "LocalBusiness"],
+				name: "Unicorn Barber Training Academy",
+				sameAs: SITE_URL,
+				logo: `${SITE_URL}/logo.png`,
+				address: {
+					"@type": "PostalAddress",
+					streetAddress: CONTACT.streetAddress,
+					addressLocality: "Dhaka",
+					addressRegion: "Dhaka",
+					postalCode: CONTACT.postalCode,
+					addressCountry: CONTACT.addressCountry,
+				},
+			},
+			jobLocation: {
+				"@type": "Place",
+				address: {
+					"@type": "PostalAddress",
+					streetAddress: CONTACT.streetAddress,
+					addressLocality: "Dhaka",
+					addressRegion: "Dhaka",
+					postalCode: CONTACT.postalCode,
+					addressCountry: CONTACT.addressCountry,
+				},
+			},
+			applicantLocationRequirements: {
+				"@type": "Country",
+				name: "Bangladesh",
+			},
+			directApply: false,
+			howToApply: {
+				"@type": "HowToApply",
+				url: `${SITE_URL}/contact`,
+			},
+		})),
+	};
+}
+
 export function CareersPage() {
 	return (
 		<main>
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+				dangerouslySetInnerHTML={{
+					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
+				}}
+			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{
+					__html: stringifyJsonLd(jobPostingsJsonLd()),
+				}}
 			/>
 			<CareersHero />
 			<OpenRoles />
@@ -119,45 +219,6 @@ function CareersHero() {
 }
 
 function OpenRoles() {
-	const roles = [
-		{
-			title: "Instructor, Barbering",
-			type: "Part-time / Cohort-based",
-			description:
-				"Teach Classic Barbering, Fades & Tapers, or Beard Sculpting. Two cohorts per year (day & evening). You design your block, we handle the rest.",
-			requirements: [
-				"5+ years behind the chair",
-				"Current portfolio & client base",
-				"NTVQF certification (or willingness to obtain)",
-				"Guild membership preferred",
-			],
-		},
-		{
-			title: "Instructor, Beauty & Cosmetology",
-			type: "Part-time / Cohort-based",
-			description:
-				"Teach Cosmetology Fundamentals, Hair Styling & Colouring, or Bridal & Editorial Makeup. Same model: you teach what you practice.",
-			requirements: [
-				"5+ years professional experience",
-				"Current portfolio & client base",
-				"NTVQF certification (or willingness to obtain)",
-				"Guild membership preferred",
-			],
-		},
-		{
-			title: "Studio Coordinator",
-			type: "Full-time",
-			description:
-				"Run the floor: client scheduling, inventory, tool maintenance, cohort logistics. The engine that keeps the studio humming.",
-			requirements: [
-				"2+ years salon/barbershop operations",
-				"Booking software fluency (Vagaro, Booksy, etc.)",
-				"Retail & inventory management",
-				"Bilingual (Bengali/English)",
-			],
-		},
-	];
-
 	return (
 		<section
 			className="section-light bg-background px-6 py-24 lg:px-10"
@@ -166,7 +227,7 @@ function OpenRoles() {
 			<div className="mx-auto max-w-7xl">
 				<SectionEyebrow guard="1" title="Open Roles" id="roles-heading" />
 				<div className="mt-14 space-y-12">
-					{roles.map((role, i) => (
+					{OPEN_ROLES.map((role, i) => (
 						<Reveal key={role.title} delay={i * 0.08}>
 							<div className="border border-border bg-background p-8 lg:p-12">
 								<div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">

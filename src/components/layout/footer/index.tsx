@@ -15,6 +15,7 @@ import { Image } from "@unpic/react";
 import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
 	AREAS_SERVED,
@@ -22,6 +23,7 @@ import {
 	OPENING_HOURS_SPEC,
 	SITE_URL,
 } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
@@ -124,7 +126,7 @@ export default function Footer() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{
-					__html: JSON.stringify(LOCAL_BUSINESS_JSON_LD),
+					__html: stringifyJsonLd(LOCAL_BUSINESS_JSON_LD),
 				}}
 			/>
 
@@ -190,6 +192,41 @@ export default function Footer() {
 							Sharpening tomorrow&apos;s master barbers, one blade at a time.
 							Hands-on training, taught by working professionals.
 						</p>
+
+						{/* Enrollment updates — WhatsApp-first capture, no backend yet */}
+						<div className="mt-6 max-w-xs">
+							<p className="text-[11px] font-medium tracking-[0.18em] text-secondary-foreground/60 uppercase">
+								Cohort announcements
+							</p>
+							<form
+								className="mt-3 flex gap-2"
+								onSubmit={(event) => {
+									event.preventDefault();
+									window.open(
+										CONTACT.whatsapp,
+										"_blank",
+										"noopener,noreferrer",
+									);
+								}}
+							>
+								<Input
+									type="tel"
+									inputMode="tel"
+									required
+									placeholder="WhatsApp number"
+									aria-label="WhatsApp number for cohort announcements"
+									className="h-10 rounded-none border-border bg-background/60 text-sm"
+								/>
+								<Button
+									type="submit"
+									variant="outline"
+									className="h-10 shrink-0 rounded-none border-primary/40 px-4 text-[11px] font-semibold tracking-[0.14em] text-primary hover:bg-primary hover:text-primary-foreground"
+								>
+									JOIN
+								</Button>
+							</form>
+						</div>
+
 						<div className="mt-6 flex items-center gap-4">
 							<SocialIcon href={SOCIAL_URLS.instagram} label="Instagram">
 								<IconBrandInstagram className="h-4 w-4" stroke={1.75} />

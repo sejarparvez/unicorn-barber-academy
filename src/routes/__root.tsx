@@ -6,17 +6,34 @@ import {
 	Link,
 	Outlet,
 	Scripts,
+	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
+import { StickyEnrollBar } from "@/components/layout/sticky-enroll-bar";
+import { WhatsappFloat } from "@/components/layout/whatsapp-float";
+import { Analytics } from "@/components/providers/analytics";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
 import type { SessionPayload } from "@/lib/types";
 import { getSession } from "@/server/session";
 import appCss from "../styles.css?url";
+
+/** Marketing-pages-only mount: the mobile enroll bar stays off the
+    dashboard/auth surfaces where it would fight app chrome. */
+function StickyEnrollMaybe() {
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const isMarketing =
+		!pathname.startsWith("/dashboard") &&
+		!pathname.startsWith("/auth") &&
+		!pathname.startsWith("/verify") &&
+		!pathname.includes("/print");
+	return isMarketing ? <StickyEnrollBar /> : null;
+}
 
 export const Route = createRootRoute({
 	// Fetched on every document load so <Header/> renders the correct
@@ -57,6 +74,13 @@ export const Route = createRootRoute({
 			},
 			{ rel: "icon", type: "image/png", href: "/favicon.png" },
 			{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+			// RSS autodiscovery — /feed.xml exists but was undiscoverable.
+			{
+				rel: "alternate",
+				type: "application/rss+xml",
+				title: "Unicorn Barber Training Academy Blog",
+				href: "/feed.xml",
+			},
 		],
 	}),
 	component: RootDocument,
@@ -119,6 +143,13 @@ function RootDocument() {
 				<HeadContent />
 			</head>
 			<body>
+				{/* Skip link — keyboard users jump straight past the header. */}
+				<a
+					href="#main-content"
+					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+				>
+					Skip to content
+				</a>
 				{/* Site chrome never prints — certificate pages rely on this. */}
 				<div className="print:hidden">
 					<Header session={session} />
@@ -132,7 +163,11 @@ function RootDocument() {
 				</div>
 				<div className="print:hidden">
 					<Footer />
+					<WhatsappFloat />
+					<StickyEnrollMaybe />
 				</div>
+				<Analytics />
+				<SmoothScroll />
 				<Toaster position="bottom-right" richColors closeButton />
 				{import.meta.env.DEV && (
 					<TanStackDevtools

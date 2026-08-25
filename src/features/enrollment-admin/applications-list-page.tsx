@@ -93,7 +93,9 @@ export function ApplicationsListPage({
 							)
 						}
 					>
-						<IconDownload className="h-3.5 w-3.5" /> Export CSV
+						{/* Exports only this page's rows — labeled honestly so
+						    admins don't assume a full-dataset dump. */}
+						<IconDownload className="h-3.5 w-3.5" /> Export page (CSV)
 					</Button>
 					<Link
 						to="/dashboard/enrollments/intakes"

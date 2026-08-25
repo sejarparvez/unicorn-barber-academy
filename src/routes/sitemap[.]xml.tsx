@@ -23,11 +23,11 @@ export const Route = createFileRoute("/sitemap.xml")({
 					listCategoriesWithCounts(CATEGORY_MIN_INDEX_POSTS),
 				]);
 
-				const today = new Date().toISOString().slice(0, 10);
 				// /enroll is intentionally absent: it sits behind sign-in and
 				// redirects crawlers to the noindex auth page. Static routes omit
 				// lastmod — a per-request "today" value is noise crawlers learn
 				// to ignore (and Google then distrusts for every URL).
+				// /blog and category lastmods derive from real post timestamps.
 				const staticRoutes = [
 					{ loc: "/", priority: "1.0" },
 					{ loc: "/about", priority: "0.7" },
@@ -36,7 +36,11 @@ export const Route = createFileRoute("/sitemap.xml")({
 					{ loc: "/gallery", priority: "0.6" },
 					{ loc: "/student-life", priority: "0.6" },
 					{ loc: "/media", priority: "0.5" },
-					{ loc: "/blog", lastmod: today, priority: "0.7" },
+					{
+						loc: "/blog",
+						lastmod: posts[0]?.updatedAt.slice(0, 10),
+						priority: "0.7",
+					},
 					{ loc: "/contact", priority: "0.8" },
 					{ loc: "/careers", priority: "0.5" },
 					{ loc: "/terms", priority: "0.2" },
@@ -55,7 +59,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 					})),
 					...categories.map((c) => ({
 						loc: `/blog/category/${c.slug}`,
-						lastmod: today,
+						lastmod: c.latestPostAt?.slice(0, 10),
 						priority: "0.5",
 					})),
 					...posts.map((post) => ({

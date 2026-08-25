@@ -9,6 +9,7 @@ import { Link } from "@tanstack/react-router";
 import { FinalCta } from "@/components/effects";
 import { SITE_URL } from "@/data/site";
 import type { BlogCategory, BlogPostSummary, Paginated } from "@/lib/blog";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { BlogPostCard } from "./blog-page";
 
 export const CATEGORY_MIN_INDEX_POSTS = 3;
@@ -45,7 +46,7 @@ export function CategoryArchivePage({ category, posts, page }: Props) {
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
 			/>
 			<section className="relative overflow-hidden bg-background px-6 pt-28 pb-14 lg:px-10 lg:pt-36">
 				<div className="mx-auto max-w-2xl text-center">

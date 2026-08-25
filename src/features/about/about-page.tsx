@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { pic } from "@/data/images";
 import { INSTRUCTORS } from "@/data/instructors";
 import { CONTACT, SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { SOCIAL_URLS } from "@/lib/social";
 
 const BREADCRUMB_JSON_LD = {
@@ -72,12 +73,14 @@ export function AboutPage() {
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+				dangerouslySetInnerHTML={{
+					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
+				}}
 			/>
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(ORG_JSON_LD) }}
 			/>
 			<AboutHero />
 			<OurStory />

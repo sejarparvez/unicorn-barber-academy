@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { Instructor } from "@/data/instructors";
 import { INSTRUCTORS } from "@/data/instructors";
 import { SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 
 const INSTRUCTORS_JSON_LD = {
 	"@context": "https://schema.org",
@@ -61,14 +62,14 @@ export function InstructorsPage() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{
-					__html: JSON.stringify(BREADCRUMB_JSON_LD),
+					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
 				}}
 			/>
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{
-					__html: JSON.stringify(INSTRUCTORS_JSON_LD),
+					__html: stringifyJsonLd(INSTRUCTORS_JSON_LD),
 				}}
 			/>
 			<Spotlight leads={leads} />

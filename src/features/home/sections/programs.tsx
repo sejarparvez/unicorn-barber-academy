@@ -16,6 +16,7 @@ import {
 	type Program,
 } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 
 /** "14 weeks" -> "P14W" (ISO 8601 duration, for Course schema) */
 const toIsoWeeks = (duration: string) => {
@@ -54,7 +55,7 @@ function trackSummary(programs: Program[]) {
 function ProgramCard({ program }: { program: Program }) {
 	return (
 		<Link to={program.to} className="group block">
-			<Card className="gap-0 overflow-hidden rounded-none border-border bg-background p-0 transition-colors group-hover:border-primary/50">
+			<Card className="glow-gold gap-0 overflow-hidden rounded-none border-border bg-background p-0 transition-colors group-hover:border-primary/50">
 				<div className="relative aspect-square overflow-hidden">
 					<Image
 						src={program.image}
@@ -158,7 +159,7 @@ export default function Programs() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{
-					__html: JSON.stringify(ALL_PROGRAMS_JSON_LD),
+					__html: stringifyJsonLd(ALL_PROGRAMS_JSON_LD),
 				}}
 			/>
 			<div className="mx-auto max-w-7xl">

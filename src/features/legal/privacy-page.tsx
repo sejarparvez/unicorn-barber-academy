@@ -2,6 +2,7 @@
 
 import { CONTACT, SITE_URL } from "@/data/site";
 import { LegalContent, LegalHero } from "@/features/legal/legal-layout";
+import { stringifyJsonLd } from "@/lib/jsonld";
 
 const BREADCRUMB_JSON_LD = {
 	"@context": "https://schema.org",
@@ -23,7 +24,9 @@ export function PrivacyPage() {
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+				dangerouslySetInnerHTML={{
+					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
+				}}
 			/>
 			<LegalHero title="Privacy Policy" />
 			<LegalContent>

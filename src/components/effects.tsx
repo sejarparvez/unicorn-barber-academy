@@ -274,7 +274,7 @@ export function FinalCta({
 						to={ctaTo}
 						className={cn(
 							buttonVariants(),
-							"rounded-none bg-primary px-8 py-6 text-[12px] font-semibold tracking-[0.16em] text-primary-foreground hover:bg-primary/90",
+							"glow-gold rounded-none bg-primary px-8 py-6 text-[12px] font-semibold tracking-[0.16em] text-primary-foreground hover:bg-primary/90",
 						)}
 					>
 						{ctaLabel}

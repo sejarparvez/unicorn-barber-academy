@@ -12,6 +12,7 @@ import {
 } from "@/data/gallery";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 const JSON_LD = {
@@ -35,7 +36,7 @@ export function GalleryPage() {
 				type="application/ld+json"
 				// eslint-disable-next-line react/no-danger
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(JSON_LD) }}
 			/>
 			<MasonryGallery />
 			<FinalCta

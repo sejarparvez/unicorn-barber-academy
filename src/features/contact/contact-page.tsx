@@ -48,6 +48,7 @@ import { pic } from "@/data/images";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
 import { submitContactMessage } from "@/lib/api/contact";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 const JSON_LD = {
@@ -70,7 +71,7 @@ export function ContactPage() {
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(JSON_LD) }}
 			/>
 			<ContactHero />
 			<ContactForm />
@@ -475,6 +476,7 @@ function SealedConfirmation({ onReset }: { onReset: () => void }) {
 			exit={{ opacity: 0 }}
 			transition={{ duration: 0.2 }}
 			className="flex flex-col items-center py-10 text-center"
+			role="status"
 		>
 			<motion.div
 				initial={
@@ -633,7 +635,7 @@ function ContactFaq() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{
-					__html: JSON.stringify(CONTACT_FAQ_JSON_LD),
+					__html: stringifyJsonLd(CONTACT_FAQ_JSON_LD),
 				}}
 			/>
 			<div className="mx-auto max-w-3xl">

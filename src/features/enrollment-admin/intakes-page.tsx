@@ -225,7 +225,11 @@ export function IntakesPage() {
 							</div>
 							<label className="flex items-center gap-2 text-xs text-muted-foreground">
 								Seats
+								{/* Keyed by the server value: after a refetch (reject,
+								    clamp, or another admin's edit) the DOM input resets to
+								    what the DB actually holds instead of keeping stale text. */}
 								<input
+									key={`${intake.id}:${intake.seatsTotal}`}
 									type="number"
 									min={1}
 									max={200}

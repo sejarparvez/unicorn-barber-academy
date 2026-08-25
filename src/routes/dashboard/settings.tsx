@@ -429,6 +429,11 @@ function SessionsCard({
 				</p>
 			) : (
 				<ul className="mt-4 divide-y divide-border">
+					{sessions === null && !loadError ? (
+						<li className="py-3 text-sm text-muted-foreground">
+							Loading sessions…
+						</li>
+					) : null}
 					{(sessions ?? []).map((sessionItem) => {
 						const isCurrent = sessionItem.token === currentToken;
 						return (

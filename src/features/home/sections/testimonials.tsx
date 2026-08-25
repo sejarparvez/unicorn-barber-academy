@@ -1,4 +1,4 @@
-﻿/* --------------------------- Testimonials --------------------------- */
+/* --------------------------- Testimonials --------------------------- */
 
 import { IconQuote } from "@tabler/icons-react";
 import { Image } from "@unpic/react";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/carousel";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 
 type Testimonial = {
 	quote: string;
@@ -113,7 +114,7 @@ export default function Testimonials() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{
-					__html: JSON.stringify(TESTIMONIALS_JSON_LD),
+					__html: stringifyJsonLd(TESTIMONIALS_JSON_LD),
 				}}
 			/>
 			<div className="mx-auto max-w-7xl">

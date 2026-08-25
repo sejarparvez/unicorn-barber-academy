@@ -36,6 +36,10 @@ export const Route = createFileRoute("/verify/$code")({
 					"Confirm the authenticity of a Unicorn Barber Training Academy certificate by its verification code.",
 			},
 			{ property: "og:type", content: "website" },
+			// Infinite URL space (/verify/<anything>) — keep crawlers from
+			// indexing arbitrary codes; meta (not robots.txt) so they still see
+			// the noindex directive.
+			{ name: "robots", content: "noindex" },
 		],
 	}),
 	component: VerifyPage,

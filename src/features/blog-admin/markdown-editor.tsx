@@ -142,6 +142,7 @@ export function MarkdownEditor({
 						type="file"
 						accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
 						className="sr-only"
+						aria-label="Insert image"
 						onChange={(e) => {
 							const file = e.target.files?.[0];
 							e.target.value = "";
@@ -210,6 +211,7 @@ export function MarkdownEditor({
 					value={value}
 					onChange={(e) => onChange(e.target.value)}
 					disabled={disabled}
+					aria-label="Article body (markdown)"
 					placeholder={"## Section heading\n\nWrite in markdown…"}
 					spellCheck
 					className="min-h-[420px] w-full resize-y bg-transparent px-4 py-3 font-mono text-sm leading-relaxed outline-none placeholder:text-muted-foreground/60"

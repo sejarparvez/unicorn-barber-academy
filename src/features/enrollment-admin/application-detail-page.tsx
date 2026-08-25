@@ -8,7 +8,7 @@
 // precisely.
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -67,6 +67,13 @@ export function ApplicationDetailPage({
 	const setStatus = useSetApplicationStatus(application.id);
 	const busy = setFee.isPending || setStatus.isPending;
 	const [note, setNote] = useState(application.decisionNote ?? "");
+	// If another admin saves a note while this page is open, the refetched
+	// value replaces our (untouched) local copy — but only when the local
+	// editor hasn't been typed into yet.
+	const [noteDirty, setNoteDirty] = useState(false);
+	useEffect(() => {
+		if (!noteDirty) setNote(application.decisionNote ?? "");
+	}, [application.decisionNote, noteDirty]);
 	const [error, setError] = useState<string | null>(null);
 	const [notice, setNotice] = useState<string | null>(null);
 
@@ -223,7 +230,10 @@ export function ApplicationDetailPage({
 							rows={3}
 							aria-label="Decision note (optional)"
 							value={note}
-							onChange={(e) => setNote(e.target.value)}
+							onChange={(e) => {
+								setNote(e.target.value);
+								setNoteDirty(true);
+							}}
 							placeholder="Recorded with the decision; included in the admin trail only."
 						/>
 						<p className="text-[11px] text-muted-foreground">
@@ -283,6 +293,7 @@ function CertificatePanel({ applicationId }: { applicationId: number }) {
 	const { data: certificate } = useApplicationCertificate(applicationId);
 	const issue = useIssueCertificate();
 	const revoke = useSetCertificateRevocation();
+	const [confirmRevoked, setConfirmRevoked] = useState(false);
 
 	const canIssue = !certificate;
 
@@ -298,6 +309,13 @@ function CertificatePanel({ applicationId }: { applicationId: number }) {
 	async function onToggleRevocation() {
 		if (!certificate) return;
 		const next = !certificate.revokedAt;
+		// Revocation breaks live QR links employers may already hold —
+		// require a second click to confirm (restore stays one click).
+		if (next && !confirmRevoked) {
+			setConfirmRevoked(true);
+			return;
+		}
+		setConfirmRevoked(false);
 		try {
 			await revoke.mutateAsync({
 				id: certificate.id,
@@ -342,11 +360,15 @@ function CertificatePanel({ applicationId }: { applicationId: number }) {
 					<Button
 						variant="ghost"
 						size="sm"
-						className="w-full"
+						className={cn("w-full", confirmRevoked && "text-destructive")}
 						disabled={issue.isPending || revoke.isPending}
 						onClick={onToggleRevocation}
 					>
-						{certificate.revokedAt ? "Restore certificate" : "Revoke…"}
+						{certificate.revokedAt
+							? "Restore certificate"
+							: confirmRevoked
+								? "Click again to confirm revocation"
+								: "Revoke…"}
 					</Button>
 				</div>
 			) : (

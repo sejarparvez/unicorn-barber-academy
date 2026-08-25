@@ -42,7 +42,10 @@ export default function UserDropDown({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
-						<Avatar className="h-9 w-9 cursor-pointer border-2 border-primary/20 hover:border-primary/40 transition-all ring-offset-background hover:ring-2 hover:ring-primary/20 hover:ring-offset-2" />
+						<Avatar
+							aria-label={`Account menu for ${session.user.name || "user"}`}
+							className="h-9 w-9 cursor-pointer border-2 border-primary/20 hover:border-primary/40 transition-all ring-offset-background hover:ring-2 hover:ring-primary/20 hover:ring-offset-2"
+						/>
 					}
 				>
 					<AvatarImage

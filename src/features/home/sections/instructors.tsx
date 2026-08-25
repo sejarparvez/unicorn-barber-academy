@@ -1,4 +1,4 @@
-﻿/* --------------------------- Instructors --------------------------- */
+/* --------------------------- Instructors --------------------------- */
 
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { Instructor } from "@/data/instructors";
 import { INSTRUCTORS } from "@/data/instructors";
 import { SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 
 const INSTRUCTORS_JSON_LD = {
 	"@context": "https://schema.org",
@@ -87,7 +88,7 @@ export default function Instructors() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{
-					__html: JSON.stringify(INSTRUCTORS_JSON_LD),
+					__html: stringifyJsonLd(INSTRUCTORS_JSON_LD),
 				}}
 			/>
 			<div className="mx-auto max-w-7xl">

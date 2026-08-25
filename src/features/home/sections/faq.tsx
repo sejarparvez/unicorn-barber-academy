@@ -1,4 +1,4 @@
-﻿/* ------------------------------- FAQ ------------------------------- */
+/* ------------------------------- FAQ ------------------------------- */
 
 import { SectionEyebrow } from "@/components/effects";
 import {
@@ -7,6 +7,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import { stringifyJsonLd } from "@/lib/jsonld";
 
 const FAQS = [
 	{
@@ -50,7 +51,7 @@ export default function Faq() {
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(FAQ_JSON_LD) }}
 			/>
 			<div className="mx-auto max-w-3xl">
 				<SectionEyebrow guard="6" title="Frequently Asked" id="faq-heading" />

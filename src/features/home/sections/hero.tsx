@@ -2,6 +2,13 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
+import {
+	motion,
+	useReducedMotion,
+	useScroll,
+	useTransform,
+} from "motion/react";
+import { useRef } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { pic } from "@/data/images";
 import { cn } from "@/lib/utils";
@@ -9,20 +16,74 @@ import { cn } from "@/lib/utils";
 /* ----------------------------- Hero ----------------------------- */
 /* Signature device: a clipper-guard gauge — a vertical ruler of real
    guard lengths (#0 skin to #4) running down the seam between copy
-   and photo, the same reference a barber checks mid-fade.
-
-   Type note: --font-heading currently resolves to Inter. For the full
-   effect, swap in a characterful serif for headings (e.g. install
-   @fontsource-variable/fraunces and point --font-heading at it) — the
-   headline below is sized to carry a serif well. It still reads fine
-   on Inter if that swap doesn't happen. */
+   and photo, the same reference a barber checks mid-fade. The photo
+   column parallaxes gently on scroll; the gradient headline shimmers. */
 
 const gradientText =
 	"bg-linear-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-transparent";
 
+const GUARD_MARKS = [
+	{ label: "#4", hint: "13mm" },
+	{ label: "#3", hint: "10mm" },
+	{ label: "#2", hint: "6mm" },
+	{ label: "#1", hint: "3mm" },
+	{ label: "#0", hint: "skin" },
+];
+
+function GuardGauge() {
+	const shouldReduceMotion = useReducedMotion();
+	return (
+		<div className="relative flex h-full max-h-[70vh] flex-col items-center justify-center gap-0">
+			<span className="mb-4 h-10 w-px bg-linear-to-b from-transparent to-primary/60" />
+			{GUARD_MARKS.map((mark, i) => (
+				<motion.div
+					key={mark.label}
+					className="flex items-center gap-2 py-5"
+					initial={shouldReduceMotion ? {} : { opacity: 0, x: -8 }}
+					whileInView={{ opacity: 1, x: 0 }}
+					viewport={{ once: true }}
+					transition={{ delay: 0.3 + i * 0.12, duration: 0.5 }}
+				>
+					<span className="font-heading text-sm text-primary/90 italic">
+						{mark.label}
+					</span>
+					<span className="h-px w-5 bg-primary/50" />
+					<span className="font-mono text-[9px] tracking-widest text-muted-foreground">
+						{mark.hint.toUpperCase()}
+					</span>
+				</motion.div>
+			))}
+			<span className="mt-4 h-10 w-px bg-linear-to-t from-transparent to-primary/60" />
+			{/* Clipper silhouette */}
+			<svg
+				viewBox="0 0 24 24"
+				className="absolute right-[-14px] bottom-16 h-5 w-5 text-primary/40"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				aria-hidden="true"
+			>
+				<path d="M6 3h12v7l-2 2v9H8v-9L6 10V3z" />
+				<path d="M8 3v7M12 3v7M16 3v7" />
+			</svg>
+		</div>
+	);
+}
+
 export default function Hero() {
+	const sectionRef = useRef<HTMLElement>(null);
+	const shouldReduceMotion = useReducedMotion();
+	// Gentle scroll-linked parallax on the photo column.
+	const { scrollYProgress } = useScroll({
+		target: sectionRef,
+		offset: ["start start", "end start"],
+	});
+	const photoY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
+	const photoScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+
 	return (
 		<section
+			ref={sectionRef}
 			className="relative overflow-hidden bg-background text-foreground"
 			aria-labelledby="hero-heading"
 		>
@@ -47,12 +108,20 @@ export default function Hero() {
 
 					<h1
 						id="hero-heading"
-						className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-100 mt-6 text-4xl leading-[1.04] sm:text-5xl lg:text-[3.75rem]"
+						className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-100 mt-6 text-5xl leading-[1.02] sm:text-6xl lg:text-[4.25rem]"
 						style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
 					>
 						Master the fade.
 						<br />
-						<span className={gradientText}>Earn the chair.</span>
+						<span
+							className={cn(
+								gradientText,
+								"italic",
+								!shouldReduceMotion && "text-shimmer",
+							)}
+						>
+							Earn the chair.
+						</span>
 					</h1>
 
 					<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-150 mt-7 max-w-sm text-base leading-relaxed text-foreground/65 sm:text-lg">
@@ -66,7 +135,7 @@ export default function Hero() {
 							to="/enroll"
 							className={cn(
 								buttonVariants({ variant: "default" }),
-								" px-8 py-6 text-[12px] font-semibold tracking-[0.16em]",
+								"glow-gold px-8 py-6 text-[12px] font-semibold tracking-[0.16em]",
 							)}
 						>
 							ENROLL NOW
@@ -93,22 +162,36 @@ export default function Hero() {
 				<div
 					aria-hidden="true"
 					className="relative hidden w-14 shrink-0 lg:flex lg:flex-col lg:items-center lg:justify-center"
-				></div>
+				>
+					<GuardGauge />
+				</div>
 
-				{/* Photo column */}
-				<div className="relative h-[46vh] sm:h-[56vh] lg:h-[88vh]">
-					<Image
-						src={pic("unicorn-hero-barbering", 1400, 1700)}
-						alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
-						layout="fullWidth"
-						sizes="(min-width: 1024px) 50vw, 100vw"
-						fetchPriority="high"
-						loading="eager"
-						className="h-full w-full object-cover contrast-[1.05] grayscale-15"
-					/>
+				{/* Photo column — gentle parallax on scroll */}
+				<div className="relative h-[46vh] overflow-hidden sm:h-[56vh] lg:h-[88vh]">
+					<motion.div
+						style={
+							shouldReduceMotion ? undefined : { y: photoY, scale: photoScale }
+						}
+						className="h-full w-full"
+					>
+						<Image
+							src={pic("unicorn-hero-barbering", 1400, 1700)}
+							alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
+							layout="fullWidth"
+							sizes="(min-width: 1024px) 50vw, 100vw"
+							fetchPriority="high"
+							loading="eager"
+							className="h-full w-full object-cover contrast-[1.05] grayscale-15"
+						/>
+					</motion.div>
 					<div
 						aria-hidden="true"
 						className="pointer-events-none absolute inset-0 bg-linear-to-l from-transparent via-transparent to-background/20"
+					/>
+					{/* Gold hairline framing the photo edge */}
+					<div
+						aria-hidden="true"
+						className="pointer-events-none absolute inset-y-0 left-0 hidden w-px bg-linear-to-b from-transparent via-primary/40 to-transparent lg:block"
 					/>
 				</div>
 			</div>

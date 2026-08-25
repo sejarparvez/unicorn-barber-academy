@@ -79,6 +79,13 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 	const [error, setError] = useState<string | null>(null);
 	const [savedAt, setSavedAt] = useState<string | null>(null);
 	const [confirmDelete, setConfirmDelete] = useState(false);
+	// The armed confirm state self-disarms — a stale destructive button
+	// shouldn't wait around for an accidental click.
+	useEffect(() => {
+		if (!confirmDelete) return;
+		const timer = setTimeout(() => setConfirmDelete(false), 5000);
+		return () => clearTimeout(timer);
+	}, [confirmDelete]);
 	const [uploadingCover, setUploadingCover] = useState(false);
 	const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -387,12 +394,13 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 
 					{/* Cover */}
 					<div className="space-y-2">
-						<Label>Cover image</Label>
+						<Label htmlFor="cover-url">Cover image</Label>
 						{form.coverImageUrl ? (
 							<div className="relative overflow-hidden rounded-lg border border-border">
 								<img
 									src={form.coverImageUrl}
 									alt={form.coverImageAlt || "Cover preview"}
+									loading="lazy"
 									className="max-h-52 w-full object-cover"
 								/>
 								<button
@@ -428,6 +436,7 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 							type="file"
 							accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
 							className="sr-only"
+							aria-label="Upload cover image"
 							onChange={(e) => {
 								const file = e.target.files?.[0];
 								e.target.value = "";
@@ -435,12 +444,14 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 							}}
 						/>
 						<Input
+							id="cover-url"
 							value={form.coverImageUrl}
 							placeholder="https://…"
 							onChange={(e) => patch({ coverImageUrl: e.target.value })}
 						/>
 						{form.coverImageUrl ? (
 							<Input
+								aria-label="Cover image alt text"
 								value={form.coverImageAlt}
 								placeholder="Alt text — describe the image using natural keywords (required)"
 								onChange={(e) => patch({ coverImageAlt: e.target.value })}

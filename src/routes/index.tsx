@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
 import { buttonVariants } from "@/components/ui/button";
 import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
+import CraftMarquee from "@/features/home/sections/craft-marquee";
 import Faq from "@/features/home/sections/faq";
 import Hero from "@/features/home/sections/hero";
 import Instructors from "@/features/home/sections/instructors";
@@ -43,6 +44,7 @@ function Home() {
 	return (
 		<main>
 			<Hero />
+			<CraftMarquee />
 			<WhyUnicorn />
 			<Stats />
 			<Programs />

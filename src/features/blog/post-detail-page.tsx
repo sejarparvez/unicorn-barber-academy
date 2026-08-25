@@ -17,6 +17,7 @@ import { Link } from "@tanstack/react-router";
 import { FinalCta } from "@/components/effects";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { Route } from "@/routes/blog.$slug";
 
 function formatPostDate(iso: string | null): string | null {
@@ -114,18 +115,18 @@ export function PostDetailPage() {
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
 			/>
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(blogPostingJsonLd) }}
 			/>
 			{faqJsonLd ? (
 				<script
 					type="application/ld+json"
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-					dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+					dangerouslySetInnerHTML={{ __html: stringifyJsonLd(faqJsonLd) }}
 				/>
 			) : null}
 

@@ -24,6 +24,7 @@ import type { Track } from "@/data/programs";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import { ProgramCard } from "@/features/programs/program-card";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 const BREADCRUMB_JSON_LD = {
@@ -46,7 +47,9 @@ export function ProgramsPage() {
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+				dangerouslySetInnerHTML={{
+					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
+				}}
 			/>
 			<ProgramsHero />
 			<ProgramCatalogue />

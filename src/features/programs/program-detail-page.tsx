@@ -14,6 +14,7 @@ import { INSTRUCTORS } from "@/data/instructors";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import { ProgramCard } from "@/features/programs/program-card";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { Route } from "@/routes/programs.$slug";
 
 export function ProgramNotFound() {
@@ -118,12 +119,12 @@ export function ProgramDetailPage() {
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
 			/>
 			<script
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(courseJsonLd) }}
 			/>
 
 			{/* ----------------------------- Hero ----------------------------- */}

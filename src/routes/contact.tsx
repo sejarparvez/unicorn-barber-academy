@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
 import { ContactPage } from "@/features/contact/contact-page";
 
@@ -22,6 +23,10 @@ export const Route = createFileRoute("/contact")({
 					"Reach admissions, partnerships, or press at Unicorn Barber Training Academy.",
 			},
 			{ property: "og:type", content: "website" },
+			{
+				property: "og:image",
+				content: `${SITE_URL}${pic("unicorn-contact-hero-1", 900, 1000)}`,
+			},
 			{ property: "og:url", content: `${SITE_URL}/contact` },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/contact` }],
