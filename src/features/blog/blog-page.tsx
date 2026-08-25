@@ -12,15 +12,12 @@ import {
 import { Link } from "@tanstack/react-router";
 import { FinalCta, Reveal } from "@/components/effects";
 import type { BlogCategory, BlogPostSummary, Paginated } from "@/lib/blog";
+import { formatLongDate } from "@/lib/date";
 import { cn } from "@/lib/utils";
 
+/** Null-safe wrapper — scheduled posts may not have a date yet. */
 function formatPostDate(iso: string | null): string {
-	if (!iso) return "";
-	return new Date(iso).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
+	return iso ? formatLongDate(iso) : "";
 }
 
 type Props = {

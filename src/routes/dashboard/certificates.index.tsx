@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { CertificateRecord } from "@/lib/certificates";
+import { formatLongDate } from "@/lib/date";
 import { COHORT_LABELS } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
 import { cn } from "@/lib/utils";
@@ -40,14 +41,6 @@ export const Route = createFileRoute("/dashboard/certificates/")({
 
 function verifyUrl(code: string) {
 	return `${APP_ORIGIN}/verify/${code}`;
-}
-
-function formatIssuedOn(value: string) {
-	return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
 }
 
 function CertificatesPage() {
@@ -114,7 +107,7 @@ function CertificateCard({ certificate }: { certificate: CertificateRecord }) {
 					</h2>
 					<p className="mt-0.5 text-xs text-muted-foreground">
 						{COHORT_LABELS[certificate.cohort]} · issued{" "}
-						{formatIssuedOn(certificate.issuedOn)}
+						{formatLongDate(certificate.issuedOn)}
 					</p>
 				</div>
 				<Badge

@@ -15,18 +15,21 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { FinalCta } from "@/components/effects";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
+import { formatLongDate } from "@/lib/date";
 import { stringifyJsonLd } from "@/lib/jsonld";
 import { Route } from "@/routes/blog.$slug";
 
+/** Null-safe wrapper — posts may be unpublished (no date yet). */
 function formatPostDate(iso: string | null): string | null {
-	if (!iso) return null;
-	return new Date(iso).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
+	return iso ? formatLongDate(iso) : null;
 }
 
 export function PostDetailPage() {
@@ -292,18 +295,22 @@ export function PostDetailPage() {
 						<h2 className="font-heading text-2xl font-medium text-foreground">
 							Frequently asked questions
 						</h2>
-						<div className="mt-6 divide-y divide-border rounded-xl border border-border bg-card">
+						<Accordion className="mt-6 rounded-xl border border-border bg-card px-5">
 							{post.faq.map((item) => (
-								<details key={item.q} className="group p-5">
-									<summary className="cursor-pointer list-none font-medium marker:hidden [&::-webkit-details-marker]:hidden">
+								<AccordionItem
+									key={item.q}
+									value={item.q}
+									className="border-b last:border-b-0"
+								>
+									<AccordionTrigger className="py-4 font-medium hover:no-underline [&>svg]:text-primary">
 										{item.q}
-									</summary>
-									<p className="mt-3 text-sm leading-relaxed text-secondary-foreground/80">
+									</AccordionTrigger>
+									<AccordionContent className="pb-4 text-sm leading-relaxed text-secondary-foreground/80">
 										{item.a}
-									</p>
-								</details>
+									</AccordionContent>
+								</AccordionItem>
 							))}
-						</div>
+						</Accordion>
 					</section>
 				) : null}
 

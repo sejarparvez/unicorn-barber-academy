@@ -11,6 +11,16 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +43,8 @@ export function IntakesPage() {
 
 	const [error, setError] = useState<string | null>(null);
 	const [notice, setNotice] = useState<string | null>(null);
+	// Intake pending deletion confirmation (only set when it has applications).
+	const [confirmDelete, setConfirmDelete] = useState<IntakeAdmin | null>(null);
 	const busy =
 		createMutation.isPending ||
 		updateMutation.isPending ||
@@ -88,18 +100,20 @@ export function IntakesPage() {
 		}
 	}
 
-	async function onDelete(intake: IntakeAdmin) {
-		if (
-			intake.applicationsCount > 0 &&
-			!window.confirm(
-				`This intake has ${intake.applicationsCount} application(s). Delete anyway?`,
-			)
-		) {
+	function onDelete(intake: IntakeAdmin) {
+		if (intake.applicationsCount > 0) {
+			// AlertDialog handles the confirmation; state holds the target.
+			setConfirmDelete(intake);
 			return;
 		}
+		void doDelete(intake);
+	}
+
+	async function doDelete(intake: IntakeAdmin) {
 		setError(null);
 		try {
 			await deleteMutation.mutateAsync(intake.id);
+			setConfirmDelete(null);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Delete failed");
 		}
@@ -270,6 +284,34 @@ export function IntakesPage() {
 				Pending, in-review, and approved applications hold seats; waitlisted and
 				rejected ones do not. Seats cannot drop below held count.
 			</p>
+
+			<AlertDialog
+				open={confirmDelete !== null}
+				onOpenChange={(open) => !open && setConfirmDelete(null)}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete this intake?</AlertDialogTitle>
+						<AlertDialogDescription>
+							{confirmDelete
+								? `This intake has ${confirmDelete.applicationsCount} application(s). Deleting it unlinks those applications from a cohort — this cannot be undone.`
+								: ""}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							className="bg-destructive text-white hover:bg-destructive/90"
+							onClick={(event) => {
+								event.preventDefault();
+								if (confirmDelete) void doDelete(confirmDelete);
+							}}
+						>
+							Delete intake
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

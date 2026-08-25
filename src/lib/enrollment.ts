@@ -1,6 +1,7 @@
 // src/lib/enrollment.ts
 // Client-safe enrollment domain types + helpers crossing the server/client
 // boundary (same contract style as lib/blog.ts / lib/roles.ts).
+import { formatDateOnly } from "./date";
 
 export const APPLICATION_STATUSES = [
 	"pending",
@@ -129,13 +130,8 @@ export function generateReference(): string {
 	return `ENR-${out}`;
 }
 
+/** Delegates to the shared date helper — kept as a domain alias so
+    enrollment call sites read naturally. UTC-pinned, "Mar 1, 2026". */
 export function formatStartsOn(iso: string): string {
-	const [y, m, d] = iso.split("-").map((part) => Number.parseInt(part, 10));
-	if (!y || !m || !d) return iso;
-	return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-		timeZone: "UTC",
-	});
+	return formatDateOnly(iso);
 }

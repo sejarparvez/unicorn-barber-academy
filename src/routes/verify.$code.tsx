@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { CONTACT } from "@/data/site";
 import type { VerifyResult } from "@/lib/certificates";
+import { formatLongDate } from "@/lib/date";
 import { COHORT_LABELS } from "@/lib/enrollment";
 import { cn } from "@/lib/utils";
 import { verifyCertificateFn } from "@/server/certificate-fns";
@@ -44,14 +45,6 @@ export const Route = createFileRoute("/verify/$code")({
 	}),
 	component: VerifyPage,
 });
-
-function formatLongDate(value: string) {
-	return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
-}
 
 function VerifyPage() {
 	const code = Route.useParams().code;

@@ -18,7 +18,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { type FormEvent, useState } from "react";
+import type { FormEvent } from "react";
 import {
 	GOLD_TEXT,
 	Grain,
@@ -48,7 +48,9 @@ import { pic } from "@/data/images";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
 import { submitContactMessage } from "@/lib/api/contact";
+
 import { stringifyJsonLd } from "@/lib/jsonld";
+import { useCopyToClipboard } from "@/lib/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
 
 const JSON_LD = {
@@ -428,22 +430,12 @@ function CopyRow({
 	icon: typeof IconMail;
 	value: string;
 }) {
-	const [copied, setCopied] = useState(false);
-
-	const handleCopy = async () => {
-		try {
-			await navigator.clipboard.writeText(value);
-			setCopied(true);
-			setTimeout(() => setCopied(false), 1800);
-		} catch {
-			// clipboard unavailable — silently ignore, value is still visible to select/copy manually
-		}
-	};
+	const { copied, copy } = useCopyToClipboard(1800);
 
 	return (
 		<button
 			type="button"
-			onClick={handleCopy}
+			onClick={() => void copy(value)}
 			className="group flex w-full items-center justify-between gap-3 border border-border bg-background px-4 py-3 text-left transition-colors hover:border-primary/40"
 		>
 			<span className="flex items-center gap-3 text-sm text-foreground">

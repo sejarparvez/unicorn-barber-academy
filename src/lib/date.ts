@@ -24,3 +24,46 @@ export function toDateOnly(value: Date | string): string {
 export function todayDateOnly(): string {
 	return toDateOnly(new Date());
 }
+
+/* ---------------------------------------------------------------------- */
+/* Display formatting — single source of truth, built on date-fns.        */
+/* Previously copy-pasted across ~10 files with drifting output.          */
+/* ---------------------------------------------------------------------- */
+
+import { format } from "date-fns";
+
+/**
+ * Build a Date at *local* midnight for a DATE-only string ("2026-03-01").
+ * Local-in/local-out guarantees the calendar date never shifts, unlike
+ * toISOString/parseISO which mix UTC into the pipeline.
+ */
+function dateFromDayValue(value: string): Date | null {
+	const [y, m, d] = value
+		.slice(0, 10)
+		.split("-")
+		.map((part) => Number.parseInt(part, 10));
+	if (!y || !m || !d) return null;
+	return new Date(y, m - 1, d);
+}
+
+/** "2026-03-01" → "Mar 1, 2026" (short month). */
+export function formatDateOnly(value: string): string {
+	const date = dateFromDayValue(value);
+	return date ? format(date, "MMM d, yyyy") : value;
+}
+
+/** "2026-03-01" → "March 1, 2026" (long month — certificates, blog dates). */
+export function formatLongDate(value: string): string {
+	const date = dateFromDayValue(value);
+	return date ? format(date, "MMMM d, yyyy") : value;
+}
+
+/**
+ * ISO timestamp → "Mar 1, 2026" (en-US medium date). Used for blog post
+ * published/updated dates; renders in the viewer's local time.
+ */
+export function formatMediumDate(value: string | Date): string {
+	const date = typeof value === "string" ? new Date(value) : value;
+	if (Number.isNaN(date.getTime())) return String(value);
+	return format(date, "MMM d, yyyy");
+}

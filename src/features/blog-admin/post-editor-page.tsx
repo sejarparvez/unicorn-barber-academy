@@ -11,6 +11,17 @@ import {
 } from "@tabler/icons-react";
 import { Link, useBlocker, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,14 +89,9 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 	const saving = save.isPending || deleteMutation.isPending;
 	const [error, setError] = useState<string | null>(null);
 	const [savedAt, setSavedAt] = useState<string | null>(null);
+	// Deletion is confirmed through the shared AlertDialog — no timer
+	// bookkeeping, and consistent with the other admin surfaces.
 	const [confirmDelete, setConfirmDelete] = useState(false);
-	// The armed confirm state self-disarms — a stale destructive button
-	// shouldn't wait around for an accidental click.
-	useEffect(() => {
-		if (!confirmDelete) return;
-		const timer = setTimeout(() => setConfirmDelete(false), 5000);
-		return () => clearTimeout(timer);
-	}, [confirmDelete]);
 	const [uploadingCover, setUploadingCover] = useState(false);
 	const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -190,7 +196,7 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 	}
 
 	async function onDelete() {
-		if (!post || !confirmDelete) return;
+		if (!post) return;
 		try {
 			await deleteMutation.mutateAsync(post.id);
 			// Post is gone — disarm the unsaved-changes blocker for this nav.
@@ -259,25 +265,41 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 						</a>
 					) : null}
 					{mode === "edit" ? (
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={() => setConfirmDelete(true)}
-							className="gap-1.5 text-destructive hover:text-destructive"
-						>
-							<IconTrash className="h-3.5 w-3.5" />
-							{confirmDelete ? "Click again to confirm" : "Delete"}
-						</Button>
-					) : null}
-					{confirmDelete ? (
-						<Button
-							size="sm"
-							variant="destructive"
-							onClick={onDelete}
-							disabled={saving}
-						>
-							Confirm delete
-						</Button>
+						<AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+							<AlertDialogTrigger
+								render={
+									<Button
+										variant="ghost"
+										size="sm"
+										className="gap-1.5 text-destructive hover:text-destructive"
+									/>
+								}
+							>
+								<IconTrash className="h-3.5 w-3.5" />
+								Delete
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Delete this post?</AlertDialogTitle>
+									<AlertDialogDescription>
+										This permanently removes the post and its slug redirects.
+										Public URLs will hard-404. This cannot be undone.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogAction
+										className="bg-destructive text-white hover:bg-destructive/90"
+										onClick={(event) => {
+											event.preventDefault();
+											void onDelete();
+										}}
+									>
+										Delete post
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
 					) : null}
 					<Button
 						onClick={() => onSave()}

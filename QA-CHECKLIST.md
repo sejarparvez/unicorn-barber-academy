@@ -18,12 +18,14 @@ Check items as you go: `[ ]` → `[x]`.
 | 0.4 | `bun run db:blog` | All 4 SQL files apply idempotently, no failures |
 | 0.5 | `bun run dev` | Server starts on http://localhost:3000 |
 | 0.6 | `bun run typecheck` | No type errors |
-| 0.7 | `bun run test` | 7 tests pass |
+| 0.7 | `bun run test` | All tests pass (150 across 15 files at time of writing) |
+| 0.8 | `bun run check` | Biome clean (format + lint) |
 
 **Degraded-mode notes (test BOTH if possible):**
 - No `RESEND_API_KEY` → emails print **links to the server terminal** instead of sending.
 - No `S3_*` vars → avatar & blog image uploads show a clear "not configured" error instead of crashing.
 - No `GOOGLE_CLIENT_ID/SECRET` → Google button hidden/inert; only email sign-in works.
+- No `VITE_PLAUSIBLE_DOMAIN` → no analytics script loads anywhere (by design; see §2.16).
 
 ---
 
@@ -47,21 +49,23 @@ mobile layout at ~375px width.
 
 | # | Page | Extra checks |
 |---|---|---|
-| 2.1 | `/` Home | Hero animates; all sections render (Why, Stats, Programs, Student Life, Instructors, Testimonials, FAQ accordion opens/closes); Visit-Us shows a **live Google Maps embed** (not placeholder image); phone displays `01337-229944`; address shows Banasree/Rampura; "GET DIRECTIONS" opens Google Maps in new tab |
+| 2.1 | `/` Home | **Headings render in Fraunces serif** (not Inter — check the hero "Master the fade."); gradient "Earn the chair." has a slow shimmer sweep; clipper-guard gauge (#0–#4 with mm hints) animates in between copy and photo; photo parallaxes gently on scroll; craft-words marquee (FADES · TAPERS · …) scrolls below hero and pauses on hover; stats count up when scrolled into view; all sections render (Why, Stats, Programs, Student Life, Instructors, Testimonials, FAQ accordion opens/closes); Visit-Us shows a **live Google Maps embed** (not placeholder image); phone displays `01337-229944`; address shows Banasree/Rampura; "GET DIRECTIONS" opens Google Maps in new tab |
+| 2.1b | `/` Home extras | Floating WhatsApp button bottom-right (hidden on print); on mobile (~375px): after scrolling past hero a sticky "Enrollment open / ENROLL" bar appears at the bottom and disappears near the footer |
 | 2.2 | `/about` | JSON-LD renders (view-source: sameAs includes all 5 social URLs incl. TikTok & X); content accurate |
 | 2.3 | `/programs` | All program cards listed |
 | 2.4 | `/programs/<slug>` for EACH program | Detail renders (curriculum, outcomes, FAQ); **view-source**: `og:image` is an **absolute** `https://…` URL, not `/assets/...`; Course JSON-LD present |
 | 2.5 | `/instructors` | All instructors render; bios say Dhaka (not Gulshan); Instagram links point to the real academy handle |
 | 2.6 | `/gallery` | Lightbox opens/closes (Esc), arrow keys navigate, focus is trapped while open |
 | 2.7 | `/student-life` | Renders, no dead links |
-| 2.8 | `/careers` | Renders |
+| 2.8 | `/careers` | Renders; **view-source**: JobPosting JSON-LD present (3 roles, hiringOrganization + jobLocation addresses) |
 | 2.9 | `/media` | Shows graceful "Coverage is coming soon" empty state (until you add stories to `src/data/media.ts`) |
-| 2.10 | `/contact` | Address/phone/hours correct; **live map embed** interactive (can pan/zoom — no overlay blocking clicks); "Convenient for students from…" lists areas; FAQs include the two location questions |
+| 2.10 | `/contact` | Address/phone/hours correct; **live map embed** interactive (can pan/zoom — no overlay blocking clicks); "Convenient for students from…" lists areas; FAQs include the two location questions; copy-to-clipboard rows show check + "Copied" for ~2s; success panel announces via `role="status"` |
 | 2.11 | `/privacy`, `/terms` | Render; no lorem ipsum |
 | 2.12 | `/enroll` (logged OUT) | Redirects to `/auth/signin?redirect=/enroll` — destination preserved after sign-in |
 | 2.13 | Any garbage URL e.g. `/xyz` | Branded "Page not found" with BACK TO HOME button |
-| 2.14 | Header (all pages) | Nav says **"Instructors"** (typo fixed); logo links home; Enroll Now button works; scroll hides/shows navbar |
-| 2.15 | Footer (all pages) | 5 social icons (IG/FB/YT/TikTok/X) with correct URLs; Press & Media link works; NAP block matches real data |
+| 2.14 | Header (all pages) | Nav says **"Instructors"** (typo fixed); logo links home; Enroll Now button works; scroll hides/shows navbar; mobile drawer: tapping a nav link closes the drawer while navigating; avatar menu trigger has an accessible name ("Account menu for …") |
+| 2.15 | Footer (all pages) | 5 social icons (IG/FB/YT/TikTok/X) with correct URLs; Press & Media link works; NAP block matches real data; **WhatsApp cohort-announcement capture**: submitting a number opens wa.me in a new tab |
+| 2.16 | Analytics hook | With `VITE_PLAUSIBLE_DOMAIN` unset: no analytics script in view-source. Set it → `plausible.io/js/script.js` tag with `data-domain` appears |
 
 ---
 
@@ -72,13 +76,15 @@ mobile layout at ~375px width.
 | 3.1 | Unique `<title>` + meta description per public page | View-source each page from §2 |
 | 3.2 | Canonical URLs correct | Blog page 2 → `…/blog?page=2`; junk `?page=` → canonical `/blog` |
 | 3.3 | OG tags absolute | All `og:image`/`og:url` start with `https://unicornbarberacademy.com` (or localhost origin in dev) |
-| 3.4 | JSON-LD validates | Paste blocks into https://validator.schema.org — LocalBusiness (footer), Course (program), FAQPage (home/contact/blog posts), BreadcrumbList, BlogPosting |
+| 3.4 | JSON-LD validates | Paste blocks into https://validator.schema.org — LocalBusiness (footer), Course (program), FAQPage (home/contact/blog posts), BreadcrumbList, BlogPosting, JobPosting (careers). All blocks are escaped via the shared `stringifyJsonLd()` helper — a post/FAQ title containing `</script>` must NOT break out of the tag |
 | 3.5 | Footer LocalBusiness block | `@type` array contains **LocalBusiness**; hasMap → Google Maps URL; areaServed lists 7 neighborhoods; contactPoint has en/bn |
 | 3.6 | `/robots.txt` | Allows `/`, disallows `/api/` and `/md/`, lists sitemap |
-| 3.7 | `/sitemap.xml` | Valid XML; **does NOT contain `/enroll`**; DOES contain `/media`; static routes have NO lastmod; blog posts have real lastmod dates |
-| 3.8 | `/feed.xml` | Valid RSS, published posts only, absolute URLs |
+| 3.7 | `/sitemap.xml` | Valid XML; **does NOT contain `/enroll`** or any `/verify/*`; DOES contain `/media`; static routes have NO lastmod; `/blog` and category entries carry **real lastmod dates from post timestamps** (not today's date); blog posts have real lastmod |
+| 3.8 | `/feed.xml` | Valid RSS, published posts only, absolute URLs. Every page's `<head>` also has RSS autodiscovery: `<link rel="alternate" type="application/rss+xml" href="/feed.xml">` |
 | 3.9 | `/llms.txt` | Contains real address/phone (Banasree), program list, md-mirror links |
 | 3.10 | Dashboard/auth routes are noindex | View-source any `/dashboard/*` page → `robots: noindex` |
+| 3.11 | `/verify/<anything>` ships `robots: noindex` | Arbitrary certificate codes must not be indexable (meta robots, not robots.txt — crawlers can still see the directive) |
+| 3.12 | og:image overrides | `/about` and `/contact` emit their own absolute og:image (page hero slot); other pages fall back to the default banner |
 
 ---
 
@@ -131,9 +137,10 @@ Sign in as ADMIN.
 | 5.3 | `/dashboard/enrollments/intakes` → create intake (future date, seats 12) | Appears in list; open-intake flag on |
 | 5.4 | Create duplicate (same program/cohort/date) | Blocked with friendly "identical intake" error |
 | 5.5 | Create with PAST date or invalid date (2026-02-30) | Rejected — future-date validation on CREATE |
-| 5.6 | PATCH intake: shrink seats below 0 / move live intake into past | Rejected ("below occupied", future-date rule on PATCH too) |
-| 5.7 | Delete unused intake | Works |
-| 5.8 | Delete intake WITH applications | Blocked ("has applications") |
+| 5.6 | PATCH intake: seats outside 1–200 / shrink below occupied / move live intake into past | Rejected ("Seats must be between 1 and 200", "below occupied", future-date rule on PATCH too) |
+| 5.7 | Delete unused intake | Works (no confirmation needed — nothing to lose) |
+| 5.8 | Delete intake WITH applications | **AlertDialog opens** warning about the application count; after confirming, server still blocks with "has applications" error |
+| 5.9 | Seats input: type an invalid value and blur (rejected by server) | After refetch, the input snaps back to the value actually in the DB — never keeps showing your rejected number |
 
 ---
 
@@ -162,8 +169,8 @@ Sign OUT of admin; sign in as the PLAIN USER.
 | 7.2 | Search box | Filters by name/email/phone/reference; `%` or `_` in search doesn't wildcard-match everything unexpectedly |
 | 7.3 | Create ≥ 21 applications (or temporarily lower perPage) then paginate | Prev/Next changes rows AND footer count — **page param actually fetches new data** (regression check) |
 | 7.4 | Status filter + search + page combined | Query string reflects all three; deep-linking the URL restores state |
-| 7.5 | Export CSV | Downloads; opens in Excel/LibreOffice; any cell starting with `=`,`+`,`-`,`@` was neutralized (leading `'`) |
-| 7.6 | Open application detail | All applicant data renders; decision-note textarea labeled |
+| 7.5 | Export CSV | Button reads **"Export page (CSV)"** — it exports only the current page; downloads fine, opens in Excel/LibreOffice; any cell starting with `=`,`+`,`-`,`@` was neutralized (leading `'`) |
+| 7.6 | Open application detail | All applicant data renders; decision-note textarea labeled. If another admin saves a note, your (untouched) textarea picks up their text on refetch; once you type, your draft is never overwritten |
 | 7.7 | Transition pending→reviewing→approved | Badges update; approval email in terminal; applicant role upgraded to `student` (verify via set-role script listing or DB) |
 | 7.8 | Mark fee paid → unpaid toggle | Badge flips both ways |
 | 7.9 | Mark **completed** | Status becomes Completed; NO email sent (silent transition) |
@@ -194,7 +201,7 @@ Sign in as the STUDENT (the one who graduated).
 ### Revocation round-trip (admin)
 | # | Step | Expected |
 |---|---|---|
-| 8.9 | Application detail → Revoke… | Badge flips to Revoked |
+| 8.9 | Application detail → Revoke… | **First click arms it** ("Click again to confirm revocation", red); second click revokes. Badge flips to Revoked. Restore stays a single click |
 | 8.10 | Reload `/verify/<code>` | Explicit **Revoked certificate** state (not "not found") |
 | 8.11 | Restore certificate | Back to Active; verify page shows Valid again |
 | 8.12 | Student's cert card | Badge mirrored Revoked/Valid |
@@ -208,13 +215,14 @@ Sign in as the STUDENT (the one who graduated).
 | 9.1 | `/dashboard/settings` | Three cards render: Profile, Password, Sessions |
 | 9.2 | Change display name → Save | Toast; header name updates after invalidation |
 | 9.3 | Blank name / unchanged name | Save disabled |
-| 9.4 | Upload avatar >2MB or `.gif` | Clear rejection message (2MB cap, JPEG/PNG/WebP only) |
-| 9.5 | Upload valid avatar (S3 configured) | Toast; header + settings avatar update everywhere |
+| 9.4 | Upload avatar >2MB | Clear rejection message (2MB cap) |
+| 9.4b | Upload a **text file renamed to .png** (fake extension) | Rejected 415 — the server sniffs magic bytes; declared Content-Type is never trusted |
+| 9.5 | Upload valid avatar (S3 configured) | Toast; header + settings avatar update everywhere; the **previous** avatar object is deleted from the bucket (no orphaned files accumulating) |
 | 9.5b | Same with NO S3 config | 503 message explains exactly which env vars are missing (graceful, not crash) |
 | 9.6 | Resend verification (on unverified account) | Terminal prints fresh verification link |
 | 9.7 | Change password (wrong current) | better-auth error surfaced |
 | 9.8 | Change password (correct) | Success; other sessions revoked |
-| 9.9 | Sessions card | Lists current device; signing out current session ends it; other-session revoke removes just that row |
+| 9.9 | Sessions card | Lists current device (shows "Loading sessions…" while fetching — never an ambiguous empty list); signing out current session ends it; other-session revoke removes just that row |
 
 ---
 
@@ -231,18 +239,19 @@ Sign in as the STUDENT (the one who graduated).
 | 10.7 | Unpublish/archive | Leaves public index; direct old URL handled gracefully |
 | 10.8 | Draft preview as ADMIN | Draft URL renders with `noindex` meta |
 | 10.9 | Draft URL as ANONYMOUS/student | Not found (no leak) |
-| 10.10 | Categories | Create/rename/delete; delete keeps posts (category becomes null) |
-| 10.11 | Category input & delete confirm | Input labeled; delete asks confirmation |
-| 10.12 | Markdown XSS attempt: post content with `<script>alert(1)</script>`, `[x](javascript:alert(1))`, `<a href="//evil.com" target="_blank">` | Nothing executes; external/protocol-relative anchors get `rel="noopener noreferrer nofollow"` |
+| 10.10 | Categories | Create/rename/delete; rename has Save + Cancel buttons and Escape cancels; delete opens an **AlertDialog** warning that the public `/blog/category/<slug>` URL stops resolving; delete keeps posts (category becomes null) |
+| 10.11 | Category input & slug conflict | Input labeled; renaming to a slug another category owns → friendly 409 "slug already in use", never a raw 500 |
+| 10.12 | Markdown XSS attempt: post content with `<script>alert(1)</script>`, `[x](javascript:alert(1))`, `<a href="//evil.com" target="_blank">` | Nothing executes; external/protocol-relative anchors get `rel="noopener noreferrer nofollow"`; `</script>` inside a title/FAQ must not break the JSON-LD `<script>` tag (see §3.4) |
+| 10.13 | Post delete (editor page) | Delete button opens an **AlertDialog** (no more "click again" timer); confirming navigates back to /dashboard/blog |
 
 ### Public blog
 | # | Step | Expected |
 |---|---|---|
-| 10.13 | `/blog` | Cards, categories sidebar, pagination |
-| 10.14 | `/blog?page=999` | **404** (not "coming soon") — regression check |
-| 10.15 | Category archive ≥3 posts | Lists; thin archive (<3) ships noindex + excluded from sitemap |
-| 10.16 | Post page | Reading time, TOC anchors jump, related posts, FAQ accordion, JSON-LD (BlogPosting/Breadcrumb/FAQ) |
-| 10.17 | `/md/blog/<slug>` | Raw markdown mirror; renamed slugs redirect here too |
+| 10.14 | `/blog` | Cards, categories sidebar, pagination; dates render via the shared date-fns helpers ("Mar 1, 2026" style) |
+| 10.15 | `/blog?page=999` | **404** (not "coming soon") — regression check |
+| 10.16 | Category archive ≥3 posts | Lists; thin archive (<3) ships noindex + excluded from sitemap |
+| 10.17 | Post page | Reading time, TOC anchors jump, related posts, **FAQ accordion (shadcn Accordion primitive — animated open/close)**, JSON-LD (BlogPosting/Breadcrumb/FAQ) |
+| 10.18 | `/md/blog/<slug>` | Raw markdown mirror; renamed slugs redirect here too |
 
 ---
 
@@ -267,7 +276,7 @@ Sign in as the STUDENT (the one who graduated).
 | 12.3 | Student-role session calls admin endpoints | 403 |
 | 12.4 | Spoofed `X-Forwarded-For: 1.2.3.4` on contact spam (direct, no proxy) | Rate-limit bucket keyed on nearest-proxy value — rotating fake XFF does NOT grant unlimited buckets |
 | 12.5 | Open-redirect: `/auth/signin?redirect=//evil.com` and `?\redirect=/\evil.com` | sanitized to safe internal path |
-| 12.6 | Upload wrong MIME / oversize to `/api/upload/avatar` | 400/413 |
+| 12.6 | Upload wrong MIME / oversize / **fake-extension text file** to `/api/upload/avatar` and `/api/admin/upload` | 400/413/415 — server sniffs magic bytes; a `.txt` renamed `.png` is rejected even though the declared type looks valid |
 | 12.7 | `/api/*` paths in robots | Disallowed (§3.6) |
 
 > Finding the server-fn endpoint id: watch Network tab while loading an admin
@@ -292,15 +301,16 @@ Repeat key pages at **375px**, **768px**, **1440px**:
 
 | # | Check |
 |---|
-| 14.1 | Mobile drawer (Sheet) opens/closes; tapping a link closes it |
+| 14.1 | Mobile drawer (Sheet) opens/closes; tapping a link closes it AND navigates |
 | 14.2 | Tables scroll horizontally inside their container, don't break layout |
-| 14.3 | Certificate print page usable on mobile (print dialog reachable) |
-| 14.4 | Keyboard-only pass: tab through header → hero → forms; visible focus rings everywhere |
-| 14.5 | Form errors announced (role="alert" present on enroll/contact/blog-admin errors) |
-| 14.6 | All images have alt text; decorative ones empty alt |
+| 14.3 | Certificate print page usable on mobile (print dialog reachable); WhatsApp float + sticky enroll bar are hidden in print output |
+| 14.4 | Keyboard-only pass: **"Skip to content" link appears on first Tab** and jumps past the header; visible focus rings everywhere |
+| 14.5 | Form errors announced (role="alert" present on enroll/contact/blog-admin errors); contact success panel announces via role="status" |
+| 14.6 | All images have alt text; decorative ones empty alt; blog-editor cover/alt inputs and markdown textarea are properly labeled |
 | 14.7 | Color contrast on gold-on-white buttons readable |
 | 14.8 | Gallery lightbox: Esc closes, arrows work, focus returns to thumbnail |
-| 14.9 | prefers-reduced-motion: animations minimized (hero reveals, carousel) |
+| 14.9 | prefers-reduced-motion: animations minimized (hero reveals, parallax, shimmer, marquee, count-up stats render final values instantly); **Lenis smooth scrolling is disabled entirely** |
+| 14.10 | Lenis smooth scroll: wheel scrolling feels smooth/inertial on marketing pages; native (no smoothing) inside `/dashboard` and `/auth` |
 
 ---
 
@@ -317,8 +327,8 @@ Repeat key pages at **375px**, **768px**, **1440px**:
 
 | # | Step | Expected |
 |---|---|---|
-| 16.1 | `bun run build` | Completes; `dist/` emitted |
-| 16.2 | `node dist/server/index.mjs` (with prod env vars) | Boots |
+| 16.1 | `bun run build` | Completes; `.output/` emitted (Nitro) |
+| 16.2 | Run the built server (with prod env vars) | Boots |
 | 16.3 | Hit `/`, `/blog`, sign-in, one admin page | All function; BETTER_AUTH_URL fail-fast triggers loudly if unset |
 | 16.4 | CI green | GitHub Actions runs typecheck + lint + tests |
 
@@ -331,3 +341,8 @@ Repeat key pages at **375px**, **768px**, **1440px**:
 - `/media` is empty until real press entries are added to `src/data/media.ts`.
 - All photos are `_placeholder.jpg` until real assets land in `src/assets/images/`.
 - Emails require `RESEND_API_KEY`; otherwise links print to the dev terminal.
+- No `aggregateRating` on the LocalBusiness JSON-LD — deliberately omitted until real Google review stats exist; do not fabricate.
+- Careers JobPosting `datePosted` is a placeholder (`2026-01-01`) — update when roles actually open/close.
+- Footer WhatsApp capture opens wa.me directly — no backend lead storage yet.
+- Analytics is a hook point only: nothing loads until `VITE_PLAUSIBLE_DOMAIN` is set.
+- Geo coordinates in `src/data/site.ts` need verification against the actual campus Google Maps pin.

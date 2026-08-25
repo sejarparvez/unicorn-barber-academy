@@ -11,6 +11,17 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -30,7 +41,6 @@ export function CategoriesPage() {
 	const [newName, setNewName] = useState("");
 	const [editingId, setEditingId] = useState<number | null>(null);
 	const [editValue, setEditValue] = useState("");
-	const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const busy =
 		createMutation.isPending ||
@@ -61,14 +71,9 @@ export function CategoriesPage() {
 
 	async function onDelete(id: number) {
 		if (busy) return;
-		if (confirmDeleteId !== id) {
-			setConfirmDeleteId(id);
-			return;
-		}
 		setError(null);
 		try {
 			await deleteMutation.mutateAsync(id);
-			setConfirmDeleteId(null);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Delete failed");
 		}
@@ -175,26 +180,45 @@ export function CategoriesPage() {
 									<span className="text-xs text-muted-foreground">
 										/{category.slug}
 									</span>
-									<Button
-										variant="ghost"
-										size="icon"
-										aria-label={
-											confirmDeleteId === category.id
-												? `Confirm delete ${category.name}`
-												: `Delete ${category.name}`
-										}
-										className={cn(
-											"text-muted-foreground hover:text-destructive",
-											confirmDeleteId === category.id &&
-												"bg-destructive/10 text-destructive",
-										)}
-										disabled={busy}
-										onClick={() => {
-											void onDelete(category.id);
-										}}
-									>
-										<IconTrash className="h-4 w-4" />
-									</Button>
+									<AlertDialog>
+										<AlertDialogTrigger
+											render={
+												<Button
+													variant="ghost"
+													size="icon"
+													aria-label={`Delete ${category.name}`}
+													className="text-muted-foreground hover:text-destructive"
+													disabled={busy}
+												/>
+											}
+										>
+											<IconTrash className="h-4 w-4" />
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>
+													Delete “{category.name}”?
+												</AlertDialogTitle>
+												<AlertDialogDescription>
+													Posts in this category stay — they just become
+													uncategorized. The public /blog/category/
+													{category.slug} URL will stop resolving.
+												</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>Cancel</AlertDialogCancel>
+												<AlertDialogAction
+													className="bg-destructive text-white hover:bg-destructive/90"
+													onClick={(event) => {
+														event.preventDefault();
+														void onDelete(category.id);
+													}}
+												>
+													Delete category
+												</AlertDialogAction>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
 								</>
 							)}
 						</li>

@@ -3,6 +3,7 @@
 // lib/api/contact.ts. Server responses are runtime-shaped by the API layer;
 // types here describe the happy path.
 import type { BlogCategory, BlogPostFull, BlogPostSummary } from "@/lib/blog";
+import { formatMediumDate } from "@/lib/date";
 import { http } from "./http";
 
 export type PostPayloadClient = {
@@ -130,11 +131,7 @@ export async function deleteCategory(id: number): Promise<void> {
 
 export function formatPostDate(iso: string | null): string {
 	if (!iso) return "—";
-	return new Date(iso).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-	});
+	return formatMediumDate(iso);
 }
 
 export type { BlogPostSummary };

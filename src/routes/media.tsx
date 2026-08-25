@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { MEDIA_FEATURES, MEDIA_TYPE_LABELS } from "@/data/media";
 import { CONTACT, SITE_URL } from "@/data/site";
+import { formatLongDate } from "@/lib/date";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/media")({
@@ -25,14 +26,6 @@ export const Route = createFileRoute("/media")({
 	}),
 	component: MediaPage,
 });
-
-function formatDate(value: string) {
-	return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
-}
 
 function MediaPage() {
 	const features = [...MEDIA_FEATURES].sort((a, b) =>
@@ -91,7 +84,7 @@ function MediaPage() {
 										{MEDIA_TYPE_LABELS[feature.type]}
 									</Badge>
 									<span className="text-xs text-muted-foreground">
-										{formatDate(feature.publishedOn)}
+										{formatLongDate(feature.publishedOn)}
 									</span>
 								</div>
 								<h2 className="mt-3 font-heading text-lg leading-snug font-semibold text-balance group-hover:text-primary">

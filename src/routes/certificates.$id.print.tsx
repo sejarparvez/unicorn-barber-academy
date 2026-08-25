@@ -6,6 +6,7 @@ import { IconPrinter } from "@tabler/icons-react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import logo from "@/assets/logo/logo.png";
 import { CONTACT } from "@/data/site";
+import { formatLongDate } from "@/lib/date";
 import { COHORT_LABELS } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
 import { getMyCertificateFn } from "@/server/certificate-fns";
@@ -42,14 +43,6 @@ export const Route = createFileRoute("/certificates/$id/print")({
 	}),
 	component: CertificatePrintPage,
 });
-
-function formatLongDate(value: string) {
-	return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
-}
 
 function CertificatePrintPage() {
 	const { certificate, qrDataUrl, verifyUrl } = Route.useLoaderData();

@@ -9,14 +9,6 @@ import type { MyApplication } from "@/lib/enrollment";
 import { APPLICATION_STATUS_LABELS, formatStartsOn } from "@/lib/enrollment";
 import { cn } from "@/lib/utils";
 
-function formatDateSafe(iso: string): string {
-	return new Date(iso).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-	});
-}
-
 const STATUS_BADGE: Record<MyApplication["status"], string> = {
 	pending: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
 	reviewing: "bg-blue-500/15 text-blue-700 dark:text-blue-400",
@@ -97,7 +89,7 @@ export function MyApplicationsCard({
 								{application.cohort === "day" ? "Day" : "Evening"} cohort ·
 								starts {formatStartsOn(application.startsOn)} ·{" "}
 								<span className="font-mono">{application.reference}</span> ·
-								applied {formatDateSafe(application.submittedAt)}
+								applied {formatStartsOn(application.submittedAt)}
 							</p>
 						</div>
 						{application.status === "approved" &&
