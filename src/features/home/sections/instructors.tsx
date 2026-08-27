@@ -3,7 +3,7 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import { SectionEyebrow } from "@/components/effects";
+import { Reveal, SectionEyebrow } from "@/components/effects";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Instructor } from "@/data/instructors";
@@ -111,8 +111,10 @@ export default function Instructors() {
 				</div>
 
 				<div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-					{INSTRUCTORS.map((instructor) => (
-						<InstructorCard key={instructor.name} instructor={instructor} />
+					{INSTRUCTORS.map((instructor, i) => (
+						<Reveal key={instructor.name} delay={i * 0.08}>
+							<InstructorCard instructor={instructor} />
+						</Reveal>
 					))}
 				</div>
 			</div>

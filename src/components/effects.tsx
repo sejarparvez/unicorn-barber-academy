@@ -1,5 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import {
+	motion,
+	useReducedMotion,
+	useScroll,
+	useSpring,
+	type Variants,
+} from "motion/react";
 import type { PropsWithChildren } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,6 +22,48 @@ const revealVariants: Variants = {
 		transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
 	},
 };
+
+/**
+ * Page-level entrance: fades/slides content in on mount and re-runs on
+ * route change (parent passes `key`). Deliberately subtle — a full
+ * AnimatePresence exit dance costs more than it earns on an SSR site.
+ */
+export function PageTransition({
+	children,
+	pageKey,
+}: PropsWithChildren<{ pageKey: string }>) {
+	const shouldReduceMotion = useReducedMotion();
+	if (shouldReduceMotion) return <>{children}</>;
+	return (
+		<motion.div
+			key={pageKey}
+			initial={{ opacity: 0, y: 10 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+		>
+			{children}
+		</motion.div>
+	);
+}
+
+/** Thin gold reading-progress bar pinned to the top of the viewport. */
+export function ScrollProgress() {
+	const shouldReduceMotion = useReducedMotion();
+	const { scrollYProgress } = useScroll();
+	const scaleX = useSpring(scrollYProgress, {
+		stiffness: 120,
+		damping: 28,
+		restDelta: 0.001,
+	});
+	if (shouldReduceMotion) return null;
+	return (
+		<motion.div
+			aria-hidden="true"
+			className="fixed inset-x-0 top-0 z-[60] h-0.5 origin-left bg-linear-to-r from-chart-1 via-primary to-chart-4"
+			style={{ scaleX }}
+		/>
+	);
+}
 
 export function Reveal({
 	children,
@@ -157,12 +205,17 @@ export function SectionEyebrow({
 	/** Render the title as a different element when a page <h1> leads the outline */
 	as?: "h2" | "p";
 }) {
+	const shouldReduceMotion = useReducedMotion();
 	const Title = as;
 	return (
 		<div className="flex items-center gap-4">
-			<span
-				className="h-6 w-px bg-linear-to-b from-chart-1 via-primary to-chart-4"
+			<motion.span
+				className="h-6 w-px origin-top bg-linear-to-b from-chart-1 via-primary to-chart-4"
 				aria-hidden="true"
+				initial={shouldReduceMotion ? {} : { scaleY: 0 }}
+				whileInView={{ scaleY: 1 }}
+				viewport={{ once: true, margin: "-60px" }}
+				transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
 			/>
 			<div>
 				<Title

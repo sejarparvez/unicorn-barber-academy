@@ -7,7 +7,7 @@ import {
 	IconUsers,
 } from "@tabler/icons-react";
 
-import { SectionEyebrow } from "@/components/effects";
+import { Reveal, SectionEyebrow } from "@/components/effects";
 
 const FEATURES = [
 	{
@@ -45,23 +45,22 @@ export default function WhyUnicorn() {
 			<div className="mx-auto max-w-7xl">
 				<SectionEyebrow guard="1" title="Why Unicorn" id="why-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-px overflow-hidden border border-border sm:grid-cols-2 lg:grid-cols-4">
-					{FEATURES.map((feature) => (
-						<div
-							key={feature.title}
-							className="bg-background p-8 transition-colors hover:bg-primary/5"
-						>
-							<feature.icon
-								className="h-7 w-7 text-primary"
-								stroke={1.5}
-								aria-hidden="true"
-							/>
-							<h3 className="mt-5 text-base font-semibold text-foreground">
-								{feature.title}
-							</h3>
-							<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-								{feature.description}
-							</p>
-						</div>
+					{FEATURES.map((feature, i) => (
+						<Reveal key={feature.title} delay={i * 0.08}>
+							<div className="h-full bg-background p-8 transition-colors hover:bg-primary/5">
+								<feature.icon
+									className="h-7 w-7 text-primary"
+									stroke={1.5}
+									aria-hidden="true"
+								/>
+								<h3 className="mt-5 text-base font-semibold text-foreground">
+									{feature.title}
+								</h3>
+								<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+									{feature.description}
+								</p>
+							</div>
+						</Reveal>
 					))}
 				</div>
 			</div>

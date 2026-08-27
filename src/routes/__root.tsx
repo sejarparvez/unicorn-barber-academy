@@ -9,6 +9,7 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { PageTransition, ScrollProgress } from "@/components/effects";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { StickyEnrollBar } from "@/components/layout/sticky-enroll-bar";
@@ -137,6 +138,12 @@ function RootError({ error }: { error: Error }) {
 
 function RootDocument() {
 	const { session } = Route.useLoaderData();
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const isMarketing =
+		!pathname.startsWith("/dashboard") &&
+		!pathname.startsWith("/auth") &&
+		!pathname.startsWith("/verify") &&
+		!pathname.includes("/print");
 	return (
 		<html lang="en">
 			<head>
@@ -150,6 +157,7 @@ function RootDocument() {
 				>
 					Skip to content
 				</a>
+				{isMarketing ? <ScrollProgress /> : null}
 				{/* Site chrome never prints — certificate pages rely on this. */}
 				<div className="print:hidden">
 					<Header session={session} />
@@ -157,7 +165,13 @@ function RootDocument() {
 				<div id="main-content" className=" min-h-screen">
 					<TooltipProvider>
 						<QueryProvider>
-							<Outlet />
+							{isMarketing ? (
+								<PageTransition pageKey={pathname}>
+									<Outlet />
+								</PageTransition>
+							) : (
+								<Outlet />
+							)}
 						</QueryProvider>
 					</TooltipProvider>
 				</div>

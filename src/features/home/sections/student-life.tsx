@@ -2,6 +2,7 @@
 
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
+import { Reveal } from "@/components/effects";
 import { pic } from "@/data/images";
 import { cn } from "@/lib/utils";
 
@@ -69,21 +70,23 @@ export default function StudentLife() {
 
 				<div className="mt-14 grid grid-cols-2 gap-3 lg:grid-cols-6">
 					{GALLERY_ITEMS.map((item, i) => (
-						<div
+						<Reveal
 							key={item.seed}
+							delay={(i % 6) * 0.05}
 							className={cn(
-								"group relative overflow-hidden",
 								i === 0 || i === 3 ? "col-span-2 row-span-2" : "col-span-1",
 							)}
 						>
-							<img
-								src={pic(item.seed, 700, 700)}
-								alt={item.alt}
-								loading="lazy"
-								className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-110"
-							/>
-							<div className="absolute inset-0 bg-primary/0 transition-colors duration-500 group-hover:bg-primary/10" />
-						</div>
+							<div className="group relative h-full overflow-hidden">
+								<img
+									src={pic(item.seed, 700, 700)}
+									alt={item.alt}
+									loading="lazy"
+									className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-110"
+								/>
+								<div className="absolute inset-0 bg-primary/0 transition-colors duration-500 group-hover:bg-primary/10" />
+							</div>
+						</Reveal>
 					))}
 				</div>
 			</div>

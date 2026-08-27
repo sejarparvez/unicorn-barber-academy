@@ -7,7 +7,7 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import { SectionEyebrow } from "@/components/effects";
+import { Reveal, SectionEyebrow } from "@/components/effects";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -139,9 +139,11 @@ function ProgramTrack({
 				aria-labelledby={trackId}
 				className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
 			>
-				{programs.map((program) => (
+				{programs.map((program, i) => (
 					<li key={program.title}>
-						<ProgramCard program={program} />
+						<Reveal delay={(i % 3) * 0.08}>
+							<ProgramCard program={program} />
+						</Reveal>
 					</li>
 				))}
 			</ul>
