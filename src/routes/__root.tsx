@@ -12,8 +12,6 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { PageTransition, ScrollProgress } from "@/components/effects";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { StickyEnrollBar } from "@/components/layout/sticky-enroll-bar";
-import { WhatsappFloat } from "@/components/layout/whatsapp-float";
 import { Analytics } from "@/components/providers/analytics";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
@@ -23,18 +21,6 @@ import { SITE_URL } from "@/data/site";
 import type { SessionPayload } from "@/lib/types";
 import { getSession } from "@/server/session";
 import appCss from "../styles.css?url";
-
-/** Marketing-pages-only mount: the mobile enroll bar stays off the
-    dashboard/auth surfaces where it would fight app chrome. */
-function StickyEnrollMaybe() {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const isMarketing =
-		!pathname.startsWith("/dashboard") &&
-		!pathname.startsWith("/auth") &&
-		!pathname.startsWith("/verify") &&
-		!pathname.includes("/print");
-	return isMarketing ? <StickyEnrollBar /> : null;
-}
 
 export const Route = createRootRoute({
 	// Fetched on every document load so <Header/> renders the correct
@@ -177,8 +163,6 @@ function RootDocument() {
 				</div>
 				<div className="print:hidden">
 					<Footer />
-					<WhatsappFloat />
-					<StickyEnrollMaybe />
 				</div>
 				<Analytics />
 				<SmoothScroll />
