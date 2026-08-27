@@ -6,7 +6,7 @@
 // renders content.
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import { FinalCta } from "@/components/effects";
+import { FinalCta, Reveal } from "@/components/effects";
 import { SITE_URL } from "@/data/site";
 import type { BlogCategory, BlogPostSummary, Paginated } from "@/lib/blog";
 import { stringifyJsonLd } from "@/lib/jsonld";
@@ -49,7 +49,7 @@ export function CategoryArchivePage({ category, posts, page }: Props) {
 				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
 			/>
 			<section className="relative overflow-hidden bg-background px-6 pt-28 pb-14 lg:px-10 lg:pt-36">
-				<div className="mx-auto max-w-2xl text-center">
+				<Reveal className="mx-auto max-w-2xl text-center">
 					<p className="font-mono text-[11px] tracking-[0.32em] text-primary">
 						THE JOURNAL
 					</p>
@@ -69,7 +69,7 @@ export function CategoryArchivePage({ category, posts, page }: Props) {
 							ARTICLES
 						</Link>
 					</p>
-				</div>
+				</Reveal>
 			</section>
 
 			<section className="bg-background px-6 pb-20 lg:px-10">

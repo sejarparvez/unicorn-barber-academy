@@ -14,7 +14,7 @@ import {
 	IconUser,
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import { FinalCta } from "@/components/effects";
+import { FinalCta, Reveal } from "@/components/effects";
 import {
 	Accordion,
 	AccordionContent,
@@ -144,7 +144,7 @@ export function PostDetailPage() {
 			<article className="bg-background">
 				{/* ----------------------------- Header ----------------------------- */}
 				<header className="border-b border-border px-6 pt-28 pb-12 lg:px-10 lg:pt-36">
-					<div className="mx-auto max-w-3xl">
+					<Reveal className="mx-auto max-w-3xl">
 						<nav
 							aria-label="Breadcrumb"
 							className="flex flex-wrap items-center gap-2 text-[11px] tracking-[0.22em] text-muted-foreground"
@@ -203,7 +203,7 @@ export function PostDetailPage() {
 								))}
 							</p>
 						) : null}
-					</div>
+					</Reveal>
 				</header>
 
 				{/* ----------------------------- Cover ------------------------------ */}

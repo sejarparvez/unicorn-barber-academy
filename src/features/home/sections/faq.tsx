@@ -1,6 +1,6 @@
 /* ------------------------------- FAQ ------------------------------- */
 
-import { SectionEyebrow } from "@/components/effects";
+import { Reveal, SectionEyebrow } from "@/components/effects";
 import {
 	Accordion,
 	AccordionContent,
@@ -58,18 +58,19 @@ export default function Faq() {
 
 				<Accordion className="mt-10">
 					{FAQS.map((item, i) => (
-						<AccordionItem
-							key={item.q}
-							value={`item-${i}`}
-							className="border-border py-1 first:border-t"
-						>
-							<AccordionTrigger className="py-4 text-base font-medium text-foreground hover:no-underline [&>svg]:text-primary">
-								{item.q}
-							</AccordionTrigger>
-							<AccordionContent className="text-sm leading-relaxed text-muted-foreground">
-								{item.a}
-							</AccordionContent>
-						</AccordionItem>
+						<Reveal key={item.q} delay={i * 0.05}>
+							<AccordionItem
+								value={`item-${i}`}
+								className="border-border py-1 first:border-t"
+							>
+								<AccordionTrigger className="py-4 text-base font-medium text-foreground hover:no-underline [&>svg]:text-primary">
+									{item.q}
+								</AccordionTrigger>
+								<AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+									{item.a}
+								</AccordionContent>
+							</AccordionItem>
+						</Reveal>
 					))}
 				</Accordion>
 			</div>

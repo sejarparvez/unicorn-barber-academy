@@ -2,7 +2,7 @@
 
 import { IconQuote } from "@tabler/icons-react";
 import { Image } from "@unpic/react";
-import { SectionEyebrow } from "@/components/effects";
+import { Reveal, SectionEyebrow } from "@/components/effects";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	Carousel,
@@ -130,12 +130,14 @@ export default function Testimonials() {
 					className="mt-14"
 				>
 					<CarouselContent className="-ml-6">
-						{TESTIMONIALS.map((testimonial) => (
+						{TESTIMONIALS.map((testimonial, i) => (
 							<CarouselItem
 								key={testimonial.name}
 								className="basis-full pl-6 sm:basis-1/2 lg:basis-1/3"
 							>
-								<TestimonialCard testimonial={testimonial} />
+								<Reveal delay={i * 0.1} className="h-full">
+									<TestimonialCard testimonial={testimonial} />
+								</Reveal>
 							</CarouselItem>
 						))}
 					</CarouselContent>

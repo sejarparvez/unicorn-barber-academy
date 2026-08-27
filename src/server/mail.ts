@@ -54,9 +54,16 @@ export async function sendMail({
 			}),
 		});
 		if (!res.ok) {
-			console.error(
-				`[mail] Resend rejected "${subject}" for ${to}: ${res.status} ${await res.text()}`,
-			);
+			const body = await res.text();
+			if (body.includes("testing emails to your own email address")) {
+				console.error(
+					`[mail] Resend is in TEST MODE: "${subject}" for ${to} was refused because the current sender ${fromAddress()} can only send to your own Resend account email. Verify a domain at resend.com/domains and set EMAIL_FROM="Academy <no-reply@yourdomain>" in .env to send to real users.`,
+				);
+			} else {
+				console.error(
+					`[mail] Resend rejected "${subject}" for ${to}: ${res.status} ${body}`,
+				);
+			}
 			return false;
 		}
 		return true;

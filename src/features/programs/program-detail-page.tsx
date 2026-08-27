@@ -217,14 +217,15 @@ export function ProgramDetailPage() {
 						title="Curriculum"
 						id="curriculum-heading"
 					/>
-					<ol className="relative mt-14">
+					<div className="relative mt-14">
 						<div
 							aria-hidden="true"
 							className="absolute top-2 bottom-2 left-3.75 w-px bg-border"
 						/>
 						{program.curriculum.map((module, i) => (
-							<li
+							<Reveal
 								key={module.title}
+								delay={i * 0.06}
 								className="relative flex gap-6 pb-10 last:pb-0"
 							>
 								<span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center border-2 border-primary bg-background font-heading text-xs text-primary">
@@ -241,70 +242,74 @@ export function ProgramDetailPage() {
 										{module.description}
 									</p>
 								</div>
-							</li>
+							</Reveal>
 						))}
-					</ol>
+					</div>
 				</div>
 			</section>
 
 			{/* ------------------------ Kit + Prerequisites ------------------------ */}
 			<section className="border-t border-border bg-muted/40 px-6 py-24 lg:px-10">
 				<div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-2">
-					<Card className="rounded-none border-border bg-background">
-						<CardContent className="p-8">
-							<IconPackage className="h-6 w-6 text-primary" stroke={1.5} />
-							<h3 className="mt-4 font-heading text-lg font-medium text-foreground">
-								What&rsquo;s Included
-							</h3>
-							<ul className="mt-4 space-y-2.5">
-								{program.kitIncludes.map((item) => (
-									<li
-										key={item}
-										className="flex items-start gap-2.5 text-sm text-muted-foreground"
-									>
-										<IconCheck
-											className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-											stroke={1.75}
-										/>
-										{item}
-									</li>
-								))}
-							</ul>
-						</CardContent>
-					</Card>
+					<Reveal>
+						<Card className="h-full rounded-none border-border bg-background">
+							<CardContent className="p-8">
+								<IconPackage className="h-6 w-6 text-primary" stroke={1.5} />
+								<h3 className="mt-4 font-heading text-lg font-medium text-foreground">
+									What&rsquo;s Included
+								</h3>
+								<ul className="mt-4 space-y-2.5">
+									{program.kitIncludes.map((item) => (
+										<li
+											key={item}
+											className="flex items-start gap-2.5 text-sm text-muted-foreground"
+										>
+											<IconCheck
+												className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+												stroke={1.75}
+											/>
+											{item}
+										</li>
+									))}
+								</ul>
+							</CardContent>
+						</Card>
+					</Reveal>
 
-					<Card className="rounded-none border-border bg-background">
-						<CardContent className="p-8">
-							<IconClipboardCheck
-								className="h-6 w-6 text-primary"
-								stroke={1.5}
-							/>
-							<h3 className="mt-4 font-heading text-lg font-medium text-foreground">
-								Prerequisites
-							</h3>
-							<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-								{program.prerequisites}
-							</p>
+					<Reveal delay={0.08}>
+						<Card className="h-full rounded-none border-border bg-background">
+							<CardContent className="p-8">
+								<IconClipboardCheck
+									className="h-6 w-6 text-primary"
+									stroke={1.5}
+								/>
+								<h3 className="mt-4 font-heading text-lg font-medium text-foreground">
+									Prerequisites
+								</h3>
+								<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+									{program.prerequisites}
+								</p>
 
-							<h3 className="mt-8 font-heading text-lg font-medium text-foreground">
-								Where Graduates Go
-							</h3>
-							<ul className="mt-4 space-y-2.5">
-								{program.outcomes.map((item) => (
-									<li
-										key={item}
-										className="flex items-start gap-2.5 text-sm text-muted-foreground"
-									>
-										<IconCheck
-											className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-											stroke={1.75}
-										/>
-										{item}
-									</li>
-								))}
-							</ul>
-						</CardContent>
-					</Card>
+								<h3 className="mt-8 font-heading text-lg font-medium text-foreground">
+									Where Graduates Go
+								</h3>
+								<ul className="mt-4 space-y-2.5">
+									{program.outcomes.map((item) => (
+										<li
+											key={item}
+											className="flex items-start gap-2.5 text-sm text-muted-foreground"
+										>
+											<IconCheck
+												className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+												stroke={1.75}
+											/>
+											{item}
+										</li>
+									))}
+								</ul>
+							</CardContent>
+						</Card>
+					</Reveal>
 				</div>
 			</section>
 
