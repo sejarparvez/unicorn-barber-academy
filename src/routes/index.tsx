@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
 import { buttonVariants } from "@/components/ui/button";
 import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
+import Brand from "@/features/home/sections/brand";
 import CraftMarquee from "@/features/home/sections/craft-marquee";
 import Faq from "@/features/home/sections/faq";
 import Hero from "@/features/home/sections/hero";
@@ -46,6 +47,7 @@ function Home() {
 			<Hero />
 			<CraftMarquee />
 			<WhyUnicorn />
+			<Brand />
 			<Stats />
 			<Programs />
 			<StudentLife />
@@ -71,7 +73,7 @@ function VisitUs() {
 			aria-labelledby="visit-heading"
 		>
 			<div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
-				<div className="flex flex-col justify-center px-6 py-24 lg:px-10">
+				<div className="flex flex-col justify-center px-4 py-24 lg:px-10">
 					<SectionEyebrow
 						guard="7"
 						title="Visit the Academy"

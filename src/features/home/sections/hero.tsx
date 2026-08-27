@@ -22,54 +22,6 @@ import { cn } from "@/lib/utils";
 const gradientText =
 	"bg-linear-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-transparent";
 
-const GUARD_MARKS = [
-	{ label: "#4", hint: "13mm" },
-	{ label: "#3", hint: "10mm" },
-	{ label: "#2", hint: "6mm" },
-	{ label: "#1", hint: "3mm" },
-	{ label: "#0", hint: "skin" },
-];
-
-function GuardGauge() {
-	const shouldReduceMotion = useReducedMotion();
-	return (
-		<div className="relative flex h-full max-h-[70vh] flex-col items-center justify-center gap-0">
-			<span className="mb-4 h-10 w-px bg-linear-to-b from-transparent to-primary/60" />
-			{GUARD_MARKS.map((mark, i) => (
-				<motion.div
-					key={mark.label}
-					className="flex items-center gap-2 py-5"
-					initial={shouldReduceMotion ? {} : { opacity: 0, x: -8 }}
-					whileInView={{ opacity: 1, x: 0 }}
-					viewport={{ once: true }}
-					transition={{ delay: 0.3 + i * 0.12, duration: 0.5 }}
-				>
-					<span className="font-heading text-sm text-primary/90 italic">
-						{mark.label}
-					</span>
-					<span className="h-px w-5 bg-primary/50" />
-					<span className="font-mono text-[9px] tracking-widest text-muted-foreground">
-						{mark.hint.toUpperCase()}
-					</span>
-				</motion.div>
-			))}
-			<span className="mt-4 h-10 w-px bg-linear-to-t from-transparent to-primary/60" />
-			{/* Clipper silhouette */}
-			<svg
-				viewBox="0 0 24 24"
-				className="absolute right-[-14px] bottom-16 h-5 w-5 text-primary/40"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="1.5"
-				aria-hidden="true"
-			>
-				<path d="M6 3h12v7l-2 2v9H8v-9L6 10V3z" />
-				<path d="M8 3v7M12 3v7M16 3v7" />
-			</svg>
-		</div>
-	);
-}
-
 export default function Hero() {
 	const sectionRef = useRef<HTMLElement>(null);
 	const shouldReduceMotion = useReducedMotion();
@@ -162,9 +114,7 @@ export default function Hero() {
 				<div
 					aria-hidden="true"
 					className="relative hidden w-14 shrink-0 lg:flex lg:flex-col lg:items-center lg:justify-center"
-				>
-					<GuardGauge />
-				</div>
+				></div>
 
 				{/* Photo column — gentle parallax on scroll */}
 				<div className="relative h-[46vh] overflow-hidden sm:h-[56vh] lg:h-[88vh]">

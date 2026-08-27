@@ -107,7 +107,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 export default function Testimonials() {
 	return (
 		<section
-			className="border-t border-primary/15  px-6 py-24 lg:px-10"
+			className="border-t border-primary/15  px-4 py-24 lg:px-10"
 			aria-labelledby="testimonials-heading"
 		>
 			<script

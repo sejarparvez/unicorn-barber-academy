@@ -7,6 +7,7 @@ import {
 	type Variants,
 } from "motion/react";
 import type { PropsWithChildren } from "react";
+import banner from "@/assets/logo/banner.png";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -305,15 +306,22 @@ export function FinalCta({
 	const shouldReduceMotion = useReducedMotion();
 
 	return (
-		<section className="relative overflow-hidden border-t border-primary/15 px-6 py-28 text-center lg:px-10">
+		<section className="relative overflow-hidden border-t border-primary/15 px-4 py-28 text-center lg:px-10">
 			<Grain />
 			<motion.div
 				aria-hidden="true"
-				className="pointer-events-none absolute left-1/2 top-1/2 h-140 w-140 -translate-x-1/2 -translate-y-1/2 text-primary opacity-[0.05]"
+				className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-auto -translate-x-1/2 -translate-y-1/2"
 				animate={shouldReduceMotion ? {} : { rotate: 360 }}
 				transition={{ duration: 90, ease: "linear", repeat: Infinity }}
 			>
-				<GuildSeal className="h-full w-full" />
+				<img
+					src={banner}
+					alt=""
+					className="h-full w-auto opacity-[0.04]"
+					width={1698}
+					height={365}
+					loading="lazy"
+				/>
 			</motion.div>
 			<Reveal className="relative mx-auto max-w-2xl">
 				<h2 className="font-heading text-4xl font-medium sm:text-5xl">

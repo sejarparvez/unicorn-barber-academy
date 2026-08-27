@@ -52,7 +52,7 @@ export default function Stats() {
 					<div
 						key={stat.label}
 						className={cn(
-							"flex flex-col items-center gap-2 border-primary/15 px-6 py-12 text-center",
+							"flex flex-col items-center gap-2 border-primary/15 px-4 py-12 text-center",
 							i % 2 === 0 ? "border-r" : "",
 							i < 2 ? "border-b lg:border-b-0" : "",
 							i > 0 && "lg:border-l",

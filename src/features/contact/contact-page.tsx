@@ -34,8 +34,8 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -257,17 +257,17 @@ function ContactForm() {
 										className="space-y-6"
 									>
 										<div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-											<div className="space-y-2">
-												<Label htmlFor="name">Full name</Label>
+											<Field>
+												<FieldLabel htmlFor="name">Full name</FieldLabel>
 												<Input
 													id="name"
 													name="name"
 													placeholder="Your name"
 													required
 												/>
-											</div>
-											<div className="space-y-2">
-												<Label htmlFor="email">Email</Label>
+											</Field>
+											<Field>
+												<FieldLabel htmlFor="email">Email</FieldLabel>
 												<Input
 													id="email"
 													name="email"
@@ -275,23 +275,28 @@ function ContactForm() {
 													placeholder="you@example.com"
 													required
 												/>
-											</div>
+											</Field>
 										</div>
 
 										<div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-											<div className="space-y-2">
-												<Label htmlFor="phone">Phone (optional)</Label>
+											<Field>
+												<FieldLabel htmlFor="phone">
+													Phone{" "}
+													<span className="text-muted-foreground">
+														(optional)
+													</span>
+												</FieldLabel>
 												<Input
 													id="phone"
 													name="phone"
 													type="tel"
 													placeholder="+880"
 												/>
-											</div>
-											<div className="space-y-2">
-												<Label htmlFor="subject">
+											</Field>
+											<Field>
+												<FieldLabel htmlFor="subject">
 													What&rsquo;s this about?
-												</Label>
+												</FieldLabel>
 												<Select name="subject" defaultValue="student">
 													<SelectTrigger id="subject">
 														<SelectValue placeholder="Select one" />
@@ -304,16 +309,17 @@ function ContactForm() {
 														))}
 													</SelectContent>
 												</Select>
-											</div>
+											</Field>
 										</div>
 
-										<div className="space-y-2">
-											<Label htmlFor="program">
-												Program you&rsquo;re interested in{" "}
-												<span className="text-muted-foreground">
-													(if applicable)
-												</span>
-											</Label>
+										<Field>
+											<FieldLabel htmlFor="program">
+												Program you&rsquo;re interested in
+											</FieldLabel>
+											<FieldDescription className="mb-2">
+												Optional — leave as &ldquo;Not applicable&rdquo; if
+												you&rsquo;re just asking a question.
+											</FieldDescription>
 											<Select name="program" defaultValue="not-applicable">
 												<SelectTrigger id="program">
 													<SelectValue placeholder="Not applicable" />
@@ -329,10 +335,10 @@ function ContactForm() {
 													</SelectItem>
 												</SelectContent>
 											</Select>
-										</div>
+										</Field>
 
-										<div className="space-y-2">
-											<Label htmlFor="message">Your message</Label>
+										<Field>
+											<FieldLabel htmlFor="message">Your message</FieldLabel>
 											<Textarea
 												id="message"
 												name="message"
@@ -340,7 +346,7 @@ function ContactForm() {
 												placeholder="Type your message here…"
 												required
 											/>
-										</div>
+										</Field>
 
 										{submitMessage.isError ? (
 											<div

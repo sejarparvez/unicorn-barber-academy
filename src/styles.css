@@ -189,6 +189,15 @@
   }
 }
 
+/* Ensure select trigger text is always legible — overrides muted-foreground
+   on the placeholder state and any inherited gold tint from parents. */
+[data-slot="select-trigger"] {
+  color: var(--color-foreground);
+}
+[data-slot="select-trigger"][data-placeholder] [data-slot="select-value"] {
+  color: var(--color-muted-foreground);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .text-shimmer,
   .animate-marquee,

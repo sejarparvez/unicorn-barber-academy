@@ -36,7 +36,7 @@ const GALLERY_ITEMS = [
 export default function StudentLife() {
 	return (
 		<section
-			className="border-t border-primary/15  px-6 py-24  lg:px-10"
+			className="border-t border-primary/15  px-4 py-24  lg:px-10"
 			aria-labelledby="academy-heading"
 		>
 			<div className="mx-auto max-w-7xl">

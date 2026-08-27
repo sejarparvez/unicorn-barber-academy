@@ -137,28 +137,17 @@ export default function Footer() {
 			/>
 
 			{/* Faint watermark crest for texture */}
-			<svg
-				viewBox="0 0 400 400"
+			<Image
+				src={logo}
+				alt=""
 				aria-hidden="true"
-				className="pointer-events-none absolute -right-16 -bottom-24 h-105 w-105 opacity-[0.04]"
-			>
-				<path
-					d="M200 40 L240 190 L200 360 L160 190 Z"
-					fill="none"
-					stroke="#D4AF37"
-					strokeWidth="3"
-				/>
-				<circle
-					cx="200"
-					cy="200"
-					r="180"
-					fill="none"
-					stroke="#D4AF37"
-					strokeWidth="2"
-				/>
-			</svg>
+				className="pointer-events-none absolute -right-12 -bottom-16 h-auto w-64 opacity-[0.04]"
+				width={400}
+				height={400}
+				loading="lazy"
+			/>
 
-			<div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-10">
+			<div className="relative mx-auto max-w-7xl px-4 py-16 lg:px-10">
 				<div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.3fr_1px_1fr_1px_1fr_1px_1fr]">
 					{/* Brand column */}
 					<div>

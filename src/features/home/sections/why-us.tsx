@@ -39,7 +39,7 @@ const FEATURES = [
 export default function WhyUnicorn() {
 	return (
 		<section
-			className="section-light bg-background px-6 py-24 lg:px-10"
+			className="section-light bg-background px-4 py-24 lg:px-10"
 			aria-labelledby="why-heading"
 		>
 			<div className="mx-auto max-w-7xl">
