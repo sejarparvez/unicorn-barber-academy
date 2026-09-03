@@ -144,7 +144,11 @@ export async function uploadImage(options: {
 	const timestamp = Math.floor(Date.now() / 1000);
 
 	const form = new FormData();
-	form.append("file", new Blob([options.buffer]), `${publicId}.${ext}`);
+	form.append(
+		"file",
+		new Blob([new Uint8Array(options.buffer)]),
+		`${publicId}.${ext}`,
+	);
 	form.append("folder", folder);
 	form.append("public_id", `${yyyymm}/${safeName}-${rand}`);
 	form.append("api_key", apiKey);
