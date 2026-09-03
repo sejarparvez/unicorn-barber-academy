@@ -9,7 +9,7 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { PageTransition, ScrollProgress } from "@/components/effects";
+import { ScrollProgress } from "@/components/effects";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { Analytics } from "@/components/providers/analytics";
@@ -151,13 +151,7 @@ function RootDocument() {
 				<div id="main-content" className=" min-h-screen">
 					<TooltipProvider>
 						<QueryProvider>
-							{isMarketing ? (
-								<PageTransition pageKey={pathname}>
-									<Outlet />
-								</PageTransition>
-							) : (
-								<Outlet />
-							)}
+							<Outlet />
 						</QueryProvider>
 					</TooltipProvider>
 				</div>

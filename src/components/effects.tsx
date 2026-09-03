@@ -24,29 +24,6 @@ const revealVariants: Variants = {
 	},
 };
 
-/**
- * Page-level entrance: fades/slides content in on mount and re-runs on
- * route change (parent passes `key`). Deliberately subtle — a full
- * AnimatePresence exit dance costs more than it earns on an SSR site.
- */
-export function PageTransition({
-	children,
-	pageKey,
-}: PropsWithChildren<{ pageKey: string }>) {
-	const shouldReduceMotion = useReducedMotion();
-	if (shouldReduceMotion) return <>{children}</>;
-	return (
-		<motion.div
-			key={pageKey}
-			initial={{ opacity: 0, y: 10 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-		>
-			{children}
-		</motion.div>
-	);
-}
-
 /** Thin gold reading-progress bar pinned to the top of the viewport. */
 export function ScrollProgress() {
 	const shouldReduceMotion = useReducedMotion();
