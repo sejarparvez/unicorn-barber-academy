@@ -30,7 +30,7 @@ export const Route = createFileRoute("/api/upload/avatar")({
 				if (!session || !parseRole(session.user.role as string)) {
 					return json({ message: "Sign in required" }, { status: 401 });
 				}
-				// S3 writes are not free — throttle per account.
+				// Cloudinary writes are not free — throttle per account.
 				if (overRateLimit(`avatar:${session.user.id}`, 10, 60_000)) {
 					return json(
 						{ message: "Too many uploads. Please wait a minute." },

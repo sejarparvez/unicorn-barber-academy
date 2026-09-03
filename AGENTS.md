@@ -7,7 +7,7 @@ Guidance for AI coding assistants working in this repository.
 Marketing and enrollment website for **Unicorn Barber Training Academy** (Dhaka).
 Public pages (programs, instructors, gallery, blog), a student enrollment flow,
 and an authenticated dashboard: enrollment application management and a blog CMS
-with S3-compatible image uploads.
+with Cloudinary image uploads.
 
 ## Tech Stack
 
@@ -50,7 +50,7 @@ bun run db:status        # migration status
 1. Copy `.env.example` to `.env` and fill in real values.
 2. PostgreSQL 17+ is required (`DATABASE_URL`).
 3. Without `RESEND_API_KEY`, email links print to the server console instead of sending.
-4. Without `S3_*` variables, blog image uploads are disabled with a clear message.
+4. Without `CLOUDINARY_*` variables, blog/avatar image uploads are disabled with a clear message.
 5. Grant roles from repo root: `bun scripts/set-role.ts user@example.com admin`.
 
 ## Architecture

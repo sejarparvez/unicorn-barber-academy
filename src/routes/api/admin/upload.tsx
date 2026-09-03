@@ -1,8 +1,8 @@
 // routes/api/admin/upload.tsx
 // Image upload for the blog editor (covers + in-article images).
-// Admin-session guarded; streams multipart/form-data to S3-compatible object
-// storage. Until S3_* env vars are configured this returns a descriptive 503
-// instead of failing mysteriously (scaffold mode — see src/server/storage.ts).
+// Admin-session guarded; streams multipart/form-data to Cloudinary. Until
+// CLOUDINARY_* env vars are configured this returns a descriptive 503 instead
+// of failing mysteriously (see src/server/storage.ts).
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";

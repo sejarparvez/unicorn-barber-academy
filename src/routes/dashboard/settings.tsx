@@ -1,5 +1,5 @@
 // routes/dashboard/settings.tsx
-// Profile & account settings: display name, avatar (S3-backed), email
+// Profile & account settings: display name, avatar (Cloudinary-backed), email
 // verification, password change, and active session management — all via
 // better-auth's client APIs.
 import { IconDeviceLaptop, IconLogout, IconTrash } from "@tabler/icons-react";
