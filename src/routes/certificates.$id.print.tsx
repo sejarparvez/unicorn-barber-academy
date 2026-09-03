@@ -9,7 +9,10 @@ import { CONTACT } from "@/data/site";
 import { formatLongDate } from "@/lib/date";
 import { COHORT_LABELS } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
-import { getMyCertificateFn } from "@/server/certificate-fns";
+import {
+	generateCertificateQrFn,
+	getMyCertificateFn,
+} from "@/server/certificate-fns";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/certificates/$id/print")({
@@ -26,12 +29,9 @@ export const Route = createFileRoute("/certificates/$id/print")({
 			: null;
 		if (!certificate) throw notFound();
 
-		const { default: QRCode } = await import("qrcode");
 		const verifyUrl = `${APP_ORIGIN}/verify/${certificate.code}`;
-		const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
-			margin: 1,
-			width: 240,
-			color: { dark: "#1c1c1a", light: "#ffffff" },
+		const { dataUrl: qrDataUrl } = await generateCertificateQrFn({
+			data: { url: verifyUrl },
 		});
 		return { certificate, qrDataUrl, verifyUrl };
 	},

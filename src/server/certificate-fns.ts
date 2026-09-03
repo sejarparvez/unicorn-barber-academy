@@ -2,6 +2,8 @@
 // Server-function wrappers around certificate-db. The student list and the
 // print-page fetch are session/ownership scoped; the verify lookup is public
 // and projects only what a verifier is allowed to see (never email/phone).
+// QR generation lives here too so the Node-only `qrcode` package never
+// reaches the client bundle.
 import { createServerFn } from "@tanstack/react-start";
 import type { CertificateRecord, VerifyResult } from "@/lib/certificates";
 import {
@@ -13,6 +15,22 @@ import {
 import { clampId, runSafe } from "@/server/fn-utils";
 import { requireAdminSession } from "@/server/guards";
 import { getSession } from "@/server/session";
+
+/**
+ * Generate a QR code data URL pointing at a public verify URL.
+ * `qrcode` (Node-only) stays on the server via this server function.
+ */
+export const generateCertificateQrFn = createServerFn({ method: "GET" })
+	.validator((input: { url: string }) => input)
+	.handler(async ({ data }): Promise<{ dataUrl: string }> => {
+		const { default: QRCode } = await import("qrcode");
+		const dataUrl = await QRCode.toDataURL(data.url, {
+			margin: 1,
+			width: 240,
+			color: { dark: "#1c1c1a", light: "#ffffff" },
+		});
+		return { dataUrl };
+	});
 
 export const listMyCertificatesFn = createServerFn({
 	method: "GET",

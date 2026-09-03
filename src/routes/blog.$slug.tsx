@@ -6,12 +6,13 @@
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { PostDetailPage, PostNotFound } from "@/features/blog/post-detail-page";
-import { renderMarkdown } from "@/lib/markdown";
-import { getPostForPublicFn, getRelatedPostsFn } from "@/server/blog-fns";
+import { getPostForPublicHtmlFn } from "@/server/blog-fns";
 
 export const Route = createFileRoute("/blog/$slug")({
 	loader: async ({ params }) => {
-		const result = await getPostForPublicFn({ data: { slug: params.slug } });
+		const result = await getPostForPublicHtmlFn({
+			data: { slug: params.slug },
+		});
 
 		if (result.kind === "redirect") {
 			// Renamed slug: permanent redirect preserves accumulated rankings.
@@ -24,19 +25,10 @@ export const Route = createFileRoute("/blog/$slug")({
 		}
 		if (result.kind === "missing") throw notFound();
 
-		const relatedPosts = await getRelatedPostsFn({
-			data: {
-				postId: result.post.id,
-				categoryId: result.post.category?.id ?? null,
-				tags: result.post.tags,
-			},
-		});
-
-		const { contentMd, ...post } = result.post;
 		return {
-			post: { ...post, html: renderMarkdown(contentMd) },
+			post: result.post,
 			isPreview: result.isPreview,
-			relatedPosts,
+			relatedPosts: result.relatedPosts,
 		};
 	},
 	head: ({ loaderData }) => {

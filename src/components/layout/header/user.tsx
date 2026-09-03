@@ -41,6 +41,7 @@ export default function UserDropDown({
 		<div className="flex items-center gap-2">
 			<DropdownMenu>
 				<DropdownMenuTrigger
+					nativeButton={false}
 					render={
 						<Avatar
 							aria-label={`Account menu for ${session.user.name || "user"}`}
@@ -58,33 +59,35 @@ export default function UserDropDown({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className="w-64" align="end" sideOffset={8}>
 					{/* User Info Header */}
-					<DropdownMenuLabel className="font-normal pb-3">
-						<div className="flex items-center gap-3">
-							<Avatar className="h-10 w-10 border-2 border-primary/20">
-								<AvatarImage
-									src={session.user.image ?? undefined}
-									alt={session.user.name || "User avatar"}
-								/>
-								<AvatarFallback className="bg-primary/10 text-primary font-semibold">
-									{getInitials(session.user.name)}
-								</AvatarFallback>
-							</Avatar>
-							<div className="flex flex-col space-y-1 flex-1 min-w-0">
-								<p className="text-sm font-semibold leading-none truncate">
-									{session.user.name}
-								</p>
-								<p className="text-xs text-muted-foreground leading-none truncate flex items-center gap-1.5">
-									<span className="truncate">{session.user.email}</span>
-									{session.user.emailVerified && (
-										<span
-											title="Email verified"
-											className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
-										/>
-									)}
-								</p>
+					<DropdownMenuGroup>
+						<DropdownMenuLabel className="font-normal pb-3">
+							<div className="flex items-center gap-3">
+								<Avatar className="h-10 w-10 border-2 border-primary/20">
+									<AvatarImage
+										src={session.user.image ?? undefined}
+										alt={session.user.name || "User avatar"}
+									/>
+									<AvatarFallback className="bg-primary/10 text-primary font-semibold">
+										{getInitials(session.user.name)}
+									</AvatarFallback>
+								</Avatar>
+								<div className="flex flex-col space-y-1 flex-1 min-w-0">
+									<p className="text-sm font-semibold leading-none truncate">
+										{session.user.name}
+									</p>
+									<p className="text-xs text-muted-foreground leading-none truncate flex items-center gap-1.5">
+										<span className="truncate">{session.user.email}</span>
+										{session.user.emailVerified && (
+											<span
+												title="Email verified"
+												className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
+											/>
+										)}
+									</p>
+								</div>
 							</div>
-						</div>
-					</DropdownMenuLabel>
+						</DropdownMenuLabel>
+					</DropdownMenuGroup>
 
 					<DropdownMenuSeparator />
 

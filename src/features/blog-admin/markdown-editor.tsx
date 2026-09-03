@@ -1,7 +1,9 @@
 // src/features/blog-admin/markdown-editor.tsx
 // Split-pane markdown editor with a small formatting toolbar and live
-// preview rendered by the SAME renderer the public article page uses
-// (lib/markdown), so previews can never drift from production output.
+// preview rendered through the same parse/heading pipeline as the public
+// article page (lib/markdown) so previews can never drift from production
+// output. The preview uses the client-safe marked-only renderer; sanitization
+// happens server-side on publish.
 //
 // The image button uploads through /api/admin/upload and inserts standard
 // markdown — stored content stays portable plain text.
@@ -21,7 +23,7 @@ import {
 } from "@tabler/icons-react";
 import { useId, useRef, useState } from "react";
 import { uploadImage } from "@/lib/api/blog-admin";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderMarkdownPreview } from "@/lib/preview-markdown";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -195,13 +197,15 @@ export function MarkdownEditor({
 			) : null}
 
 			{previewing ? (
-				// Preview uses the exact server-side renderer (marked + sanitize-html),
-				// so the HTML is already stripped of anything dangerous.
+				// Preview uses the same parse/heading pipeline as the server
+				// renderer (see lib/markdown) so it matches production output.
+				// It is NOT sanitized client-side — sanitization happens on the
+				// server when content is published, and this is a draft preview.
 				<div
 					className="prose prose-sm dark:prose-invert min-h-[420px] max-w-none px-4 py-4"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: content passes through sanitize-html
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: draft preview for the admin editor only
 					dangerouslySetInnerHTML={{
-						__html: renderMarkdown(value || "*Nothing to preview yet.*"),
+						__html: renderMarkdownPreview(value || "*Nothing to preview yet.*"),
 					}}
 				/>
 			) : (

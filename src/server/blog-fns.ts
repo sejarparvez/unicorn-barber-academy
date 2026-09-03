@@ -16,6 +16,7 @@ import type {
 	Paginated,
 } from "@/lib/blog";
 import { parseBlogStatus } from "@/lib/blog";
+import { renderMarkdown } from "@/lib/markdown";
 import {
 	getAnyBySlug,
 	getCategoryBySlug,
@@ -102,6 +103,46 @@ export const getPostForPublicFn = createServerFn({ method: "GET" })
 				return { kind: "missing" };
 			}),
 	);
+
+/**
+ * Public post fetch that ALSO renders markdown to sanitized HTML on the
+ * server. Kept separate from getPostForPublicFn because the sanitizing
+ * renderer (lib/markdown) is Node-only and must never be imported by a
+ * client-bundled route file.
+ */
+export type PublicPostHtml =
+	| {
+			kind: "post";
+			post: Omit<BlogPostFull, "contentMd"> & { html: string };
+			isPreview: boolean;
+			relatedPosts: BlogPostSummary[];
+	  }
+	| { kind: "redirect"; toSlug: string }
+	| { kind: "missing" };
+
+export const getPostForPublicHtmlFn = createServerFn({ method: "GET" })
+	.validator((input: { slug: string }) => input)
+	.handler(async ({ data }): Promise<PublicPostHtml> => {
+		const result = await getPostForPublicFn({ data: { slug: data.slug } });
+
+		if (result.kind !== "post") return result;
+
+		const relatedPosts = await getRelatedPostsFn({
+			data: {
+				postId: result.post.id,
+				categoryId: result.post.category?.id ?? null,
+				tags: result.post.tags,
+			},
+		});
+
+		const { contentMd, ...post } = result.post;
+		return {
+			kind: "post",
+			post: { ...post, html: renderMarkdown(contentMd) },
+			isPreview: result.isPreview,
+			relatedPosts,
+		};
+	});
 
 /** Post-to-post internal linking for the detail page. */
 export const getRelatedPostsFn = createServerFn({ method: "GET" })

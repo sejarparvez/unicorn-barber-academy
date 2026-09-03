@@ -77,7 +77,7 @@ export const Route = createFileRoute("/api/admin/upload")({
 						return json(
 							{
 								message:
-									"Uploads are not configured yet — set the S3_* variables in .env.",
+									"Uploads are not configured — set the CLOUDINARY_* variables in .env.",
 							},
 							{ status: 503 },
 						);

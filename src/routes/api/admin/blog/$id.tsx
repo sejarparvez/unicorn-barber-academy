@@ -12,6 +12,7 @@ import {
 	updatePost,
 } from "@/server/blog-db";
 import { parsePostPayload } from "@/server/blog-validate";
+import { deleteImage, keyFromUrl } from "@/server/storage";
 
 type Params = { id: string };
 
@@ -121,9 +122,24 @@ export const Route = createFileRoute("/api/admin/blog/$id")({
 				if (!id) return json({ message: "Invalid post id" }, { status: 400 });
 
 				try {
+					const post = await getPostById(id);
 					const deleted = await deletePost(id);
 					if (!deleted) {
 						return json({ message: "Post not found" }, { status: 404 });
+					}
+					// Best-effort cleanup of Cloudinary assets so deleted posts
+					// don't leave orphan images. Must not fail the deletion.
+					if (post) {
+						const urls = [post.coverImageUrl, post.ogImageUrl];
+						for (const url of urls) {
+							if (!url) continue;
+							const publicId = keyFromUrl(url);
+							if (publicId) {
+								await deleteImage(publicId).catch((error) => {
+									console.error("[blog] image cleanup failed:", error);
+								});
+							}
+						}
 					}
 					return json({ ok: true });
 				} catch (error) {

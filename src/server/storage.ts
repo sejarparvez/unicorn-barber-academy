@@ -1,17 +1,10 @@
 // src/server/storage.ts
-// S3-compatible image uploads (AWS S3, Cloudflare R2, Backblaze B2, MinIO —
-// anything speaking the S3 API). Configured entirely through env vars, so
-// pointing it at a different provider later needs zero code changes.
-//
-// SCAFFOLD MODE: credentials are not provisioned yet. Until every
-// S3_* variable is present the module degrades gracefully — isStorageReady()
-// returns false and uploadImage() throws StorageNotConfiguredError, which
-// the upload endpoint converts into a clear 503 for the editor UI.
-import {
-	DeleteObjectCommand,
-	PutObjectCommand,
-	S3Client,
-} from "@aws-sdk/client-s3";
+// Blog/avatar image uploads via Cloudinary (free tier, no credit card).
+// Configured entirely through env vars: CLOUDINARY_CLOUD_NAME,
+// CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET. If any are missing the module
+// degrades gracefully — isStorageReady() returns false and uploadImage()
+// throws StorageNotConfiguredError.
+import { createHash } from "node:crypto";
 
 /** Whitelist — images only; anything else is rejected before upload. */
 const ALLOWED_MIME = new Set([
@@ -39,7 +32,7 @@ export function isAllowedImageMime(mime: string): boolean {
 /**
  * Detect the real image type from magic bytes. `file.type` from a multipart
  * form is entirely client-declared — never trusted on its own; the sniffed
- * type is what decides whether an upload ships to the bucket.
+ * type is what decides whether an upload ships to Cloudinary.
  */
 export function sniffImageMime(buffer: Buffer): string | null {
 	if (buffer.length < 12) return null;
@@ -62,21 +55,18 @@ export function sniffImageMime(buffer: Buffer): string | null {
 }
 
 /**
- * Best-effort reverse of uploadImage()'s URL scheme: map a public URL back
- * to its bucket key. Returns null for URLs outside S3_PUBLIC_BASE_URL.
+ * Reverse of uploadImage()'s URL scheme: map a public delivery URL back to
+ * its Cloudinary public_id. Returns null for URLs outside the cloud.
  */
 export function keyFromUrl(url: string): string | null {
-	const base = env("S3_PUBLIC_BASE_URL");
-	if (!base) return null;
-	const prefix = `${base.replace(/\/+$/, "")}/`;
-	return url.startsWith(prefix) ? url.slice(prefix.length) : null;
+	// Extract public_id from the /v<ver>/<public_id>.<ext> delivery URL.
+	const match = url.match(/\/v\d+\/(.+)\.(?:jpg|jpeg|png|webp|gif|avif)$/i);
+	return match ? match[1] : null;
 }
 
-/** Delete an object by key (used to clean up replaced avatars etc.). */
-export async function deleteImage(key: string): Promise<void> {
-	await client().send(
-		new DeleteObjectCommand({ Bucket: env("S3_BUCKET"), Key: key }),
-	);
+/** Delete an upload by public_id (used to clean up replaced avatars etc.). */
+export async function deleteImage(publicId: string): Promise<void> {
+	await destroyCloudinary(publicId);
 }
 
 function env(name: string): string | undefined {
@@ -87,55 +77,42 @@ function env(name: string): string | undefined {
 export class StorageNotConfiguredError extends Error {
 	constructor() {
 		super(
-			"Object storage is not configured: set S3_BUCKET, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY and S3_PUBLIC_BASE_URL (see .env.example).",
+			"Object storage is not configured: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET in .env.",
 		);
 		this.name = "StorageNotConfiguredError";
 	}
 }
 
-let cachedClient: { key: string; client: S3Client } | null = null;
-
-function configKey(): string {
-	return [
-		env("S3_ENDPOINT") ?? "",
-		env("S3_REGION") ?? "",
-		env("S3_BUCKET") ?? "",
-	].join("|");
-}
-
 export function isStorageReady(): boolean {
 	return Boolean(
-		env("S3_BUCKET") &&
-			env("S3_ACCESS_KEY_ID") &&
-			env("S3_SECRET_ACCESS_KEY") &&
-			env("S3_PUBLIC_BASE_URL"),
+		env("CLOUDINARY_CLOUD_NAME") &&
+			env("CLOUDINARY_API_KEY") &&
+			env("CLOUDINARY_API_SECRET"),
 	);
 }
 
-function client(): S3Client {
-	if (!isStorageReady()) throw new StorageNotConfiguredError();
-	const key = configKey();
-	if (!cachedClient || cachedClient.key !== key) {
-		cachedClient = {
-			key,
-			client: new S3Client({
-				// Blank endpoint = AWS proper. Set S3_ENDPOINT for R2/B2/MinIO.
-				...(env("S3_ENDPOINT") ? { endpoint: env("S3_ENDPOINT") } : {}),
-				region: env("S3_REGION") ?? "auto",
-				credentials: {
-					accessKeyId: env("S3_ACCESS_KEY_ID") as string,
-					secretAccessKey: env("S3_SECRET_ACCESS_KEY") as string,
-				},
-			}),
-		};
-	}
-	return cachedClient.client;
+function cloudinaryBase(): string {
+	const name = env("CLOUDINARY_CLOUD_NAME");
+	if (!name) throw new StorageNotConfiguredError();
+	return `https://api.cloudinary.com/v1_1/${name}/image`;
+}
+
+/** Sign Cloudinary params: sorted name=value pairs + api_secret, then SHA-1. */
+function cloudinarySignature(params: Record<string, string | number>): string {
+	const secret = env("CLOUDINARY_API_SECRET");
+	if (!secret) throw new StorageNotConfiguredError();
+	const str = Object.keys(params)
+		.sort()
+		.map((k) => `${k}=${params[k]}`)
+		.join("&");
+	return createHash("sha1").update(`${str}${secret}`).digest("hex");
 }
 
 /**
- * Uploads an image buffer and returns its public URL.
- * Key scheme: <folder>/<yyyy>/<mm>/<name>-<rand6>.<ext> — stable, sortable,
- * collision-safe, and cache-friendly once uploaded (immutable content).
+ * Uploads an image buffer and returns its public URL and public_id.
+ * Organized into Cloudinary folders by the `folder` option ("avatars",
+ * "blog", ...). public_id: <folder>/<yyyy>/<mm>/<name>-<rand6> — stable,
+ * sortable, and collision-safe; Cloudinary appends the extension on delivery.
  */
 export async function uploadImage(options: {
 	buffer: Buffer;
@@ -156,18 +133,67 @@ export async function uploadImage(options: {
 			.replace(/[^a-z0-9]+/g, "-")
 			.replace(/^-+|-+$/g, "")
 			.slice(0, 60) || "img";
-	const key = `${options.folder ?? "blog"}/${yyyy}/${mm}/${safeName}-${rand}.${ext}`;
+	// folder passed to Cloudinary builds a real folder hierarchy; public_id is
+	// the full folded path so keyFromUrl() can reverse it back.
+	const folder = options.folder ?? "blog";
+	const yyyymm = `${yyyy}/${mm}`;
+	const publicId = `${folder}/${yyyymm}/${safeName}-${rand}`;
 
-	await client().send(
-		new PutObjectCommand({
-			Bucket: env("S3_BUCKET"),
-			Key: key,
-			Body: options.buffer,
-			ContentType: options.mime,
-			CacheControl: "public, max-age=31536000, immutable",
+	const apiKey = env("CLOUDINARY_API_KEY");
+	if (!apiKey) throw new StorageNotConfiguredError();
+	const timestamp = Math.floor(Date.now() / 1000);
+
+	const form = new FormData();
+	form.append("file", new Blob([options.buffer]), `${publicId}.${ext}`);
+	form.append("folder", folder);
+	form.append("public_id", `${yyyymm}/${safeName}-${rand}`);
+	form.append("api_key", apiKey);
+	form.append("timestamp", String(timestamp));
+	form.append(
+		"signature",
+		cloudinarySignature({
+			folder,
+			public_id: `${yyyymm}/${safeName}-${rand}`,
+			timestamp,
 		}),
 	);
 
-	const base = (env("S3_PUBLIC_BASE_URL") as string).replace(/\/+$/, "");
-	return { url: `${base}/${key}`, key };
+	const res = await fetch(`${cloudinaryBase()}/upload`, {
+		method: "POST",
+		body: form,
+	});
+
+	if (!res.ok) {
+		const body = await res.text();
+		throw new Error(`Cloudinary upload failed (${res.status}): ${body}`);
+	}
+
+	const json = (await res.json()) as { secure_url?: string };
+	const url = json.secure_url;
+	if (!url) throw new Error("Cloudinary response missing secure_url");
+
+	return { url, key: publicId };
+}
+
+async function destroyCloudinary(publicId: string): Promise<void> {
+	const apiKey = env("CLOUDINARY_API_KEY");
+	if (!apiKey) throw new StorageNotConfiguredError();
+	const timestamp = Math.floor(Date.now() / 1000);
+	const params = { public_id: publicId, timestamp };
+
+	const form = new FormData();
+	form.append("public_id", publicId);
+	form.append("api_key", apiKey);
+	form.append("timestamp", String(timestamp));
+	form.append("signature", cloudinarySignature(params));
+
+	const res = await fetch(`${cloudinaryBase()}/destroy`, {
+		method: "POST",
+		body: form,
+	});
+
+	if (!res.ok) {
+		const body = await res.text();
+		throw new Error(`Cloudinary destroy failed (${res.status}): ${body}`);
+	}
 }
