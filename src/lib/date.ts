@@ -20,11 +20,6 @@ export function toDateOnly(value: Date | string): string {
 	return `${year}-${month}-${day}`;
 }
 
-/** Today's date in the server's local timezone as "YYYY-MM-DD". */
-export function todayDateOnly(): string {
-	return toDateOnly(new Date());
-}
-
 /* ---------------------------------------------------------------------- */
 /* Display formatting — single source of truth, built on date-fns.        */
 /* Previously copy-pasted across ~10 files with drifting output.          */

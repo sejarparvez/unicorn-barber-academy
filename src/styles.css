@@ -179,21 +179,12 @@
       0 4px 24px color-mix(in oklch, var(--primary) 35%, transparent);
     transform: translateY(-1px);
   }
-
-  /* Slow image zoom inside overflow-hidden cards on hover. */
-  .group:hover .img-zoom {
-    transform: scale(1.06);
-  }
-  .img-zoom {
-    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .text-shimmer,
   .animate-marquee,
-  .glow-gold,
-  .img-zoom {
+  .glow-gold {
     animation: none;
     transition: none;
   }
