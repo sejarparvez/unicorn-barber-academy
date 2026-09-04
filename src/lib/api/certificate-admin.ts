@@ -1,15 +1,6 @@
 // src/lib/api/certificate-admin.ts
 // Admin-side client for certificate management (issue/revoke).
-import { http } from "./http";
-
-async function errorOf(error: unknown): Promise<string> {
-	if (typeof error === "object" && error !== null) {
-		const data = (error as { response?: { data?: { message?: string } } })
-			.response?.data;
-		if (data?.message) return data.message;
-	}
-	return "Something went wrong. Please try again.";
-}
+import { extractErrorMessage, http } from "./http";
 
 export async function issueCertificate(applicationId: number): Promise<string> {
 	try {
@@ -18,7 +9,7 @@ export async function issueCertificate(applicationId: number): Promise<string> {
 		});
 		return res.data.code;
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -30,6 +21,6 @@ export async function setCertificateRevoked(
 	try {
 		await http.patch(`/api/admin/certificates/${id}`, { revoked, reason });
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }

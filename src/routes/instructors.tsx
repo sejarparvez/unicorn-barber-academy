@@ -23,6 +23,7 @@ export const Route = createFileRoute("/instructors")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/instructors` },
+			{ property: "og:image", content: `${SITE_URL}/banner.png` },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/instructors` }],
 	}),

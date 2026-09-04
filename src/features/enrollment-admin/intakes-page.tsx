@@ -256,6 +256,12 @@ export function IntakesPage() {
 									}}
 									className="h-8 w-20 rounded-md border border-border bg-background px-2 text-sm"
 								/>
+								{intake.seatsWarning ? (
+									<span className="text-destructive font-medium">
+										Overbooked ({intake.applicationsCount - intake.seatsTotal}{" "}
+										excess)
+									</span>
+								) : null}
 							</label>
 							<Button
 								variant="outline"
@@ -294,7 +300,7 @@ export function IntakesPage() {
 						<AlertDialogTitle>Delete this intake?</AlertDialogTitle>
 						<AlertDialogDescription>
 							{confirmDelete
-								? `This intake has ${confirmDelete.applicationsCount} application(s). Deleting it unlinks those applications from a cohort — this cannot be undone.`
+								? `This intake has ${confirmDelete.applicationsCount} application(s) and cannot be deleted. Remove or transfer the applications first, then try again.`
 								: ""}
 						</AlertDialogDescription>
 					</AlertDialogHeader>

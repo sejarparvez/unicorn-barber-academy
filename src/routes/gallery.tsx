@@ -23,6 +23,16 @@ export const Route = createFileRoute("/gallery")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/gallery` },
+			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{
+				name: "twitter:title",
+				content: "Gallery | Unicorn Barber Training Academy",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"Before-and-after transformations and studio life from Unicorn Barber Training Academy.",
+			},
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/gallery` }],
 	}),

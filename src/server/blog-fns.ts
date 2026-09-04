@@ -122,27 +122,32 @@ export type PublicPostHtml =
 
 export const getPostForPublicHtmlFn = createServerFn({ method: "GET" })
 	.validator((input: { slug: string }) => input)
-	.handler(async ({ data }): Promise<PublicPostHtml> => {
-		const result = await getPostForPublicFn({ data: { slug: data.slug } });
+	.handler(
+		async ({ data }): Promise<PublicPostHtml> =>
+			runSafe(async () => {
+				const result = await getPostForPublicFn({
+					data: { slug: data.slug },
+				});
 
-		if (result.kind !== "post") return result;
+				if (result.kind !== "post") return result;
 
-		const relatedPosts = await getRelatedPostsFn({
-			data: {
-				postId: result.post.id,
-				categoryId: result.post.category?.id ?? null,
-				tags: result.post.tags,
-			},
-		});
+				const relatedPosts = await getRelatedPostsFn({
+					data: {
+						postId: result.post.id,
+						categoryId: result.post.category?.id ?? null,
+						tags: result.post.tags,
+					},
+				});
 
-		const { contentMd, ...post } = result.post;
-		return {
-			kind: "post",
-			post: { ...post, html: renderMarkdown(contentMd) },
-			isPreview: result.isPreview,
-			relatedPosts,
-		};
-	});
+				const { contentMd, ...post } = result.post;
+				return {
+					kind: "post",
+					post: { ...post, html: renderMarkdown(contentMd) },
+					isPreview: result.isPreview,
+					relatedPosts,
+				};
+			}),
+	);
 
 /** Post-to-post internal linking for the detail page. */
 export const getRelatedPostsFn = createServerFn({ method: "GET" })

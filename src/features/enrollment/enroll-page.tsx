@@ -5,10 +5,12 @@
 import { IconArrowRight, IconCircleCheck } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { trackEvent } from "@/components/providers/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { getProgramBySlug } from "@/data/programs";
 import { submitApplication } from "@/lib/api/enrollment";
 import type { IntakePublic } from "@/lib/enrollment";
 import { COHORT_LABELS, formatStartsOn } from "@/lib/enrollment";
@@ -29,6 +31,8 @@ const HEAR_ABOUT_OPTIONS = [
 	{ value: "walkby", label: "Walked by the academy" },
 	{ value: "other", label: "Other" },
 ];
+
+const PHONE_REGEX = /^[+]?[\d\s\-()]{7,20}$/;
 
 export function EnrollPage({ intakes, session }: Props) {
 	const [track, setTrack] = useState<"barbering" | "beauty">("barbering");
@@ -70,25 +74,51 @@ export function EnrollPage({ intakes, session }: Props) {
 	async function onSubmit(event: React.FormEvent) {
 		event.preventDefault();
 		if (!intakeId || submitting) return;
+		if (!PHONE_REGEX.test(phone)) {
+			setError("Enter a valid phone number (e.g. +880 1XXX-XXXXXX)");
+			return;
+		}
 		setSubmitting(true);
 		setError(null);
-		const result = await submitApplication({
-			intakeId,
-			phone,
-			experienceNote: experienceNote.trim() || null,
-			hearAbout: hearAbout || null,
-		});
-		if (result.ok) {
-			setReference(result.reference);
-		} else {
-			setError(result.message);
+		try {
+			const result = await submitApplication({
+				intakeId,
+				phone,
+				experienceNote: experienceNote.trim() || null,
+				hearAbout: hearAbout || null,
+			});
+			if (result.ok) {
+				setReference(result.reference);
+				trackEvent("Enrollment Submitted", { program: programSlug });
+			} else {
+				setError(result.message);
+			}
+		} catch (err) {
+			setError(
+				err instanceof Error
+					? err.message
+					: "Submission failed. Please try again.",
+			);
+		} finally {
+			setSubmitting(false);
 		}
-		setSubmitting(false);
 	}
 
 	if (reference) {
+		const selectedIntake = intakes.find((i) => i.id === intakeId);
+		const selectedProgram = programSlug ? getProgramBySlug(programSlug) : null;
 		return (
-			<ConfirmationPanel reference={reference} email={session.user.email} />
+			<ConfirmationPanel
+				reference={reference}
+				email={session.user.email}
+				programTitle={selectedProgram?.title ?? programSlug}
+				cohortLabel={
+					selectedIntake ? `${COHORT_LABELS[selectedIntake.cohort]}` : undefined
+				}
+				startsOn={
+					selectedIntake ? formatStartsOn(selectedIntake.startsOn) : undefined
+				}
+			/>
 		);
 	}
 
@@ -123,6 +153,7 @@ export function EnrollPage({ intakes, session }: Props) {
 									key={t}
 									type="button"
 									onClick={() => switchTrack(t)}
+									aria-pressed={track === t}
 									className={cn(
 										"py-2.5 text-sm font-medium transition-colors",
 										track === t
@@ -243,8 +274,21 @@ export function EnrollPage({ intakes, session }: Props) {
 								value={phone}
 								placeholder="+880 1XXX-XXXXXX"
 								onChange={(e) => setPhone(e.target.value)}
+								autoComplete="tel"
+								pattern="^[+]?[\d\s\-()]{7,20}$"
 								required
+								aria-describedby={
+									phone && !PHONE_REGEX.test(phone) ? "phone-error" : undefined
+								}
+								aria-invalid={
+									phone && !PHONE_REGEX.test(phone) ? true : undefined
+								}
 							/>
+							{phone && !PHONE_REGEX.test(phone) ? (
+								<p id="phone-error" className="text-xs text-destructive">
+									Enter a valid phone number (e.g. +880 1XXX-XXXXXX)
+								</p>
+							) : null}
 						</div>
 						<div className="space-y-1.5">
 							<Label htmlFor="enroll-note">
@@ -271,6 +315,19 @@ export function EnrollPage({ intakes, session }: Props) {
 									</option>
 								))}
 							</select>
+							{programSlug
+								? (() => {
+										const program = getProgramBySlug(programSlug);
+										return program ? (
+											<p className="text-sm text-muted-foreground">
+												Tuition:{" "}
+												<span className="font-semibold text-foreground">
+													{program.tuition}
+												</span>
+											</p>
+										) : null;
+									})()
+								: null}
 						</div>
 					</div>
 
@@ -286,7 +343,7 @@ export function EnrollPage({ intakes, session }: Props) {
 					<Button
 						type="submit"
 						size="lg"
-						disabled={!intakeId || submitting}
+						disabled={!intakeId || submitting || !PHONE_REGEX.test(phone)}
 						className="w-full gap-2"
 					>
 						{submitting ? "Submitting…" : "Submit application"}
@@ -301,9 +358,15 @@ export function EnrollPage({ intakes, session }: Props) {
 function ConfirmationPanel({
 	reference,
 	email,
+	programTitle,
+	cohortLabel,
+	startsOn,
 }: {
 	reference: string;
 	email: string;
+	programTitle?: string;
+	cohortLabel?: string;
+	startsOn?: string;
 }) {
 	return (
 		<main className="section-light bg-background px-6 py-24">
@@ -326,6 +389,13 @@ function ConfirmationPanel({
 					<p className="mt-2 font-heading text-3xl font-semibold tracking-wide text-primary">
 						{reference}
 					</p>
+					{programTitle ? (
+						<p className="mt-3 text-sm text-muted-foreground">
+							{programTitle}
+							{cohortLabel ? ` · ${cohortLabel}` : ""}
+							{startsOn ? ` · starts ${startsOn}` : ""}
+						</p>
+					) : null}
 					<p className="mt-3 text-xs text-muted-foreground">
 						A confirmation email is on its way to {email}. Track your
 						application anytime from your dashboard.

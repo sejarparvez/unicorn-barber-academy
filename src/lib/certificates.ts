@@ -13,7 +13,9 @@ export type CertificateRecord = {
 	programTitle: string | null;
 	cohort: Cohort;
 	issuedOn: string; // yyyy-mm-dd
+	issuedBy: number | null;
 	revokedAt: string | null;
+	revokedBy: number | null;
 	revokedReason: string | null;
 };
 
@@ -28,4 +30,4 @@ export type VerifyResult =
 			cohort: string;
 			issuedOn: string;
 	  }
-	| { kind: "unknown" };
+	| { kind: "unknown" | "rate-limited" };

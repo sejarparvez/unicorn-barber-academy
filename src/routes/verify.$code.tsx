@@ -113,20 +113,24 @@ function CodeForm({ initialCode }: { initialCode: string }) {
 }
 
 function ResultCard({ result }: { result: VerifyResult }) {
-	if (result.kind === "unknown") {
+	if (result.kind !== "valid" && result.kind !== "revoked") {
+		const message =
+			result.kind === "rate-limited"
+				? "Too many lookups"
+				: "No certificate found";
+		const hint =
+			result.kind === "rate-limited"
+				? "Please wait a moment before trying again."
+				: `Double-check the code printed on the document (format UBT-YYYY-NNNN). If it still doesn\u2019t resolve, contact us at ${CONTACT.phoneDisplay}.`;
 		return (
 			<div className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
 				<IconSearch
 					className="mx-auto h-10 w-10 text-muted-foreground/50"
 					stroke={1.5}
 				/>
-				<h2 className="mt-4 font-heading text-xl font-semibold">
-					No certificate found
-				</h2>
+				<h2 className="mt-4 font-heading text-xl font-semibold">{message}</h2>
 				<p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-					Double-check the code printed on the document (format{" "}
-					<span className="font-mono">UBT-YYYY-NNNN</span>). If it still
-					doesn&rsquo;t resolve, contact us at {CONTACT.phoneDisplay}.
+					{hint}
 				</p>
 			</div>
 		);

@@ -27,6 +27,7 @@ import {
 	SectionEyebrow,
 	useFadeUp,
 } from "@/components/effects";
+import { trackEvent } from "@/components/providers/analytics";
 import {
 	Accordion,
 	AccordionContent,
@@ -67,6 +68,14 @@ const JSON_LD = {
 	],
 };
 
+const CONTACT_PAGE_JSON_LD = {
+	"@context": "https://schema.org",
+	"@type": "ContactPage",
+	name: "Contact Unicorn Barber Training Academy",
+	url: `${SITE_URL}/contact`,
+	mainEntity: { "@id": `${SITE_URL}/#academy` },
+};
+
 export function ContactPage() {
 	return (
 		<main>
@@ -74,6 +83,13 @@ export function ContactPage() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(JSON_LD) }}
+			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{
+					__html: stringifyJsonLd(CONTACT_PAGE_JSON_LD),
+				}}
 			/>
 			<ContactHero />
 			<ContactForm />
@@ -226,6 +242,7 @@ function ContactForm() {
 			program: String(data.get("program") ?? "") || undefined,
 			message: String(data.get("message") ?? "").trim(),
 		});
+		trackEvent("Contact Submitted");
 	};
 
 	return (

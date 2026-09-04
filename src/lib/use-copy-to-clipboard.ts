@@ -1,7 +1,7 @@
 // src/lib/use-copy-to-clipboard.ts
 // Shared clipboard helper with a self-resetting "copied" flag. Previously
 // duplicated in contact-page CopyRow and dashboard certificates.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useCopyToClipboard(resetAfterMs = 2000): {
 	copied: boolean;
@@ -15,7 +15,7 @@ export function useCopyToClipboard(resetAfterMs = 2000): {
 		return () => clearTimeout(timer);
 	}, [copied, resetAfterMs]);
 
-	async function copy(text: string): Promise<boolean> {
+	const copy = useCallback(async (text: string): Promise<boolean> => {
 		try {
 			await navigator.clipboard.writeText(text);
 			setCopied(true);
@@ -23,7 +23,7 @@ export function useCopyToClipboard(resetAfterMs = 2000): {
 		} catch {
 			return false;
 		}
-	}
+	}, []);
 
 	return { copied, copy };
 }

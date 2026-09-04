@@ -28,6 +28,15 @@ export const Route = createFileRoute("/contact")({
 				content: `${SITE_URL}${pic("unicorn-contact-hero-1", 900, 1000)}`,
 			},
 			{ property: "og:url", content: `${SITE_URL}/contact` },
+			{
+				name: "twitter:title",
+				content: "Contact | Unicorn Barber Training Academy",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"Reach admissions, partnerships, or press at Unicorn Barber Training Academy.",
+			},
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/contact` }],
 	}),

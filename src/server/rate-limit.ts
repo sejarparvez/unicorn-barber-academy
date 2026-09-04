@@ -10,6 +10,7 @@
 const buckets = new Map<string, { count: number; resetAt: number }>();
 let lastSweep = Date.now();
 const SWEEP_INTERVAL_MS = 60_000;
+const MAX_BUCKETS = 100_000;
 
 function sweep(now: number) {
 	if (now - lastSweep < SWEEP_INTERVAL_MS) return;
@@ -29,6 +30,12 @@ export function overRateLimit(
 	sweep(now);
 	const bucket = buckets.get(key);
 	if (!bucket || bucket.resetAt <= now) {
+		// Evict oldest entry when at capacity to prevent memory exhaustion
+		// from spoofed unique-IP keys.
+		if (buckets.size >= MAX_BUCKETS) {
+			const oldest = buckets.keys().next().value;
+			if (oldest) buckets.delete(oldest);
+		}
 		buckets.set(key, { count: 1, resetAt: now + windowMs });
 		return false;
 	}
@@ -129,16 +136,26 @@ function ipv4ToLong(ip: string): number | null {
 /**
  * Blocks cross-site browser submissions (CSRF-style form/fetch posts) by
  * requiring the Origin host to match the request host — or the configured
- * app origin, since reverse proxies can rewrite the Host header. Requests
- * without an Origin header (curl, server-to-server) pass through; the rate
- * limiter still applies to them.
+ * app origin, since reverse proxies can rewrite the Host header. For POST
+ * requests, rejects when neither Origin nor Referer is present (script-based
+ * CSRF without an Origin header is blocked). GET requests pass through
+ * unconditionally.
  */
 export function isSameOrigin(request: Request): boolean {
+	// GET requests are safe — browsers never cross-origin GET with credentialed
+	// form submissions, and the rate limiter still applies.
+	if (request.method === "GET") return true;
+
 	const origin = request.headers.get("origin");
-	if (!origin) return true;
+	const referer = request.headers.get("referer");
+
+	// For POST, require at least one of Origin or Referer to be present.
+	// Script-based attacks that omit both are blocked.
+	if (!origin && !referer) return false;
+
 	let originHost: string;
 	try {
-		originHost = new URL(origin).host;
+		originHost = new URL(origin || referer || "").host;
 	} catch {
 		return false;
 	}

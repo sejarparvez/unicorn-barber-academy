@@ -32,6 +32,18 @@ const PROGRAMS: FooterLink[] = [
 	{ label: "Classic Barbering", to: "/programs/classic-barbering" },
 	{ label: "Beard Sculpting", to: "/programs/beard-sculpting" },
 	{ label: "Fades & Tapers", to: "/programs/fades-and-tapers" },
+	{
+		label: "Cosmetology Fundamentals",
+		to: "/programs/cosmetology-fundamentals",
+	},
+	{
+		label: "Hair Styling & Colouring",
+		to: "/programs/hair-styling-and-colouring",
+	},
+	{
+		label: "Bridal & Editorial Makeup",
+		to: "/programs/bridal-and-editorial-makeup",
+	},
 ];
 
 const ACADEMY: FooterLink[] = [
@@ -40,6 +52,7 @@ const ACADEMY: FooterLink[] = [
 	{ label: "Student Life", to: "/student-life" },
 	{ label: "Press & Media", to: "/media" },
 	{ label: "Careers", to: "/careers" },
+	{ label: "Verify Certificate", to: "/verify" },
 ];
 
 const LEGAL_LINKS: FooterLink[] = [
@@ -105,7 +118,7 @@ const LOCAL_BUSINESS_JSON_LD = {
 	],
 	hasOfferCatalog: {
 		"@type": "OfferCatalog",
-		name: "Barbering Programs",
+		name: "Barbering & Beauty Programs",
 		itemListElement: PROGRAMS.map((program) => ({
 			"@type": "Course",
 			name: program.label,
@@ -163,12 +176,9 @@ export default function Footer() {
 								width={400}
 								height={400}
 							/>
-							<span className="h-7 w-px shrink-0 bg-linear-to-b from-[#F4C430] via-primary to-[#8B6914] sm:h-8" />
+							<span className="h-7 w-px shrink-0 bg-linear-to-b from-chart-1 via-primary to-chart-4 sm:h-8" />
 							<span className="flex flex-col min-w-0 leading-none">
-								<span
-									className="bg-linear-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-base sm:text-xl tracking-[0.12em] sm:tracking-[0.14em] text-transparent truncate"
-									style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
-								>
+								<span className="bg-[linear-gradient(90deg,var(--chart-1),var(--primary),var(--chart-4))] bg-clip-text text-base sm:text-xl tracking-[0.12em] sm:tracking-[0.14em] text-transparent truncate font-semibold">
 									UNICORN
 								</span>
 								<span className="mt-1 text-[8px] sm:text-[10px] text-secondary-foreground/65 truncate">

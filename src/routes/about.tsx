@@ -28,6 +28,15 @@ export const Route = createFileRoute("/about")({
 				content: `${SITE_URL}${pic("unicorn-about-story", 800, 600)}`,
 			},
 			{ property: "og:url", content: `${SITE_URL}/about` },
+			{
+				name: "twitter:title",
+				content: "About Us | Unicorn Barber Training Academy",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"Dhaka's premier hands-on training academy for barbering and beauty & cosmetology.",
+			},
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
 	}),

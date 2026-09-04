@@ -6,6 +6,8 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /dashboard/
+Disallow: /auth/
 # Raw-markdown mirrors of blog posts are for AI answer engines only;
 # search engines get the canonical HTML page instead.
 Disallow: /md/
@@ -45,6 +47,12 @@ User-agent: Amazonbot
 Allow: /
 
 User-agent: meta-externalagent
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: MistralAI-User
 Allow: /
 
 Sitemap: https://unicornbarberacademy.com/sitemap.xml

@@ -42,6 +42,7 @@ export const Route = createFileRoute("/api/admin/certificates/$id")({
 					id,
 					revoked: body.revoked,
 					reason,
+					revokedBy: guard.userId,
 				});
 				if (!updated) {
 					return json({ message: "Certificate not found" }, { status: 404 });

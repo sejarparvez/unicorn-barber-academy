@@ -42,7 +42,7 @@ export function useIssueCertificate() {
 	return useMutation({
 		mutationFn: async (applicationId: number) =>
 			issueCertificate(applicationId),
-		onSuccess: () => {
+		onSuccess: (_data, applicationId) => {
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.certificates(),
 			});
@@ -51,6 +51,9 @@ export function useIssueCertificate() {
 			});
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.consoleOverview(),
+			});
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.applicationCertificate(applicationId),
 			});
 		},
 	});
@@ -64,12 +67,15 @@ export function useSetCertificateRevocation() {
 			revoked: boolean;
 			reason?: string | null;
 		}) => setCertificateRevoked(input.id, input.revoked, input.reason),
-		onSuccess: () => {
+		onSuccess: (_data, input) => {
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.certificates(),
 			});
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.consoleOverview(),
+			});
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.certificate(input.id),
 			});
 		},
 	});

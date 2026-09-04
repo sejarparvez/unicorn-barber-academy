@@ -25,6 +25,16 @@ export const Route = createFileRoute("/programs/")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/programs` },
+			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{
+				name: "twitter:title",
+				content: "Programs | Unicorn Barber Training Academy",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"Six hands-on barbering and beauty programs in Dhaka — day and evening cohorts.",
+			},
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/programs` }],
 	}),

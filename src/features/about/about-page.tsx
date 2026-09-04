@@ -67,6 +67,14 @@ const ORG_JSON_LD = {
 	},
 };
 
+const ABOUT_PAGE_JSON_LD = {
+	"@context": "https://schema.org",
+	"@type": "AboutPage",
+	name: "About Unicorn Barber Training Academy",
+	url: `${SITE_URL}/about`,
+	mainEntity: { "@id": `${SITE_URL}/#academy` },
+};
+
 export function AboutPage() {
 	return (
 		<main>
@@ -81,6 +89,13 @@ export function AboutPage() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(ORG_JSON_LD) }}
+			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{
+					__html: stringifyJsonLd(ABOUT_PAGE_JSON_LD),
+				}}
 			/>
 			<AboutHero />
 			<OurStory />

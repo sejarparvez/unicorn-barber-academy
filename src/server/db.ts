@@ -22,6 +22,10 @@ export function db(): Pool {
 			// Blog traffic is low-volume admin CRUD + cached public reads;
 			// a small pool keeps serverless/Neon connection counts happy.
 			max: 5,
+			connectionTimeoutMillis: 5_000,
+		});
+		pool.on("error", (err) => {
+			console.error("[db] pool idle client error:", err.message);
 		});
 	}
 	return pool;

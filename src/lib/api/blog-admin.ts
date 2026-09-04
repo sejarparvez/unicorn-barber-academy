@@ -4,7 +4,7 @@
 // types here describe the happy path.
 import type { BlogCategory, BlogPostFull, BlogPostSummary } from "@/lib/blog";
 import { formatMediumDate } from "@/lib/date";
-import { http } from "./http";
+import { extractErrorMessage, http } from "./http";
 
 export type PostPayloadClient = {
 	slug?: string;
@@ -28,15 +28,6 @@ export type PostPayloadClient = {
 	categoryId: number | null;
 };
 
-async function errorOf(error: unknown): Promise<string> {
-	if (typeof error === "object" && error !== null) {
-		const data = (error as { response?: { data?: { message?: string } } })
-			.response?.data;
-		if (data?.message) return data.message;
-	}
-	return "Something went wrong. Please try again.";
-}
-
 export async function createPost(
 	payload: PostPayloadClient,
 ): Promise<BlogPostFull> {
@@ -47,7 +38,7 @@ export async function createPost(
 		);
 		return res.data.post;
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -62,7 +53,7 @@ export async function updatePost(
 		);
 		return res.data.post;
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -74,7 +65,7 @@ export async function setPostStatus(
 	try {
 		await http.patch(`/api/admin/blog/${id}`, { action });
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -82,7 +73,7 @@ export async function deletePost(id: number): Promise<void> {
 	try {
 		await http.delete(`/api/admin/blog/${id}`);
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -97,7 +88,7 @@ export async function uploadImage(file: File, name: string): Promise<string> {
 		});
 		return res.data.url;
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -109,7 +100,7 @@ export async function createCategory(name: string): Promise<BlogCategory> {
 		);
 		return res.data.category;
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -117,7 +108,7 @@ export async function renameCategory(id: number, name: string): Promise<void> {
 	try {
 		await http.patch(`/api/admin/blog/categories/${id}`, { name });
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -125,7 +116,7 @@ export async function deleteCategory(id: number): Promise<void> {
 	try {
 		await http.delete(`/api/admin/blog/categories/${id}`);
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 

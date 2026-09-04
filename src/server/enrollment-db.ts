@@ -8,6 +8,7 @@
 // single-sourced in code; intakes only reference slugs.
 
 import { ALL_PROGRAMS } from "@/data/programs";
+import { toDateOnly } from "@/lib/date";
 import type {
 	ApplicationStatus,
 	ApplicationSummary,
@@ -18,41 +19,19 @@ import type {
 	MyApplication,
 } from "@/lib/enrollment";
 import { generateReference, parseApplicationStatus } from "@/lib/enrollment";
-import { db } from "./db";
+import { db, withTransaction } from "./db";
+import { PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION } from "./pg-codes";
+import { programTitle } from "./program-utils";
 
-const PG_UNIQUE_VIOLATION = "23505";
-const PG_FOREIGN_KEY_VIOLATION = "23503";
-
-function programTitle(slug: string): string | null {
-	return ALL_PROGRAMS.find((p) => p.slug === slug)?.title ?? null;
-}
-
-function dateOnly(value: Date | string): string {
-	return new Date(value).toISOString().slice(0, 10);
-}
-
-/** Transaction runner: dedicated client, BEGIN/COMMIT, rollback on throw. */
-async function withTransaction<T>(
-	fn: (client: {
-		query: <R extends Record<string, unknown>>(
-			text: string,
-			params?: unknown[],
-		) => Promise<{ rows: R[]; rowCount: number | null }>;
-	}) => Promise<T>,
-): Promise<T> {
-	const client = await db().connect();
-	try {
-		await client.query("BEGIN");
-		const result = await fn(client);
-		await client.query("COMMIT");
-		return result;
-	} catch (error) {
-		await client.query("ROLLBACK");
-		throw error;
-	} finally {
-		client.release();
-	}
-}
+/** Allowed status transitions. A key maps from the current status to the set of statuses it can move to. */
+const VALID_TRANSITIONS: Record<string, readonly string[]> = {
+	pending: ["reviewing", "approved", "waitlisted", "rejected"],
+	reviewing: ["approved", "waitlisted", "rejected"],
+	approved: ["completed", "rejected"],
+	waitlisted: ["approved", "rejected"],
+	rejected: [],
+	completed: [],
+};
 
 /* ------------------------------- public --------------------------------- */
 
@@ -90,7 +69,7 @@ export async function listOpenIntakes(): Promise<IntakePublic[]> {
 			programTitle: title,
 			track,
 			cohort: row.cohort as Cohort,
-			startsOn: dateOnly(row.starts_on),
+			startsOn: toDateOnly(row.starts_on),
 			seatsTotal: row.seats_total,
 			seatsLeft: Math.max(0, row.seats_left),
 		});
@@ -222,7 +201,7 @@ export async function listMyApplications(
 				programTitle: title,
 				programSlug: row.program_slug,
 				cohort: row.cohort as Cohort,
-				startsOn: dateOnly(row.starts_on),
+				startsOn: toDateOnly(row.starts_on),
 				submittedAt: new Date(row.created_at).toISOString(),
 			},
 		];
@@ -317,7 +296,7 @@ export async function listApplicationsAdmin(options: {
 					programTitle: title,
 					programSlug: row.program_slug,
 					cohort: row.cohort as Cohort,
-					startsOn: dateOnly(row.starts_on),
+					startsOn: toDateOnly(row.starts_on),
 					userId: row.user_id,
 					userRole: row.user_role,
 					submittedAt: new Date(row.created_at).toISOString(),
@@ -387,7 +366,7 @@ export async function getApplicationDetail(id: number) {
 			programTitle: title,
 			programSlug: row.program_slug,
 			cohort: row.cohort as Cohort,
-			startsOn: dateOnly(row.starts_on),
+			startsOn: toDateOnly(row.starts_on),
 			userId: row.user_id,
 			userRole: row.user_role,
 			submittedAt: new Date(row.created_at).toISOString(),
@@ -410,7 +389,7 @@ export type StatusUpdateResult =
 			emailKind: "approved" | "waitlisted" | "rejected" | null;
 			userRoleUpgraded: boolean;
 	  }
-	| { ok: false; reason: "not-found" };
+	| { ok: false; reason: "not-found" | "invalid-transition" };
 
 /**
  * Status transition with side effects, all in one transaction:
@@ -447,6 +426,15 @@ export async function updateApplicationStatus(options: {
 		);
 		const current = currentRes.rows[0];
 		if (!current) return { ok: false as const, reason: "not-found" as const };
+
+		// Validate the status transition.
+		const allowed = VALID_TRANSITIONS[current.status];
+		if (!allowed || !allowed.includes(options.status)) {
+			return {
+				ok: false as const,
+				reason: "invalid-transition" as const,
+			};
+		}
 
 		const firstDecision =
 			TERMINAL.includes(options.status) && !current.decided_at;
@@ -539,11 +527,12 @@ export async function listIntakesAdmin(): Promise<IntakeAdmin[]> {
 				ALL_PROGRAMS.find((p) => p.slug === row.program_slug)?.track ??
 				"barbering",
 			cohort: row.cohort as Cohort,
-			startsOn: dateOnly(row.starts_on),
+			startsOn: toDateOnly(row.starts_on),
 			seatsTotal: row.seats_total,
 			seatsLeft: Math.max(0, row.seats_total - row.seats_occupied),
 			isOpen: row.is_open,
 			applicationsCount: row.applications_count,
+			seatsWarning: row.seats_total - row.seats_occupied < 0,
 		});
 	}
 	return out;

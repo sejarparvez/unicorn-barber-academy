@@ -8,8 +8,12 @@
 //   * FAQPage       — only when the editor added FAQ pairs
 import {
 	IconArrowLeft,
+	IconBrandFacebook,
+	IconBrandWhatsapp,
+	IconBrandX,
 	IconCalendarEvent,
 	IconClock,
+	IconCopy,
 	IconEyeOff,
 	IconUser,
 } from "@tabler/icons-react";
@@ -21,10 +25,13 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import { buttonVariants } from "@/components/ui/button";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import { formatLongDate } from "@/lib/date";
 import { stringifyJsonLd } from "@/lib/jsonld";
+import { useCopyToClipboard } from "@/lib/use-copy-to-clipboard";
+import { cn } from "@/lib/utils";
 import { Route } from "@/routes/blog.$slug";
 
 /** Null-safe wrapper — posts may be unpublished (no date yet). */
@@ -194,15 +201,60 @@ export function PostDetailPage() {
 						{post.tags.length > 0 ? (
 							<p className="mt-6 flex flex-wrap gap-1.5">
 								{post.tags.map((tag) => (
-									<span
+									<Link
 										key={tag}
-										className="rounded-full border border-border px-2.5 py-0.5 text-[11px] text-muted-foreground"
+										to="/blog"
+										search={{ page: undefined }}
+										className="rounded-full border border-border px-2.5 py-0.5 text-[11px] text-muted-foreground hover:border-primary/40 hover:text-primary"
 									>
 										#{tag}
-									</span>
+									</Link>
 								))}
 							</p>
 						) : null}
+
+						<div className="mt-6 flex items-center gap-2">
+							<span className="text-[11px] tracking-wide text-muted-foreground uppercase">
+								Share
+							</span>
+							<a
+								href={`https://wa.me/?text=${encodeURIComponent(`${post.title} — ${url}`)}`}
+								target="_blank"
+								rel="noreferrer"
+								aria-label="Share on WhatsApp"
+								className={cn(
+									buttonVariants({ variant: "outline", size: "icon" }),
+									"h-8 w-8",
+								)}
+							>
+								<IconBrandWhatsapp className="h-4 w-4" stroke={1.75} />
+							</a>
+							<a
+								href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
+								target="_blank"
+								rel="noreferrer"
+								aria-label="Share on Facebook"
+								className={cn(
+									buttonVariants({ variant: "outline", size: "icon" }),
+									"h-8 w-8",
+								)}
+							>
+								<IconBrandFacebook className="h-4 w-4" stroke={1.75} />
+							</a>
+							<a
+								href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(post.title)}`}
+								target="_blank"
+								rel="noreferrer"
+								aria-label="Share on X"
+								className={cn(
+									buttonVariants({ variant: "outline", size: "icon" }),
+									"h-8 w-8",
+								)}
+							>
+								<IconBrandX className="h-4 w-4" stroke={1.75} />
+							</a>
+							<ShareLinkButton url={url} />
+						</div>
 					</Reveal>
 				</header>
 
@@ -378,5 +430,22 @@ export function PostNotFound() {
 				<IconArrowLeft className="h-3.5 w-3.5" stroke={1.75} />
 			</Link>
 		</main>
+	);
+}
+
+function ShareLinkButton({ url }: { url: string }) {
+	const { copied, copy } = useCopyToClipboard();
+	return (
+		<button
+			type="button"
+			onClick={() => copy(url)}
+			aria-label={copied ? "Copied!" : "Copy link"}
+			className={cn(
+				buttonVariants({ variant: "outline", size: "icon" }),
+				"h-8 w-8",
+			)}
+		>
+			<IconCopy className="h-4 w-4" stroke={1.75} />
+		</button>
 	);
 }

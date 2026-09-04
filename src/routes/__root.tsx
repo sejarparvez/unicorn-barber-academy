@@ -18,6 +18,7 @@ import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import type { SessionPayload } from "@/lib/types";
 import { getSession } from "@/server/session";
 import appCss from "../styles.css?url";
@@ -52,6 +53,17 @@ export const Route = createRootRoute({
 				content: "Unicorn Barber Training Academy banner",
 			},
 			{ name: "twitter:card", content: "summary_large_image" },
+			{ name: "twitter:site", content: "@UnicornBTAcademy" },
+			{
+				name: "twitter:title",
+				content:
+					"Unicorn Barber Training Academy | Barbering & Beauty Courses in Dhaka",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"Hands-on barbering and beauty training in Banasree, Dhaka — taught by working barbers and stylists. Enroll today.",
+			},
 			{ name: "twitter:image", content: `${SITE_URL}/banner.png` },
 		],
 		links: [
@@ -133,6 +145,18 @@ function RootDocument() {
 	return (
 		<html lang="en">
 			<head>
+				<script
+					type="application/ld+json"
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+					dangerouslySetInnerHTML={{
+						__html: stringifyJsonLd({
+							"@context": "https://schema.org",
+							"@type": "WebSite",
+							name: "Unicorn Barber Training Academy",
+							url: SITE_URL,
+						}),
+					}}
+				/>
 				<HeadContent />
 			</head>
 			<body>

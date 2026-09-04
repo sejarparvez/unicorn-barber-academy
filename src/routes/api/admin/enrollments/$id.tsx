@@ -17,6 +17,7 @@ import {
 	applicationApprovedEmail,
 	applicationRejectedEmail,
 	applicationWaitlistedEmail,
+	feePaymentConfirmedEmail,
 	sendMail,
 } from "@/server/mail";
 
@@ -48,6 +49,39 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 					if (!updated) {
 						return json({ message: "Application not found" }, { status: 404 });
 					}
+					// Send payment confirmation email when marking as paid.
+					if (body.paid === true) {
+						try {
+							const detail = await getApplicationDetail(id);
+							if (detail) {
+								const app = detail.application;
+								await sendMail({
+									to: app.email,
+									subject: `Payment confirmed (${app.reference}) | Unicorn Barber Training Academy`,
+									html: feePaymentConfirmedEmail({
+										reference: app.reference,
+										fullName: app.fullName,
+										programTitle: app.programTitle,
+										cohortLabel:
+											app.cohort === "day" ? "Day cohort" : "Evening cohort",
+										startsOnDisplay: new Date(app.startsOn).toLocaleDateString(
+											"en-US",
+											{
+												year: "numeric",
+												month: "long",
+												day: "numeric",
+											},
+										),
+									}),
+								});
+							}
+						} catch (error) {
+							console.error(
+								"[enrollments] fee confirmation email failed:",
+								error,
+							);
+						}
+					}
 					return json({ ok: true });
 				}
 
@@ -68,7 +102,16 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 						note,
 					});
 					if (!result.ok) {
-						return json({ message: "Application not found" }, { status: 404 });
+						if (result.reason === "not-found") {
+							return json(
+								{ message: "Application not found" },
+								{ status: 404 },
+							);
+						}
+						return json(
+							{ message: "This status transition is not allowed" },
+							{ status: 409 },
+						);
 					}
 
 					// Decision emails — non-fatal; admission state already committed.

@@ -37,8 +37,30 @@ export const Route = createFileRoute("/dashboard")({
 		});
 		return { session };
 	},
+	errorComponent: DashboardError,
 	component: DashboardLayout,
 });
+
+function DashboardError() {
+	return (
+		<main className="min-h-[calc(100svh-4rem)] bg-muted/25">
+			<div className="mx-auto max-w-7xl px-4 py-10 text-center sm:px-6 lg:px-8">
+				<h1 className="font-heading text-2xl font-semibold">
+					Something went wrong
+				</h1>
+				<p className="mt-2 text-sm text-muted-foreground">
+					An error occurred in the dashboard. Please try refreshing the page.
+				</p>
+				<Link
+					to="/dashboard"
+					className="mt-6 inline-flex h-10 items-center rounded-md border border-border bg-background px-4 text-sm font-medium hover:bg-muted"
+				>
+					Back to overview
+				</Link>
+			</div>
+		</main>
+	);
+}
 
 type NavItem = {
 	label: string;

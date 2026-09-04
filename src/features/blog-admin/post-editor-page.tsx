@@ -334,6 +334,7 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 							id="post-title"
 							value={form.title}
 							placeholder="How long does it take to become a barber?"
+							required
 							onChange={(e) => {
 								const title = e.target.value;
 								patch({

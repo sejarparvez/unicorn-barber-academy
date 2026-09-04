@@ -2,16 +2,7 @@
 // Browser-side client for the admissions endpoints.
 import { csvCell } from "@/lib/csv";
 import type { ApplicationStatus } from "@/lib/enrollment";
-import { http } from "./http";
-
-async function errorOf(error: unknown): Promise<string> {
-	if (typeof error === "object" && error !== null) {
-		const data = (error as { response?: { data?: { message?: string } } })
-			.response?.data;
-		if (data?.message) return data.message;
-	}
-	return "Something went wrong. Please try again.";
-}
+import { extractErrorMessage, http } from "./http";
 
 export async function setApplicationStatus(
 	id: number,
@@ -25,7 +16,7 @@ export async function setApplicationStatus(
 		);
 		return { userRoleUpgraded: Boolean(res.data.userRoleUpgraded) };
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -39,7 +30,7 @@ export async function setApplicationFee(
 			paid,
 		});
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -52,7 +43,7 @@ export async function createIntake(payload: {
 	try {
 		await http.post("/api/admin/enrollments/intakes", payload);
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -63,7 +54,7 @@ export async function updateIntake(
 	try {
 		await http.patch(`/api/admin/enrollments/intakes/${id}`, patch);
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 
@@ -71,7 +62,7 @@ export async function deleteIntake(id: number): Promise<void> {
 	try {
 		await http.delete(`/api/admin/enrollments/intakes/${id}`);
 	} catch (error) {
-		throw new Error(await errorOf(error));
+		throw new Error(await extractErrorMessage(error));
 	}
 }
 

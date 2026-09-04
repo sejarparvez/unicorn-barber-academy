@@ -11,3 +11,13 @@ export const http = axios.create({
 	timeout: 15_000,
 	headers: { "Content-Type": "application/json" },
 });
+
+/** Extract a user-friendly error message from an axios error response. */
+export async function extractErrorMessage(error: unknown): Promise<string> {
+	if (typeof error === "object" && error !== null) {
+		const data = (error as { response?: { data?: { message?: string } } })
+			.response?.data;
+		if (data?.message) return data.message;
+	}
+	return "Something went wrong. Please try again.";
+}

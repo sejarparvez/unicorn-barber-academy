@@ -45,7 +45,7 @@ ${post.category ? `      <category>${xmlEscape(post.category.name)}</category>\n
     <title>Unicorn Barber Training Academy — The Journal</title>
     <link>${SITE_URL}/blog</link>
     <description>Barbering technique, beauty careers, and professional training in Dhaka.</description>
-    <language>en-us</language>
+    <language>en-bd</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link rel="self" type="application/rss+xml" href="${SITE_URL}/feed.xml"/>
 ${entries.join("\n")}

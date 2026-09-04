@@ -113,6 +113,7 @@ export type IntakeAdmin = {
 	seatsLeft: number;
 	isOpen: boolean;
 	applicationsCount: number;
+	seatsWarning: boolean; // true when seats_left is negative (data integrity issue)
 };
 
 /* ------------------------------ helpers -------------------------------- */

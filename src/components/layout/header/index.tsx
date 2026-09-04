@@ -1,7 +1,7 @@
 import { IconMenu2, IconPlus } from "@tabler/icons-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Logo from "@/assets/logo/logo.png";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +21,7 @@ const navItems = [
 	{ name: "Programs", href: "/programs" },
 	{ name: "Instructors", href: "/instructors" },
 	{ name: "Gallery", href: "/gallery" },
+	{ name: "Student Life", href: "/student-life" },
 	{ name: "Blog", href: "/blog" },
 	{ name: "Contact", href: "/contact" },
 ];
@@ -41,7 +42,7 @@ export default function Header({
 	// TanStack Router equivalent of next/navigation's usePathname().
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const [isVisible, setIsVisible] = useState(true);
-	const [lastScrollY, setLastScrollY] = useState(0);
+	const lastScrollYRef = useRef(0);
 	// Controlled so nav links can close the drawer on tap — Base UI's Dialog
 	// does not auto-close when the route changes underneath it.
 	const [mobileOpen, setMobileOpen] = useState(false);
@@ -51,20 +52,24 @@ export default function Header({
 			const currentScrollY = window.scrollY;
 			if (currentScrollY < 10) {
 				setIsVisible(true);
-			} else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+			} else if (
+				currentScrollY > lastScrollYRef.current &&
+				currentScrollY > 100
+			) {
 				setIsVisible(false);
-			} else if (currentScrollY < lastScrollY) {
+			} else if (currentScrollY < lastScrollYRef.current) {
 				setIsVisible(true);
 			}
-			setLastScrollY(currentScrollY);
+			lastScrollYRef.current = currentScrollY;
 		};
 
 		window.addEventListener("scroll", controlNavbar, { passive: true });
 		return () => window.removeEventListener("scroll", controlNavbar);
-	}, [lastScrollY]);
+	}, []);
 
 	return (
 		<nav
+			aria-label="Main navigation"
 			className={cn(
 				"sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-transform duration-300",
 				isVisible ? "translate-y-0" : "-translate-y-full",
@@ -237,8 +242,6 @@ export default function Header({
 						<IconPlus className="w-4 h-4" stroke={1.75} />
 						Enroll Now
 					</Button>
-
-					{/* Ghost mode toggle — no border box */}
 				</div>
 			</div>
 		</nav>

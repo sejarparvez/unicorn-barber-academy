@@ -13,7 +13,7 @@ import {
 	setPostStatus,
 	updatePost,
 } from "@/lib/api/blog-admin";
-import type { BlogCategory, BlogPostSummary } from "@/lib/blog";
+import type { BlogCategory, BlogPostSummary, BlogStatus } from "@/lib/blog";
 import { queryKeys } from "./query-keys";
 
 /* -------------------------------- reads --------------------------------- */
@@ -27,7 +27,7 @@ type ListPage = {
 };
 
 export function useAdminPosts(
-	filters: { status?: string; page?: number },
+	filters: { status?: BlogStatus; page?: number },
 	options?: { initialData?: ListPage },
 ) {
 	return useQuery({
@@ -35,7 +35,7 @@ export function useAdminPosts(
 		queryFn: async (): Promise<ListPage> => {
 			const { listAdminPostsFn } = await import("@/server/blog-fns");
 			return listAdminPostsFn({
-				data: { status: filters.status as never, page: filters.page ?? 1 },
+				data: { status: filters.status, page: filters.page ?? 1 },
 			});
 		},
 		initialData: options?.initialData,

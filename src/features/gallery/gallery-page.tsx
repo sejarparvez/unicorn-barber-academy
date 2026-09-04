@@ -29,6 +29,20 @@ const JSON_LD = {
 	],
 };
 
+const IMAGE_GALLERY_JSON_LD = {
+	"@context": "https://schema.org",
+	"@type": "ImageGallery",
+	name: "Unicorn Barber Training Academy — Studio & Cohort Gallery",
+	url: `${SITE_URL}/gallery`,
+	image: GALLERY_ITEMS.map((item) => ({
+		"@type": "ImageObject",
+		contentUrl: pic(item.seed, item.w, item.h),
+		alt: item.alt,
+		width: item.w,
+		height: item.h,
+	})),
+};
+
 export function GalleryPage() {
 	return (
 		<main>
@@ -38,6 +52,25 @@ export function GalleryPage() {
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
 				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(JSON_LD) }}
 			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{
+					__html: stringifyJsonLd(IMAGE_GALLERY_JSON_LD),
+				}}
+			/>
+			<section className="mx-auto max-w-7xl px-6 pt-24 lg:px-10">
+				<p className="text-[11px] font-medium tracking-[0.22em] text-primary uppercase">
+					Our work
+				</p>
+				<h1 className="mt-2 font-heading text-4xl font-semibold tracking-tight sm:text-5xl">
+					Studio &amp; cohort gallery
+				</h1>
+				<p className="mt-4 max-w-2xl text-muted-foreground">
+					A look inside the studio — fades in progress, graduation day, and the
+					everyday moments that make up life at Unicorn Barber Training Academy.
+				</p>
+			</section>
 			<MasonryGallery />
 			<FinalCta
 				title="Your before-and-after"

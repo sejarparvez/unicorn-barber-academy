@@ -121,6 +121,7 @@ function Carousel({
         className={cn("relative", className)}
         role="region"
         aria-roledescription="carousel"
+        aria-label={props["aria-label"] ?? "Image carousel"}
         data-slot="carousel"
         {...props}
       >

@@ -187,6 +187,41 @@ export function applicationRejectedEmail(data: ApplicationEmailData): string {
 	);
 }
 
+export type CertificateEmailData = {
+	fullName: string;
+	programTitle: string;
+	cohortLabel: string;
+	certificateCode: string;
+	dashboardUrl: string;
+};
+
+export function certificateIssuedEmail(data: CertificateEmailData): string {
+	return shell(
+		"Your certificate is ready",
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(data.fullName.split(" ")[0]) || "there"}, congratulations on completing your training! Your official certificate has been issued and is available in your dashboard.</p>
+${detailTable([
+	["Certificate", data.certificateCode],
+	["Program", data.programTitle],
+	["Cohort", data.cohortLabel],
+])}
+<p style="margin:0 0 8px;font-size:13px;line-height:1.6;">You can view, print, or share your certificate from the dashboard. Employers can verify it at the link on your certificate.</p>
+${button(data.dashboardUrl, "View My Certificate")}`,
+	);
+}
+
+export function feePaymentConfirmedEmail(data: ApplicationEmailData): string {
+	return shell(
+		"Payment confirmed",
+		`<p style="margin:0 0 16px;font-size:14px;line-height:1.6;">Hi ${escapeHtml(data.fullName.split(" ")[0]) || "there"}, we've received your registration fee payment for ${escapeHtml(data.programTitle)} (reference ${escapeHtml(data.reference)}). Your enrollment is now fully confirmed.</p>
+${detailTable([
+	["Reference", data.reference],
+	["Program", data.programTitle],
+	["Cohort", `${data.cohortLabel} · starts ${data.startsOnDisplay}`],
+])}
+<p style="margin:0 0 8px;font-size:13px;line-height:1.6;">See you on the first day — bring a valid ID and be ready to work.</p>`,
+	);
+}
+
 /* ------------------------------- contact -------------------------------- */
 
 export type ContactInquiryData = {

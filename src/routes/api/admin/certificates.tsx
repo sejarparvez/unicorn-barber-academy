@@ -5,6 +5,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
 import { issueCertificateForApplication } from "@/server/certificate-db";
+import { getApplicationDetail } from "@/server/enrollment-db";
+import { certificateIssuedEmail, sendMail } from "@/server/mail";
 
 const REASON_MESSAGES = {
 	"not-found": "Application not found",
@@ -48,6 +50,27 @@ export const Route = createFileRoute("/api/admin/certificates")({
 							{ message: REASON_MESSAGES[result.reason] },
 							{ status: result.reason === "not-found" ? 404 : 409 },
 						);
+					}
+					// Send certificate issuance email (non-fatal on failure).
+					try {
+						const detail = await getApplicationDetail(applicationId);
+						if (detail) {
+							const app = detail.application;
+							await sendMail({
+								to: app.email,
+								subject: `Your certificate is ready (${result.code}) | Unicorn Barber Training Academy`,
+								html: certificateIssuedEmail({
+									fullName: app.fullName,
+									programTitle: app.programTitle,
+									cohortLabel:
+										app.cohort === "day" ? "Day cohort" : "Evening cohort",
+									certificateCode: result.code,
+									dashboardUrl: `/dashboard`,
+								}),
+							});
+						}
+					} catch (emailError) {
+						console.error("[certificates] issuance email failed:", emailError);
 					}
 					return json({ ok: true, code: result.code });
 				} catch (error) {

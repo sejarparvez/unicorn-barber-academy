@@ -29,43 +29,48 @@ export const Route = createFileRoute("/sitemap.xml")({
 				// to ignore (and Google then distrusts for every URL).
 				// /blog and category lastmods derive from real post timestamps.
 				const staticRoutes = [
-					{ loc: "/", priority: "1.0" },
-					{ loc: "/about", priority: "0.7" },
-					{ loc: "/programs", priority: "0.9" },
-					{ loc: "/instructors", priority: "0.7" },
-					{ loc: "/gallery", priority: "0.6" },
-					{ loc: "/student-life", priority: "0.6" },
-					{ loc: "/media", priority: "0.5" },
+					{ loc: "/", priority: "1.0", changefreq: "weekly" },
+					{ loc: "/about", priority: "0.7", changefreq: "monthly" },
+					{ loc: "/programs", priority: "0.9", changefreq: "monthly" },
+					{ loc: "/instructors", priority: "0.7", changefreq: "monthly" },
+					{ loc: "/gallery", priority: "0.6", changefreq: "monthly" },
+					{ loc: "/student-life", priority: "0.6", changefreq: "monthly" },
+					{ loc: "/media", priority: "0.5", changefreq: "yearly" },
 					{
 						loc: "/blog",
 						lastmod: posts[0]?.updatedAt.slice(0, 10),
 						priority: "0.7",
+						changefreq: "weekly",
 					},
-					{ loc: "/contact", priority: "0.8" },
-					{ loc: "/careers", priority: "0.5" },
-					{ loc: "/terms", priority: "0.2" },
-					{ loc: "/privacy", priority: "0.2" },
+					{ loc: "/contact", priority: "0.8", changefreq: "yearly" },
+					{ loc: "/careers", priority: "0.5", changefreq: "monthly" },
+					{ loc: "/terms", priority: "0.2", changefreq: "yearly" },
+					{ loc: "/privacy", priority: "0.2", changefreq: "yearly" },
 				];
 
 				const entries: Array<{
 					loc: string;
 					lastmod?: string;
 					priority: string;
+					changefreq?: string;
 				}> = [
 					...staticRoutes,
 					...ALL_PROGRAMS.map((p) => ({
 						loc: p.to,
 						priority: "0.8",
+						changefreq: "monthly",
 					})),
 					...categories.map((c) => ({
 						loc: `/blog/category/${c.slug}`,
 						lastmod: c.latestPostAt?.slice(0, 10),
 						priority: "0.5",
+						changefreq: "monthly",
 					})),
 					...posts.map((post) => ({
 						loc: `/blog/${post.slug}`,
 						lastmod: post.updatedAt.slice(0, 10),
 						priority: "0.6",
+						changefreq: "monthly",
 					})),
 				];
 
@@ -75,7 +80,7 @@ ${entries
 	.map(
 		(entry) => `  <url>
     <loc>${SITE_URL}${entry.loc === "/" ? "" : entry.loc}</loc>
-${entry.lastmod ? `    <lastmod>${entry.lastmod}</lastmod>\n` : ""}${entry.loc.startsWith("/blog/") ? "    <changefreq>monthly</changefreq>\n" : ""}    <priority>${entry.priority}</priority>
+${entry.lastmod ? `    <lastmod>${entry.lastmod}</lastmod>\n` : ""}${entry.changefreq ? `    <changefreq>${entry.changefreq}</changefreq>\n` : ""}    <priority>${entry.priority}</priority>
   </url>`,
 	)
 	.join("\n")}

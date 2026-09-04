@@ -15,6 +15,7 @@ import type {
 } from "@/lib/blog";
 import { estimateReadingMinutes, parseBlogStatus } from "@/lib/blog";
 import { q, withTransaction } from "./db";
+import { PG_UNIQUE_VIOLATION } from "./pg-codes";
 
 /* ------------------------------ row mapping ----------------------------- */
 
@@ -491,8 +492,6 @@ function publishAt(status: BlogStatus): Date | null {
 async function clearRedirectsToSlug(slug: string): Promise<void> {
 	await q("DELETE FROM blog_slug_redirect WHERE old_slug = $1", [slug]);
 }
-
-const PG_UNIQUE_VIOLATION = "23505";
 
 export async function createPost(
 	input: NewPostInput,

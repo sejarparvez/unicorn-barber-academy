@@ -219,7 +219,9 @@ model Certificate {
   programSlug   String                 @map("program_slug") @db.VarChar(120)
   cohort        String                 @db.VarChar(16) // day | evening
   issuedOn      DateTime               @default(now()) @map("issued_on") @db.Date
+  issuedBy      Int?                   @map("issued_by")
   revokedAt     DateTime?              @map("revoked_at") @db.Timestamptz
+  revokedBy     Int?                   @map("revoked_by")
   revokedReason String?                @map("revoked_reason")
   createdAt     DateTime               @default(now()) @map("created_at") @db.Timestamptz
 

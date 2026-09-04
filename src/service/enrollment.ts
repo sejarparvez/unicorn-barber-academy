@@ -98,6 +98,10 @@ function useInvalidateEnrollment() {
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.myApplications(),
 			});
+			// Dashboard overview shows enrollment stats that change on mutations.
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.consoleOverview(),
+			});
 		},
 	};
 }

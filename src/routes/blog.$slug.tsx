@@ -70,6 +70,14 @@ export const Route = createFileRoute("/blog/$slug")({
 				...[post.focusKeyword, ...post.tags]
 					.filter((tag): tag is string => Boolean(tag))
 					.map((tag) => ({ property: "article:tag", content: tag })),
+				{
+					property: "article:author",
+					content: post.authorName || "Unicorn Barber Training Academy",
+				},
+				{
+					property: "article:publisher",
+					content: "Unicorn Barber Training Academy",
+				},
 				{ name: "twitter:card", content: "summary_large_image" },
 				...(image ? [{ name: "twitter:image", content: image }] : []),
 			],

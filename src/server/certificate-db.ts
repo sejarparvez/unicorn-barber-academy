@@ -5,16 +5,11 @@
 // employer verification checks, so uniqueness is enforced with retries
 // against the DB constraint rather than trusting count-based sequences.
 
-import { ALL_PROGRAMS } from "@/data/programs";
 import type { CertificateRecord } from "@/lib/certificates";
 import type { Cohort } from "@/lib/enrollment";
 import { db, withTransaction } from "./db";
-
-const PG_UNIQUE_VIOLATION = "23505";
-
-function programTitle(slug: string): string | null {
-	return ALL_PROGRAMS.find((p) => p.slug === slug)?.title ?? null;
-}
+import { PG_UNIQUE_VIOLATION } from "./pg-codes";
+import { programTitle } from "./program-utils";
 
 type CertificateRow = {
 	id: number;
@@ -24,7 +19,9 @@ type CertificateRow = {
 	program_slug: string;
 	cohort: string;
 	issued_on: Date;
+	issued_by: number | null;
 	revoked_at: Date | null;
+	revoked_by: number | null;
 	revoked_reason: string | null;
 };
 
@@ -38,13 +35,15 @@ function rowToRecord(row: CertificateRow): CertificateRecord {
 		programTitle: programTitle(row.program_slug),
 		cohort: row.cohort as Cohort,
 		issuedOn: new Date(row.issued_on).toISOString().slice(0, 10),
+		issuedBy: row.issued_by,
 		revokedAt: row.revoked_at ? new Date(row.revoked_at).toISOString() : null,
+		revokedBy: row.revoked_by,
 		revokedReason: row.revoked_reason,
 	};
 }
 
 const SELECT_COLUMNS = `c.id, c.code, c.user_id, u.name AS holder_name,
-	c.program_slug, c.cohort, c.issued_on, c.revoked_at, c.revoked_reason`;
+	c.program_slug, c.cohort, c.issued_on, c.issued_by, c.revoked_at, c.revoked_by, c.revoked_reason`;
 
 /* ------------------------------- issuance -------------------------------- */
 
@@ -112,10 +111,17 @@ export async function issueCertificateForApplication(
 			const code = `UBT-${year}-${String(serial).padStart(4, "0")}`;
 			try {
 				const insertRes = await tx.query<{ code: string }>(
-					`INSERT INTO certificate (code, user_id, application_id, program_slug, cohort)
-					 VALUES ($1, $2, $3, $4, $5)
+					`INSERT INTO certificate (code, user_id, application_id, program_slug, cohort, issued_by)
+					 VALUES ($1, $2, $3, $4, $5, $6)
 					 RETURNING code`,
-					[code, app.user_id, applicationId, app.program_slug, app.cohort],
+					[
+						code,
+						app.user_id,
+						applicationId,
+						app.program_slug,
+						app.cohort,
+						adminUserId,
+					],
 				);
 				return { ok: true, code: insertRes.rows[0].code };
 			} catch (error) {
@@ -135,13 +141,20 @@ export async function setCertificateRevocation(options: {
 	id: number;
 	revoked: boolean;
 	reason: string | null;
+	revokedBy: number | null;
 }): Promise<boolean> {
 	const res = await db().query(
 		`UPDATE certificate SET
 			revoked_at = CASE WHEN $2 THEN now() ELSE NULL END,
-			revoked_reason = CASE WHEN $2 THEN $3 ELSE NULL END
+			revoked_reason = CASE WHEN $2 THEN $3 ELSE NULL END,
+			revoked_by = CASE WHEN $2 THEN $4 ELSE NULL END
 		 WHERE id = $1`,
-		[options.id, options.revoked, options.reason?.slice(0, 500)],
+		[
+			options.id,
+			options.revoked,
+			options.reason?.slice(0, 500),
+			options.revokedBy,
+		],
 	);
 	return (res.rowCount ?? 0) > 0;
 }

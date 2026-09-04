@@ -8,11 +8,14 @@ import {
 	IconArrowRight,
 	IconCalendarEvent,
 	IconClock,
+	IconRss,
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { FinalCta, Reveal } from "@/components/effects";
+import { SITE_URL } from "@/data/site";
 import type { BlogCategory, BlogPostSummary, Paginated } from "@/lib/blog";
 import { formatLongDate } from "@/lib/date";
+import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 /** Null-safe wrapper — scheduled posts may not have a date yet. */
@@ -31,8 +34,46 @@ export function BlogPage({ posts, categories, page }: Props) {
 		return <BlogComingSoon />;
 	}
 
+	const blogJsonLd = {
+		"@context": "https://schema.org",
+		"@type": "Blog",
+		name: "Unicorn Barber Training Academy — The Journal",
+		url: `${SITE_URL}/blog`,
+		blogPost: posts.items.map((post) => ({
+			"@type": "BlogPosting",
+			headline: post.title,
+			url: `${SITE_URL}/blog/${post.slug}`,
+			...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
+			...(post.excerpt ? { description: post.excerpt } : {}),
+		})),
+	};
+
+	const breadcrumbJsonLd = {
+		"@context": "https://schema.org",
+		"@type": "BreadcrumbList",
+		itemListElement: [
+			{ "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+			{
+				"@type": "ListItem",
+				position: 2,
+				name: "Blog",
+				item: `${SITE_URL}/blog`,
+			},
+		],
+	};
+
 	return (
 		<main>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(blogJsonLd) }}
+			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
+				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
+			/>
 			{/* ----------------------------- Hero ----------------------------- */}
 			<section className="relative overflow-hidden bg-background px-6 pt-28 pb-14 lg:px-10 lg:pt-36">
 				<Reveal className="mx-auto max-w-2xl text-center">
@@ -65,6 +106,13 @@ export function BlogPage({ posts, categories, page }: Props) {
 							))}
 						</nav>
 					) : null}
+					<a
+						href="/feed.xml"
+						className="mt-6 inline-flex items-center gap-1.5 text-[11px] font-medium tracking-[0.14em] text-muted-foreground uppercase hover:text-primary"
+					>
+						<IconRss className="h-3 w-3" stroke={2} />
+						Subscribe via RSS
+					</a>
 				</Reveal>
 			</section>
 

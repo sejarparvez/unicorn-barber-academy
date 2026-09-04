@@ -36,6 +36,15 @@ export async function runSafe<T>(fn: () => Promise<T>): Promise<T> {
 		// Authz failures carry a safe, intentional message — let them through
 		// so clients can react (e.g. redirect) instead of showing "failed".
 		if (error instanceof AdminAccessError) throw error;
+		// TanStack Router redirects (thrown in beforeLoad) must propagate.
+		if (
+			error &&
+			typeof error === "object" &&
+			"statusCode" in error &&
+			"redirect" in error
+		) {
+			throw error;
+		}
 		console.error("[server-function]", error);
 		throw new Error("Request failed");
 	}

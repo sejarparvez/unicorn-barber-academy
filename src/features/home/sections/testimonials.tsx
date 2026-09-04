@@ -44,7 +44,7 @@ const TESTIMONIALS: Testimonial[] = [
 		quote:
 			"Business of Barbering paid for itself in my first month. I priced my services wrong for years before this.",
 		name: "Shakil Ahmed",
-		program: "Full Program",
+		program: "Classic Barbering",
 		cohort: "2024",
 		image: pic("unicorn-student-3", 200, 200),
 	},
@@ -53,11 +53,13 @@ const TESTIMONIALS: Testimonial[] = [
 const TESTIMONIALS_JSON_LD = {
 	"@context": "https://schema.org",
 	"@type": "EducationalOrganization",
+	"@id": `${SITE_URL}/#academy`,
 	name: "Unicorn Barber Training Academy",
 	url: SITE_URL,
 	review: TESTIMONIALS.map((t) => ({
 		"@type": "Review",
 		reviewBody: t.quote,
+		reviewRating: { "@type": "Rating", ratingValue: 5, bestRating: 5 },
 		author: { "@type": "Person", name: t.name },
 		itemReviewed: {
 			"@type": "Course",

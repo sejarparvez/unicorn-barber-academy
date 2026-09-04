@@ -6,6 +6,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
+import { overRateLimit } from "@/server/rate-limit";
 import {
 	isAllowedImageMime,
 	MAX_UPLOAD_BYTES,
@@ -21,6 +22,12 @@ export const Route = createFileRoute("/api/admin/upload")({
 				const guard = await requireAdminApi(request);
 				if (!guard.ok) {
 					return json({ message: guard.message }, { status: guard.status });
+				}
+				if (overRateLimit(`admin-upload:${guard.userId}`, 50, 60_000)) {
+					return json(
+						{ message: "Too many uploads. Please try again later." },
+						{ status: 429 },
+					);
 				}
 
 				let form: FormData;

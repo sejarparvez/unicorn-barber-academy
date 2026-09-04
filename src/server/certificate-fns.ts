@@ -5,6 +5,7 @@
 // QR generation lives here too so the Node-only `qrcode` package never
 // reaches the client bundle.
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import type { CertificateRecord, VerifyResult } from "@/lib/certificates";
 import {
 	getCertificateByApplicationId,
@@ -14,6 +15,7 @@ import {
 } from "@/server/certificate-db";
 import { clampId, runSafe } from "@/server/fn-utils";
 import { requireAdminSession } from "@/server/guards";
+import { clientIp, overRateLimit } from "@/server/rate-limit";
 import { getSession } from "@/server/session";
 
 /**
@@ -66,6 +68,11 @@ export const verifyCertificateFn = createServerFn({ method: "GET" })
 	.handler(
 		async ({ data }): Promise<VerifyResult> =>
 			runSafe(async () => {
+				// Rate-limit lookups per-IP to discourage brute-force enumeration.
+				const ip = clientIp(getRequest());
+				if (overRateLimit(`verify:cert:${ip}`, 30, 60_000)) {
+					return { kind: "rate-limited" as const };
+				}
 				const record = await getCertificateByCode(
 					data.code.trim().toUpperCase(),
 				);

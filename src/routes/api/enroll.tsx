@@ -46,7 +46,7 @@ export const Route = createFileRoute("/api/enroll")({
 					result = await submitApplication({
 						userId: Number(session.user.id),
 						intakeId: parsed.value.intakeId,
-						fullName: session.user.name || "Applicant",
+						fullName: (session.user.name || "Applicant").slice(0, 160),
 						email: session.user.email,
 						phone: parsed.value.phone,
 						experienceNote: parsed.value.experienceNote,

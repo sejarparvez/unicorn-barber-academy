@@ -41,6 +41,9 @@ export function ProgramCard({ program }: { program: Program }) {
 				<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
 					{program.description}
 				</p>
+				<p className="mt-3 text-sm font-semibold text-primary">
+					{program.tuition}
+				</p>
 				<ul className="mt-4 flex flex-wrap gap-2">
 					{program.highlights.map((h) => (
 						<li

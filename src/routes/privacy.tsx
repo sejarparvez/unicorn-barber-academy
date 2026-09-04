@@ -18,6 +18,12 @@ export const Route = createFileRoute("/privacy")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/privacy` },
+			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{
+				property: "og:description",
+				content:
+					"Privacy policy for Unicorn Barber Training Academy — how we collect, use, and protect your personal information.",
+			},
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/privacy` }],
 	}),

@@ -2,7 +2,7 @@
 // Press & media: stories featuring the academy. Content is curated in
 // src/data/media.ts; this page renders it with outbound canonical links.
 import { IconArrowUpRight, IconNews } from "@tabler/icons-react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { MEDIA_FEATURES, MEDIA_TYPE_LABELS } from "@/data/media";
@@ -19,8 +19,15 @@ export const Route = createFileRoute("/media")({
 				content:
 					"TV appearances, newspaper features, and interviews with Unicorn Barber Training Academy — barbering and beauty education in Dhaka.",
 			},
+			{
+				property: "og:description",
+				content:
+					"TV appearances, newspaper features, and interviews with Unicorn Barber Training Academy — barbering and beauty education in Dhaka.",
+			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/media` },
+			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{ name: "robots", content: "noindex" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/media` }],
 	}),
@@ -116,12 +123,12 @@ function MediaPage() {
 					Journalists and creators are welcome to visit a live cohort, meet
 					instructors, and film on campus.
 				</p>
-				<a
-					href="/contact"
+				<Link
+					to="/contact"
 					className={cn(buttonVariants({ variant: "outline" }), "mt-6")}
 				>
 					Contact our team
-				</a>
+				</Link>
 			</section>
 		</main>
 	);
