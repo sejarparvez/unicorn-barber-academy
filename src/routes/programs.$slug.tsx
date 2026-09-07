@@ -43,6 +43,14 @@ export const Route = createFileRoute("/programs/$slug")({
 						? program.image
 						: `${SITE_URL}${program.image}`,
 				},
+				{
+					name: "twitter:title",
+					content: `${program.title} | Unicorn Barber Training Academy`,
+				},
+				{
+					name: "twitter:description",
+					content: program.description,
+				},
 			],
 			links: [{ rel: "canonical", href: url }],
 		};

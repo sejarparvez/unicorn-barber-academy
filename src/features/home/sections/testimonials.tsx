@@ -3,6 +3,7 @@
 import { IconQuote } from "@tabler/icons-react";
 import { Image } from "@unpic/react";
 import { Reveal, SectionEyebrow } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	Carousel,
@@ -13,7 +14,6 @@ import {
 } from "@/components/ui/carousel";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 
 type Testimonial = {
 	quote: string;
@@ -84,7 +84,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 					<figcaption className="mt-6 flex items-center gap-3">
 						<Image
 							src={testimonial.image}
-							alt=""
+							alt={testimonial.name}
 							layout="constrained"
 							width={40}
 							height={40}
@@ -112,19 +112,9 @@ export default function Testimonials() {
 			className="border-t border-primary/15  px-4 py-24 lg:px-10"
 			aria-labelledby="testimonials-heading"
 		>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(TESTIMONIALS_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={TESTIMONIALS_JSON_LD} />
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="5"
-					title="What Graduates Say"
-					id="testimonials-heading"
-				/>
+				<SectionEyebrow title="What Graduates Say" id="testimonials-heading" />
 
 				<Carousel
 					opts={{ align: "start", loop: true }}

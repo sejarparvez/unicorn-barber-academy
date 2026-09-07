@@ -1,6 +1,6 @@
 // src/features/blog-admin/types.ts
 // Shared editor form state for the blog post editor (new + edit pages).
-import type { BlogStatus } from "@/lib/blog";
+import type { BlogPostFull, BlogStatus } from "@/lib/blog";
 
 function uid(): string {
 	return (
@@ -43,5 +43,32 @@ export function formRowsFromPost(post?: {
 			text,
 		})),
 		faq: (post?.faq ?? []).map((item) => ({ id: uid(), ...item })),
+	};
+}
+
+/** Full post → initial editor form state. */
+export function formFromPost(post?: BlogPostFull): PostFormState {
+	const rows = formRowsFromPost(post);
+	return {
+		title: post?.title ?? "",
+		slug: post?.slug ?? "",
+		slugTouched: Boolean(post),
+		excerpt: post?.excerpt ?? "",
+		contentMd: post?.contentMd ?? "",
+		coverImageUrl: post?.coverImageUrl ?? "",
+		coverImageAlt: post?.coverImageAlt ?? "",
+		metaTitle: post?.metaTitle ?? "",
+		metaDescription: post?.metaDescription ?? "",
+		focusKeyword: post?.focusKeyword ?? "",
+		seoKeywords: post?.seoKeywords ?? [],
+		canonicalUrl: post?.canonicalUrl ?? "",
+		ogImageUrl: post?.ogImageUrl ?? "",
+		noindex: post?.noindex ?? false,
+		keyTakeaways: rows.keyTakeaways,
+		faq: rows.faq,
+		relatedProgramSlugs: post?.relatedProgramSlugs ?? [],
+		tags: post?.tags ?? [],
+		status: post?.status ?? "draft",
+		categoryId: post?.category?.id ?? null,
 	};
 }

@@ -1,27 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { formatStartsOn } from "@/lib/enrollment";
+import { guardPublicEndpoint } from "@/server/api-guard";
 import { auth } from "@/server/auth";
 import { listOpenIntakes, submitApplication } from "@/server/enrollment-db";
 import { validateApplicationPayload } from "@/server/enrollment-validate";
 import { applicationReceivedEmail, sendMail } from "@/server/mail";
-import { clientIp, isSameOrigin, overRateLimit } from "@/server/rate-limit";
+import { clientIp } from "@/server/rate-limit";
 
 export const Route = createFileRoute("/api/enroll")({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
-				// Same-origin + per-IP cap stay on even though the endpoint now
-				// requires a session � cheap defense against scripted abuse.
-				if (!isSameOrigin(request)) {
-					return json({ message: "Forbidden" }, { status: 403 });
-				}
-				if (overRateLimit(`enroll:${clientIp(request)}`, 5, 60_000)) {
-					return json(
-						{ message: "Too many requests. Please try again later." },
-						{ status: 429 },
-					);
-				}
+				const guard = guardPublicEndpoint(request, {
+					rateKey: `enroll:${clientIp(request)}`,
+					rateMax: 5,
+					rateWindowMs: 60_000,
+				});
+				if (!guard.ok) return guard.response;
 
 				const session = await auth.api.getSession({
 					headers: request.headers,

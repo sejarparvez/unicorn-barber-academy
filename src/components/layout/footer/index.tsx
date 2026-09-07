@@ -14,6 +14,7 @@ import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -23,7 +24,6 @@ import {
 	OPENING_HOURS_SPEC,
 	SITE_URL,
 } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
@@ -135,13 +135,7 @@ const LOCAL_BUSINESS_JSON_LD = {
 export default function Footer() {
 	return (
 		<footer className="relative overflow-hidden">
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(LOCAL_BUSINESS_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={LOCAL_BUSINESS_JSON_LD} />
 
 			{/* Top gradient hairline, echoing the header divider */}
 			<Separator

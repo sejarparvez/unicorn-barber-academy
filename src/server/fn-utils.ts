@@ -25,6 +25,11 @@ export function clampSearchTerm(term: unknown, max = 100): string {
 	return typeof term === "string" ? term.slice(0, max) : "";
 }
 
+/** Escape ILIKE metacharacters (`\`, `%`, `_`) so user input is treated as literal text. */
+export function escapeLike(term: string): string {
+	return term.replace(/[\\%_]/g, "\\$&");
+}
+
 /**
  * Run DB work behind a catch-all: log the real error server-side, rethrow
  * a generic message so pg driver details never reach the client.

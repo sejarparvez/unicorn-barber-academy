@@ -10,6 +10,7 @@
 import {
 	IconBold,
 	IconCode,
+	IconColumns2,
 	IconDeviceFloppy,
 	IconEye,
 	IconH2,
@@ -39,7 +40,9 @@ export function MarkdownEditor({
 	slugForUploads,
 	disabled,
 }: Props) {
-	const [previewing, setPreviewing] = useState(false);
+	const [viewMode, setViewMode] = useState<"write" | "preview" | "split">(
+		"write",
+	);
 	const [uploading, setUploading] = useState(false);
 	const [uploadError, setUploadError] = useState<string | null>(null);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -159,10 +162,10 @@ export function MarkdownEditor({
 				<div className="flex items-center overflow-hidden rounded border border-border">
 					<button
 						type="button"
-						onClick={() => setPreviewing(false)}
+						onClick={() => setViewMode("write")}
 						className={cn(
 							"flex items-center gap-1 px-2 py-1 text-xs font-medium",
-							!previewing
+							viewMode === "write"
 								? "bg-primary text-primary-foreground"
 								: "text-muted-foreground hover:bg-muted",
 						)}
@@ -171,10 +174,23 @@ export function MarkdownEditor({
 					</button>
 					<button
 						type="button"
-						onClick={() => setPreviewing(true)}
+						onClick={() => setViewMode("split")}
 						className={cn(
 							"flex items-center gap-1 px-2 py-1 text-xs font-medium",
-							previewing
+							viewMode === "split"
+								? "bg-primary text-primary-foreground"
+								: "text-muted-foreground hover:bg-muted",
+						)}
+						title="Side-by-side preview"
+					>
+						<IconColumns2 className="h-3.5 w-3.5" /> Split
+					</button>
+					<button
+						type="button"
+						onClick={() => setViewMode("preview")}
+						className={cn(
+							"flex items-center gap-1 px-2 py-1 text-xs font-medium",
+							viewMode === "preview"
 								? "bg-primary text-primary-foreground"
 								: "text-muted-foreground hover:bg-muted",
 						)}
@@ -196,11 +212,30 @@ export function MarkdownEditor({
 				</p>
 			) : null}
 
-			{previewing ? (
-				// Preview uses the same parse/heading pipeline as the server
-				// renderer (see lib/markdown) so it matches production output.
-				// It is NOT sanitized client-side — sanitization happens on the
-				// server when content is published, and this is a draft preview.
+			{viewMode === "split" ? (
+				<div className="flex min-h-[420px]">
+					<textarea
+						id={editorId}
+						ref={textareaRef}
+						value={value}
+						onChange={(e) => onChange(e.target.value)}
+						disabled={disabled}
+						aria-label="Article body (markdown)"
+						placeholder={"## Section heading\n\nWrite in markdown…"}
+						spellCheck
+						className="w-1/2 resize-y bg-transparent px-4 py-3 font-mono text-sm leading-relaxed outline-none placeholder:text-muted-foreground/60 border-r border-border"
+					/>
+					<div
+						className="prose prose-sm dark:prose-invert w-1/2 px-4 py-4 overflow-y-auto"
+						// biome-ignore lint/security/noDangerouslySetInnerHtml: draft preview for the admin editor only
+						dangerouslySetInnerHTML={{
+							__html: renderMarkdownPreview(
+								value || "*Nothing to preview yet.*",
+							),
+						}}
+					/>
+				</div>
+			) : viewMode === "preview" ? (
 				<div
 					className="prose prose-sm dark:prose-invert min-h-[420px] max-w-none px-4 py-4"
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: draft preview for the admin editor only

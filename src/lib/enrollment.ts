@@ -39,7 +39,24 @@ export const SEAT_HOLDING_STATUSES: readonly ApplicationStatus[] = [
 ] as const;
 
 export type FeeStatus = "unpaid" | "paid";
+export const FEE_STATUSES = ["unpaid", "paid"] as const;
+
 export type Cohort = "day" | "evening";
+export const COHORTS = ["day", "evening"] as const;
+
+export function parseCohort(value: unknown): Cohort | undefined {
+	return typeof value === "string" &&
+		(COHORTS as readonly string[]).includes(value)
+		? (value as Cohort)
+		: undefined;
+}
+
+export function parseFeeStatus(value: unknown): FeeStatus | undefined {
+	return typeof value === "string" &&
+		(FEE_STATUSES as readonly string[]).includes(value)
+		? (value as FeeStatus)
+		: undefined;
+}
 
 export const COHORT_LABELS: Record<Cohort, string> = {
 	day: "Day cohort",

@@ -9,8 +9,8 @@ import {
 	IconPhotoPlus,
 	IconTrash,
 } from "@tabler/icons-react";
-import { Link, useBlocker, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useMemo, useRef, useState } from "react";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -35,6 +35,7 @@ import {
 	type BlogPostFull,
 	type BlogStatus,
 	deriveExcerpt,
+	parseBlogStatus,
 	seoChecks,
 	slugify,
 } from "@/lib/blog";
@@ -42,39 +43,14 @@ import { cn } from "@/lib/utils";
 import { useDeletePost, useSavePost } from "@/service/blog";
 import { MarkdownEditor } from "./markdown-editor";
 import { SeoPanel } from "./seo-panel";
-import { formRowsFromPost, type PostFormState } from "./types";
+import { formFromPost, type PostFormState } from "./types";
+import { useAutoSave, useUnsavedChangesGuard } from "./use-editor-guards";
 
 type Props = {
 	mode: "new" | "edit";
 	categories: BlogCategory[];
 	post?: BlogPostFull;
 };
-
-function formFromPost(post?: BlogPostFull): PostFormState {
-	const rows = formRowsFromPost(post);
-	return {
-		title: post?.title ?? "",
-		slug: post?.slug ?? "",
-		slugTouched: Boolean(post),
-		excerpt: post?.excerpt ?? "",
-		contentMd: post?.contentMd ?? "",
-		coverImageUrl: post?.coverImageUrl ?? "",
-		coverImageAlt: post?.coverImageAlt ?? "",
-		metaTitle: post?.metaTitle ?? "",
-		metaDescription: post?.metaDescription ?? "",
-		focusKeyword: post?.focusKeyword ?? "",
-		seoKeywords: post?.seoKeywords ?? [],
-		canonicalUrl: post?.canonicalUrl ?? "",
-		ogImageUrl: post?.ogImageUrl ?? "",
-		noindex: post?.noindex ?? false,
-		keyTakeaways: rows.keyTakeaways,
-		faq: rows.faq,
-		relatedProgramSlugs: post?.relatedProgramSlugs ?? [],
-		tags: post?.tags ?? [],
-		status: post?.status ?? "draft",
-		categoryId: post?.category?.id ?? null,
-	};
-}
 
 export function PostEditorPage({ mode, categories, post }: Props) {
 	const navigate = useNavigate();
@@ -89,6 +65,7 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 	const saving = save.isPending || deleteMutation.isPending;
 	const [error, setError] = useState<string | null>(null);
 	const [savedAt, setSavedAt] = useState<string | null>(null);
+	const [autoSavedAt, setAutoSavedAt] = useState<string | null>(null);
 	// Deletion is confirmed through the shared AlertDialog — no timer
 	// bookkeeping, and consistent with the other admin surfaces.
 	const [confirmDelete, setConfirmDelete] = useState(false);
@@ -101,26 +78,16 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 		() => JSON.stringify(form) !== savedSnapshot,
 		[form, savedSnapshot],
 	);
-	useBlocker({
-		shouldBlockFn: () => {
-			if (!isDirty || saving) return false;
-			const leave = window.confirm(
-				"You have unsaved changes. Leave without saving?",
-			);
-			return !leave;
-		},
-	});
-	useEffect(() => {
-		if (!isDirty) return;
-		const handler = (event: BeforeUnloadEvent) => {
-			event.preventDefault();
-		};
-		window.addEventListener("beforeunload", handler);
-		return () => window.removeEventListener("beforeunload", handler);
-	}, [isDirty]);
+	useUnsavedChangesGuard(isDirty, saving);
 
-	const patch = (changes: Partial<PostFormState>) =>
+	// Auto-save: fires every 30 seconds, but only if the user has been idle
+	// for 3+ seconds (debounced via ref to avoid saving during active typing).
+	const { markInput } = useAutoSave(mode, isDirty, saving, onSave);
+
+	const patch = (changes: Partial<PostFormState>) => {
+		markInput();
 		setForm((prev) => ({ ...prev, ...changes }));
+	};
 
 	const checks = useMemo(
 		() =>
@@ -132,7 +99,7 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 		[form],
 	);
 
-	async function onSave(nextStatus?: BlogStatus) {
+	async function onSave(nextStatus?: BlogStatus, isAutoSave = false) {
 		// Mirror the server rule locally so admins get instant feedback.
 		if (form.coverImageUrl.trim() && !form.coverImageAlt.trim()) {
 			setError(
@@ -188,7 +155,13 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 				const next = { ...form, slug: saved.slug, status: saved.status };
 				setForm(next);
 				setSavedSnapshot(JSON.stringify(next));
-				setSavedAt(new Date().toLocaleTimeString());
+				const now = new Date().toLocaleTimeString();
+				if (isAutoSave) {
+					setAutoSavedAt(now);
+				} else {
+					setSavedAt(now);
+					setAutoSavedAt(null);
+				}
 			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Save failed");
@@ -324,6 +297,11 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 					Saved at {savedAt}.
 				</p>
 			) : null}
+			{autoSavedAt && !savedAt && !error ? (
+				<p className="rounded-md border border-muted px-3 py-2 text-xs text-muted-foreground">
+					Auto-saved at {autoSavedAt}.
+				</p>
+			) : null}
 
 			<div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
 				{/* ------------------------- Content pane ------------------------- */}
@@ -391,7 +369,7 @@ export function PostEditorPage({ mode, categories, post }: Props) {
 								id="post-status"
 								value={form.status}
 								onChange={(e) =>
-									patch({ status: e.target.value as BlogStatus })
+									patch({ status: parseBlogStatus(e.target.value) ?? "draft" })
 								}
 								className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
 							>

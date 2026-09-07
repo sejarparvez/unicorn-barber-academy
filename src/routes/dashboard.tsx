@@ -14,7 +14,7 @@ import {
 	Outlet,
 	useMatches,
 } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -126,10 +126,17 @@ function isActive(pathname: string, to: string): boolean {
 		: pathname === to || pathname.startsWith(`${to}/`);
 }
 
+const CmdK = lazy(() =>
+	import("@/components/cmd-k").then((m) => ({ default: m.CmdK })),
+);
+
 function DashboardLayout() {
 	const { session } = Route.useRouteContext();
 	return (
 		<main className="min-h-[calc(100svh-4rem)] bg-muted/25">
+			<Suspense>
+				<CmdK />
+			</Suspense>
 			<div className="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
 				<Sidebar session={session} />
 				<div className="min-w-0 flex-1">

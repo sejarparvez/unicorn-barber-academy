@@ -2,8 +2,15 @@
 // TanStack Query hooks for the blog admin surfaces. Same contract as
 // service/enrollment.ts — reads wrap server functions, mutations invalidate
 // precisely (post detail + affected lists).
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import {
+	bulkDeletePosts,
+	bulkSetPostStatus,
 	createCategory,
 	createPost,
 	deleteCategory,
@@ -27,7 +34,12 @@ type ListPage = {
 };
 
 export function useAdminPosts(
-	filters: { status?: BlogStatus; page?: number },
+	filters: {
+		status?: BlogStatus;
+		search?: string;
+		category?: number;
+		page?: number;
+	},
 	options?: { initialData?: ListPage },
 ) {
 	return useQuery({
@@ -35,10 +47,17 @@ export function useAdminPosts(
 		queryFn: async (): Promise<ListPage> => {
 			const { listAdminPostsFn } = await import("@/server/blog-fns");
 			return listAdminPostsFn({
-				data: { status: filters.status, page: filters.page ?? 1 },
+				data: {
+					status: filters.status,
+					search: filters.search,
+					category: filters.category,
+					page: filters.page ?? 1,
+				},
 			});
 		},
 		initialData: options?.initialData,
+		staleTime: 30_000,
+		placeholderData: keepPreviousData,
 	});
 }
 
@@ -50,6 +69,7 @@ export function useBlogCategories(options?: { initialData?: BlogCategory[] }) {
 			return listCategoriesFn();
 		},
 		initialData: options?.initialData,
+		staleTime: 60_000,
 	});
 }
 
@@ -84,20 +104,79 @@ export function useSavePost(id?: number) {
 
 export function useDeletePost() {
 	const invalidate = useInvalidateBlog();
+	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (id: number) => deletePost(id),
-		onSuccess: () => invalidate(),
+		onMutate: async (id) => {
+			await queryClient.cancelQueries({ queryKey: queryKeys.adminPosts() });
+			const previous = queryClient.getQueriesData({
+				queryKey: queryKeys.adminPosts(),
+			});
+			queryClient.setQueriesData(
+				{ queryKey: queryKeys.adminPosts() },
+				(old: ListPage | undefined) => {
+					if (!old) return old;
+					return {
+						...old,
+						items: old.items.filter((item) => item.id !== id),
+						total: old.total - 1,
+					};
+				},
+			);
+			return { previous };
+		},
+		onError: (_err, _id, context) => {
+			if (context?.previous) {
+				for (const [key, data] of context.previous) {
+					queryClient.setQueryData(key, data);
+				}
+			}
+		},
+		onSettled: () => invalidate(),
 	});
 }
 
 export function useSetPostStatus() {
 	const invalidate = useInvalidateBlog();
+	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (input: {
 			id: number;
 			action: "publish" | "unpublish" | "archive";
 		}) => setPostStatus(input.id, input.action),
-		onSuccess: () => invalidate(),
+		onMutate: async (input) => {
+			await queryClient.cancelQueries({ queryKey: queryKeys.adminPosts() });
+			const previous = queryClient.getQueriesData({
+				queryKey: queryKeys.adminPosts(),
+			});
+			const statusMap: Record<string, BlogStatus> = {
+				publish: "published",
+				unpublish: "draft",
+				archive: "archived",
+			};
+			const newStatus = statusMap[input.action];
+			queryClient.setQueriesData(
+				{ queryKey: queryKeys.adminPosts() },
+				(old: ListPage | undefined) => {
+					if (!old) return old;
+					return {
+						...old,
+						items: old.items.map((item) =>
+							item.id === input.id ? { ...item, status: newStatus } : item,
+						),
+					};
+				},
+			);
+			return { previous };
+		},
+		onError: (_err, _input, context) => {
+			if (context?.previous) {
+				for (const [key, data] of context.previous) {
+					queryClient.setQueryData(key, data);
+				}
+			}
+		},
+		onSettled: () => invalidate(),
 	});
 }
 
@@ -122,6 +201,25 @@ export function useDeleteCategory() {
 	const invalidate = useInvalidateBlog();
 	return useMutation({
 		mutationFn: async (id: number) => deleteCategory(id),
+		onSuccess: () => invalidate(),
+	});
+}
+
+export function useBulkSetPostStatus() {
+	const invalidate = useInvalidateBlog();
+	return useMutation({
+		mutationFn: async (input: {
+			ids: number[];
+			status: "draft" | "published" | "archived";
+		}) => bulkSetPostStatus(input.ids, input.status),
+		onSuccess: () => invalidate(),
+	});
+}
+
+export function useBulkDeletePosts() {
+	const invalidate = useInvalidateBlog();
+	return useMutation({
+		mutationFn: async (ids: number[]) => bulkDeletePosts(ids),
 		onSuccess: () => invalidate(),
 	});
 }

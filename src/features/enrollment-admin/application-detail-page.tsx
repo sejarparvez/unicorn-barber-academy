@@ -15,7 +15,11 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ApplicationDetail, ApplicationStatus } from "@/lib/enrollment";
-import { APPLICATION_STATUS_LABELS, formatStartsOn } from "@/lib/enrollment";
+import {
+	APPLICATION_STATUS_LABELS,
+	formatStartsOn,
+	parseApplicationStatus,
+} from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
 import { cn } from "@/lib/utils";
 import {
@@ -25,6 +29,7 @@ import {
 } from "@/service/certificate";
 import {
 	useApplicationDetail,
+	useApplicationStatusLog,
 	useSetApplicationFee,
 	useSetApplicationStatus,
 } from "@/service/enrollment";
@@ -218,6 +223,8 @@ export function ApplicationDetailPage({
 							</p>
 						</>
 					) : null}
+
+					<StatusHistory applicationId={application.id} />
 				</section>
 
 				{/* Actions */}
@@ -390,5 +397,51 @@ function CertificatePanel({ applicationId }: { applicationId: number }) {
 				</div>
 			)}
 		</section>
+	);
+}
+
+function StatusHistory({ applicationId }: { applicationId: number }) {
+	const { data: log, isPending } = useApplicationStatusLog(applicationId);
+
+	if (isPending) {
+		return (
+			<>
+				<h2 className="pt-2 font-heading text-lg font-semibold">History</h2>
+				<p className="text-sm text-muted-foreground">Loading…</p>
+			</>
+		);
+	}
+
+	if (!log || log.length === 0) return null;
+
+	return (
+		<>
+			<h2 className="pt-2 font-heading text-lg font-semibold">History</h2>
+			<ol className="relative border-l border-border pl-4 text-sm">
+				{log.map((entry) => (
+					<li key={entry.id} className="relative mb-4 last:mb-0">
+						<span className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full border border-border bg-muted" />
+						<p className="font-medium">
+							{APPLICATION_STATUS_LABELS[
+								parseApplicationStatus(entry.fromStatus) ?? "pending"
+							] ?? entry.fromStatus}
+							{" → "}
+							{APPLICATION_STATUS_LABELS[
+								parseApplicationStatus(entry.toStatus) ?? "pending"
+							] ?? entry.toStatus}
+						</p>
+						<p className="text-xs text-muted-foreground">
+							{entry.adminName ?? "Admin"} ·{" "}
+							{new Date(entry.createdAt).toLocaleString()}
+						</p>
+						{entry.note ? (
+							<p className="mt-1 rounded border border-border bg-muted/30 p-2 text-xs">
+								{entry.note}
+							</p>
+						) : null}
+					</li>
+				))}
+			</ol>
+		</>
 	);
 }

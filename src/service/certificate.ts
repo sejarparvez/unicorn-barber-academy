@@ -10,19 +10,6 @@ import {
 import type { CertificateRecord } from "@/lib/certificates";
 import { queryKeys } from "./query-keys";
 
-export function useMyCertificates(options?: {
-	initialData?: CertificateRecord[];
-}) {
-	return useQuery({
-		queryKey: queryKeys.certificates(),
-		queryFn: async (): Promise<CertificateRecord[]> => {
-			const { listMyCertificatesFn } = await import("@/server/certificate-fns");
-			return listMyCertificatesFn();
-		},
-		initialData: options?.initialData,
-	});
-}
-
 export function useApplicationCertificate(applicationId: number) {
 	return useQuery({
 		queryKey: queryKeys.applicationCertificate(applicationId),
@@ -34,6 +21,7 @@ export function useApplicationCertificate(applicationId: number) {
 				data: { applicationId },
 			});
 		},
+		staleTime: 60_000,
 	});
 }
 

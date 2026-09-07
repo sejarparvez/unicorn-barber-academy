@@ -1,8 +1,8 @@
 // src/features/legal/terms-page.tsx
 
+import { JsonLdScript } from "@/components/jsonld-script";
 import { CONTACT, SITE_URL } from "@/data/site";
 import { LegalContent, LegalHero } from "@/features/legal/legal-layout";
-import { stringifyJsonLd } from "@/lib/jsonld";
 
 const BREADCRUMB_JSON_LD = {
 	"@context": "https://schema.org",
@@ -21,13 +21,7 @@ const BREADCRUMB_JSON_LD = {
 export function TermsPage() {
 	return (
 		<main className="min-h-screen">
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={BREADCRUMB_JSON_LD} />
 			<LegalHero title="Terms of Service" />
 			<LegalContent>
 				<section className="mb-12">

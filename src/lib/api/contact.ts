@@ -1,7 +1,7 @@
 // src/lib/api/contact.ts
 import { http } from "./http";
 
-export type ContactPayload = {
+type ContactPayload = {
 	name: string;
 	email: string;
 	phone?: string;
@@ -10,7 +10,7 @@ export type ContactPayload = {
 	message: string;
 };
 
-export type ContactResponse = {
+type ContactResponse = {
 	success: boolean;
 	message: string;
 	inquiryId?: string;

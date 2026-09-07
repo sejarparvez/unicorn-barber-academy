@@ -11,10 +11,10 @@ import {
 	SectionEyebrow,
 	useFadeUp,
 } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { GALLERY_ITEMS } from "@/data/gallery";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 const BREADCRUMB_JSON_LD = {
@@ -37,13 +37,7 @@ const GRAD_ITEMS = GALLERY_ITEMS.filter((g) => g.category === "graduation");
 export function StudentLifePage() {
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={BREADCRUMB_JSON_LD} />
 			<StudentLifeHero />
 			<StudioFloor />
 			<CohortLife />
@@ -139,11 +133,7 @@ function StudioFloor() {
 			aria-labelledby="studio-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="1"
-					title="The Studio Floor"
-					id="studio-heading"
-				/>
+				<SectionEyebrow title="The Studio Floor" id="studio-heading" />
 				<p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
 					Twelve chairs. Two wash basins. A colour bar. A retail wall. This is
 					where you'll spend 80% of your time — not in a lecture hall.
@@ -201,11 +191,7 @@ function CohortLife() {
 			aria-labelledby="cohort-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="2"
-					title="A Day in the Life"
-					id="cohort-heading"
-				/>
+				<SectionEyebrow title="A Day in the Life" id="cohort-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
 					{moments.map((moment, i) => (
 						<Reveal key={moment.title} delay={i * 0.08}>
@@ -232,7 +218,7 @@ function GraduationDays() {
 			aria-labelledby="grad-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="3" title="Graduation Days" id="grad-heading" />
+				<SectionEyebrow title="Graduation Days" id="grad-heading" />
 				<p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
 					The ceremony is simple: certificates, a guild pin, a group photo, and
 					the quiet realisation that you're now the professional.

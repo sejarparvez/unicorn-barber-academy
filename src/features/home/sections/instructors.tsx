@@ -4,12 +4,12 @@ import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import { Reveal, SectionEyebrow } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Instructor } from "@/data/instructors";
 import { INSTRUCTORS } from "@/data/instructors";
 import { SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 
 const INSTRUCTORS_JSON_LD = {
 	"@context": "https://schema.org",
@@ -84,20 +84,10 @@ export default function Instructors() {
 			className="section-light border-t border-border bg-background px-4 py-24 lg:px-10"
 			aria-labelledby="instructors-heading"
 		>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(INSTRUCTORS_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={INSTRUCTORS_JSON_LD} />
 			<div className="mx-auto max-w-7xl">
 				<div className="flex flex-wrap items-end justify-between gap-6">
-					<SectionEyebrow
-						guard="4"
-						title="Instructors"
-						id="instructors-heading"
-					/>
+					<SectionEyebrow title="Instructors" id="instructors-heading" />
 					<Link
 						to="/instructors"
 						className="group inline-flex items-center gap-2 text-[13px] font-medium tracking-[0.16em] text-muted-foreground hover:text-primary"

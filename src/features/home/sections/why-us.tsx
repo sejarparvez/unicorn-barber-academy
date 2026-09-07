@@ -43,7 +43,7 @@ export default function WhyUnicorn() {
 			aria-labelledby="why-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="1" title="Why Unicorn" id="why-heading" />
+				<SectionEyebrow title="Why Unicorn" id="why-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-px overflow-hidden border border-border sm:grid-cols-2 lg:grid-cols-4">
 					{FEATURES.map((feature, i) => (
 						<Reveal key={feature.title} delay={i * 0.08}>

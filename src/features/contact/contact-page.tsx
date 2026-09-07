@@ -27,6 +27,7 @@ import {
 	SectionEyebrow,
 	useFadeUp,
 } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { trackEvent } from "@/components/providers/analytics";
 import {
 	Accordion,
@@ -45,12 +46,11 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { SUBJECT_OPTIONS } from "@/data/contact";
 import { pic } from "@/data/images";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
 import { submitContactMessage } from "@/lib/api/contact";
-
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { useCopyToClipboard } from "@/lib/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
 
@@ -79,18 +79,8 @@ const CONTACT_PAGE_JSON_LD = {
 export function ContactPage() {
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(JSON_LD) }}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(CONTACT_PAGE_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={JSON_LD} />
+			<JsonLdScript data={CONTACT_PAGE_JSON_LD} />
 			<ContactHero />
 			<ContactForm />
 			<VisitStudio />
@@ -201,13 +191,6 @@ function ContactHero() {
 
 /* ------------------------------ Form ------------------------------ */
 
-const SUBJECTS = [
-	{ value: "student", label: "Prospective student" },
-	{ value: "partner", label: "Salon or barbershop partnership" },
-	{ value: "press", label: "Press & media" },
-	{ value: "other", label: "Something else" },
-];
-
 const DESKS = [
 	{
 		icon: IconSchool,
@@ -251,7 +234,7 @@ function ContactForm() {
 			aria-labelledby="contact-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="1" title="Send a Message" id="contact-heading" />
+				<SectionEyebrow title="Send a Message" id="contact-heading" />
 
 				<div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-5">
 					{/* Form */}
@@ -319,7 +302,7 @@ function ContactForm() {
 														<SelectValue placeholder="Select one" />
 													</SelectTrigger>
 													<SelectContent>
-														{SUBJECTS.map((s) => (
+														{SUBJECT_OPTIONS.map((s) => (
 															<SelectItem key={s.value} value={s.value}>
 																{s.label}
 															</SelectItem>
@@ -529,11 +512,7 @@ function VisitStudio() {
 		<section id="visit" className="scroll-mt-20 border-t border-border">
 			<div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
 				<Reveal className="flex flex-col justify-center px-6 py-24 lg:px-10">
-					<SectionEyebrow
-						guard="2"
-						title="Visit the Studio"
-						id="visit-heading"
-					/>
+					<SectionEyebrow title="Visit the Studio" id="visit-heading" />
 
 					<address className="mt-8 space-y-5 text-sm not-italic text-secondary-foreground/75">
 						<p className="flex items-start gap-3">
@@ -646,19 +625,9 @@ function ContactFaq() {
 			className="section-light border-t border-border bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="contact-faq-heading"
 		>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(CONTACT_FAQ_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={CONTACT_FAQ_JSON_LD} />
 			<div className="mx-auto max-w-3xl">
-				<SectionEyebrow
-					guard="3"
-					title="Before You Reach Out"
-					id="contact-faq-heading"
-				/>
+				<SectionEyebrow title="Before You Reach Out" id="contact-faq-heading" />
 				<Accordion className="mt-10">
 					{CONTACT_FAQS.map((item, i) => (
 						<AccordionItem

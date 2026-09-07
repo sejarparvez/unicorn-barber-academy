@@ -55,9 +55,11 @@ import { Route as DashboardEnrollmentsIdRouteImport } from './routes/dashboard/e
 import { Route as DashboardEnrollmentsIntakesRouteImport } from './routes/dashboard/enrollments/intakes'
 import { Route as MdBlogSlugRouteImport } from './routes/md/blog.$slug'
 import { Route as ApiAdminBlogIdRouteImport } from './routes/api/admin/blog/$id'
+import { Route as ApiAdminBlogBulkRouteImport } from './routes/api/admin/blog/bulk'
 import { Route as ApiAdminBlogCategoriesRouteImport } from './routes/api/admin/blog/categories'
 import { Route as ApiAdminCertificatesIdRouteImport } from './routes/api/admin/certificates/$id'
 import { Route as ApiAdminEnrollmentsIdRouteImport } from './routes/api/admin/enrollments/$id'
+import { Route as ApiAdminEnrollmentsBulkRouteImport } from './routes/api/admin/enrollments/bulk'
 import { Route as ApiAdminEnrollmentsIntakesRouteImport } from './routes/api/admin/enrollments/intakes'
 import { Route as DashboardBlogIdEditRouteImport } from './routes/dashboard/blog.$id.edit'
 import { Route as ApiAdminBlogCategoriesIdRouteImport } from './routes/api/admin/blog/categories/$id'
@@ -296,6 +298,11 @@ const ApiAdminBlogIdRoute = ApiAdminBlogIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ApiAdminBlogRoute,
 } as any)
+const ApiAdminBlogBulkRoute = ApiAdminBlogBulkRouteImport.update({
+  id: '/bulk',
+  path: '/bulk',
+  getParentRoute: () => ApiAdminBlogRoute,
+} as any)
 const ApiAdminBlogCategoriesRoute = ApiAdminBlogCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -309,6 +316,11 @@ const ApiAdminCertificatesIdRoute = ApiAdminCertificatesIdRouteImport.update({
 const ApiAdminEnrollmentsIdRoute = ApiAdminEnrollmentsIdRouteImport.update({
   id: '/api/admin/enrollments/$id',
   path: '/api/admin/enrollments/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminEnrollmentsBulkRoute = ApiAdminEnrollmentsBulkRouteImport.update({
+  id: '/api/admin/enrollments/bulk',
+  path: '/api/admin/enrollments/bulk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminEnrollmentsIntakesRoute =
@@ -382,9 +394,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/certificates/': typeof DashboardCertificatesIndexRoute
   '/dashboard/enrollments/': typeof DashboardEnrollmentsIndexRoute
   '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
+  '/api/admin/blog/bulk': typeof ApiAdminBlogBulkRoute
   '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
   '/api/admin/certificates/$id': typeof ApiAdminCertificatesIdRoute
   '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
+  '/api/admin/enrollments/bulk': typeof ApiAdminEnrollmentsBulkRoute
   '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
   '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
   '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
@@ -436,9 +450,11 @@ export interface FileRoutesByTo {
   '/dashboard/certificates': typeof DashboardCertificatesIndexRoute
   '/dashboard/enrollments': typeof DashboardEnrollmentsIndexRoute
   '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
+  '/api/admin/blog/bulk': typeof ApiAdminBlogBulkRoute
   '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
   '/api/admin/certificates/$id': typeof ApiAdminCertificatesIdRoute
   '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
+  '/api/admin/enrollments/bulk': typeof ApiAdminEnrollmentsBulkRoute
   '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
   '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
   '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
@@ -492,9 +508,11 @@ export interface FileRoutesById {
   '/dashboard/certificates/': typeof DashboardCertificatesIndexRoute
   '/dashboard/enrollments/': typeof DashboardEnrollmentsIndexRoute
   '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
+  '/api/admin/blog/bulk': typeof ApiAdminBlogBulkRoute
   '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
   '/api/admin/certificates/$id': typeof ApiAdminCertificatesIdRoute
   '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
+  '/api/admin/enrollments/bulk': typeof ApiAdminEnrollmentsBulkRoute
   '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
   '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
   '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
@@ -549,9 +567,11 @@ export interface FileRouteTypes {
     | '/dashboard/certificates/'
     | '/dashboard/enrollments/'
     | '/api/admin/blog/$id'
+    | '/api/admin/blog/bulk'
     | '/api/admin/blog/categories'
     | '/api/admin/certificates/$id'
     | '/api/admin/enrollments/$id'
+    | '/api/admin/enrollments/bulk'
     | '/api/admin/enrollments/intakes'
     | '/dashboard/blog/$id/edit'
     | '/api/admin/blog/categories/$id'
@@ -603,9 +623,11 @@ export interface FileRouteTypes {
     | '/dashboard/certificates'
     | '/dashboard/enrollments'
     | '/api/admin/blog/$id'
+    | '/api/admin/blog/bulk'
     | '/api/admin/blog/categories'
     | '/api/admin/certificates/$id'
     | '/api/admin/enrollments/$id'
+    | '/api/admin/enrollments/bulk'
     | '/api/admin/enrollments/intakes'
     | '/dashboard/blog/$id/edit'
     | '/api/admin/blog/categories/$id'
@@ -658,9 +680,11 @@ export interface FileRouteTypes {
     | '/dashboard/certificates/'
     | '/dashboard/enrollments/'
     | '/api/admin/blog/$id'
+    | '/api/admin/blog/bulk'
     | '/api/admin/blog/categories'
     | '/api/admin/certificates/$id'
     | '/api/admin/enrollments/$id'
+    | '/api/admin/enrollments/bulk'
     | '/api/admin/enrollments/intakes'
     | '/dashboard/blog/$id/edit'
     | '/api/admin/blog/categories/$id'
@@ -704,6 +728,7 @@ export interface RootRouteChildren {
   CertificatesIdPrintRoute: typeof CertificatesIdPrintRoute
   MdBlogSlugRoute: typeof MdBlogSlugRoute
   ApiAdminEnrollmentsIdRoute: typeof ApiAdminEnrollmentsIdRoute
+  ApiAdminEnrollmentsBulkRoute: typeof ApiAdminEnrollmentsBulkRoute
   ApiAdminEnrollmentsIntakesRoute: typeof ApiAdminEnrollmentsIntakesRouteWithChildren
 }
 
@@ -1031,6 +1056,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminBlogIdRouteImport
       parentRoute: typeof ApiAdminBlogRoute
     }
+    '/api/admin/blog/bulk': {
+      id: '/api/admin/blog/bulk'
+      path: '/bulk'
+      fullPath: '/api/admin/blog/bulk'
+      preLoaderRoute: typeof ApiAdminBlogBulkRouteImport
+      parentRoute: typeof ApiAdminBlogRoute
+    }
     '/api/admin/blog/categories': {
       id: '/api/admin/blog/categories'
       path: '/categories'
@@ -1050,6 +1082,13 @@ declare module '@tanstack/react-router' {
       path: '/api/admin/enrollments/$id'
       fullPath: '/api/admin/enrollments/$id'
       preLoaderRoute: typeof ApiAdminEnrollmentsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/enrollments/bulk': {
+      id: '/api/admin/enrollments/bulk'
+      path: '/api/admin/enrollments/bulk'
+      fullPath: '/api/admin/enrollments/bulk'
+      preLoaderRoute: typeof ApiAdminEnrollmentsBulkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/enrollments/intakes': {
@@ -1131,11 +1170,13 @@ const ApiAdminBlogCategoriesRouteWithChildren =
 
 interface ApiAdminBlogRouteChildren {
   ApiAdminBlogIdRoute: typeof ApiAdminBlogIdRoute
+  ApiAdminBlogBulkRoute: typeof ApiAdminBlogBulkRoute
   ApiAdminBlogCategoriesRoute: typeof ApiAdminBlogCategoriesRouteWithChildren
 }
 
 const ApiAdminBlogRouteChildren: ApiAdminBlogRouteChildren = {
   ApiAdminBlogIdRoute: ApiAdminBlogIdRoute,
+  ApiAdminBlogBulkRoute: ApiAdminBlogBulkRoute,
   ApiAdminBlogCategoriesRoute: ApiAdminBlogCategoriesRouteWithChildren,
 }
 
@@ -1205,17 +1246,9 @@ const rootRouteChildren: RootRouteChildren = {
   CertificatesIdPrintRoute: CertificatesIdPrintRoute,
   MdBlogSlugRoute: MdBlogSlugRoute,
   ApiAdminEnrollmentsIdRoute: ApiAdminEnrollmentsIdRoute,
+  ApiAdminEnrollmentsBulkRoute: ApiAdminEnrollmentsBulkRoute,
   ApiAdminEnrollmentsIntakesRoute: ApiAdminEnrollmentsIntakesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

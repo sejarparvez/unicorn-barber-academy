@@ -11,9 +11,9 @@ import {
 	SectionEyebrow,
 	useFadeUp,
 } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { pic } from "@/data/images";
 import { CONTACT, SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 const BREADCRUMB_JSON_LD = {
@@ -123,20 +123,8 @@ function jobPostingsJsonLd() {
 export function CareersPage() {
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
-				}}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(jobPostingsJsonLd()),
-				}}
-			/>
+			<JsonLdScript data={BREADCRUMB_JSON_LD} />
+			<JsonLdScript data={jobPostingsJsonLd()} />
 			<CareersHero />
 			<OpenRoles />
 			<WhyTeach />
@@ -225,7 +213,7 @@ function OpenRoles() {
 			aria-labelledby="roles-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="1" title="Open Roles" id="roles-heading" />
+				<SectionEyebrow title="Open Roles" id="roles-heading" />
 				<div className="mt-14 space-y-12">
 					{OPEN_ROLES.map((role, i) => (
 						<Reveal key={role.title} delay={i * 0.08}>
@@ -299,11 +287,7 @@ function WhyTeach() {
 			aria-labelledby="why-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="2"
-					title="Why Teach at Unicorn?"
-					id="why-heading"
-				/>
+				<SectionEyebrow title="Why Teach at Unicorn?" id="why-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
 					{reasons.map((reason, i) => (
 						<Reveal key={reason.title} delay={i * 0.08}>

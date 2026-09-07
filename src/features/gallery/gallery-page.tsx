@@ -5,6 +5,7 @@ import { Image } from "@unpic/react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { FinalCta, Reveal, SectionEyebrow } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import {
 	GALLERY_ITEMS,
 	type GalleryCategory,
@@ -12,7 +13,6 @@ import {
 } from "@/data/gallery";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 const JSON_LD = {
@@ -46,19 +46,8 @@ const IMAGE_GALLERY_JSON_LD = {
 export function GalleryPage() {
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// eslint-disable-next-line react/no-danger
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(JSON_LD) }}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(IMAGE_GALLERY_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={JSON_LD} />
+			<JsonLdScript data={IMAGE_GALLERY_JSON_LD} />
 			<section className="mx-auto max-w-7xl px-6 pt-24 lg:px-10">
 				<p className="text-[11px] font-medium tracking-[0.22em] text-primary uppercase">
 					Our work
@@ -125,11 +114,7 @@ function MasonryGallery() {
 			aria-labelledby="gallery-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="2"
-					title="Studio & Cohort Life"
-					id="gallery-heading"
-				/>
+				<SectionEyebrow title="Studio & Cohort Life" id="gallery-heading" />
 
 				<fieldset className="mt-10 flex flex-wrap gap-x-8 gap-y-3 border-b border-border p-0 m-0">
 					<legend className="sr-only">Filter gallery by category</legend>

@@ -20,11 +20,11 @@ import {
 	Reveal,
 	SectionEyebrow,
 } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import type { Track } from "@/data/programs";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import { ProgramCard } from "@/features/programs/program-card";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 const BREADCRUMB_JSON_LD = {
@@ -44,13 +44,7 @@ const BREADCRUMB_JSON_LD = {
 export function ProgramsPage() {
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={BREADCRUMB_JSON_LD} />
 			<ProgramsHero />
 			<ProgramCatalogue />
 			<HowItWorks />
@@ -90,12 +84,7 @@ function ProgramsHero() {
 				<div className="mt-10 grid grid-cols-1 gap-14 lg:grid-cols-2 lg:items-start">
 					{/* Left: statement */}
 					<div>
-						<SectionEyebrow
-							id="program"
-							guard="1"
-							title="The Catalogue"
-							as="p"
-						/>
+						<SectionEyebrow id="program" title="The Catalogue" as="p" />
 						<h1 className="mt-6 font-heading text-5xl font-medium leading-[1.08] sm:text-6xl">
 							Every program,{" "}
 							<span className={cn("italic font-normal", GOLD_TEXT)}>
@@ -208,11 +197,7 @@ function ProgramCatalogue() {
 			aria-labelledby="catalogue-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="2"
-					title="Browse by Track"
-					id="catalogue-heading"
-				/>
+				<SectionEyebrow title="Browse by Track" id="catalogue-heading" />
 
 				<fieldset className="mt-10 flex flex-wrap gap-x-8 gap-y-3 border-b border-border p-0 m-0">
 					<legend className="sr-only">Filter programs by track</legend>
@@ -319,7 +304,7 @@ function HowItWorks() {
 			aria-labelledby="how-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="3" title="How Training Works" id="how-heading" />
+				<SectionEyebrow title="How Training Works" id="how-heading" />
 				<div className="relative mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
 					<div
 						aria-hidden="true"
@@ -362,7 +347,7 @@ function CohortFormat() {
 			aria-labelledby="cohort-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="4" title="Day or Evening" id="cohort-heading" />
+				<SectionEyebrow title="Day or Evening" id="cohort-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-px overflow-hidden border border-border lg:grid-cols-2">
 					<Reveal className="bg-background p-10">
 						<IconSun

@@ -184,8 +184,7 @@ function ResultCard({ result }: { result: VerifyResult }) {
 
 				<dt className="text-muted-foreground">Cohort</dt>
 				<dd className="font-semibold">
-					{COHORT_LABELS[result.cohort as keyof typeof COHORT_LABELS] ??
-						result.cohort}
+					{COHORT_LABELS[result.cohort] ?? result.cohort}
 				</dd>
 
 				<dt className="text-muted-foreground">Issued on</dt>

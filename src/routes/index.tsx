@@ -83,11 +83,7 @@ function VisitUs() {
 		>
 			<div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
 				<div className="flex flex-col justify-center px-4 py-24 lg:px-10">
-					<SectionEyebrow
-						guard="7"
-						title="Visit the Academy"
-						id="visit-heading"
-					/>
+					<SectionEyebrow title="Visit the Academy" id="visit-heading" />
 					<address className="mt-8 space-y-5 text-sm not-italic text-secondary-foreground/75">
 						<p className="flex items-start gap-3">
 							<IconMapPin

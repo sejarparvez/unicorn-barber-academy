@@ -8,13 +8,13 @@ import {
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import { FinalCta, Reveal, SectionEyebrow } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { INSTRUCTORS } from "@/data/instructors";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import { ProgramCard } from "@/features/programs/program-card";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { Route } from "@/routes/programs.$slug";
 
 export function ProgramNotFound() {
@@ -116,16 +116,8 @@ export function ProgramDetailPage() {
 
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(courseJsonLd) }}
-			/>
+			<JsonLdScript data={breadcrumbJsonLd} />
+			<JsonLdScript data={courseJsonLd} />
 
 			{/* ----------------------------- Hero ----------------------------- */}
 			<section className="border-b border-border bg-background px-6 pt-28 pb-16 lg:px-10 lg:pt-36 lg:pb-20">
@@ -212,11 +204,7 @@ export function ProgramDetailPage() {
 				aria-labelledby="curriculum-heading"
 			>
 				<div className="mx-auto max-w-4xl">
-					<SectionEyebrow
-						guard="1"
-						title="Curriculum"
-						id="curriculum-heading"
-					/>
+					<SectionEyebrow title="Curriculum" id="curriculum-heading" />
 					<div className="relative mt-14">
 						<div
 							aria-hidden="true"
@@ -320,7 +308,7 @@ export function ProgramDetailPage() {
 					aria-labelledby="teachers-heading"
 				>
 					<div className="mx-auto max-w-4xl">
-						<SectionEyebrow guard="2" title="Taught By" id="teachers-heading" />
+						<SectionEyebrow title="Taught By" id="teachers-heading" />
 						<div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
 							{teachers.map((instructor) => (
 								<Reveal key={instructor.name}>
@@ -363,7 +351,6 @@ export function ProgramDetailPage() {
 				>
 					<div className="mx-auto max-w-7xl">
 						<SectionEyebrow
-							guard="3"
 							title={`More in ${trackLabel}`}
 							id="related-heading"
 						/>

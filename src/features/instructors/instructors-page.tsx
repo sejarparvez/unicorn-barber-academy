@@ -8,12 +8,12 @@ import {
 	Reveal,
 	SectionEyebrow,
 } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Instructor } from "@/data/instructors";
 import { INSTRUCTORS } from "@/data/instructors";
 import { SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 
 const INSTRUCTORS_JSON_LD = {
 	"@context": "https://schema.org",
@@ -58,28 +58,11 @@ export function InstructorsPage() {
 
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
-				}}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(INSTRUCTORS_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={BREADCRUMB_JSON_LD} />
+			<JsonLdScript data={INSTRUCTORS_JSON_LD} />
 			<Spotlight leads={leads} />
+			<FacultyGroup title="Barbering Faculty" instructors={barberingFaculty} />
 			<FacultyGroup
-				guard="2"
-				title="Barbering Faculty"
-				instructors={barberingFaculty}
-			/>
-			<FacultyGroup
-				guard="3"
 				title="Beauty & Cosmetology Faculty"
 				instructors={beautyFaculty}
 			/>
@@ -104,7 +87,7 @@ function Spotlight({ leads }: { leads: Instructor[] }) {
 		>
 			<h1 className="sr-only">Meet the Instructors</h1>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="1" title="Lead Instructors" id="leads-heading" />
+				<SectionEyebrow title="Lead Instructors" id="leads-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-2">
 					{leads.map((lead, i) => (
 						<Reveal key={lead.name} delay={i * 0.1}>
@@ -176,22 +159,20 @@ function Spotlight({ leads }: { leads: Instructor[] }) {
 /* --------------------------- Faculty groups --------------------------- */
 
 function FacultyGroup({
-	guard,
 	title,
 	instructors,
 }: {
-	guard: string;
 	title: string;
 	instructors: Instructor[];
 }) {
-	const headingId = `faculty-${guard}`;
+	const headingId = `faculty-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 	return (
 		<section
 			className="border-t border-border bg-muted/40 px-6 py-24 lg:px-10"
 			aria-labelledby={headingId}
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard={guard} title={title} id={headingId} />
+				<SectionEyebrow title={title} id={headingId} />
 				<div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
 					{instructors.map((instructor, i) => (
 						<Reveal key={instructor.name} delay={i * 0.08}>

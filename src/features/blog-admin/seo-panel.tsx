@@ -2,15 +2,19 @@
 // Right-hand "SEO & AIO" panel of the post editor: search-snippet fields,
 // keyword targeting, AI-extraction fields (takeaways + FAQ), program
 // cross-links, per-post index overrides, and a live checklist.
-import { IconCheck, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
+// Sub-sections extracted to seo-panel/checklist, snippet-preview,
+// takeaway-section, and faq-section.
+import { IconPlus, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ALL_PROGRAMS } from "@/data/programs";
-import type { FaqItem, SeoCheck } from "@/lib/blog";
-import { cn } from "@/lib/utils";
+import type { SeoCheck } from "@/lib/blog";
+import { Checklist } from "./seo-panel/checklist";
+import { FaqSection } from "./seo-panel/faq-section";
+import { SnippetPreview } from "./seo-panel/snippet-preview";
+import { TakeawaySection } from "./seo-panel/takeaway-section";
 import type { PostFormState } from "./types";
 
 type Props = {
@@ -19,20 +23,9 @@ type Props = {
 	checks: SeoCheck[];
 };
 
-const LEVEL_STYLE: Record<SeoCheck["level"], string> = {
-	good: "text-emerald-600 dark:text-emerald-400",
-	warn: "text-amber-600 dark:text-amber-400",
-	bad: "text-destructive",
-};
-
 export function SeoPanel({ value, onChange, checks }: Props) {
 	const [keywordInput, setKeywordInput] = useState("");
 	const [tagInput, setTagInput] = useState("");
-	const [faqDraft, setFaqDraft] = useState<FaqItem>({ q: "", a: "" });
-	const [takeawayDraft, setTakeawayDraft] = useState("");
-
-	const titleLen = (value.metaTitle || value.title || "").length;
-	const descLen = (value.metaDescription || value.excerpt || "").length;
 
 	function addKeyword() {
 		const kw = keywordInput.trim();
@@ -52,102 +45,17 @@ export function SeoPanel({ value, onChange, checks }: Props) {
 		setTagInput("");
 	}
 
-	function addTakeaway() {
-		const text = takeawayDraft.trim();
-		if (!text) return;
-		onChange({
-			keyTakeaways: [...value.keyTakeaways, { id: crypto.randomUUID(), text }],
-		});
-		setTakeawayDraft("");
-	}
-
-	function addFaq() {
-		if (!faqDraft.q.trim() || !faqDraft.a.trim()) return;
-		onChange({
-			faq: [
-				...value.faq,
-				{
-					id: crypto.randomUUID(),
-					q: faqDraft.q.trim(),
-					a: faqDraft.a.trim(),
-				},
-			],
-		});
-		setFaqDraft({ q: "", a: "" });
-	}
-
 	return (
 		<div className="space-y-6">
-			{/* Live checklist */}
-			<section className="rounded-lg border border-border bg-muted/30 p-4">
-				<h3 className="font-heading text-sm font-semibold">
-					Optimization checklist
-				</h3>
-				<ul className="mt-3 space-y-1.5">
-					{checks.map((check) => (
-						<li
-							key={check.label}
-							className={cn(
-								"flex items-start gap-2 text-xs",
-								LEVEL_STYLE[check.level],
-							)}
-						>
-							{check.level === "good" ? (
-								<IconCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-							) : check.level === "warn" ? (
-								<span className="mt-0.5 shrink-0 font-bold">!</span>
-							) : (
-								<IconX className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-							)}
-							{check.label}
-						</li>
-					))}
-				</ul>
-			</section>
+			<Checklist checks={checks} />
 
-			{/* Search snippet */}
-			<section className="space-y-4">
-				<h3 className="font-heading text-sm font-semibold">Search snippet</h3>
-				<div className="space-y-1.5">
-					<Label htmlFor="meta-title">SEO title override</Label>
-					<Input
-						id="meta-title"
-						value={value.metaTitle}
-						maxLength={200}
-						placeholder="Defaults to the post title"
-						onChange={(e) => onChange({ metaTitle: e.target.value })}
-					/>
-					<p
-						className={cn(
-							"text-[11px]",
-							titleLen > 60 ? "text-destructive" : "text-muted-foreground",
-						)}
-					>
-						{titleLen}/60 characters
-					</p>
-				</div>
-				<div className="space-y-1.5">
-					<Label htmlFor="meta-desc">Meta description</Label>
-					<Textarea
-						id="meta-desc"
-						rows={3}
-						value={value.metaDescription}
-						maxLength={400}
-						placeholder="Defaults to the excerpt"
-						onChange={(e) => onChange({ metaDescription: e.target.value })}
-					/>
-					<p
-						className={cn(
-							"text-[11px]",
-							descLen > 160 || (descLen > 0 && descLen < 50)
-								? "text-amber-600 dark:text-amber-400"
-								: "text-muted-foreground",
-						)}
-					>
-						{descLen}/160 characters
-					</p>
-				</div>
-			</section>
+			<SnippetPreview
+				metaTitle={value.metaTitle}
+				metaDescription={value.metaDescription}
+				excerpt={value.excerpt}
+				title={value.title}
+				onChange={(patch) => onChange(patch)}
+			/>
 
 			{/* Keywords */}
 			<section className="space-y-3">
@@ -212,133 +120,15 @@ export function SeoPanel({ value, onChange, checks }: Props) {
 				</div>
 			</section>
 
-			{/* AIO: takeaways + FAQ */}
-			<section className="space-y-3">
-				<h3 className="font-heading text-sm font-semibold">
-					Key takeaways{" "}
-					<span className="font-normal text-muted-foreground">
-						(AI extraction)
-					</span>
-				</h3>
-				<p className="text-xs text-muted-foreground">
-					Rendered as a TL;DR box on the article and fed to llms.txt /
-					structured data.
-				</p>
-				<ul className="space-y-2">
-					{value.keyTakeaways.map((row, i) => (
-						<li key={row.id} className="flex items-center gap-2">
-							<Input
-								value={row.text}
-								placeholder={`Takeaway ${i + 1}`}
-								onChange={(e) => {
-									onChange({
-										keyTakeaways: value.keyTakeaways.map((r) =>
-											r.id === row.id ? { ...r, text: e.target.value } : r,
-										),
-									});
-								}}
-							/>
-							<Button
-								type="button"
-								variant="ghost"
-								size="icon"
-								aria-label="Remove takeaway"
-								onClick={() =>
-									onChange({
-										keyTakeaways: value.keyTakeaways.filter(
-											(r) => r.id !== row.id,
-										),
-									})
-								}
-							>
-								<IconTrash className="h-4 w-4 text-muted-foreground" />
-							</Button>
-						</li>
-					))}
-				</ul>
-				<div className="flex gap-2">
-					<Input
-						value={takeawayDraft}
-						placeholder="Add a takeaway…"
-						onChange={(e) => setTakeawayDraft(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								e.preventDefault();
-								addTakeaway();
-							}
-						}}
-					/>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={addTakeaway}
-						className="gap-1.5"
-					>
-						<IconPlus className="h-3.5 w-3.5" /> Add
-					</Button>
-				</div>
-			</section>
+			<TakeawaySection
+				takeaways={value.keyTakeaways}
+				onChange={(items) => onChange({ keyTakeaways: items })}
+			/>
 
-			<section className="space-y-3">
-				<h3 className="font-heading text-sm font-semibold">
-					FAQ{" "}
-					<span className="font-normal text-muted-foreground">
-						(answer engines)
-					</span>
-				</h3>
-				{value.faq.length > 0 ? (
-					<ul className="space-y-2">
-						{value.faq.map((item) => (
-							<li
-								key={item.id}
-								className="rounded-md border border-border p-2.5"
-							>
-								<div className="flex items-start justify-between gap-2">
-									<p className="text-xs font-medium">{item.q}</p>
-									<button
-										type="button"
-										aria-label="Remove FAQ"
-										className="text-muted-foreground hover:text-destructive"
-										onClick={() =>
-											onChange({
-												faq: value.faq.filter((f) => f.id !== item.id),
-											})
-										}
-									>
-										<IconTrash className="h-3.5 w-3.5" />
-									</button>
-								</div>
-								<p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-									{item.a}
-								</p>
-							</li>
-						))}
-					</ul>
-				) : null}
-				<div className="space-y-2 rounded-md border border-dashed border-border p-2.5">
-					<Input
-						value={faqDraft.q}
-						placeholder="Question"
-						onChange={(e) => setFaqDraft({ ...faqDraft, q: e.target.value })}
-					/>
-					<Textarea
-						rows={2}
-						value={faqDraft.a}
-						placeholder="Answer"
-						onChange={(e) => setFaqDraft({ ...faqDraft, a: e.target.value })}
-					/>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={addFaq}
-						className="gap-1.5"
-					>
-						<IconPlus className="h-3.5 w-3.5" /> Add FAQ
-					</Button>
-				</div>
-			</section>
+			<FaqSection
+				items={value.faq}
+				onChange={(items) => onChange({ faq: items })}
+			/>
 
 			{/* Program links */}
 			<section className="space-y-3">

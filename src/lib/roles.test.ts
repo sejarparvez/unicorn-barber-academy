@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isAdmin, isStaff, parseRole, ROLES } from "@/lib/roles";
+import { isStaff, parseRole, ROLES } from "@/lib/roles";
 
 describe("parseRole", () => {
 	test("accepts every declared role", () => {
@@ -30,12 +30,5 @@ describe("isStaff", () => {
 		expect(isStaff("student")).toBe(false);
 		expect(isStaff("user")).toBe(false);
 		expect(isStaff(undefined)).toBe(false);
-	});
-});
-
-describe("isAdmin", () => {
-	test("only admin passes", () => {
-		expect(isAdmin("admin")).toBe(true);
-		expect(isAdmin("instructor")).toBe(false);
 	});
 });

@@ -8,6 +8,8 @@ import { requireRoles } from "@/server/guards";
 
 type BlogSearch = {
 	status?: ReturnType<typeof parseBlogStatus>;
+	search?: string;
+	category?: number;
 	page?: number;
 };
 
@@ -15,8 +17,15 @@ export const Route = createFileRoute("/dashboard/blog/")({
 	validateSearch: (search: Record<string, unknown>): BlogSearch => {
 		const status = parseBlogStatus(search.status);
 		const page = Number.parseInt(String(search.page ?? ""), 10);
+		const searchStr =
+			typeof search.search === "string"
+				? search.search.trim() || undefined
+				: undefined;
+		const category = Number.parseInt(String(search.category ?? ""), 10);
 		return {
 			...(status ? { status } : {}),
+			...(searchStr ? { search: searchStr } : {}),
+			...(Number.isInteger(category) && category > 0 ? { category } : {}),
 			...(Number.isInteger(page) && page > 1 ? { page } : {}),
 		};
 	},
@@ -39,6 +48,13 @@ export const Route = createFileRoute("/dashboard/blog/")({
 });
 
 function PostListRoute() {
-	const { status, page } = Route.useSearch();
-	return <PostListPage statusFilter={status} page={page ?? 1} />;
+	const { status, search, category, page } = Route.useSearch();
+	return (
+		<PostListPage
+			statusFilter={status}
+			search={search}
+			categoryFilter={category}
+			page={page ?? 1}
+		/>
+	);
 }

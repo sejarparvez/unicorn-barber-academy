@@ -8,13 +8,20 @@ import { createServerFn } from "@tanstack/react-start";
 import type {
 	ApplicationStatus,
 	ApplicationSummary,
+	Cohort,
+	FeeStatus,
 	IntakeAdmin,
 	IntakePublic,
 	MyApplication,
 } from "@/lib/enrollment";
-import { parseApplicationStatus } from "@/lib/enrollment";
+import {
+	parseApplicationStatus,
+	parseCohort,
+	parseFeeStatus,
+} from "@/lib/enrollment";
 import {
 	getApplicationDetail,
+	listApplicationStatusLog,
 	listApplicationsAdmin,
 	listIntakesAdmin,
 	listMyApplications,
@@ -43,8 +50,14 @@ export const listMyApplicationsFn = createServerFn({ method: "GET" }).handler(
 
 export const listApplicationsAdminFn = createServerFn({ method: "GET" })
 	.validator(
-		(input?: { status?: ApplicationStatus; search?: string; page?: number }) =>
-			input,
+		(input?: {
+			status?: ApplicationStatus;
+			search?: string;
+			programSlug?: string;
+			cohort?: Cohort;
+			feeStatus?: FeeStatus;
+			page?: number;
+		}) => input,
 	)
 	.handler(
 		async ({
@@ -60,6 +73,9 @@ export const listApplicationsAdminFn = createServerFn({ method: "GET" })
 				const result = await listApplicationsAdmin({
 					status: parseApplicationStatus(data?.status),
 					search: clampSearchTerm(data?.search),
+					programSlug: clampSearchTerm(data?.programSlug, 50),
+					cohort: parseCohort(data?.cohort),
+					feeStatus: parseFeeStatus(data?.feeStatus),
 					page: clampPage(data?.page),
 				});
 				return {
@@ -77,6 +93,13 @@ export const getApplicationAdminFn = createServerFn({ method: "GET" })
 	.handler(async ({ data }) => {
 		await requireAdminSession();
 		return runSafe(() => getApplicationDetail(clampId(data.id)));
+	});
+
+export const listApplicationStatusLogFn = createServerFn({ method: "GET" })
+	.validator((input: { applicationId: number }) => input)
+	.handler(async ({ data }) => {
+		await requireAdminSession();
+		return runSafe(() => listApplicationStatusLog(clampId(data.applicationId)));
 	});
 
 export const listIntakesAdminFn = createServerFn({ method: "GET" }).handler(

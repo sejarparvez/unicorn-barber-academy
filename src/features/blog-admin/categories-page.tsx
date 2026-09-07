@@ -10,7 +10,8 @@ import {
 	IconX,
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -42,10 +43,21 @@ export function CategoriesPage() {
 	const [editingId, setEditingId] = useState<number | null>(null);
 	const [editValue, setEditValue] = useState("");
 	const [error, setError] = useState<string | null>(null);
+	const lastRenamedIdRef = useRef<number | null>(null);
 	const busy =
 		createMutation.isPending ||
 		renameMutation.isPending ||
 		deleteMutation.isPending;
+
+	useEffect(() => {
+		if (editingId === null && lastRenamedIdRef.current !== null) {
+			const btn = document.querySelector<HTMLButtonElement>(
+				`[data-category-name="${lastRenamedIdRef.current}"]`,
+			);
+			btn?.focus();
+			lastRenamedIdRef.current = null;
+		}
+	}, [editingId]);
 
 	async function onAdd() {
 		if (!newName.trim() || busy) return;
@@ -53,6 +65,7 @@ export function CategoriesPage() {
 		try {
 			await createMutation.mutateAsync(newName.trim());
 			setNewName("");
+			toast.success("Category created");
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Create failed");
 		}
@@ -63,7 +76,9 @@ export function CategoriesPage() {
 		setError(null);
 		try {
 			await renameMutation.mutateAsync({ id, name: editValue.trim() });
+			lastRenamedIdRef.current = id;
 			setEditingId(null);
+			toast.success("Category renamed");
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Rename failed");
 		}
@@ -74,6 +89,7 @@ export function CategoriesPage() {
 		setError(null);
 		try {
 			await deleteMutation.mutateAsync(id);
+			toast.success("Category deleted");
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Delete failed");
 		}
@@ -103,7 +119,10 @@ export function CategoriesPage() {
 			</header>
 
 			{error ? (
-				<p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+				<p
+					role="alert"
+					className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+				>
 					{error}
 				</p>
 			) : null}
@@ -168,6 +187,7 @@ export function CategoriesPage() {
 								<>
 									<button
 										type="button"
+										data-category-name={category.id}
 										className="min-w-0 flex-1 truncate rounded px-1 py-0.5 text-left font-medium hover:bg-muted"
 										onClick={() => {
 											setEditingId(category.id);

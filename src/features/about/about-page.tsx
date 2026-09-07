@@ -14,11 +14,11 @@ import {
 	Reveal,
 	SectionEyebrow,
 } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { Card, CardContent } from "@/components/ui/card";
 import { pic } from "@/data/images";
 import { INSTRUCTORS } from "@/data/instructors";
 import { CONTACT, SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { SOCIAL_URLS } from "@/lib/social";
 
 const BREADCRUMB_JSON_LD = {
@@ -78,25 +78,9 @@ const ABOUT_PAGE_JSON_LD = {
 export function AboutPage() {
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(BREADCRUMB_JSON_LD),
-				}}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(ORG_JSON_LD) }}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(ABOUT_PAGE_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={BREADCRUMB_JSON_LD} />
+			<JsonLdScript data={ORG_JSON_LD} />
+			<JsonLdScript data={ABOUT_PAGE_JSON_LD} />
 			<AboutHero />
 			<OurStory />
 			<OurApproach />
@@ -227,7 +211,7 @@ function OurStory() {
 			aria-labelledby="story-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow guard="2" title="Our Story" id="story-heading" />
+				<SectionEyebrow title="Our Story" id="story-heading" />
 				<div className="mt-14 grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
 					<div>
 						<p className="text-base leading-relaxed text-muted-foreground">
@@ -307,11 +291,7 @@ function OurApproach() {
 			aria-labelledby="approach-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="3"
-					title="How We're Different"
-					id="approach-heading"
-				/>
+				<SectionEyebrow title="How We're Different" id="approach-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
 					{PILLARS.map((pillar, i) => (
 						<Reveal key={pillar.title} delay={i * 0.08}>
@@ -354,7 +334,7 @@ function LedBy() {
 		>
 			<div className="mx-auto max-w-7xl">
 				<div className="flex flex-wrap items-end justify-between gap-6">
-					<SectionEyebrow guard="4" title="Led By" id="led-by-heading" />
+					<SectionEyebrow title="Led By" id="led-by-heading" />
 					<Link
 						to="/instructors"
 						className="group inline-flex items-center gap-2 text-[13px] font-medium tracking-[0.16em] text-muted-foreground hover:text-primary"
@@ -418,11 +398,7 @@ function TheGuild() {
 			aria-labelledby="guild-heading"
 		>
 			<div className="mx-auto max-w-7xl">
-				<SectionEyebrow
-					guard="5"
-					title="Guild & Accreditation"
-					id="guild-heading"
-				/>
+				<SectionEyebrow title="Guild & Accreditation" id="guild-heading" />
 				<div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 					{CREDENTIALS.map((cred, i) => (
 						<Reveal key={cred} delay={i * 0.06}>

@@ -15,9 +15,14 @@ export const queryKeys = {
 	applications: (filters?: {
 		status?: string;
 		search?: string;
+		programSlug?: string;
+		cohort?: string;
+		feeStatus?: string;
 		page?: number;
 	}) => ["applications", filters ?? {}] as const,
 	application: (id: number) => ["applications", "detail", id] as const,
+	applicationLog: (id: number) =>
+		["applications", "detail", id, "log"] as const,
 	intakes: () => ["intakes"] as const,
 	myApplications: () => ["my-applications"] as const,
 	openIntakes: () => ["open-intakes"] as const,
@@ -32,8 +37,12 @@ export const queryKeys = {
 	consoleOverview: () => ["console-overview"] as const,
 
 	/* -------------------------------- blog --------------------------------- */
-	adminPosts: (filters?: { status?: string; page?: number }) =>
-		["admin-posts", filters ?? {}] as const,
+	adminPosts: (filters?: {
+		status?: string;
+		search?: string;
+		category?: number;
+		page?: number;
+	}) => ["admin-posts", filters ?? {}] as const,
 	adminPost: (id: number) => ["admin-posts", "detail", id] as const,
 	blogCategories: () => ["blog-categories"] as const,
 };

@@ -94,8 +94,7 @@ export default function Hero() {
 						</Link>
 
 						<Link
-							to="/programs/$slug"
-							params={{ slug: "classic-barbering" }}
+							to="/programs"
 							className={cn(
 								buttonVariants({ variant: "outline" }),
 								" px-8 py-6 text-[12px] font-semibold tracking-[0.16em]",

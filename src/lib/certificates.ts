@@ -27,7 +27,7 @@ export type VerifyResult =
 			holderName: string;
 			programTitle: string | null;
 			programSlug: string;
-			cohort: string;
+			cohort: Cohort;
 			issuedOn: string;
 	  }
 	| { kind: "unknown" | "rate-limited" };

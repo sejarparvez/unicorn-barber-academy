@@ -66,6 +66,33 @@ export async function deleteIntake(id: number): Promise<void> {
 	}
 }
 
+export async function bulkSetStatus(
+	ids: number[],
+	status: ApplicationStatus,
+	note?: string | null,
+): Promise<{ applied: number; failed: Array<{ id: number; reason: string }> }> {
+	try {
+		const res = await http.post<{
+			applied: number;
+			failed: Array<{ id: number; reason: string }>;
+		}>("/api/admin/enrollments/bulk", { ids, status, note });
+		return res.data;
+	} catch (error) {
+		throw new Error(await extractErrorMessage(error));
+	}
+}
+
+export type StatusLogEntry = {
+	id: number;
+	applicationId: number;
+	adminUserId: number;
+	adminName: string | null;
+	fromStatus: string | null;
+	toStatus: string;
+	note: string | null;
+	createdAt: string;
+};
+
 /** Client-side CSV export of the currently visible applications. */
 export function downloadApplicationsCsv(
 	rows: Array<Record<string, string | number>>,

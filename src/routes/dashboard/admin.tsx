@@ -11,6 +11,7 @@ import {
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Table,
 	TableBody,
@@ -20,7 +21,11 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { IntakeAdmin } from "@/lib/enrollment";
-import { APPLICATION_STATUS_LABELS, formatStartsOn } from "@/lib/enrollment";
+import {
+	APPLICATION_STATUS_LABELS,
+	COHORT_LABELS,
+	formatStartsOn,
+} from "@/lib/enrollment";
 import { cn } from "@/lib/utils";
 import type { ConsoleOverview } from "@/server/console-fns";
 import { getConsoleOverviewFn } from "@/server/console-fns";
@@ -41,8 +46,55 @@ export const Route = createFileRoute("/dashboard/admin")({
 			{ name: "robots", content: "noindex" },
 		],
 	}),
+	pendingComponent: AdminConsoleSkeleton,
+	errorComponent: AdminConsoleError,
 	component: AdminConsolePage,
 });
+
+function AdminConsoleSkeleton() {
+	return (
+		<div className="space-y-8">
+			<header>
+				<Skeleton className="h-3 w-20" />
+				<Skeleton className="mt-1 h-7 w-40" />
+			</header>
+			<section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+				{["needs-review", "approved", "certificates", "posts"].map((k) => (
+					<div
+						key={k}
+						className="rounded-xl border border-border bg-card p-5 shadow-sm"
+					>
+						<Skeleton className="h-3 w-24" />
+						<Skeleton className="mt-3 h-8 w-12" />
+						<Skeleton className="mt-1 h-3 w-32" />
+					</div>
+				))}
+			</section>
+			<Skeleton className="h-48 rounded-xl" />
+			<Skeleton className="h-64 rounded-xl" />
+		</div>
+	);
+}
+
+function AdminConsoleError() {
+	return (
+		<div className="space-y-4">
+			<header>
+				<p className="text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase">
+					Console
+				</p>
+				<h1 className="mt-1 font-heading text-2xl font-semibold tracking-tight">
+					Academy overview
+				</h1>
+			</header>
+			<div className="rounded-xl border border-dashed border-border bg-muted/30 p-8 text-center">
+				<p className="text-sm text-muted-foreground">
+					Failed to load the admin overview. Please try refreshing the page.
+				</p>
+			</div>
+		</div>
+	);
+}
 
 function AdminConsolePage() {
 	const overview = Route.useLoaderData();
@@ -178,7 +230,7 @@ function IntakeFill({ intakes }: { intakes: IntakeAdmin[] }) {
 								<p className="font-medium">
 									{intake.programTitle}{" "}
 									<span className="font-normal text-muted-foreground">
-										· {COHORT_SHORT[intake.cohort] ?? intake.cohort} · starts{" "}
+										· {COHORT_LABELS[intake.cohort] ?? intake.cohort} · starts{" "}
 										{formatStartsOn(intake.startsOn)}
 									</span>
 								</p>
@@ -194,11 +246,6 @@ function IntakeFill({ intakes }: { intakes: IntakeAdmin[] }) {
 		</section>
 	);
 }
-
-const COHORT_SHORT: Record<string, string> = {
-	day: "Day",
-	evening: "Evening",
-};
 
 function RecentApplications({ overview }: { overview: ConsoleOverview }) {
 	return (

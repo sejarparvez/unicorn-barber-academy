@@ -30,7 +30,3 @@ export function parseRole(role: string | null | undefined): Role | undefined {
 export function isStaff(role: string | null | undefined): boolean {
 	return role === "admin" || role === "instructor";
 }
-
-export function isAdmin(role: string | null | undefined): boolean {
-	return role === "admin";
-}

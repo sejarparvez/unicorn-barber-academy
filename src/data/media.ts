@@ -23,7 +23,7 @@ export const MEDIA_TYPES = [
 	"youtube",
 	"podcast",
 ] as const;
-export type MediaType = (typeof MEDIA_TYPES)[number];
+type MediaType = (typeof MEDIA_TYPES)[number];
 
 export const MEDIA_TYPE_LABELS: Record<MediaType, string> = {
 	tv: "TV appearance",

@@ -54,9 +54,21 @@ export const Route = createFileRoute("/blog/category/$slug")({
 				// Thin archives stay out of the index until they earn it.
 				...(indexable ? [] : [{ name: "robots", content: "noindex" as const }]),
 				{ property: "og:title", content: `${category.name} — Blog` },
+				{
+					property: "og:description",
+					content: `Articles on ${category.name.toLowerCase()} from Unicorn Barber Training Academy in Dhaka.`,
+				},
 				{ property: "og:type", content: "website" },
 				{ property: "og:url", content: url },
 				{ property: "og:image", content: `${SITE_URL}/banner.png` },
+				{
+					name: "twitter:title",
+					content: `${category.name} — Blog`,
+				},
+				{
+					name: "twitter:description",
+					content: `Articles on ${category.name.toLowerCase()} from Unicorn Barber Training Academy in Dhaka.`,
+				},
 			],
 			links: [{ rel: "canonical", href: url }],
 		};

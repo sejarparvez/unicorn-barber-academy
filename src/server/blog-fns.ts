@@ -46,12 +46,21 @@ export const listPublishedPostsFn = createServerFn({ method: "GET" })
 	);
 
 export const listAdminPostsFn = createServerFn({ method: "GET" })
-	.validator((input?: { status?: BlogStatus; page?: number }) => input)
+	.validator(
+		(input?: {
+			status?: BlogStatus;
+			search?: string;
+			category?: number;
+			page?: number;
+		}) => input,
+	)
 	.handler(async ({ data }): Promise<Paginated<BlogPostSummary>> => {
 		await requireAdminSession();
 		return runSafe(() =>
 			listAllPosts({
 				status: parseBlogStatus(data?.status),
+				search: clampSearchTerm(data?.search),
+				categoryId: data?.category,
 				page: clampPage(data?.page),
 				perPage: 20,
 			}),
@@ -88,11 +97,11 @@ export const getPostForPublicFn = createServerFn({ method: "GET" })
 				if (published)
 					return { kind: "post", post: published, isPreview: false };
 
-				const any = await getAnyBySlug(slug);
-				if (any && any.status === "draft") {
+				const existingPost = await getAnyBySlug(slug);
+				if (existingPost && existingPost.status === "draft") {
 					const session = await getSession();
 					if (session?.user.role === "admin") {
-						return { kind: "post", post: any, isPreview: true };
+						return { kind: "post", post: existingPost, isPreview: true };
 					}
 				}
 

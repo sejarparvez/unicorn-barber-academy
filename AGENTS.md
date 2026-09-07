@@ -16,7 +16,7 @@ with Cloudinary image uploads.
 | Framework      | TanStack Start (React 19, SSR) + TanStack Router (file-based routes) |
 | Build          | Vite 8, Nitro 3 as server/deploy adapter                            |
 | Styling        | Tailwind CSS v4 (+ typography plugin), shadcn-style UI primitives   |
-| Database       | PostgreSQL ≥ 17 via Prisma Next (v8 RC)                             |
+| Database       | PostgreSQL ≥ 17 via Prisma Next (schema docs) + raw `pg` (all writes) |
 | Auth           | Better Auth (Google OAuth, email verification via Resend)            |
 | Client state   | TanStack Query                                                      |
 | Runtime / PM   | Bun — runtime, package manager (`bun.lock`), and test runner        |
@@ -40,8 +40,8 @@ bun run check            # biome check --write (format + lint + safe fixes)
 bun run generate-routes  # regenerates src/routeTree.gen.ts
 
 # Database (Prisma Next)
-bun run db:migrate       # prisma-next db init (set up database)
-bun run db:emit          # regenerate contract.json/.d.ts after schema edits
+bun run db:migrate       # apply pending Prisma migrations
+bun run db:emit          # regenerate schema.json/schema.d.ts after schema edits
 bun run db:status        # migration status
 ```
 

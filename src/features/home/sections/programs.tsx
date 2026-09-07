@@ -8,6 +8,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import { Reveal, SectionEyebrow } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -16,7 +17,6 @@ import {
 	type Program,
 } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 
 /** "14 weeks" -> "P14W" (ISO 8601 duration, for Course schema) */
 const toIsoWeeks = (duration: string) => {
@@ -157,16 +157,10 @@ export default function Programs() {
 			className="section-light border-t border-border bg-background px-4 py-24 lg:px-10"
 			aria-labelledby="programs-heading"
 		>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{
-					__html: stringifyJsonLd(ALL_PROGRAMS_JSON_LD),
-				}}
-			/>
+			<JsonLdScript data={ALL_PROGRAMS_JSON_LD} />
 			<div className="mx-auto max-w-7xl">
 				<div className="flex flex-wrap items-end justify-between gap-6">
-					<SectionEyebrow guard="2" title="Programs" id="programs-heading" />
+					<SectionEyebrow title="Programs" id="programs-heading" />
 					<Link
 						to="/programs"
 						className="group inline-flex items-center gap-2 text-[13px] font-medium tracking-[0.16em] text-muted-foreground hover:text-primary"

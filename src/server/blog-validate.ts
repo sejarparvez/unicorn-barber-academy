@@ -9,22 +9,12 @@ import {
 	parseBlogStatus,
 	slugify,
 } from "@/lib/blog";
+import type { ValidationResult } from "./validate-utils";
+import { nullableStr, str } from "./validate-utils";
 
 const HTTP_URL = /^https?:\/\/\S+$/i;
 
-export type ValidationResult<T> =
-	| { ok: true; value: T }
-	| { ok: false; message: string };
-
-function str(value: unknown): string {
-	return typeof value === "string" ? value.trim() : "";
-}
-
-function nullableStr(value: unknown, max: number): string | null {
-	const s = str(value);
-	if (!s) return null;
-	return s.length > max ? s.slice(0, max) : s;
-}
+export type { ValidationResult } from "./validate-utils";
 
 function urlOrNull(value: unknown): string | null | false {
 	const s = str(value);

@@ -177,7 +177,6 @@ export function SectionEyebrow({
 	id,
 	as = "h2",
 }: {
-	guard: string;
 	title: string;
 	id: string;
 	/** Render the title as a different element when a page <h1> leads the outline */

@@ -7,9 +7,9 @@
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { FinalCta, Reveal } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { SITE_URL } from "@/data/site";
 import type { BlogCategory, BlogPostSummary, Paginated } from "@/lib/blog";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { BlogPostCard } from "./blog-page";
 
 export const CATEGORY_MIN_INDEX_POSTS = 3;
@@ -43,11 +43,7 @@ export function CategoryArchivePage({ category, posts, page }: Props) {
 
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
-			/>
+			<JsonLdScript data={breadcrumbJsonLd} />
 			<section className="relative overflow-hidden bg-background px-6 pt-28 pb-14 lg:px-10 lg:pt-36">
 				<Reveal className="mx-auto max-w-2xl text-center">
 					<p className="font-mono text-[11px] tracking-[0.32em] text-primary">

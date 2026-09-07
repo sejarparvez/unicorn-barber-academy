@@ -27,6 +27,15 @@ export const Route = createFileRoute("/media")({
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/media` },
 			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{
+				name: "twitter:title",
+				content: "Press & Media | Unicorn Barber Training Academy",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"TV appearances, newspaper features, and interviews with Unicorn Barber Training Academy — barbering and beauty education in Dhaka.",
+			},
 			{ name: "robots", content: "noindex" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/media` }],

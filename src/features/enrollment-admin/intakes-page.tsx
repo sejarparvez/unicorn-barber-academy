@@ -24,6 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ALL_PROGRAMS } from "@/data/programs";
 import type { IntakeAdmin } from "@/lib/enrollment";
 import { COHORT_LABELS, formatStartsOn } from "@/lib/enrollment";
@@ -208,8 +209,12 @@ export function IntakesPage() {
 
 			<ul className="divide-y divide-border rounded-xl border border-border bg-card">
 				{isPending ? (
-					<li className="p-8 text-center text-sm text-muted-foreground">
-						Loading intakes…
+					<li className="p-4">
+						<div className="flex items-center gap-3">
+							<Skeleton className="h-4 w-32" />
+							<Skeleton className="h-5 w-16 rounded-full" />
+							<Skeleton className="h-3 w-24" />
+						</div>
 					</li>
 				) : (intakes?.length ?? 0) === 0 ? (
 					<li className="p-8 text-center text-sm text-muted-foreground">

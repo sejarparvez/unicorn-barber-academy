@@ -1,4 +1,10 @@
 import { describe, expect, test } from "bun:test";
+import {
+	CONTACT_SUBJECTS,
+	type ContactSubject,
+	SUBJECT_OPTIONS,
+	TOPIC_LABELS,
+} from "@/data/contact";
 import { INSTRUCTORS } from "@/data/instructors";
 import { MEDIA_FEATURES, MEDIA_TYPES, type MediaFeature } from "@/data/media";
 import { ALL_PROGRAMS } from "@/data/programs";
@@ -90,6 +96,30 @@ describe("social URLs", () => {
 describe("site URL", () => {
 	test("is production https origin without trailing slash", () => {
 		expect(SITE_URL).toMatch(/^https:\/\/[a-z.-]+$/);
+	});
+});
+
+describe("contact subject data", () => {
+	test("CONTACT_SUBJECTS matches TOPIC_LABELS keys", () => {
+		const topicKeys = Object.keys(TOPIC_LABELS) as ContactSubject[];
+		expect([...CONTACT_SUBJECTS].sort()).toEqual([...topicKeys].sort());
+	});
+
+	test("CONTACT_SUBJECTS matches SUBJECT_OPTIONS values", () => {
+		const optionValues = SUBJECT_OPTIONS.map((o) => o.value);
+		expect([...CONTACT_SUBJECTS].sort()).toEqual([...optionValues].sort());
+	});
+
+	test("every SUBJECT_OPTIONS has a non-empty label", () => {
+		for (const opt of SUBJECT_OPTIONS) {
+			expect(opt.label.length).toBeGreaterThan(0);
+		}
+	});
+
+	test("every TOPIC_LABELS has a non-empty label", () => {
+		for (const [key, label] of Object.entries(TOPIC_LABELS)) {
+			expect(label.length, key).toBeGreaterThan(0);
+		}
 	});
 });
 

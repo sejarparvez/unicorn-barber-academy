@@ -1,86 +1,44 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
+import { TOPIC_LABELS } from "@/data/contact";
 import { CONTACT } from "@/data/site";
+import { guardPublicEndpoint } from "@/server/api-guard";
+import { validateContactInput } from "@/server/contact-validate";
 import { contactInquiryEmail, sendMail } from "@/server/mail";
-import { clientIp, isSameOrigin, overRateLimit } from "@/server/rate-limit";
-
-// Keep in sync with SUBJECTS in src/routes/contact.tsx (kept inline here so
-// the server bundle doesn't pull in the page component).
-const VALID_SUBJECTS = ["student", "partner", "press", "other"] as const;
-const TOPIC_LABELS: Record<(typeof VALID_SUBJECTS)[number], string> = {
-	student: "Admissions",
-	partner: "Partnership",
-	press: "Press & media",
-	other: "Other",
-};
-
-function text(value: unknown, max: number): string {
-	return typeof value === "string" ? value.trim().slice(0, max) : "";
-}
+import { clientIp } from "@/server/rate-limit";
 
 export const Route = createFileRoute("/api/contact")({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
-				// Unauthenticated endpoint: block cross-site submissions and cap
-				// per-IP volume so this can't be used as a spam/log-flooding vector.
-				if (!isSameOrigin(request)) {
-					return json({ message: "Forbidden" }, { status: 403 });
-				}
-				if (overRateLimit(`contact:${clientIp(request)}`, 5, 60_000)) {
-					return json(
-						{ message: "Too many requests. Please try again later." },
-						{ status: 429 },
-					);
-				}
+				const guard = guardPublicEndpoint(request, {
+					rateKey: `contact:${clientIp(request)}`,
+					rateMax: 5,
+					rateWindowMs: 60_000,
+				});
+				if (!guard.ok) return guard.response;
 				try {
 					const body = await request.json();
-
-					const name = text(body.name, 120);
-					const email = text(body.email, 254);
-					const phone = text(body.phone, 30);
-					const program = text(body.program, 120);
-					const message = text(body.message, 5000);
-					const subject = typeof body.subject === "string" ? body.subject : "";
-
-					if (!name || !email || !subject || !message) {
+					const validated = validateContactInput(body);
+					if (!validated.ok) {
 						return json(
-							{ message: "All required fields must be filled" },
-							{ status: 400 },
+							{ message: validated.message },
+							{ status: validated.status },
 						);
-					}
-
-					const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-					if (!emailRegex.test(email)) {
-						return json({ message: "Invalid email format" }, { status: 400 });
-					}
-
-					if (phone) {
-						const phoneRegex = /^[+]?[\d\s\-()]{10,30}$/;
-						if (!phoneRegex.test(phone)) {
-							return json({ message: "Invalid phone number" }, { status: 400 });
-						}
-					}
-
-					const topic = (VALID_SUBJECTS as readonly string[]).includes(subject)
-						? (subject as (typeof VALID_SUBJECTS)[number])
-						: null;
-					if (!topic) {
-						return json({ message: "Invalid subject" }, { status: 400 });
 					}
 
 					const inquiryId = `MSG-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 					const sent = await sendMail({
 						to: CONTACT.email,
-						replyTo: email,
-						subject: `[Website] ${TOPIC_LABELS[topic]} — ${inquiryId}`,
+						replyTo: validated.email,
+						subject: `[Website] ${TOPIC_LABELS[validated.subject]} — ${inquiryId}`,
 						html: contactInquiryEmail({
-							name,
-							email,
-							phone: phone || undefined,
-							topicLabel: TOPIC_LABELS[topic],
-							program: program || undefined,
-							message,
+							name: validated.name,
+							email: validated.email,
+							phone: validated.phone || undefined,
+							topicLabel: TOPIC_LABELS[validated.subject],
+							program: validated.program || undefined,
+							message: validated.message,
 						}),
 					});
 					if (!sent) {

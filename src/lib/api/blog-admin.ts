@@ -77,6 +77,36 @@ export async function deletePost(id: number): Promise<void> {
 	}
 }
 
+export async function bulkSetPostStatus(
+	ids: number[],
+	status: "draft" | "published" | "archived",
+): Promise<{ updated: number }> {
+	try {
+		const res = await http.post<{ updated: number }>("/api/admin/blog/bulk", {
+			ids,
+			action: "status",
+			status,
+		});
+		return res.data;
+	} catch (error) {
+		throw new Error(await extractErrorMessage(error));
+	}
+}
+
+export async function bulkDeletePosts(
+	ids: number[],
+): Promise<{ deleted: number }> {
+	try {
+		const res = await http.post<{ deleted: number }>("/api/admin/blog/bulk", {
+			ids,
+			action: "delete",
+		});
+		return res.data;
+	} catch (error) {
+		throw new Error(await extractErrorMessage(error));
+	}
+}
+
 export async function uploadImage(file: File, name: string): Promise<string> {
 	const form = new FormData();
 	form.append("file", file);

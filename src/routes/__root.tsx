@@ -10,15 +10,16 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ScrollProgress } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { Analytics } from "@/components/providers/analytics";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
+import { RouteProgress } from "@/components/route-progress";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import type { SessionPayload } from "@/lib/types";
 import { getSession } from "@/server/session";
 import appCss from "../styles.css?url";
@@ -145,21 +146,18 @@ function RootDocument() {
 	return (
 		<html lang="en">
 			<head>
-				<script
-					type="application/ld+json"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-					dangerouslySetInnerHTML={{
-						__html: stringifyJsonLd({
-							"@context": "https://schema.org",
-							"@type": "WebSite",
-							name: "Unicorn Barber Training Academy",
-							url: SITE_URL,
-						}),
+				<JsonLdScript
+					data={{
+						"@context": "https://schema.org",
+						"@type": "WebSite",
+						name: "Unicorn Barber Training Academy",
+						url: SITE_URL,
 					}}
 				/>
 				<HeadContent />
 			</head>
 			<body>
+				<RouteProgress />
 				{/* Skip link — keyboard users jump straight past the header. */}
 				<a
 					href="#main-content"

@@ -2,14 +2,22 @@
 // TanStack Query hooks for the enrollment system. Reads wrap the server
 // functions (they run over HTTP automatically during client navigation);
 // mutations invalidate precisely instead of re-running every loader.
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import {
+	bulkSetStatus,
 	setApplicationFee,
 	setApplicationStatus,
 } from "@/lib/api/enrollment-admin";
 import type {
 	ApplicationDetail,
 	ApplicationStatus,
+	Cohort,
+	FeeStatus,
 	IntakeAdmin,
 } from "@/lib/enrollment";
 import { queryKeys } from "./query-keys";
@@ -19,6 +27,9 @@ import { queryKeys } from "./query-keys";
 type ListFilters = {
 	status?: ApplicationStatus;
 	search?: string;
+	programSlug?: string;
+	cohort?: Cohort;
+	feeStatus?: FeeStatus;
 	page?: number;
 };
 type ListPage = {
@@ -45,6 +56,8 @@ export function useApplicationsList(
 			return result;
 		},
 		initialData: options?.initialData,
+		staleTime: 30_000,
+		placeholderData: keepPreviousData,
 	});
 }
 
@@ -61,6 +74,7 @@ export function useApplicationDetail(
 			};
 		},
 		initialData: options?.initialData,
+		staleTime: 60_000,
 	});
 }
 
@@ -72,6 +86,7 @@ export function useIntakesAdmin(options?: { initialData?: IntakeAdmin[] }) {
 			return listIntakesAdminFn();
 		},
 		initialData: options?.initialData,
+		staleTime: 30_000,
 	});
 }
 
@@ -119,9 +134,54 @@ export function useSetApplicationStatus(id: number) {
 
 export function useSetApplicationFee(id: number) {
 	const { invalidateApplication } = useInvalidateEnrollment();
+	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (paid: boolean) => setApplicationFee(id, paid),
-		onSuccess: () => invalidateApplication(id),
+		onMutate: async (paid) => {
+			await queryClient.cancelQueries({
+				queryKey: queryKeys.application(id),
+			});
+			await queryClient.cancelQueries({ queryKey: queryKeys.applications() });
+			const prevDetail = queryClient.getQueryData(queryKeys.application(id));
+			const prevLists = queryClient.getQueriesData({
+				queryKey: queryKeys.applications(),
+			});
+			const newFeeStatus = paid ? "paid" : "unpaid";
+			queryClient.setQueryData(
+				queryKeys.application(id),
+				(old: { application: ApplicationDetail } | undefined) => {
+					if (!old) return old;
+					return {
+						...old,
+						application: { ...old.application, feeStatus: newFeeStatus },
+					};
+				},
+			);
+			queryClient.setQueriesData(
+				{ queryKey: queryKeys.applications() },
+				(old: ListPage | undefined) => {
+					if (!old) return old;
+					return {
+						...old,
+						items: old.items.map((item) =>
+							item.id === id ? { ...item, feeStatus: newFeeStatus } : item,
+						),
+					};
+				},
+			);
+			return { prevDetail, prevLists };
+		},
+		onError: (_err, _paid, context) => {
+			if (context?.prevDetail) {
+				queryClient.setQueryData(queryKeys.application(id), context.prevDetail);
+			}
+			if (context?.prevLists) {
+				for (const [key, data] of context.prevLists) {
+					queryClient.setQueryData(key, data);
+				}
+			}
+		},
+		onSettled: () => invalidateApplication(id),
 	});
 }
 
@@ -171,6 +231,30 @@ export function useDeleteIntake() {
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: queryKeys.intakes() });
 			void queryClient.invalidateQueries({ queryKey: queryKeys.openIntakes() });
+		},
+	});
+}
+
+export function useBulkSetApplicationStatus() {
+	const { invalidateLists } = useInvalidateEnrollment();
+	return useMutation({
+		mutationFn: async (input: {
+			ids: number[];
+			status: ApplicationStatus;
+			note?: string | null;
+		}) => bulkSetStatus(input.ids, input.status, input.note ?? null),
+		onSuccess: () => invalidateLists(),
+	});
+}
+
+export function useApplicationStatusLog(applicationId: number) {
+	return useQuery({
+		queryKey: queryKeys.applicationLog(applicationId),
+		queryFn: async () => {
+			const { listApplicationStatusLogFn } = await import(
+				"@/server/enrollment-fns"
+			);
+			return listApplicationStatusLogFn({ data: { applicationId } });
 		},
 	});
 }

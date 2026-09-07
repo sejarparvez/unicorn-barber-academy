@@ -5,9 +5,8 @@
 // updated server-side, so every session picks up the new image.
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
-import { parseRole } from "@/lib/roles";
+import { guardAuthenticatedEndpoint } from "@/server/api-guard";
 import { auth } from "@/server/auth";
-import { isSameOrigin, overRateLimit } from "@/server/rate-limit";
 import {
 	deleteImage,
 	keyFromUrl,
@@ -23,20 +22,12 @@ export const Route = createFileRoute("/api/upload/avatar")({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
-				if (!isSameOrigin(request)) {
-					return json({ message: "Forbidden" }, { status: 403 });
-				}
-				const session = await auth.api.getSession({ headers: request.headers });
-				if (!session || !parseRole(session.user.role as string)) {
-					return json({ message: "Sign in required" }, { status: 401 });
-				}
-				// Cloudinary writes are not free — throttle per account.
-				if (overRateLimit(`avatar:${session.user.id}`, 10, 60_000)) {
-					return json(
-						{ message: "Too many uploads. Please wait a minute." },
-						{ status: 429 },
-					);
-				}
+				const guard = await guardAuthenticatedEndpoint(request, {
+					rateKey: "avatar",
+					rateMax: 10,
+					rateWindowMs: 60_000,
+				});
+				if (!guard.ok) return guard.response;
 
 				let form: FormData;
 				try {
@@ -66,11 +57,11 @@ export const Route = createFileRoute("/api/upload/avatar")({
 							{ status: 415 },
 						);
 					}
-					const previousImage = session.user.image;
+					const previousImage = guard.userImage;
 					const { url } = await uploadImage({
 						buffer,
 						mime,
-						namePrefix: `avatar-${session.user.id}`,
+						namePrefix: `avatar-${guard.userId}`,
 						folder: "avatars",
 					});
 					await auth.api.updateUser({

@@ -19,6 +19,7 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { FinalCta, Reveal } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import {
 	Accordion,
 	AccordionContent,
@@ -29,7 +30,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import { formatLongDate } from "@/lib/date";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { useCopyToClipboard } from "@/lib/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
 import { Route } from "@/routes/blog.$slug";
@@ -122,23 +122,9 @@ export function PostDetailPage() {
 
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(blogPostingJsonLd) }}
-			/>
-			{faqJsonLd ? (
-				<script
-					type="application/ld+json"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-					dangerouslySetInnerHTML={{ __html: stringifyJsonLd(faqJsonLd) }}
-				/>
-			) : null}
+			<JsonLdScript data={breadcrumbJsonLd} />
+			<JsonLdScript data={blogPostingJsonLd} />
+			{faqJsonLd ? <JsonLdScript data={faqJsonLd} /> : null}
 
 			{/* Draft-preview banner — admins only, always paired with noindex */}
 			{isPreview ? (

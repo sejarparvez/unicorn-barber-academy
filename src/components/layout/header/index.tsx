@@ -1,8 +1,6 @@
 import { IconMenu2, IconPlus } from "@tabler/icons-react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import { useEffect, useRef, useState } from "react";
-import Logo from "@/assets/logo/logo.png";
 import { Button } from "@/components/ui/button";
 import {
 	Sheet,
@@ -13,6 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import type { SessionPayload } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { LogoLink } from "./logo-link";
 import UserDropDown from "./user";
 
 const navItems = [
@@ -75,7 +74,7 @@ export default function Header({
 				isVisible ? "translate-y-0" : "-translate-y-full",
 			)}
 		>
-			<div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
+			<div className="mx-auto flex h-16 max-w-8xl items-center justify-between px-4 sm:px-6 lg:px-16">
 				{/* ── Left: mobile menu + logo ── */}
 				<div className="flex items-center gap-2">
 					{/* Mobile hamburger */}
@@ -91,39 +90,8 @@ export default function Header({
 							</SheetTrigger>
 							<SheetContent side="left" className="w-72 p-0">
 								<SheetHeader className="border-b border-border px-6 py-5">
-									{/* Logo — matches footer logo treatment */}
 									<SheetTitle>
-										{/* Brand */}
-										<Link
-											to="/"
-											preload="intent"
-											onClick={() => setMobileOpen(false)}
-											className="flex min-w-0 shrink-0 items-center gap-2.5 sm:gap-4"
-											aria-label="Unicorn Barber Training Academy, home"
-										>
-											<Image
-												src={Logo}
-												alt="Unicorn Barber Training Academy logo"
-												className="h-8 w-8 shrink-0 sm:h-10 sm:w-10"
-												width={400}
-												height={400}
-											/>
-
-											<span
-												aria-hidden="true"
-												className="h-7 w-px shrink-0 bg-foreground sm:h-8"
-											/>
-
-											<span className="flex min-w-0 flex-col leading-none">
-												<span className="font-bold text-primary text-xl md:text-2xl tracking-widest">
-													UNICORN
-												</span>
-
-												<span className="mt-1 truncate text-[6px] tracking-[0.2em] text-secondary-foreground/65 sm:text-[10px] sm:tracking-[0.32em]">
-													BARBER TRAINING ACADEMY
-												</span>
-											</span>
-										</Link>
+										<LogoLink onNavigate={() => setMobileOpen(false)} />
 									</SheetTitle>
 								</SheetHeader>
 
@@ -171,36 +139,7 @@ export default function Header({
 					</div>
 
 					{/* Logo */}
-					{/* Brand */}
-					<Link
-						to="/"
-						preload="intent"
-						className="flex min-w-0 shrink-0 items-center gap-2.5 sm:gap-4"
-						aria-label="Unicorn Barber Training Academy, home"
-					>
-						<Image
-							src={Logo}
-							alt="Unicorn Barber Training Academy logo"
-							className="h-8 w-8 shrink-0 sm:h-10 sm:w-10"
-							width={400}
-							height={400}
-						/>
-
-						<span
-							aria-hidden="true"
-							className="h-7 w-px shrink-0 bg-foreground sm:h-8"
-						/>
-
-						<span className="flex min-w-0 flex-col leading-none">
-							<span className="font-bold text-primary text-xl md:text-2xl tracking-widest">
-								UNICORN
-							</span>
-
-							<span className="mt-1 truncate text-[6px] tracking-[0.2em] text-secondary-foreground/65 sm:text-[10px] sm:tracking-[0.32em]">
-								BARBER TRAINING ACADEMY
-							</span>
-						</span>
-					</Link>
+					<LogoLink />
 				</div>
 
 				{/* ── Center: desktop nav ── */}

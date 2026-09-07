@@ -2,14 +2,14 @@
 // Browser-side client for enrollment endpoints (mirrors lib/api/blog-admin.ts).
 import { http } from "./http";
 
-export type SubmitApplicationPayload = {
+type SubmitApplicationPayload = {
 	intakeId: number;
 	phone: string;
 	experienceNote?: string | null;
 	hearAbout?: string | null;
 };
 
-export type SubmitResult =
+type SubmitResult =
 	| { ok: true; reference: string }
 	| { ok: false; message: string };
 

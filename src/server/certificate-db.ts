@@ -6,7 +6,7 @@
 // against the DB constraint rather than trusting count-based sequences.
 
 import type { CertificateRecord } from "@/lib/certificates";
-import type { Cohort } from "@/lib/enrollment";
+import { parseCohort } from "@/lib/enrollment";
 import { db, withTransaction } from "./db";
 import { PG_UNIQUE_VIOLATION } from "./pg-codes";
 import { programTitle } from "./program-utils";
@@ -33,7 +33,7 @@ function rowToRecord(row: CertificateRow): CertificateRecord {
 		holderName: row.holder_name ?? "Graduate",
 		programSlug: row.program_slug,
 		programTitle: programTitle(row.program_slug),
-		cohort: row.cohort as Cohort,
+		cohort: parseCohort(row.cohort) ?? "day",
 		issuedOn: new Date(row.issued_on).toISOString().slice(0, 10),
 		issuedBy: row.issued_by,
 		revokedAt: row.revoked_at ? new Date(row.revoked_at).toISOString() : null,

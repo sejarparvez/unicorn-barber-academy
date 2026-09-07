@@ -15,6 +15,7 @@ import type {
 } from "@/lib/blog";
 import { estimateReadingMinutes, parseBlogStatus } from "@/lib/blog";
 import { q, withTransaction } from "./db";
+import { escapeLike } from "./fn-utils";
 import { PG_UNIQUE_VIOLATION } from "./pg-codes";
 
 /* ------------------------------ row mapping ----------------------------- */
@@ -115,7 +116,7 @@ function rowToSummary(row: PostSummaryRow): BlogPostSummary {
 		coverImageUrl: row.cover_image_url,
 		coverImageAlt: row.cover_image_alt,
 		tags: row.tags ?? [],
-		status: row.status as BlogStatus,
+		status: parseBlogStatus(row.status) ?? "draft",
 		category:
 			row.category_id && row.category_name && row.category_slug
 				? {
@@ -395,27 +396,46 @@ export async function listCategoriesWithCounts(
 
 export async function listAllPosts(options: {
 	status?: BlogStatus;
+	search?: string;
+	categoryId?: number;
 	page?: number;
 	perPage?: number;
 }): Promise<Paginated<BlogPostSummary>> {
 	const page = Math.max(1, options.page ?? 1);
 	const perPage = Math.min(50, Math.max(1, options.perPage ?? 20));
-	const where = options.status ? "WHERE p.status = $1" : "";
-	// List query binds $1=limit, $2=offset (+ optional $3=status);
-	// the count query binds status as its own $1.
-	const listWhere = options.status ? "WHERE p.status = $3" : "";
+
+	const conditions: string[] = [];
 	const params: unknown[] = [perPage, (page - 1) * perPage];
-	if (options.status) params.push(options.status);
+	if (options.status) {
+		params.push(options.status);
+		conditions.push(`p.status = $${params.length}`);
+	}
+	if (options.categoryId) {
+		params.push(options.categoryId);
+		conditions.push(`p.category_id = $${params.length}`);
+	}
+	if (options.search?.trim()) {
+		params.push(`%${escapeLike(options.search.trim())}%`);
+		conditions.push(
+			`(p.title ILIKE $${params.length} OR p.slug ILIKE $${params.length} OR p.excerpt ILIKE $${params.length})`,
+		);
+	}
+	const where =
+		conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+	// Count query: rebind params without LIMIT/OFFSET ($1, $2 are always LIMIT/OFFSET in the list query).
+	const countParams = params.slice(2);
+	const countPlaceholders = countParams.map((_, i) => `$${i + 1}`).join(", ");
 
 	const totalRes = await q<{ count: string }>(
 		`SELECT count(*)::text AS count FROM blog_post p ${where}`,
-		options.status ? [options.status] : [],
+		countPlaceholders ? countParams : [],
 	);
 	const total = Number.parseInt(totalRes.rows[0]?.count ?? "0", 10);
 	const totalPages = Math.max(1, Math.ceil(total / perPage));
 
 	const res = await q<PostSummaryRow>(
-		`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS} ${listWhere}
+		`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS} ${where}
 		 ORDER BY p.updated_at DESC
 		 LIMIT $1 OFFSET $2`,
 		params,
@@ -738,4 +758,29 @@ export async function getPostCountsByStatus(): Promise<BlogStats> {
 		if (status) counts[status] = row.n;
 	}
 	return counts;
+}
+
+/* ----------------------------- bulk admin ------------------------------ */
+
+export type BulkPostResult = { updated: number } | { deleted: number };
+
+export async function bulkUpdatePostStatus(
+	ids: number[],
+	status: BlogStatus,
+): Promise<{ updated: number }> {
+	if (ids.length === 0) return { updated: 0 };
+	const res = await q(
+		`UPDATE blog_post SET status = $1, updated_at = now()
+		 WHERE id = ANY($2::int[])`,
+		[status, ids],
+	);
+	return { updated: res.rowCount ?? 0 };
+}
+
+export async function bulkDeletePosts(
+	ids: number[],
+): Promise<{ deleted: number }> {
+	if (ids.length === 0) return { deleted: 0 };
+	const res = await q("DELETE FROM blog_post WHERE id = ANY($1::int[])", [ids]);
+	return { deleted: res.rowCount ?? 0 };
 }

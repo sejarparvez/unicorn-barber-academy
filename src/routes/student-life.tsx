@@ -24,6 +24,15 @@ export const Route = createFileRoute("/student-life")({
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/student-life` },
 			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{
+				name: "twitter:title",
+				content: "Student Life | Unicorn Barber Training Academy",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"Studio sessions, cohort bonding, and graduation days at Unicorn Barber Training Academy.",
+			},
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/student-life` }],
 	}),

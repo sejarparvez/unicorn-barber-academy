@@ -2,8 +2,7 @@
 // Blog/avatar image uploads via Cloudinary (free tier, no credit card).
 // Configured entirely through env vars: CLOUDINARY_CLOUD_NAME,
 // CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET. If any are missing the module
-// degrades gracefully — isStorageReady() returns false and uploadImage()
-// throws StorageNotConfiguredError.
+// degrades gracefully — uploadImage() throws StorageNotConfiguredError.
 import { createHash } from "node:crypto";
 
 /** Whitelist — images only; anything else is rejected before upload. */
@@ -81,14 +80,6 @@ export class StorageNotConfiguredError extends Error {
 		);
 		this.name = "StorageNotConfiguredError";
 	}
-}
-
-export function isStorageReady(): boolean {
-	return Boolean(
-		env("CLOUDINARY_CLOUD_NAME") &&
-			env("CLOUDINARY_API_KEY") &&
-			env("CLOUDINARY_API_SECRET"),
-	);
 }
 
 function cloudinaryBase(): string {

@@ -12,10 +12,10 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { FinalCta, Reveal } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import { SITE_URL } from "@/data/site";
 import type { BlogCategory, BlogPostSummary, Paginated } from "@/lib/blog";
 import { formatLongDate } from "@/lib/date";
-import { stringifyJsonLd } from "@/lib/jsonld";
 import { cn } from "@/lib/utils";
 
 /** Null-safe wrapper — scheduled posts may not have a date yet. */
@@ -64,16 +64,8 @@ export function BlogPage({ posts, categories, page }: Props) {
 
 	return (
 		<main>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(blogJsonLd) }}
-			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(breadcrumbJsonLd) }}
-			/>
+			<JsonLdScript data={blogJsonLd} />
+			<JsonLdScript data={breadcrumbJsonLd} />
 			{/* ----------------------------- Hero ----------------------------- */}
 			<section className="relative overflow-hidden bg-background px-6 pt-28 pb-14 lg:px-10 lg:pt-36">
 				<Reveal className="mx-auto max-w-2xl text-center">

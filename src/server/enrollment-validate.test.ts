@@ -70,6 +70,37 @@ describe("validateApplicationPayload", () => {
 		expect(validateApplicationPayload("hi").ok).toBe(false);
 		expect(validateApplicationPayload(42).ok).toBe(false);
 	});
+
+	test("accepts empty experienceNote and hearAbout", () => {
+		const result = validateApplicationPayload({
+			intakeId: 1,
+			phone: "01337229944",
+			experienceNote: "",
+			hearAbout: "",
+		});
+		expect(result.ok).toBe(true);
+		if (result.ok) {
+			expect(result.value.experienceNote).toBeNull();
+			expect(result.value.hearAbout).toBeNull();
+		}
+	});
+
+	test("phone with special characters is accepted", () => {
+		const result = validateApplicationPayload({
+			intakeId: 1,
+			phone: "+880 (133) 722-9944",
+		});
+		expect(result.ok).toBe(true);
+	});
+
+	test("intakeId as string number is coerced", () => {
+		const result = validateApplicationPayload({
+			intakeId: "42",
+			phone: "01337229944",
+		});
+		expect(result.ok).toBe(true);
+		if (result.ok) expect(result.value.intakeId).toBe(42);
+	});
 });
 
 describe("isValidFutureStartDate", () => {

@@ -1,13 +1,13 @@
 /* ------------------------------- FAQ ------------------------------- */
 
 import { Reveal, SectionEyebrow } from "@/components/effects";
+import { JsonLdScript } from "@/components/jsonld-script";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
-import { stringifyJsonLd } from "@/lib/jsonld";
 
 const FAQS = [
 	{
@@ -48,13 +48,9 @@ export default function Faq() {
 			className="section-light border-t border-border bg-background px-4 py-24 lg:px-10"
 			aria-labelledby="faq-heading"
 		>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: this is fine
-				dangerouslySetInnerHTML={{ __html: stringifyJsonLd(FAQ_JSON_LD) }}
-			/>
+			<JsonLdScript data={FAQ_JSON_LD} />
 			<div className="mx-auto max-w-3xl">
-				<SectionEyebrow guard="6" title="Frequently Asked" id="faq-heading" />
+				<SectionEyebrow title="Frequently Asked" id="faq-heading" />
 
 				<Accordion className="mt-10">
 					{FAQS.map((item, i) => (

@@ -18,13 +18,22 @@ import type {
 	IntakePublic,
 	MyApplication,
 } from "@/lib/enrollment";
-import { generateReference, parseApplicationStatus } from "@/lib/enrollment";
+import {
+	generateReference,
+	parseApplicationStatus,
+	parseCohort,
+	parseFeeStatus,
+} from "@/lib/enrollment";
 import { db, withTransaction } from "./db";
+import { escapeLike } from "./fn-utils";
 import { PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION } from "./pg-codes";
 import { programTitle } from "./program-utils";
 
 /** Allowed status transitions. A key maps from the current status to the set of statuses it can move to. */
-const VALID_TRANSITIONS: Record<string, readonly string[]> = {
+const VALID_TRANSITIONS: Record<
+	ApplicationStatus,
+	readonly ApplicationStatus[]
+> = {
 	pending: ["reviewing", "approved", "waitlisted", "rejected"],
 	reviewing: ["approved", "waitlisted", "rejected"],
 	approved: ["completed", "rejected"],
@@ -68,7 +77,7 @@ export async function listOpenIntakes(): Promise<IntakePublic[]> {
 			programSlug: row.program_slug,
 			programTitle: title,
 			track,
-			cohort: row.cohort as Cohort,
+			cohort: parseCohort(row.cohort) ?? "day",
 			startsOn: toDateOnly(row.starts_on),
 			seatsTotal: row.seats_total,
 			seatsLeft: Math.max(0, row.seats_left),
@@ -196,11 +205,11 @@ export async function listMyApplications(
 			{
 				id: row.id,
 				reference: row.reference,
-				status: row.status as ApplicationStatus,
-				feeStatus: row.fee_status as FeeStatus,
+				status: parseApplicationStatus(row.status) ?? "pending",
+				feeStatus: parseFeeStatus(row.fee_status) ?? "unpaid",
 				programTitle: title,
 				programSlug: row.program_slug,
-				cohort: row.cohort as Cohort,
+				cohort: parseCohort(row.cohort) ?? "day",
 				startsOn: toDateOnly(row.starts_on),
 				submittedAt: new Date(row.created_at).toISOString(),
 			},
@@ -210,14 +219,12 @@ export async function listMyApplications(
 
 /* -------------------------------- admin --------------------------------- */
 
-/** Escape LIKE/ILIKE metacharacters so user input can't inject wildcards. */
-function escapeLike(term: string): string {
-	return term.replace(/[\\%_]/g, "\\$&");
-}
-
 export async function listApplicationsAdmin(options: {
 	status?: ApplicationStatus;
 	search?: string;
+	programSlug?: string;
+	cohort?: Cohort;
+	feeStatus?: FeeStatus;
 	page?: number;
 	perPage?: number;
 }): Promise<{
@@ -242,6 +249,18 @@ export async function listApplicationsAdmin(options: {
 		conditions.push(
 			`(a.reference ILIKE $${n} OR a.full_name ILIKE $${n} OR a.email ILIKE $${n} OR a.phone ILIKE $${n})`,
 		);
+	}
+	if (options.programSlug) {
+		countParams.push(options.programSlug);
+		conditions.push(`i.program_slug = $${countParams.length}`);
+	}
+	if (options.cohort) {
+		countParams.push(options.cohort);
+		conditions.push(`i.cohort = $${countParams.length}`);
+	}
+	if (options.feeStatus) {
+		countParams.push(options.feeStatus);
+		conditions.push(`a.fee_status = $${countParams.length}`);
 	}
 	const where =
 		conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -288,14 +307,14 @@ export async function listApplicationsAdmin(options: {
 				{
 					id: row.id,
 					reference: row.reference,
-					status: row.status as ApplicationStatus,
-					feeStatus: row.fee_status as FeeStatus,
+					status: parseApplicationStatus(row.status) ?? "pending",
+					feeStatus: parseFeeStatus(row.fee_status) ?? "unpaid",
 					fullName: row.full_name,
 					email: row.email,
 					phone: row.phone,
 					programTitle: title,
 					programSlug: row.program_slug,
-					cohort: row.cohort as Cohort,
+					cohort: parseCohort(row.cohort) ?? "day",
 					startsOn: toDateOnly(row.starts_on),
 					userId: row.user_id,
 					userRole: row.user_role,
@@ -358,14 +377,14 @@ export async function getApplicationDetail(id: number) {
 		application: {
 			id: row.id,
 			reference: row.reference,
-			status: row.status as ApplicationStatus,
-			feeStatus: row.fee_status as FeeStatus,
+			status: parseApplicationStatus(row.status) ?? "pending",
+			feeStatus: parseFeeStatus(row.fee_status) ?? "unpaid",
 			fullName: row.full_name,
 			email: row.email,
 			phone: row.phone,
 			programTitle: title,
 			programSlug: row.program_slug,
-			cohort: row.cohort as Cohort,
+			cohort: parseCohort(row.cohort) ?? "day",
 			startsOn: toDateOnly(row.starts_on),
 			userId: row.user_id,
 			userRole: row.user_role,
@@ -391,6 +410,51 @@ export type StatusUpdateResult =
 	  }
 	| { ok: false; reason: "not-found" | "invalid-transition" };
 
+export type StatusLogEntry = {
+	id: number;
+	applicationId: number;
+	adminUserId: number;
+	adminName: string | null;
+	fromStatus: string | null;
+	toStatus: string;
+	note: string | null;
+	createdAt: string;
+};
+
+/** Audit trail for one application, newest first. */
+export async function listApplicationStatusLog(
+	applicationId: number,
+): Promise<StatusLogEntry[]> {
+	const res = await db().query<{
+		id: number;
+		application_id: number;
+		admin_user_id: number;
+		admin_name: string | null;
+		from_status: string | null;
+		to_status: string;
+		note: string | null;
+		created_at: Date;
+	}>(
+		`SELECT l.id, l.application_id, l.admin_user_id, u.name AS admin_name,
+			l.from_status, l.to_status, l.note, l.created_at
+		 FROM application_status_log l
+		 LEFT JOIN "user" u ON u.id = l.admin_user_id
+		 WHERE l.application_id = $1
+		 ORDER BY l.created_at DESC`,
+		[applicationId],
+	);
+	return res.rows.map((row) => ({
+		id: row.id,
+		applicationId: row.application_id,
+		adminUserId: row.admin_user_id,
+		adminName: row.admin_name,
+		fromStatus: row.from_status,
+		toStatus: row.to_status,
+		note: row.note,
+		createdAt: new Date(row.created_at).toISOString(),
+	}));
+}
+
 /**
  * Status transition with side effects, all in one transaction:
  *   * stamps decided_at/by on first terminal decision,
@@ -403,7 +467,7 @@ export async function updateApplicationStatus(options: {
 	adminUserId: number;
 	note: string | null;
 }): Promise<StatusUpdateResult> {
-	const TERMINAL: readonly string[] = [
+	const TERMINAL: readonly ApplicationStatus[] = [
 		"approved",
 		"waitlisted",
 		"rejected",
@@ -428,7 +492,10 @@ export async function updateApplicationStatus(options: {
 		if (!current) return { ok: false as const, reason: "not-found" as const };
 
 		// Validate the status transition.
-		const allowed = VALID_TRANSITIONS[current.status];
+		const currentStatus = parseApplicationStatus(current.status);
+		if (!currentStatus)
+			return { ok: false as const, reason: "invalid-transition" as const };
+		const allowed = VALID_TRANSITIONS[currentStatus];
 		if (!allowed || !allowed.includes(options.status)) {
 			return {
 				ok: false as const,
@@ -453,6 +520,20 @@ export async function updateApplicationStatus(options: {
 				options.adminUserId,
 				options.note,
 				firstDecision,
+			],
+		);
+
+		// Audit trail: record who changed what and when.
+		await tx.query(
+			`INSERT INTO application_status_log
+				(application_id, admin_user_id, from_status, to_status, note)
+			 VALUES ($1, $2, $3, $4, $5)`,
+			[
+				options.id,
+				options.adminUserId,
+				current.status,
+				options.status,
+				options.note,
 			],
 		);
 
@@ -494,6 +575,39 @@ export async function setApplicationFee(
 	return (res.rowCount ?? 0) > 0;
 }
 
+/** Batch status update for the bulk action bar. Runs each transition
+ * individually (they have side effects: role upgrades, emails) and
+ * returns per-application results. Max 50 IDs per call. */
+export async function bulkUpdateApplicationStatus(options: {
+	ids: number[];
+	status: ApplicationStatus;
+	adminUserId: number;
+	note: string | null;
+}): Promise<{
+	applied: number;
+	failed: Array<{ id: number; reason: string }>;
+}> {
+	const ids = options.ids.slice(0, 50);
+	const applied: number[] = [];
+	const failed: Array<{ id: number; reason: string }> = [];
+
+	for (const id of ids) {
+		const result = await updateApplicationStatus({
+			id,
+			status: options.status,
+			adminUserId: options.adminUserId,
+			note: options.note,
+		});
+		if (result.ok) {
+			applied.push(id);
+		} else {
+			failed.push({ id, reason: result.reason });
+		}
+	}
+
+	return { applied: applied.length, failed };
+}
+
 /* ---------------------------- admin: intakes ----------------------------- */
 
 export async function listIntakesAdmin(): Promise<IntakeAdmin[]> {
@@ -526,7 +640,7 @@ export async function listIntakesAdmin(): Promise<IntakeAdmin[]> {
 			track:
 				ALL_PROGRAMS.find((p) => p.slug === row.program_slug)?.track ??
 				"barbering",
-			cohort: row.cohort as Cohort,
+			cohort: parseCohort(row.cohort) ?? "day",
 			startsOn: toDateOnly(row.starts_on),
 			seatsTotal: row.seats_total,
 			seatsLeft: Math.max(0, row.seats_total - row.seats_occupied),

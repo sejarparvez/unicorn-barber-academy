@@ -3,16 +3,12 @@
 // library), mirrors blog-validate.ts. Returns normalized values.
 import { ALL_PROGRAMS } from "@/data/programs";
 import type { Cohort } from "@/lib/enrollment";
+import type { ValidationResult } from "./validate-utils";
+import { str } from "./validate-utils";
 
 const HTTP_PHONE = /^[+]?[\d\s\-()]{7,20}$/;
 
-export type ValidationResult<T> =
-	| { ok: true; value: T }
-	| { ok: false; message: string };
-
-function str(value: unknown): string {
-	return typeof value === "string" ? value.trim() : "";
-}
+export type { ValidationResult } from "./validate-utils";
 
 export function validateApplicationPayload(body: unknown): ValidationResult<{
 	intakeId: number;

@@ -9,5 +9,3 @@ export const SOCIAL_URLS = {
 	tiktok: "https://www.tiktok.com/@unicorntrainingacademy",
 	x: "https://x.com/unicorntraining",
 } as const;
-
-export type SocialPlatform = keyof typeof SOCIAL_URLS;

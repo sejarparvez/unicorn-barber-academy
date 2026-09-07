@@ -5,10 +5,16 @@
 import { IconArrowRight, IconCircleCheck } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { z } from "zod";
 import { trackEvent } from "@/components/providers/analytics";
 import { Button } from "@/components/ui/button";
+import {
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getProgramBySlug } from "@/data/programs";
 import { submitApplication } from "@/lib/api/enrollment";
@@ -32,7 +38,21 @@ const HEAR_ABOUT_OPTIONS = [
 	{ value: "other", label: "Other" },
 ];
 
-const PHONE_REGEX = /^[+]?[\d\s\-()]{7,20}$/;
+const enrollSchema = z.object({
+	programSlug: z.string().min(1, "Please select a program"),
+	intakeId: z.number().int().positive("Please select a start date"),
+	phone: z
+		.string()
+		.min(1, "Phone number is required")
+		.regex(
+			/^[+]?[\d\s\-()]{7,20}$/,
+			"Enter a valid phone number (e.g. +880 1XXX-XXXXXX)",
+		),
+	experienceNote: z.string().max(2000).optional(),
+	hearAbout: z.string().optional(),
+});
+
+type EnrollValues = z.infer<typeof enrollSchema>;
 
 export function EnrollPage({ intakes, session }: Props) {
 	const [track, setTrack] = useState<"barbering" | "beauty">("barbering");
@@ -44,6 +64,10 @@ export function EnrollPage({ intakes, session }: Props) {
 	const [submitting, setSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [reference, setReference] = useState<string | null>(null);
+	const [showConfirm, setShowConfirm] = useState(false);
+	const [fieldErrors, setFieldErrors] = useState<
+		Partial<Record<keyof EnrollValues, string>>
+	>({});
 
 	const trackIntakes = useMemo(
 		() => intakes.filter((i) => i.track === track),
@@ -71,18 +95,41 @@ export function EnrollPage({ intakes, session }: Props) {
 		setIntakeId(null);
 	}
 
-	async function onSubmit(event: React.FormEvent) {
-		event.preventDefault();
-		if (!intakeId || submitting) return;
-		if (!PHONE_REGEX.test(phone)) {
-			setError("Enter a valid phone number (e.g. +880 1XXX-XXXXXX)");
-			return;
+	function validate(): boolean {
+		const result = enrollSchema.safeParse({
+			programSlug,
+			intakeId: intakeId ?? 0,
+			phone,
+			experienceNote: experienceNote.trim() || undefined,
+			hearAbout: hearAbout || undefined,
+		});
+		if (result.success) {
+			setFieldErrors({});
+			return true;
 		}
+		const errors: Partial<Record<keyof EnrollValues, string>> = {};
+		for (const issue of result.error.issues) {
+			const key = issue.path[0] as keyof EnrollValues;
+			if (!errors[key]) errors[key] = issue.message;
+		}
+		setFieldErrors(errors);
+		return false;
+	}
+
+	function onSubmit(event: React.FormEvent) {
+		event.preventDefault();
+		if (submitting) return;
+		if (!validate()) return;
+		setShowConfirm(true);
+	}
+
+	async function onConfirm() {
+		if (submitting) return;
 		setSubmitting(true);
 		setError(null);
 		try {
 			const result = await submitApplication({
-				intakeId,
+				intakeId: intakeId ?? 0,
 				phone,
 				experienceNote: experienceNote.trim() || null,
 				hearAbout: hearAbout || null,
@@ -92,6 +139,7 @@ export function EnrollPage({ intakes, session }: Props) {
 				trackEvent("Enrollment Submitted", { program: programSlug });
 			} else {
 				setError(result.message);
+				setShowConfirm(false);
 			}
 		} catch (err) {
 			setError(
@@ -99,6 +147,7 @@ export function EnrollPage({ intakes, session }: Props) {
 					? err.message
 					: "Submission failed. Please try again.",
 			);
+			setShowConfirm(false);
 		} finally {
 			setSubmitting(false);
 		}
@@ -145,8 +194,8 @@ export function EnrollPage({ intakes, session }: Props) {
 					className="mx-auto max-w-2xl space-y-8 rounded-2xl border border-border bg-card p-6 sm:p-10"
 				>
 					{/* Track */}
-					<div className="space-y-2">
-						<Label>Track</Label>
+					<Field>
+						<FieldLabel>Track</FieldLabel>
 						<div className="grid grid-cols-2 overflow-hidden rounded-lg border border-border">
 							{(["barbering", "beauty"] as const).map((t) => (
 								<button
@@ -165,19 +214,24 @@ export function EnrollPage({ intakes, session }: Props) {
 								</button>
 							))}
 						</div>
-					</div>
+					</Field>
 
 					{/* Program */}
-					<div className="space-y-2">
-						<Label htmlFor="enroll-program">Program</Label>
+					<Field>
+						<FieldLabel htmlFor="enroll-program">Program *</FieldLabel>
 						<select
 							id="enroll-program"
 							value={programSlug}
 							onChange={(e) => {
 								setProgramSlug(e.target.value);
 								setIntakeId(null);
+								setFieldErrors((prev) => ({ ...prev, programSlug: undefined }));
 							}}
 							required
+							aria-invalid={!!fieldErrors.programSlug}
+							aria-describedby={
+								fieldErrors.programSlug ? "program-error" : undefined
+							}
 							className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
 						>
 							<option value="" disabled>
@@ -191,12 +245,17 @@ export function EnrollPage({ intakes, session }: Props) {
 								</option>
 							))}
 						</select>
-					</div>
+						{fieldErrors.programSlug ? (
+							<FieldError id="program-error">
+								{fieldErrors.programSlug}
+							</FieldError>
+						) : null}
+					</Field>
 
 					{/* Intakes */}
 					{programSlug ? (
-						<div className="space-y-2">
-							<Label>Available cohorts</Label>
+						<Field>
+							<FieldLabel>Available cohorts *</FieldLabel>
 							{programIntakes.length === 0 ? (
 								<p className="rounded-md border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground">
 									No open intakes for this program yet — check back soon.
@@ -224,7 +283,13 @@ export function EnrollPage({ intakes, session }: Props) {
 															className="accent-[var(--primary)]"
 															checked={selected}
 															disabled={full}
-															onChange={() => setIntakeId(intake.id)}
+															onChange={() => {
+																setIntakeId(intake.id);
+																setFieldErrors((prev) => ({
+																	...prev,
+																	intakeId: undefined,
+																}));
+															}}
 														/>
 														<span className="text-sm">
 															<span className="font-medium">
@@ -255,7 +320,10 @@ export function EnrollPage({ intakes, session }: Props) {
 									})}
 								</ul>
 							)}
-						</div>
+							{fieldErrors.intakeId ? (
+								<FieldError>{fieldErrors.intakeId}</FieldError>
+							) : null}
+						</Field>
 					) : null}
 
 					{/* Contact details (prefilled name/email from account) */}
@@ -267,42 +335,42 @@ export function EnrollPage({ intakes, session }: Props) {
 							</span>{" "}
 							({session.user.email})
 						</p>
-						<div className="space-y-1.5">
-							<Label htmlFor="enroll-phone">Phone *</Label>
+						<Field>
+							<FieldLabel htmlFor="enroll-phone">Phone *</FieldLabel>
 							<Input
 								id="enroll-phone"
 								value={phone}
 								placeholder="+880 1XXX-XXXXXX"
-								onChange={(e) => setPhone(e.target.value)}
+								onChange={(e) => {
+									setPhone(e.target.value);
+									setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+								}}
 								autoComplete="tel"
-								pattern="^[+]?[\d\s\-()]{7,20}$"
-								required
-								aria-describedby={
-									phone && !PHONE_REGEX.test(phone) ? "phone-error" : undefined
-								}
-								aria-invalid={
-									phone && !PHONE_REGEX.test(phone) ? true : undefined
-								}
+								aria-invalid={!!fieldErrors.phone}
+								aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
 							/>
-							{phone && !PHONE_REGEX.test(phone) ? (
-								<p id="phone-error" className="text-xs text-destructive">
-									Enter a valid phone number (e.g. +880 1XXX-XXXXXX)
-								</p>
+							{fieldErrors.phone ? (
+								<FieldError id="phone-error">{fieldErrors.phone}</FieldError>
 							) : null}
-						</div>
-						<div className="space-y-1.5">
-							<Label htmlFor="enroll-note">
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="enroll-note">
 								Prior experience or questions (optional)
-							</Label>
+							</FieldLabel>
 							<Textarea
 								id="enroll-note"
 								rows={3}
 								value={experienceNote}
 								onChange={(e) => setExperienceNote(e.target.value)}
 							/>
-						</div>
-						<div className="space-y-1.5">
-							<Label htmlFor="enroll-hear">How did you hear about us?</Label>
+							<FieldDescription>
+								Anything you&rsquo;d like us to know before your interview.
+							</FieldDescription>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="enroll-hear">
+								How did you hear about us?
+							</FieldLabel>
 							<select
 								id="enroll-hear"
 								value={hearAbout}
@@ -328,7 +396,7 @@ export function EnrollPage({ intakes, session }: Props) {
 										) : null;
 									})()
 								: null}
-						</div>
+						</Field>
 					</div>
 
 					{error ? (
@@ -340,15 +408,70 @@ export function EnrollPage({ intakes, session }: Props) {
 						</p>
 					) : null}
 
-					<Button
-						type="submit"
-						size="lg"
-						disabled={!intakeId || submitting || !PHONE_REGEX.test(phone)}
-						className="w-full gap-2"
-					>
-						{submitting ? "Submitting…" : "Submit application"}
-						{!submitting ? <IconArrowRight className="h-4 w-4" /> : null}
-					</Button>
+					{showConfirm ? (
+						<div className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-3">
+							<p className="text-sm font-medium">
+								Please confirm your application:
+							</p>
+							<ul className="space-y-1 text-sm text-muted-foreground">
+								{programSlug ? (
+									<li>
+										Program:{" "}
+										<span className="font-medium text-foreground">
+											{getProgramBySlug(programSlug)?.title ?? programSlug}
+										</span>
+									</li>
+								) : null}
+								{(() => {
+									const intake = intakes.find((i) => i.id === intakeId);
+									return intake ? (
+										<li>
+											Cohort:{" "}
+											<span className="font-medium text-foreground">
+												{COHORT_LABELS[intake.cohort]} · starts{" "}
+												{formatStartsOn(intake.startsOn)}
+											</span>
+										</li>
+									) : null;
+								})()}
+								{phone ? (
+									<li>
+										Phone:{" "}
+										<span className="font-medium text-foreground">{phone}</span>
+									</li>
+								) : null}
+							</ul>
+							<div className="flex gap-3">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setShowConfirm(false)}
+									disabled={submitting}
+								>
+									Go back
+								</Button>
+								<Button
+									type="button"
+									onClick={() => void onConfirm()}
+									disabled={submitting}
+									className="gap-2"
+								>
+									{submitting ? "Submitting…" : "Confirm & submit"}
+									{!submitting ? <IconArrowRight className="h-4 w-4" /> : null}
+								</Button>
+							</div>
+						</div>
+					) : (
+						<Button
+							type="submit"
+							size="lg"
+							disabled={submitting}
+							className="w-full gap-2"
+						>
+							{submitting ? "Submitting…" : "Submit application"}
+							{!submitting ? <IconArrowRight className="h-4 w-4" /> : null}
+						</Button>
+					)}
 				</form>
 			</section>
 		</main>

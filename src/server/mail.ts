@@ -8,7 +8,7 @@
 //   RESEND_API_KEY  — from resend.com dashboard (API keys)
 //   EMAIL_FROM      — "Academy <no-reply@yourdomain>"; onboarding@resend.dev
 //                     works out of the box for testing before domain setup.
-export type MailInput = {
+type MailInput = {
 	to: string;
 	subject: string;
 	html: string;
@@ -76,12 +76,13 @@ export async function sendMail({
 function shell(title: string, body: string): string {
 	return `<!doctype html>
 <html>
+  <head><meta charset="utf-8"></head>
   <body style="margin:0;padding:32px 16px;background:#f6f6f4;font-family:Arial,Helvetica,sans-serif;color:#1c1c1a;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       <tr><td align="center">
         <div style="max-width:480px;background:#ffffff;border-radius:12px;padding:40px;border:1px solid #e7e5df;">
           <p style="margin:0 0 24px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:#8a7b3f;">Unicorn Barber Training Academy</p>
-          <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;">${title}</h1>
+          <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;">${escapeHtml(title)}</h1>
           ${body}
           <p style="margin:32px 0 0;font-size:12px;color:#8b8b85;">If you didn't request this email you can safely ignore it.</p>
         </div>
@@ -107,7 +108,7 @@ function escapeHtml(value: string): string {
 }
 
 function button(url: string, label: string): string {
-	return `<a href="${escapeHtml(url)}" style="display:inline-block;margin-top:8px;padding:12px 28px;background:#c9a227;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">${label}</a>`;
+	return `<a href="${escapeHtml(url)}" style="display:inline-block;margin-top:8px;padding:12px 28px;background:#c9a227;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">${escapeHtml(label)}</a>`;
 }
 
 export function verificationEmail(name: string, url: string): string {
@@ -135,7 +136,7 @@ function detailTable(rows: Array<[string, string]>): string {
 		.join("")}</table>`;
 }
 
-export type ApplicationEmailData = {
+type ApplicationEmailData = {
 	reference: string;
 	fullName: string;
 	programTitle: string;
@@ -187,7 +188,7 @@ export function applicationRejectedEmail(data: ApplicationEmailData): string {
 	);
 }
 
-export type CertificateEmailData = {
+type CertificateEmailData = {
 	fullName: string;
 	programTitle: string;
 	cohortLabel: string;
@@ -224,7 +225,7 @@ ${detailTable([
 
 /* ------------------------------- contact -------------------------------- */
 
-export type ContactInquiryData = {
+type ContactInquiryData = {
 	name: string;
 	email: string;
 	phone?: string;

@@ -2,12 +2,19 @@
 // Admissions table. Admin-only.
 import { createFileRoute } from "@tanstack/react-router";
 import { ApplicationsListPage } from "@/features/enrollment-admin/applications-list-page";
-import { parseApplicationStatus } from "@/lib/enrollment";
+import {
+	parseApplicationStatus,
+	parseCohort,
+	parseFeeStatus,
+} from "@/lib/enrollment";
 import { requireRoles } from "@/server/guards";
 
 type EnrollmentsSearch = {
 	status?: ReturnType<typeof parseApplicationStatus>;
 	search?: string;
+	programSlug?: string;
+	cohort?: ReturnType<typeof parseCohort>;
+	feeStatus?: ReturnType<typeof parseFeeStatus>;
 	page?: number;
 };
 
@@ -19,9 +26,18 @@ export const Route = createFileRoute("/dashboard/enrollments/")({
 			typeof search.search === "string" && search.search.trim()
 				? search.search.trim().slice(0, 120)
 				: undefined;
+		const programSlug =
+			typeof search.programSlug === "string" && search.programSlug.trim()
+				? search.programSlug.trim().slice(0, 50)
+				: undefined;
+		const cohort = parseCohort(search.cohort);
+		const feeStatus = parseFeeStatus(search.feeStatus);
 		return {
 			...(status ? { status } : {}),
 			...(searchQ ? { search: searchQ } : {}),
+			...(programSlug ? { programSlug } : {}),
+			...(cohort ? { cohort } : {}),
+			...(feeStatus ? { feeStatus } : {}),
 			...(Number.isInteger(page) && page > 1 ? { page } : {}),
 		};
 	},
@@ -44,11 +60,15 @@ export const Route = createFileRoute("/dashboard/enrollments/")({
 });
 
 function ApplicationsRoute() {
-	const { status, search, page } = Route.useSearch();
+	const { status, search, programSlug, cohort, feeStatus, page } =
+		Route.useSearch();
 	return (
 		<ApplicationsListPage
 			statusFilter={status}
 			search={search}
+			programSlug={programSlug}
+			cohort={cohort}
+			feeStatus={feeStatus}
 			page={page ?? 1}
 		/>
 	);
