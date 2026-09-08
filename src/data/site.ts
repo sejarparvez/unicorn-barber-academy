@@ -32,7 +32,7 @@ export const AREAS_SERVED = [
  * Hours follow the detailed studio schedule shown on /contact.
  */
 export const CONTACT = {
-	email: "hello@unicornbta.com",
+	email: "info@unicornbarberacademy.com",
 	phoneDisplay: "01337-229944",
 	phoneHref: "tel:+8801337229944",
 	phoneE164: "+8801337229944",
@@ -45,11 +45,11 @@ export const CONTACT = {
 		"House 04 (1st Floor), Block F, Main Road, Banasree, Rampura, Dhaka 1219, Bangladesh",
 	mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAPS_QUERY)}`,
 	mapsEmbedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(MAPS_QUERY)}&output=embed`,
-	hoursSummary: "Sun–Thu, 9AM–9PM · Fri, 9AM–12:30PM & 2:30–9PM · Sat, 9AM–7PM",
+	hoursSummary: "Saturday – Thursday, 9AM–9PM",
 	hours: [
-		{ day: "Sunday – Thursday", time: "9:00 AM – 9:00 PM" },
-		{ day: "Friday", time: "9:00 AM – 12:30 PM, 2:30 PM – 9:00 PM" },
-		{ day: "Saturday", time: "9:00 AM – 7:00 PM" },
+		{ day: "Saturday – Thursday", time: "9:00 AM – 9:00 PM" },
+		// { day: "Friday", time: "9:00 AM – 12:30 PM, 2:30 PM – 9:00 PM" },
+		// { day: "Saturday", time: "9:00 AM – 7:00 PM" },
 	],
 };
 

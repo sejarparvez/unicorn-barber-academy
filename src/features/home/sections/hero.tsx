@@ -9,6 +9,7 @@ import {
 	useTransform,
 } from "motion/react";
 import { useRef } from "react";
+import banner from "@/assets/logo/banner.png";
 import { buttonVariants } from "@/components/ui/button";
 import { pic } from "@/data/images";
 import { cn } from "@/lib/utils";
@@ -51,8 +52,21 @@ export default function Hero() {
 			/>
 
 			<div className="relative mx-auto grid max-w-350 grid-cols-1 lg:grid-cols-[1fr_auto_1fr]">
+				{/* Brand banner — mobile only, shows first */}
+				<div className="order-1 flex items-center justify-center bg-[#0d0d0f] px-6 pt-10 pb-8 lg:hidden">
+					<img
+						src={banner}
+						alt="Unicorn Barber Training Academy"
+						className="h-auto w-full max-w-md"
+						width={1698}
+						height={365}
+						fetchPriority="high"
+						loading="eager"
+					/>
+				</div>
+
 				{/* Content column */}
-				<div className="flex flex-col justify-center px-4 py-16 sm:px-10 lg:min-h-[88vh] lg:px-14 lg:py-0">
+				<div className="order-2 flex flex-col justify-center px-4 pt-8 pb-16 sm:px-10 lg:order-none lg:min-h-[88vh] lg:px-14 lg:py-0">
 					<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 flex items-center gap-3 font-mono text-[11px] tracking-[0.32em] text-primary">
 						<span className="h-px w-8 bg-primary/70" />
 						ENROLLMENT OPEN &mdash; FALL COHORT
@@ -115,8 +129,8 @@ export default function Hero() {
 					className="relative hidden w-14 shrink-0 lg:flex lg:flex-col lg:items-center lg:justify-center"
 				></div>
 
-				{/* Photo column — gentle parallax on scroll */}
-				<div className="relative h-[46vh] overflow-hidden sm:h-[56vh] lg:h-[88vh]">
+				{/* Photo column — desktop only; mobile shows the brand banner instead */}
+				<div className="relative hidden overflow-hidden lg:block lg:h-[88vh]">
 					<motion.div
 						style={
 							shouldReduceMotion ? undefined : { y: photoY, scale: photoScale }
