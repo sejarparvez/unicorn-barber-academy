@@ -3,9 +3,9 @@
 // better-auth tables are owned by the pool inside src/server/auth.ts — that
 // one stays untouched; this pool simply follows the same connection rules.
 //
-// Prisma-next mirrors these schemas in prisma/schema.prisma as contract
-// documentation only. Do not point a Prisma client at writes here either:
-// one engine per table, same rule as the auth comment in auth.ts.
+// Prisma contract (prisma/schema.prisma) owns DDL for these tables.
+// Runtime queries stay raw pg here by design — do not point a Prisma client
+// at writes either: one engine per table, same rule as auth.ts.
 import "dotenv/config";
 import { Pool } from "pg";
 

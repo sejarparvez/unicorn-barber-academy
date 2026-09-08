@@ -55,19 +55,25 @@ export async function listOpenIntakes(): Promise<IntakePublic[]> {
 		starts_on: Date;
 		seats_total: number;
 		seats_left: number;
+		fee_poisha: number | null;
+		is_published: boolean | null;
 	}>(
 		`SELECT i.id, i.program_slug, i.cohort, i.starts_on, i.seats_total,
 			i.seats_total - (
 				SELECT count(*) FROM enrollment_application a
 				WHERE a.intake_id = i.id
 				  AND a.status IN ('pending', 'reviewing', 'approved')
-			)::int AS seats_left
+			)::int AS seats_left,
+			p.fee_poisha, p.is_published
 		 FROM program_intake i
+		 LEFT JOIN program p ON p.slug = i.program_slug
 		 WHERE i.is_open = TRUE AND i.starts_on >= CURRENT_DATE
 		 ORDER BY i.starts_on ASC, i.cohort ASC`,
 	);
 	const out: IntakePublic[] = [];
 	for (const row of res.rows) {
+		// Hidden or unknown programs never surface on the apply form.
+		if (row.is_published !== true) continue;
 		const title = programTitle(row.program_slug);
 		if (!title) continue; // stale slug — never surface it
 		const track = ALL_PROGRAMS.find((p) => p.slug === row.program_slug)?.track;
@@ -81,6 +87,7 @@ export async function listOpenIntakes(): Promise<IntakePublic[]> {
 			startsOn: toDateOnly(row.starts_on),
 			seatsTotal: row.seats_total,
 			seatsLeft: Math.max(0, row.seats_left),
+			feePoisha: row.fee_poisha ?? 0,
 		});
 	}
 	return out;

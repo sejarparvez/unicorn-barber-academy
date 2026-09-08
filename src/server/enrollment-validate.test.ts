@@ -125,6 +125,7 @@ describe("isValidFutureStartDate", () => {
 });
 
 describe("parseIntakePayload", () => {
+	const t = test.skipIf(!process.env.DATABASE_URL);
 	const validBase = {
 		programSlug: "classic-barbering",
 		cohort: "day",
@@ -132,36 +133,46 @@ describe("parseIntakePayload", () => {
 		seatsTotal: 12,
 	};
 
-	test("accepts a clean intake", () => {
-		const result = parseIntakePayload(validBase);
+	t("accepts a clean intake", async () => {
+		const result = await parseIntakePayload(validBase);
 		expect(result.ok).toBe(true);
 		if (result.ok) expect(result.value.seatsTotal).toBe(12);
 	});
 
-	test("rejects unknown programs", () => {
-		const result = parseIntakePayload({ ...validBase, programSlug: "welding" });
+	t("rejects unknown programs", async () => {
+		const result = await parseIntakePayload({
+			...validBase,
+			programSlug: "welding",
+		});
 		expect(result.ok).toBe(false);
 	});
 
-	test("rejects bad cohorts", () => {
-		const result = parseIntakePayload({ ...validBase, cohort: "midnight" });
+	t("rejects bad cohorts", async () => {
+		const result = await parseIntakePayload({
+			...validBase,
+			cohort: "midnight",
+		});
 		expect(result.ok).toBe(false);
 	});
 
-	test("rejects past or invalid start dates", () => {
+	t("rejects past or invalid start dates", async () => {
 		expect(
-			parseIntakePayload({ ...validBase, startsOn: "2020-01-01" }).ok,
+			(await parseIntakePayload({ ...validBase, startsOn: "2020-01-01" })).ok,
 		).toBe(false);
 		expect(
-			parseIntakePayload({ ...validBase, startsOn: "2027-02-31" }).ok,
+			(await parseIntakePayload({ ...validBase, startsOn: "2027-02-31" })).ok,
 		).toBe(false);
 	});
 
-	test("seat bounds are enforced (1–200)", () => {
-		expect(parseIntakePayload({ ...validBase, seatsTotal: 0 }).ok).toBe(false);
-		expect(parseIntakePayload({ ...validBase, seatsTotal: 201 }).ok).toBe(
+	t("seat bounds are enforced (1–200)", async () => {
+		expect((await parseIntakePayload({ ...validBase, seatsTotal: 0 })).ok).toBe(
 			false,
 		);
-		expect(parseIntakePayload({ ...validBase, seatsTotal: 200 }).ok).toBe(true);
+		expect(
+			(await parseIntakePayload({ ...validBase, seatsTotal: 201 })).ok,
+		).toBe(false);
+		expect(
+			(await parseIntakePayload({ ...validBase, seatsTotal: 200 })).ok,
+		).toBe(true);
 	});
 });

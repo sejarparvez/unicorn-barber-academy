@@ -2,9 +2,8 @@
 // Server-only: mounted at /api/auth/* via src/routes/api/auth/$.tsx
 //
 // DB ownership: this pg Pool OWNS the better-auth tables (user/session/
-// account/verification). Prisma-next mirrors the same schema in
-// src/prisma/schema.prisma purely as contract documentation — do not point
-// two ORMs at writes for these tables.
+// account/verification). Prisma contract (prisma/schema.prisma) owns DDL
+// for all tables — do not point two ORMs at writes for these tables.
 //
 // Admin plugin adds `role`/`banned`/`banReason`/`banExpires` columns to the
 // user table (see schema.prisma). Academy roles are the typed union in

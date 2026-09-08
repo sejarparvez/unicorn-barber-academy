@@ -34,15 +34,15 @@ describe("database connectivity (read-only)", () => {
 		}
 	});
 
-	t("application status CHECK includes 'completed'", async () => {
-		const res = await q<{ check_clause: string }>(
-			`SELECT pg_get_constraintdef(c.oid) AS check_clause
-			 FROM pg_constraint c
-			 JOIN pg_class t ON t.oid = c.conrelid
-			 WHERE t.relname = 'enrollment_application' AND c.contype = 'c'`,
+	t("application status log table exists", async () => {
+		const res = await q<{ table_name: string }>(
+			`SELECT table_name FROM information_schema.tables
+			 WHERE table_schema = 'public'
+			 AND table_name = 'application_status_log'`,
 		);
-		const all = res.rows.map((r) => r.check_clause).join(" ");
-		expect(all).toContain("'completed'");
+		expect(res.rows.map((r) => r.table_name)).toContain(
+			"application_status_log",
+		);
 	});
 
 	t("certificate code uniqueness constraint exists", async () => {

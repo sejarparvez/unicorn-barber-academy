@@ -132,8 +132,14 @@ keep this intact.
 
 ## Database Workflow (Prisma Next)
 
+Prisma contract (`prisma/schema.prisma`) is the single source of truth for
+all tables — it owns DDL. Never hand-write schema SQL. Runtime queries stay
+raw `pg` (`src/server/db.ts` + `*-db.ts`); better-auth owns its tables via
+its own pool. Neon-only (no local Postgres): run DDL against the direct URL,
+not the pooler (PgBouncer breaks migrations).
+
 1. Edit `prisma/schema.prisma` (models: User, Session, Account, BlogPost,
-   EnrollmentApplication, ...).
+   EnrollmentApplication, ApplicationStatusLog, ...).
 2. Run `bun run db:emit` to regenerate the contract files.
 3. Apply changes with `bun run db:migrate`; verify with `bun run db:status`.
 4. Commit `schema.prisma` together with regenerated contract files.

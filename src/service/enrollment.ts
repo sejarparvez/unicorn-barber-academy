@@ -19,6 +19,8 @@ import type {
 	Cohort,
 	FeeStatus,
 	IntakeAdmin,
+	ProgramAdmin,
+	ProgramOption,
 } from "@/lib/enrollment";
 import { queryKeys } from "./query-keys";
 
@@ -87,6 +89,54 @@ export function useIntakesAdmin(options?: { initialData?: IntakeAdmin[] }) {
 		},
 		initialData: options?.initialData,
 		staleTime: 30_000,
+	});
+}
+
+export function useProgramOptions() {
+	return useQuery({
+		queryKey: queryKeys.programOptions(),
+		queryFn: async (): Promise<ProgramOption[]> => {
+			const { listProgramOptionsFn } = await import("@/server/enrollment-fns");
+			return listProgramOptionsFn();
+		},
+		staleTime: 60_000,
+	});
+}
+
+export function useProgramsAdmin() {
+	return useQuery({
+		queryKey: queryKeys.programs(),
+		queryFn: async (): Promise<ProgramAdmin[]> => {
+			const { listProgramsAdminFn } = await import("@/server/enrollment-fns");
+			return listProgramsAdminFn();
+		},
+		staleTime: 30_000,
+	});
+}
+
+export function useUpdateProgram() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async (input: {
+			slug: string;
+			patch: {
+				title?: string;
+				duration?: string;
+				feePoisha?: number;
+				defaultSeats?: number;
+				isPublished?: boolean;
+			};
+		}) => {
+			const { updateProgramFn } = await import("@/server/enrollment-fns");
+			await updateProgramFn({ data: input });
+		},
+		onSuccess: () => {
+			void queryClient.invalidateQueries({ queryKey: queryKeys.programs() });
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.programOptions(),
+			});
+			void queryClient.invalidateQueries({ queryKey: queryKeys.intakes() });
+		},
 	});
 }
 

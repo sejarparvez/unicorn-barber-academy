@@ -24,6 +24,8 @@ export const queryKeys = {
 	applicationLog: (id: number) =>
 		["applications", "detail", id, "log"] as const,
 	intakes: () => ["intakes"] as const,
+	programs: () => ["programs"] as const,
+	programOptions: () => ["programs", "options"] as const,
 	myApplications: () => ["my-applications"] as const,
 	openIntakes: () => ["open-intakes"] as const,
 

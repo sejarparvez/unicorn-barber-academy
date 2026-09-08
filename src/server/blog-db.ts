@@ -316,6 +316,39 @@ export async function listRelatedPosts(options: {
 	return res.rows.map(rowToSummary);
 }
 
+/** Prev/next published posts by publish date (newest-first walk). Returns
+    the newer post as `next` and the older one as `prev`; either may be null
+    at the ends of the archive. */
+export async function getAdjacentPosts(postId: number): Promise<{
+	prev: BlogPostSummary | null;
+	next: BlogPostSummary | null;
+}> {
+	const current = await q<{ published_at: Date | null }>(
+		"SELECT published_at FROM blog_post WHERE id = $1",
+		[postId],
+	);
+	const publishedAt = current.rows[0]?.published_at;
+	if (!publishedAt) return { prev: null, next: null };
+	const [older, newer] = await Promise.all([
+		q<PostSummaryRow>(
+			`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS}
+			 WHERE p.status = 'published' AND p.published_at < $1
+			 ORDER BY p.published_at DESC, p.id DESC LIMIT 1`,
+			[publishedAt],
+		),
+		q<PostSummaryRow>(
+			`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS}
+			 WHERE p.status = 'published' AND p.published_at > $1
+			 ORDER BY p.published_at ASC, p.id ASC LIMIT 1`,
+			[publishedAt],
+		),
+	]);
+	return {
+		prev: older.rows[0] ? rowToSummary(older.rows[0]) : null,
+		next: newer.rows[0] ? rowToSummary(newer.rows[0]) : null,
+	};
+}
+
 /* --------------------------- category archives -------------------------- */
 
 export async function getCategoryBySlug(

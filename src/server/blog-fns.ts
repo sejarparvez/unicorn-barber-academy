@@ -18,6 +18,7 @@ import type {
 import { parseBlogStatus } from "@/lib/blog";
 import { renderMarkdown } from "@/lib/markdown";
 import {
+	getAdjacentPosts,
 	getAnyBySlug,
 	getCategoryBySlug,
 	getPostById,
@@ -122,12 +123,40 @@ export const getPostForPublicFn = createServerFn({ method: "GET" })
 export type PublicPostHtml =
 	| {
 			kind: "post";
-			post: Omit<BlogPostFull, "contentMd"> & { html: string };
+			post: Omit<BlogPostFull, "contentMd"> & {
+				html: string;
+				toc: TocEntry[];
+			};
 			isPreview: boolean;
 			relatedPosts: BlogPostSummary[];
+			adjacent: {
+				prev: BlogPostSummary | null;
+				next: BlogPostSummary | null;
+			};
 	  }
 	| { kind: "redirect"; toSlug: string }
 	| { kind: "missing" };
+
+/** Table-of-contents entry extracted from a rendered H2. */
+export type TocEntry = { id: string; text: string };
+
+/** Pull H2 anchors (added by the markdown pipeline) for the article TOC.
+    Runs on our own sanitized HTML — ids are slugified, inner tags stripped. */
+export function extractToc(html: string): TocEntry[] {
+	const entries: TocEntry[] = [];
+	for (const match of html.matchAll(/<h2\s+id="([^"]+)">([\s\S]*?)<\/h2>/g)) {
+		const text = (match[2] ?? "")
+			.replace(/<[^>]+>/g, "")
+			.replace(/&amp;/g, "&")
+			.replace(/&lt;/g, "<")
+			.replace(/&gt;/g, ">")
+			.replace(/&quot;/g, '"')
+			.replace(/&#39;/g, "'")
+			.trim();
+		if (match[1] && text) entries.push({ id: match[1], text });
+	}
+	return entries;
+}
 
 export const getPostForPublicHtmlFn = createServerFn({ method: "GET" })
 	.validator((input: { slug: string }) => input)
@@ -149,11 +178,15 @@ export const getPostForPublicHtmlFn = createServerFn({ method: "GET" })
 				});
 
 				const { contentMd, ...post } = result.post;
+				const html = renderMarkdown(contentMd);
 				return {
 					kind: "post",
-					post: { ...post, html: renderMarkdown(contentMd) },
+					post: { ...post, html, toc: extractToc(html) },
 					isPreview: result.isPreview,
 					relatedPosts,
+					adjacent: result.isPreview
+						? { prev: null, next: null }
+						: await getAdjacentPosts(result.post.id),
 				};
 			}),
 	);

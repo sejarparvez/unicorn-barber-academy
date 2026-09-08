@@ -29,6 +29,7 @@ export const Route = createFileRoute("/blog/$slug")({
 			post: result.post,
 			isPreview: result.isPreview,
 			relatedPosts: result.relatedPosts,
+			adjacent: result.adjacent,
 		};
 	},
 	head: ({ loaderData }) => {

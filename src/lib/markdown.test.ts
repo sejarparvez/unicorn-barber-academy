@@ -80,4 +80,10 @@ describe("renderMarkdown structure", () => {
 		expect(html).toContain('loading="lazy"');
 		expect(html).toContain('decoding="async"');
 	});
+
+	test("tables are wrapped in a horizontal scroll container", () => {
+		const html = renderMarkdown("| A | B |\n|---|---|\n| 1 | 2 |");
+		expect(html).toContain('<div class="overflow-x-auto"><table>');
+		expect(html).toContain("</table></div>");
+	});
 });

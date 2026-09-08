@@ -25,15 +25,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ALL_PROGRAMS } from "@/data/programs";
-import type { IntakeAdmin } from "@/lib/enrollment";
-import { COHORT_LABELS, formatStartsOn } from "@/lib/enrollment";
+import type { IntakeAdmin, ProgramAdmin } from "@/lib/enrollment";
+import {
+	COHORT_LABELS,
+	formatFeePoisha,
+	formatStartsOn,
+} from "@/lib/enrollment";
 import { cn } from "@/lib/utils";
 import {
 	useCreateIntake,
 	useDeleteIntake,
 	useIntakesAdmin,
+	useProgramOptions,
+	useProgramsAdmin,
 	useUpdateIntake,
+	useUpdateProgram,
 } from "@/service/enrollment";
 
 export function IntakesPage() {
@@ -52,22 +58,33 @@ export function IntakesPage() {
 		deleteMutation.isPending;
 
 	// create form
-	const [programSlug, setProgramSlug] = useState(ALL_PROGRAMS[0]?.slug ?? "");
+	const { data: programOptions } = useProgramOptions();
+	const { data: programs } = useProgramsAdmin();
+	const updateProgramMutation = useUpdateProgram();
+	const [programSlug, setProgramSlug] = useState("");
 	const [cohort, setCohort] = useState<"day" | "evening">("day");
 	const [startsOn, setStartsOn] = useState("");
 	const [seatsTotal, setSeatsTotal] = useState("12");
 
+	const selectedProgram = (programOptions ?? []).find(
+		(p) => p.slug === programSlug,
+	);
+	const effectiveSlug = programSlug || programOptions?.[0]?.slug || "";
+	const effectiveSeats = selectedProgram
+		? String(selectedProgram.defaultSeats)
+		: seatsTotal;
+
 	async function onCreate(event: React.FormEvent) {
 		event.preventDefault();
-		if (busy || !startsOn) return;
+		if (busy || !startsOn || !effectiveSlug) return;
 		setError(null);
 		setNotice(null);
 		try {
 			await createMutation.mutateAsync({
-				programSlug,
+				programSlug: effectiveSlug,
 				cohort,
 				startsOn,
-				seatsTotal: Number.parseInt(seatsTotal, 10),
+				seatsTotal: Number.parseInt(effectiveSeats, 10),
 			});
 			setNotice("Intake created.");
 			setStartsOn("");
@@ -163,12 +180,18 @@ export function IntakesPage() {
 				className="grid gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-[minmax(0,2fr)_auto_auto_auto_auto]"
 			>
 				<select
-					value={programSlug}
-					onChange={(e) => setProgramSlug(e.target.value)}
+					value={effectiveSlug}
+					onChange={(e) => {
+						setProgramSlug(e.target.value);
+						const next = (programOptions ?? []).find(
+							(p) => p.slug === e.target.value,
+						);
+						if (next) setSeatsTotal(String(next.defaultSeats));
+					}}
 					className="h-9 rounded-md border border-border bg-background px-3 text-sm"
 					aria-label="Program"
 				>
-					{ALL_PROGRAMS.map((p) => (
+					{(programOptions ?? []).map((p) => (
 						<option key={p.slug} value={p.slug}>
 							{p.title}
 						</option>
@@ -202,10 +225,23 @@ export function IntakesPage() {
 					className="h-9 w-24"
 					aria-label="Seats"
 				/>
-				<Button type="submit" disabled={busy || !startsOn} className="gap-1.5">
+				<Button
+					type="submit"
+					disabled={busy || !startsOn || !effectiveSlug}
+					className="gap-1.5"
+				>
 					<IconPlus className="h-4 w-4" /> Create
 				</Button>
 			</form>
+
+			<ProgramsOverview
+				programs={programs}
+				busy={busy}
+				onError={setError}
+				updateProgram={(slug, patch) =>
+					updateProgramMutation.mutateAsync({ slug, patch })
+				}
+			/>
 
 			<ul className="divide-y divide-border rounded-xl border border-border bg-card">
 				{isPending ? (
@@ -324,5 +360,142 @@ export function IntakesPage() {
 				</AlertDialogContent>
 			</AlertDialog>
 		</div>
+	);
+}
+
+/* ------------------------- programs overview ------------------------- */
+
+function ProgramsOverview({
+	programs,
+	busy,
+	onError,
+	updateProgram,
+}: {
+	programs: ProgramAdmin[] | undefined;
+	busy: boolean;
+	onError: (message: string | null) => void;
+	updateProgram: (
+		slug: string,
+		patch: {
+			feePoisha?: number;
+			defaultSeats?: number;
+			isPublished?: boolean;
+		},
+	) => Promise<unknown>;
+}) {
+	async function save(
+		slug: string,
+		patch: { feePoisha?: number; defaultSeats?: number; isPublished?: boolean },
+	) {
+		onError(null);
+		try {
+			await updateProgram(slug, patch);
+		} catch (err) {
+			onError(err instanceof Error ? err.message : "Update failed");
+		}
+	}
+
+	return (
+		<section aria-label="Programs overview" className="space-y-3">
+			<h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
+				Programs — what&apos;s live, seats &amp; fees
+			</h2>
+			{(programs ?? []).length === 0 ? (
+				<p className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+					No programs yet — seed with{" "}
+					<code className="font-mono text-xs">
+						bun scripts/seed-programs.ts
+					</code>
+					.
+				</p>
+			) : (
+				<ul className="grid gap-3 md:grid-cols-2">
+					{(programs ?? []).map((program) => (
+						<li
+							key={program.slug}
+							className="space-y-3 rounded-xl border border-border bg-card p-4"
+						>
+							<div className="flex flex-wrap items-center gap-2">
+								<Badge variant={program.isPublished ? "default" : "secondary"}>
+									{program.isPublished ? "Live" : "Hidden"}
+								</Badge>
+								<span className="font-medium">{program.title}</span>
+								<span className="text-xs text-muted-foreground">
+									{program.duration}
+								</span>
+								<Button
+									variant="outline"
+									size="sm"
+									className="ml-auto"
+									disabled={busy}
+									onClick={() =>
+										void save(program.slug, {
+											isPublished: !program.isPublished,
+										})
+									}
+								>
+									{program.isPublished ? "Hide" : "Publish"}
+								</Button>
+							</div>
+							<p className="text-xs text-muted-foreground">
+								{program.openIntakes} open intake
+								{program.openIntakes === 1 ? "" : "s"} · {program.seatsFilled}/
+								{program.seatsTotal} seats filled · {program.pendingCount}{" "}
+								pending review ·{" "}
+								{formatFeePoisha(program.paidCount * program.feePoisha)}{" "}
+								collected
+							</p>
+							<div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+								<label className="flex items-center gap-2">
+									Fee (৳)
+									<input
+										key={`${program.slug}:fee:${program.feePoisha}`}
+										type="number"
+										min={0}
+										max={1000000}
+										step={500}
+										defaultValue={Math.floor(program.feePoisha / 100)}
+										onBlur={(e) => {
+											const bdt = Number.parseInt(e.target.value, 10);
+											if (
+												Number.isInteger(bdt) &&
+												bdt * 100 !== program.feePoisha
+											) {
+												void save(program.slug, { feePoisha: bdt * 100 });
+											}
+										}}
+										className="h-8 w-28 rounded-md border border-border bg-background px-2 text-sm"
+									/>
+								</label>
+								<label className="flex items-center gap-2">
+									Default seats
+									<input
+										key={`${program.slug}:seats:${program.defaultSeats}`}
+										type="number"
+										min={1}
+										max={200}
+										defaultValue={program.defaultSeats}
+										onBlur={(e) => {
+											const seats = Number.parseInt(e.target.value, 10);
+											if (
+												Number.isInteger(seats) &&
+												seats !== program.defaultSeats
+											) {
+												void save(program.slug, { defaultSeats: seats });
+											}
+										}}
+										className="h-8 w-20 rounded-md border border-border bg-background px-2 text-sm"
+									/>
+								</label>
+								<span>
+									Per intake: {formatFeePoisha(program.feePoisha)} ×{" "}
+									{program.defaultSeats} seats
+								</span>
+							</div>
+						</li>
+					))}
+				</ul>
+			)}
+		</section>
 	);
 }

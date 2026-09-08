@@ -99,13 +99,12 @@ bun test src/lib     # run tests in a specific directory
 
 ## Database
 
-Uses raw SQL via the `pg` driver. Prisma schema is contract documentation only — do not use the Prisma client for writes. Migrations are in `scripts/sql/`:
+Prisma contract (`prisma/schema.prisma`) owns all DDL — never hand-write schema SQL. Runtime queries stay raw SQL via the `pg` driver; do not use the Prisma client for writes.
 
 ```bash
-# Apply schema changes (run the SQL files in order)
-psql $DATABASE_URL -f scripts/sql/001_blog.sql
-psql $DATABASE_URL -f scripts/sql/002_blog_slug_redirects.sql
-# ... etc
+bun run db:emit     # regenerate schema.json/schema.d.ts after schema edits
+bun run db:migrate  # apply contract to Neon (use direct URL, not pooler)
+bun run db:status   # verify DB matches contract
 ```
 
 ## Deployment

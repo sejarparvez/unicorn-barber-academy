@@ -13,7 +13,6 @@
     "lint": "biome lint",
     "check": "biome check . --write",
     "db:emit": "bun prisma-next contract emit",
-    "db:blog": "bun scripts/migrate-blog.ts",
     "db:migrate": "bun prisma-next db init",
     "db:status": "bun prisma-next migration status"
   },

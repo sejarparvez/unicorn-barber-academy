@@ -31,7 +31,7 @@ export function transformMarkdown(markdown: string): string {
 
 	// Anchor ids for deep links / featured snippets, deduped with -N.
 	const seen = new Map<string, number>();
-	return demoted.replace(
+	const anchored = demoted.replace(
 		/<h([23])>([\s\S]*?)<\/h\1>/g,
 		(_match, level: string, inner: string) => {
 			let id = headingId(inner.replace(/<[^>]+>/g, ""));
@@ -43,6 +43,12 @@ export function transformMarkdown(markdown: string): string {
 			return `<h${level}${id ? ` id="${id}"` : ""}>${inner}</h${level}>`;
 		},
 	);
+
+	// Wide tables (fee comparisons, guard charts) scroll inside their own
+	// container instead of overflowing the article column on mobile.
+	return anchored
+		.replace(/<table(\s[^>]*)?>/g, '<div class="overflow-x-auto"><table$1>')
+		.replaceAll("</table>", "</table></div>");
 }
 
 /**

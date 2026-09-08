@@ -53,11 +53,11 @@ export default function Hero() {
 
 			<div className="relative mx-auto grid max-w-350 grid-cols-1 lg:grid-cols-[1fr_auto_1fr]">
 				{/* Brand banner — mobile only, shows first */}
-				<div className="order-1 flex items-center justify-center bg-[#0d0d0f] px-6 pt-10 pb-8 lg:hidden">
+				<div className="order-1 flex items-center justify-center bg-[#0d0d0f] -ml-8 pt-6 pb-5 lg:hidden">
 					<img
 						src={banner}
 						alt="Unicorn Barber Training Academy"
-						className="h-auto w-full max-w-md"
+						className="h-auto w-full"
 						width={1698}
 						height={365}
 						fetchPriority="high"
@@ -66,15 +66,18 @@ export default function Hero() {
 				</div>
 
 				{/* Content column */}
-				<div className="order-2 flex flex-col justify-center px-4 pt-8 pb-16 sm:px-10 lg:order-none lg:min-h-[88vh] lg:px-14 lg:py-0">
-					<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 flex items-center gap-3 font-mono text-[11px] tracking-[0.32em] text-primary">
-						<span className="h-px w-8 bg-primary/70" />
+				<div className="order-2 flex flex-col justify-center px-5 pt-10 pb-20 sm:px-10 lg:order-none lg:min-h-[88vh] lg:px-14 lg:py-0">
+					<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 flex items-center gap-3 font-mono text-xs tracking-[0.28em] text-primary">
+						<span
+							aria-hidden="true"
+							className="h-1.5 w-1.5 rounded-full bg-primary"
+						/>
 						ENROLLMENT OPEN &mdash; FALL COHORT
 					</p>
 
 					<h1
 						id="hero-heading"
-						className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-100 mt-6 text-5xl leading-[1.02] sm:text-6xl lg:text-[4.25rem]"
+						className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-100 mt-5 text-[clamp(2.75rem,12vw,4.5rem)] leading-[1.0] tracking-tight sm:text-6xl lg:text-[4.25rem] lg:tracking-normal"
 						style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
 					>
 						Master the fade.
@@ -90,18 +93,18 @@ export default function Hero() {
 						</span>
 					</h1>
 
-					<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-150 mt-7 max-w-sm text-base leading-relaxed text-foreground/65 sm:text-lg">
+					<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-150 mt-5 max-w-md text-[17px] leading-relaxed text-foreground/70 sm:text-lg">
 						Fades, tapers, and straight-razor shaves — hands-on barbering
 						training in Banasree, Dhaka, taught by working barbers, not
 						textbooks.
 					</p>
 
-					<div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-200 mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
+					<div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-200 mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-7 sm:gap-y-4 lg:w-auto">
 						<Link
 							to="/enroll"
 							className={cn(
 								buttonVariants({ variant: "default" }),
-								"glow-gold px-8 py-6 text-[12px] font-semibold tracking-[0.16em]",
+								"glow-gold justify-center px-8 py-6 text-[12px] font-semibold tracking-[0.16em]",
 							)}
 						>
 							ENROLL NOW
@@ -110,8 +113,8 @@ export default function Hero() {
 						<Link
 							to="/programs"
 							className={cn(
-								buttonVariants({ variant: "outline" }),
-								" px-8 py-6 text-[12px] font-semibold tracking-[0.16em]",
+								buttonVariants({ variant: "ghost" }),
+								"justify-center px-8 py-6 text-[12px] font-semibold tracking-[0.16em] text-foreground/80 sm:text-foreground",
 							)}
 						>
 							SEE THE CURRICULUM
@@ -158,6 +161,15 @@ export default function Hero() {
 					/>
 				</div>
 			</div>
+			{/* Bottom fade into the marquee — mobile only, softens the exit */}
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-b from-transparent to-background lg:hidden"
+			/>
+			<div
+				aria-hidden="true"
+				className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent lg:hidden"
+			/>
 		</section>
 	);
 }

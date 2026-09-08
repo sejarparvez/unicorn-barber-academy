@@ -30,7 +30,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'7c956ddbae5c9731270a747db51936ddd92f22a4b3c9cc09c66b7c6f621610c3'>;
+  StorageHashBase<'ff8019ee4e8977e483dc5d65ecf8f30a88c717c282fbfbe121078371214f71a7'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -241,18 +241,6 @@ export type FieldOutputTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz@1']['output'];
     };
-    readonly Program: {
-      readonly id: CodecTypes['pg/int4@1']['output'];
-      readonly slug: Varchar<120>;
-      readonly title: Varchar<200>;
-      readonly track: Varchar<16>;
-      readonly duration: Varchar<40>;
-      readonly feePoisha: CodecTypes['pg/int4@1']['output'];
-      readonly defaultSeats: CodecTypes['pg/int4@1']['output'];
-      readonly isPublished: CodecTypes['pg/bool@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz@1']['output'];
-    };
     readonly ProgramIntake: {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly programSlug: Varchar<120>;
@@ -391,18 +379,6 @@ export type FieldInputTypes = {
       readonly decisionNote: CodecTypes['pg/text@1']['input'] | null;
       readonly feeStatus: CodecTypes['sql/varchar@1']['input'];
       readonly feePaidAt: CodecTypes['pg/timestamptz@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz@1']['input'];
-    };
-    readonly Program: {
-      readonly id: CodecTypes['pg/int4@1']['input'];
-      readonly slug: CodecTypes['sql/varchar@1']['input'];
-      readonly title: CodecTypes['sql/varchar@1']['input'];
-      readonly track: CodecTypes['sql/varchar@1']['input'];
-      readonly duration: CodecTypes['sql/varchar@1']['input'];
-      readonly feePoisha: CodecTypes['pg/int4@1']['input'];
-      readonly defaultSeats: CodecTypes['pg/int4@1']['input'];
-      readonly isPublished: CodecTypes['pg/bool@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz@1']['input'];
     };
@@ -547,18 +523,6 @@ export type StorageColumnTypes = {
       readonly updated_at: CodecTypes['pg/timestamptz@1']['output'];
       readonly user_id: CodecTypes['pg/int4@1']['output'];
     };
-    readonly program: {
-      readonly created_at: CodecTypes['pg/timestamptz@1']['output'];
-      readonly default_seats: CodecTypes['pg/int4@1']['output'];
-      readonly duration: Varchar<40>;
-      readonly fee_poisha: CodecTypes['pg/int4@1']['output'];
-      readonly id: CodecTypes['pg/int4@1']['output'];
-      readonly is_published: CodecTypes['pg/bool@1']['output'];
-      readonly slug: Varchar<120>;
-      readonly title: Varchar<200>;
-      readonly track: Varchar<16>;
-      readonly updated_at: CodecTypes['pg/timestamptz@1']['output'];
-    };
     readonly program_intake: {
       readonly cohort: Varchar<16>;
       readonly created_at: CodecTypes['pg/timestamptz@1']['output'];
@@ -699,18 +663,6 @@ export type StorageColumnInputTypes = {
       readonly status: CodecTypes['sql/varchar@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz@1']['input'];
       readonly user_id: CodecTypes['pg/int4@1']['input'];
-    };
-    readonly program: {
-      readonly created_at: CodecTypes['pg/timestamptz@1']['input'];
-      readonly default_seats: CodecTypes['pg/int4@1']['input'];
-      readonly duration: CodecTypes['sql/varchar@1']['input'];
-      readonly fee_poisha: CodecTypes['pg/int4@1']['input'];
-      readonly id: CodecTypes['pg/int4@1']['input'];
-      readonly is_published: CodecTypes['pg/bool@1']['input'];
-      readonly slug: CodecTypes['sql/varchar@1']['input'];
-      readonly title: CodecTypes['sql/varchar@1']['input'];
-      readonly track: CodecTypes['sql/varchar@1']['input'];
-      readonly updated_at: CodecTypes['pg/timestamptz@1']['input'];
     };
     readonly program_intake: {
       readonly cohort: CodecTypes['sql/varchar@1']['input'];
@@ -1620,88 +1572,6 @@ type ContractBase = Omit<
                 },
               ];
             };
-            readonly program: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'function';
-                    readonly expression: 'autoincrement()';
-                  };
-                };
-                readonly slug: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly nullable: false;
-                  readonly typeParams: { readonly length: 120 };
-                };
-                readonly title: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly nullable: false;
-                  readonly typeParams: { readonly length: 200 };
-                };
-                readonly track: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly nullable: false;
-                  readonly typeParams: { readonly length: 16 };
-                };
-                readonly duration: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly nullable: false;
-                  readonly typeParams: { readonly length: 40 };
-                };
-                readonly fee_poisha: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly default_seats: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 12>;
-                  };
-                };
-                readonly is_published: {
-                  readonly nativeType: 'bool';
-                  readonly codecId: 'pg/bool@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
-                  };
-                };
-                readonly created_at: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-                readonly updated_at: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [
-                { readonly columns: readonly ['slug']; readonly name: 'program_slug_key' },
-              ];
-              indexes: readonly [];
-              foreignKeys: readonly [];
-            };
             readonly program_intake: {
               columns: {
                 readonly id: {
@@ -2030,7 +1900,6 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'ApplicationStatusLog';
     };
-    readonly program: { readonly namespace: 'public' & NamespaceId; readonly model: 'Program' };
   };
   readonly domain: {
     readonly namespaces: {
@@ -2784,83 +2653,6 @@ type ContractBase = Omit<
                 readonly decisionNote: { readonly column: 'decision_note' };
                 readonly feeStatus: { readonly column: 'fee_status' };
                 readonly feePaidAt: { readonly column: 'fee_paid_at' };
-                readonly createdAt: { readonly column: 'created_at' };
-                readonly updatedAt: { readonly column: 'updated_at' };
-              };
-            };
-          };
-          readonly Program: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly slug: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 120 };
-                };
-              };
-              readonly title: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 200 };
-                };
-              };
-              readonly track: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 16 };
-                };
-              };
-              readonly duration: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 40 };
-                };
-              };
-              readonly feePoisha: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly defaultSeats: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly isPublished: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/timestamptz@1' };
-              };
-              readonly updatedAt: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/timestamptz@1' };
-              };
-            };
-            readonly relations: Record<string, never>;
-            readonly storage: {
-              readonly table: 'program';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly slug: { readonly column: 'slug' };
-                readonly title: { readonly column: 'title' };
-                readonly track: { readonly column: 'track' };
-                readonly duration: { readonly column: 'duration' };
-                readonly feePoisha: { readonly column: 'fee_poisha' };
-                readonly defaultSeats: { readonly column: 'default_seats' };
-                readonly isPublished: { readonly column: 'is_published' };
                 readonly createdAt: { readonly column: 'created_at' };
                 readonly updatedAt: { readonly column: 'updated_at' };
               };

@@ -32,6 +32,7 @@ export function renderMarkdown(markdown: string): string {
 		allowedTags: ALLOWED_TAGS,
 		allowedAttributes: {
 			a: ["href", "title", "rel", "target"],
+			div: ["class"],
 			img: ["src", "alt", "title", "loading", "decoding", "width", "height"],
 			h1: ["id"],
 			h2: ["id"],

@@ -13,6 +13,8 @@ import type {
 	IntakeAdmin,
 	IntakePublic,
 	MyApplication,
+	ProgramAdmin,
+	ProgramOption,
 } from "@/lib/enrollment";
 import {
 	parseApplicationStatus,
@@ -27,6 +29,7 @@ import {
 	listMyApplications,
 	listOpenIntakes,
 } from "@/server/enrollment-db";
+import { parseProgramPatch } from "@/server/enrollment-validate";
 import {
 	clampId,
 	clampPage,
@@ -34,6 +37,11 @@ import {
 	runSafe,
 } from "@/server/fn-utils";
 import { requireAdminSession } from "@/server/guards";
+import {
+	listProgramOptions,
+	listProgramsAdmin,
+	updateProgram,
+} from "@/server/program-db";
 import { getSession } from "@/server/session";
 
 export const listOpenIntakesFn = createServerFn({ method: "GET" }).handler(
@@ -108,3 +116,28 @@ export const listIntakesAdminFn = createServerFn({ method: "GET" }).handler(
 		return runSafe(() => listIntakesAdmin());
 	},
 );
+
+export const listProgramOptionsFn = createServerFn({ method: "GET" }).handler(
+	async (): Promise<ProgramOption[]> => {
+		await requireAdminSession();
+		return runSafe(() => listProgramOptions());
+	},
+);
+
+export const listProgramsAdminFn = createServerFn({ method: "GET" }).handler(
+	async (): Promise<ProgramAdmin[]> => {
+		await requireAdminSession();
+		return runSafe(() => listProgramsAdmin());
+	},
+);
+
+export const updateProgramFn = createServerFn({ method: "POST" })
+	.validator((input: { slug: string; patch: Record<string, unknown> }) => input)
+	.handler(async ({ data }): Promise<{ ok: true }> => {
+		await requireAdminSession();
+		const parsed = parseProgramPatch(data.patch);
+		if (!parsed.ok) throw new Error(parsed.message);
+		const result = await runSafe(() => updateProgram(data.slug, parsed.value));
+		if (!result.ok) throw new Error("Program not found");
+		return { ok: true };
+	});

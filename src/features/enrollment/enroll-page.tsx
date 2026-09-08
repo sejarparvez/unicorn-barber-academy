@@ -16,10 +16,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { getProgramBySlug } from "@/data/programs";
 import { submitApplication } from "@/lib/api/enrollment";
 import type { IntakePublic } from "@/lib/enrollment";
-import { COHORT_LABELS, formatStartsOn } from "@/lib/enrollment";
+import {
+	COHORT_LABELS,
+	formatFeePoisha,
+	formatStartsOn,
+} from "@/lib/enrollment";
 import type { SessionPayload } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -155,12 +158,11 @@ export function EnrollPage({ intakes, session }: Props) {
 
 	if (reference) {
 		const selectedIntake = intakes.find((i) => i.id === intakeId);
-		const selectedProgram = programSlug ? getProgramBySlug(programSlug) : null;
 		return (
 			<ConfirmationPanel
 				reference={reference}
 				email={session.user.email}
-				programTitle={selectedProgram?.title ?? programSlug}
+				programTitle={selectedIntake?.programTitle ?? programSlug}
 				cohortLabel={
 					selectedIntake ? `${COHORT_LABELS[selectedIntake.cohort]}` : undefined
 				}
@@ -385,12 +387,12 @@ export function EnrollPage({ intakes, session }: Props) {
 							</select>
 							{programSlug
 								? (() => {
-										const program = getProgramBySlug(programSlug);
-										return program ? (
+										const fee = programIntakes[0]?.feePoisha;
+										return fee ? (
 											<p className="text-sm text-muted-foreground">
 												Tuition:{" "}
 												<span className="font-semibold text-foreground">
-													{program.tuition}
+													{formatFeePoisha(fee)}
 												</span>
 											</p>
 										) : null;
@@ -418,7 +420,7 @@ export function EnrollPage({ intakes, session }: Props) {
 									<li>
 										Program:{" "}
 										<span className="font-medium text-foreground">
-											{getProgramBySlug(programSlug)?.title ?? programSlug}
+											{programIntakes[0]?.programTitle ?? programSlug}
 										</span>
 									</li>
 								) : null}

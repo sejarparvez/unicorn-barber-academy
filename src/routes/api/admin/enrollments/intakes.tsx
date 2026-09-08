@@ -22,7 +22,7 @@ export const Route = createFileRoute("/api/admin/enrollments/intakes")({
 					return json({ message: "Invalid JSON body" }, { status: 400 });
 				}
 
-				const parsed = parseIntakePayload(body);
+				const parsed = await parseIntakePayload(body);
 				if (!parsed.ok) {
 					return json({ message: parsed.message }, { status: 400 });
 				}

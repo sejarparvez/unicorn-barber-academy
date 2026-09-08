@@ -1,8 +1,8 @@
 // src/server/enrollment-validate.ts
 // Manual payload validation for enrollment endpoints — house style (no schema
 // library), mirrors blog-validate.ts. Returns normalized values.
-import { ALL_PROGRAMS } from "@/data/programs";
 import type { Cohort } from "@/lib/enrollment";
+import { isProgramLive } from "@/server/program-db";
 import type { ValidationResult } from "./validate-utils";
 import { str } from "./validate-utils";
 
@@ -74,19 +74,26 @@ export function isValidFutureStartDate(value: string): boolean {
 	);
 }
 
-export function parseIntakePayload(body: unknown): ValidationResult<{
-	programSlug: string;
-	cohort: Cohort;
-	startsOn: string;
-	seatsTotal: number;
-}> {
+export async function parseIntakePayload(body: unknown): Promise<
+	ValidationResult<{
+		programSlug: string;
+		cohort: Cohort;
+		startsOn: string;
+		seatsTotal: number;
+	}>
+> {
 	if (typeof body !== "object" || body === null) {
 		return { ok: false, message: "Invalid request body" };
 	}
 	const b = body as Record<string, unknown>;
 
 	const programSlug = str(b.programSlug);
-	if (!ALL_PROGRAMS.some((p) => p.slug === programSlug)) {
+	if (!programSlug) {
+		return { ok: false, message: "Unknown program" };
+	}
+	// Slug must exist in the program table and be published — the DB catalog
+	// (seeded from src/data/programs.ts) is the source of truth, not code.
+	if (!(await isProgramLive(programSlug))) {
 		return { ok: false, message: "Unknown program" };
 	}
 
@@ -110,4 +117,57 @@ export function parseIntakePayload(body: unknown): ValidationResult<{
 		ok: true,
 		value: { programSlug, cohort, startsOn, seatsTotal },
 	};
+}
+
+/** Admin program patch: fee in poisha (integer ≥ 0), seats 1–200. */
+export function parseProgramPatch(body: unknown): ValidationResult<{
+	title?: string;
+	duration?: string;
+	feePoisha?: number;
+	defaultSeats?: number;
+	isPublished?: boolean;
+}> {
+	if (typeof body !== "object" || body === null) {
+		return { ok: false, message: "Invalid request body" };
+	}
+	const b = body as Record<string, unknown>;
+	const value: {
+		title?: string;
+		duration?: string;
+		feePoisha?: number;
+		defaultSeats?: number;
+		isPublished?: boolean;
+	} = {};
+
+	if (b.title !== undefined) {
+		const title = str(b.title).slice(0, 200);
+		if (!title) return { ok: false, message: "Title cannot be empty" };
+		value.title = title;
+	}
+	if (b.duration !== undefined) {
+		const duration = str(b.duration).slice(0, 40);
+		if (!duration) return { ok: false, message: "Duration cannot be empty" };
+		value.duration = duration;
+	}
+	if (b.feePoisha !== undefined) {
+		const fee = Number.parseInt(String(b.feePoisha), 10);
+		if (!Number.isInteger(fee) || fee < 0 || fee > 100_000_000) {
+			return { ok: false, message: "Fee must be between ৳0 and ৳1,000,000" };
+		}
+		value.feePoisha = fee;
+	}
+	if (b.defaultSeats !== undefined) {
+		const seats = Number.parseInt(String(b.defaultSeats), 10);
+		if (!Number.isInteger(seats) || seats < 1 || seats > 200) {
+			return { ok: false, message: "Seats must be between 1 and 200" };
+		}
+		value.defaultSeats = seats;
+	}
+	if (b.isPublished !== undefined) {
+		if (typeof b.isPublished !== "boolean") {
+			return { ok: false, message: "isPublished must be a boolean" };
+		}
+		value.isPublished = b.isPublished;
+	}
+	return { ok: true, value };
 }

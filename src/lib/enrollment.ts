@@ -73,6 +73,7 @@ export type IntakePublic = {
 	startsOn: string; // yyyy-mm-dd
 	seatsTotal: number;
 	seatsLeft: number;
+	feePoisha: number;
 };
 
 /** Applicant's own view of their application. */
@@ -132,6 +133,37 @@ export type IntakeAdmin = {
 	applicationsCount: number;
 	seatsWarning: boolean; // true when seats_left is negative (data integrity issue)
 };
+
+/** Published program option for dropdowns (intake create, apply form). */
+export type ProgramOption = {
+	slug: string;
+	title: string;
+	track: "barbering" | "beauty";
+	feePoisha: number;
+	defaultSeats: number;
+};
+
+/** Admin program row with live overview stats. */
+export type ProgramAdmin = {
+	slug: string;
+	title: string;
+	track: "barbering" | "beauty";
+	duration: string;
+	feePoisha: number;
+	defaultSeats: number;
+	isPublished: boolean;
+	openIntakes: number;
+	seatsTotal: number;
+	seatsFilled: number;
+	pendingCount: number;
+	paidCount: number;
+};
+
+/** 4500000 → "৳45,000". Fees are stored as integer poisha (1 BDT = 100). */
+export function formatFeePoisha(poisha: number): string {
+	const bdt = Math.floor(poisha / 100);
+	return `৳${bdt.toLocaleString("en-US")}`;
+}
 
 /* ------------------------------ helpers -------------------------------- */
 
