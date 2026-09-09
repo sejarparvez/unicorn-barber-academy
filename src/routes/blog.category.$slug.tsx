@@ -3,6 +3,7 @@
 // avoid thin-content signals (head() flips to noindex below the threshold);
 // sitemap inclusion mirrors the same rule.
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { CardGridSkeleton } from "@/components/route-skeletons";
 import { SITE_URL } from "@/data/site";
 import {
 	CATEGORY_MIN_INDEX_POSTS,
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/blog/category/$slug")({
 		if (!result) throw notFound();
 		return result;
 	},
+	pendingComponent: () => <CardGridSkeleton count={6} />,
 	head: ({ loaderData }) => {
 		if (!loaderData) {
 			return {

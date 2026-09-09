@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CardGridSkeleton } from "@/components/route-skeletons";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
 import { AboutPage } from "@/features/about/about-page";
@@ -6,6 +7,8 @@ import { listInstructorsFn } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/about")({
 	loader: async () => ({ instructors: await listInstructorsFn() }),
+	staleTime: 60_000,
+	pendingComponent: () => <CardGridSkeleton count={4} />,
 	component: AboutRoute,
 	head: () => ({
 		meta: [

@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import type { ApplicationDetail, ApplicationStatus } from "@/lib/enrollment";
 import {
@@ -514,7 +515,14 @@ function StatusHistory({ applicationId }: { applicationId: number }) {
 		return (
 			<>
 				<h2 className="pt-2 font-heading text-lg font-semibold">History</h2>
-				<p className="text-sm text-muted-foreground">Loading…</p>
+				<output className="block space-y-3" aria-label="Loading history">
+					{[0, 1, 2].map((i) => (
+						<div key={i} className="space-y-1.5">
+							<Skeleton className="h-4 w-2/3" />
+							<Skeleton className="h-3 w-1/3" />
+						</div>
+					))}
+				</output>
 			</>
 		);
 	}

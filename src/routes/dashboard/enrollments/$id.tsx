@@ -1,6 +1,7 @@
 // routes/dashboard/enrollments/$id.tsx
 // Admissions decision page. Admin-only.
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { DetailPageSkeleton } from "@/components/route-skeletons";
 import { ApplicationDetailPage } from "@/features/enrollment-admin/application-detail-page";
 import { getApplicationAdminFn } from "@/server/enrollment/enrollment-fns";
 import { requireRoles } from "@/server/guards";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/dashboard/enrollments/$id")({
 		if (!result) throw notFound();
 		return result;
 	},
+	pendingComponent: DetailPageSkeleton,
 	head: () => ({
 		meta: [
 			{ title: "Review application | Dashboard" },

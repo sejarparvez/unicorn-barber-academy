@@ -12,6 +12,7 @@ import {
 } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { CardGridSkeleton } from "@/components/route-skeletons";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { CertificateRecord } from "@/lib/certificates";
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/dashboard/certificates/")({
 		});
 	},
 	loader: () => listMyCertificatesFn(),
+	pendingComponent: () => <CardGridSkeleton count={4} />,
 	head: () => ({
 		meta: [
 			{ title: "My Certificates | Dashboard" },

@@ -4,6 +4,7 @@
 // Markdown is rendered to sanitized HTML on the server — the client bundle
 // never receives the raw body.
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
+import { ArticleSkeleton } from "@/components/route-skeletons";
 import { SITE_URL } from "@/data/site";
 import { PostDetailPage, PostNotFound } from "@/features/blog/post-detail-page";
 import { getPostForPublicHtmlFn } from "@/server/blog/blog-fns";
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/blog/$slug")({
 			adjacent: result.adjacent,
 		};
 	},
+	pendingComponent: ArticleSkeleton,
 	head: ({ loaderData }) => {
 		if (!loaderData) {
 			return {

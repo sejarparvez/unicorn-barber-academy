@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CardGridSkeleton } from "@/components/route-skeletons";
 import { SITE_URL } from "@/data/site";
 import { StudentLifePage } from "@/features/student-life/student-life-page";
 import { listGalleryFn } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/student-life")({
 	loader: async () => ({ gallery: await listGalleryFn() }),
+	staleTime: 60_000,
+	pendingComponent: () => <CardGridSkeleton count={6} />,
 	component: StudentLifeRoute,
 	head: () => ({
 		meta: [

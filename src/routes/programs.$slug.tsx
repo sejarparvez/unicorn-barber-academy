@@ -1,5 +1,6 @@
 // routes/programs.$slug.tsx
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { ArticleSkeleton } from "@/components/route-skeletons";
 import { getProgramBySlug } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import {
@@ -14,6 +15,8 @@ export const Route = createFileRoute("/programs/$slug")({
 		if (!program) throw notFound();
 		return { program, instructors: await listInstructorsFn() };
 	},
+	staleTime: 60_000,
+	pendingComponent: ArticleSkeleton,
 	head: ({ loaderData }) => {
 		if (!loaderData) {
 			return {

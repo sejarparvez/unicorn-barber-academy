@@ -2,6 +2,7 @@
 // Application page. Sign-in required: anonymous visitors bounce to
 // /auth/signin?redirect=/enroll (requireRoles preserves the destination).
 import { createFileRoute } from "@tanstack/react-router";
+import { FormSkeleton } from "@/components/route-skeletons";
 import { SITE_URL } from "@/data/site";
 import { EnrollPage } from "@/features/enrollment/enroll-page";
 import { listOpenIntakesFn } from "@/server/enrollment/enrollment-fns";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/enroll")({
 		return { session };
 	},
 	loader: () => listOpenIntakesFn(),
+	pendingComponent: FormSkeleton,
 	head: () => ({
 		meta: [
 			{ title: "Enroll | Unicorn Barber Training Academy" },

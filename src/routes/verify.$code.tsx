@@ -10,6 +10,7 @@ import {
 } from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { FormSkeleton } from "@/components/route-skeletons";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import type { VerifyResult } from "@/lib/certificates";
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/verify/$code")({
 		});
 		return { result };
 	},
+	pendingComponent: FormSkeleton,
 	head: () => ({
 		meta: [
 			{

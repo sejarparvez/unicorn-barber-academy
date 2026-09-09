@@ -35,10 +35,13 @@ export const Route = createRootRoute({
 	loader: async (): Promise<{
 		session: SessionPayload | null;
 		site: ResolvedSettings;
-	}> => ({
-		session: await getSession(),
-		site: await getSiteSettingsFn(),
-	}),
+	}> => {
+		const [session, site] = await Promise.all([
+			getSession(),
+			getSiteSettingsFn(),
+		]);
+		return { session, site };
+	},
 	head: () => ({
 		meta: [
 			{

@@ -1,6 +1,7 @@
 // routes/dashboard/blog.new.tsx
 // Create-post editor. Admin-only.
 import { createFileRoute } from "@tanstack/react-router";
+import { FormSkeleton } from "@/components/route-skeletons";
 import { PostEditorPage } from "@/features/blog-admin/post-editor-page";
 import { listCategoriesFn } from "@/server/blog/blog-fns";
 import { requireRoles } from "@/server/guards";
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/dashboard/blog/new")({
 		});
 	},
 	loader: () => listCategoriesFn(),
+	pendingComponent: FormSkeleton,
 	head: () => ({
 		meta: [
 			{ title: "New post | Dashboard" },

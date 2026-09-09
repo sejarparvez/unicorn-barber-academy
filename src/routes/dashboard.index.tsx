@@ -1,5 +1,6 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { TableSkeleton } from "@/components/route-skeletons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/dashboard/")({
 		if (role !== undefined && isStaff(role)) return [];
 		return listMyApplicationsFn();
 	},
+	pendingComponent: () => <TableSkeleton rows={4} />,
 	component: DashboardIndex,
 	head: () => ({
 		meta: [

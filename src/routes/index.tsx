@@ -1,6 +1,7 @@
 import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
+import { HomeHeroSkeleton } from "@/components/route-skeletons";
 import { buttonVariants } from "@/components/ui/button";
 import { SITE_URL } from "@/data/site";
 import Brand from "@/features/home/sections/brand";
@@ -23,12 +24,17 @@ import {
 } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/")({
-	loader: async () => ({
-		instructors: await listInstructorsFn(),
-		testimonials: await listTestimonialsFn(),
-		faqs: await listFaqsFn({ data: { placement: "home" } }),
-		featured: await listFeaturedGalleryFn(),
-	}),
+	loader: async () => {
+		const [instructors, testimonials, faqs, featured] = await Promise.all([
+			listInstructorsFn(),
+			listTestimonialsFn(),
+			listFaqsFn({ data: { placement: "home" } }),
+			listFeaturedGalleryFn(),
+		]);
+		return { instructors, testimonials, faqs, featured };
+	},
+	staleTime: 60_000,
+	pendingComponent: HomeHeroSkeleton,
 	component: Home,
 	head: () => ({
 		meta: [

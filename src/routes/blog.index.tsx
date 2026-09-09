@@ -2,6 +2,7 @@
 // Public journal index. Loader pulls published posts from the DB; search
 // param ?page=N drives crawlable pagination.
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { CardGridSkeleton } from "@/components/route-skeletons";
 import { SITE_URL } from "@/data/site";
 import { BlogPage } from "@/features/blog/blog-page";
 import { listCategoriesFn, listPublishedPostsFn } from "@/server/blog/blog-fns";
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/blog/")({
 		}
 		return { posts, categories };
 	},
+	pendingComponent: () => <CardGridSkeleton count={6} />,
 	head: ({ loaderData }) => {
 		const page = loaderData?.posts.page ?? 1;
 		const totalPages = loaderData?.posts.totalPages ?? 1;
