@@ -82,7 +82,19 @@ export function PostDetailPage() {
 		...(post.excerpt ? { description: post.excerpt } : {}),
 		url,
 		mainEntityOfPage: { "@type": "WebPage", "@id": url },
-		...(post.coverImageUrl ? { image: [post.coverImageUrl] } : {}),
+		isPartOf: { "@id": `${SITE_URL}/blog#blog` },
+		inLanguage: "en",
+		...(post.coverImageUrl
+			? {
+					image: [
+						{
+							"@type": "ImageObject",
+							url: post.coverImageUrl,
+							...(post.coverImageAlt ? { caption: post.coverImageAlt } : {}),
+						},
+					],
+				}
+			: {}),
 		...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
 		dateModified: post.updatedAt,
 		author: {
@@ -90,9 +102,7 @@ export function PostDetailPage() {
 			name: post.authorName || "Unicorn Barber Training Academy",
 		},
 		publisher: {
-			"@type": "EducationalOrganization",
-			name: "Unicorn Barber Training Academy",
-			sameAs: SITE_URL,
+			"@id": `${SITE_URL}/#academy`,
 		},
 		keywords: [post.focusKeyword, ...post.seoKeywords]
 			.filter((k): k is string => Boolean(k))

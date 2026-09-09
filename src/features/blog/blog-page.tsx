@@ -37,8 +37,15 @@ export function BlogPage({ posts, categories, page }: Props) {
 	const blogJsonLd = {
 		"@context": "https://schema.org",
 		"@type": "Blog",
+		"@id": `${SITE_URL}/blog#blog`,
 		name: "Unicorn Barber Training Academy — The Journal",
+		description:
+			"Fade guides, beauty career advice, and training insights from working barbers and stylists in Dhaka.",
 		url: `${SITE_URL}/blog`,
+		inLanguage: "en",
+		publisher: {
+			"@id": `${SITE_URL}/#academy`,
+		},
 		blogPost: posts.items.map((post) => ({
 			"@type": "BlogPosting",
 			headline: post.title,

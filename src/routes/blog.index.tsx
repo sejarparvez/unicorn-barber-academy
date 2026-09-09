@@ -37,42 +37,51 @@ export const Route = createFileRoute("/blog/")({
 		const url = validPage
 			? `${SITE_URL}/blog?page=${page}`
 			: `${SITE_URL}/blog`;
+		const title = validPage
+			? `Barbering & Beauty Blog — Page ${page} | Unicorn Barber Training Academy`
+			: "Barbering & Beauty Blog | Unicorn Barber Training Academy";
+		const description = validPage
+			? `Page ${page} of fade guides, beauty career advice, and training insights from Unicorn Barber Training Academy in Dhaka.`
+			: "Fade guides, beauty career advice, and training insights from Unicorn Barber Training Academy in Dhaka. Learn from working pros.";
 		return {
 			meta: [
-				{
-					title: validPage
-						? `Blog (page ${page}) | Unicorn Barber Training Academy`
-						: "Blog | Unicorn Barber Training Academy",
-				},
-				{
-					name: "description",
-					content:
-						"Articles on barbering technique, beauty careers, and professional training in Dhaka from Unicorn Barber Training Academy.",
-				},
+				{ title },
+				{ name: "description", content: description },
 				{ name: "robots", content: "index, follow" },
-				{
-					property: "og:title",
-					content: "Blog | Unicorn Barber Training Academy",
-				},
-				{
-					property: "og:description",
-					content:
-						"Articles on barbering technique, beauty careers, and professional training in Dhaka.",
-				},
+				{ property: "og:title", content: title },
+				{ property: "og:description", content: description },
 				{ property: "og:type", content: "website" },
 				{ property: "og:url", content: url },
 				{ property: "og:image", content: `${SITE_URL}/banner.png` },
 				{
-					name: "twitter:title",
-					content: "Blog | Unicorn Barber Training Academy",
+					property: "og:image:alt",
+					content: "Unicorn Barber Training Academy banner",
 				},
+				{ name: "twitter:card", content: "summary_large_image" },
 				{
-					name: "twitter:description",
-					content:
-						"Articles on barbering technique, beauty careers, and professional training in Dhaka.",
+					name: "twitter:title",
+					content: title,
 				},
+				{ name: "twitter:description", content: description },
+				{ name: "twitter:image", content: `${SITE_URL}/banner.png` },
 			],
-			links: [{ rel: "canonical", href: url }],
+			links: [
+				{ rel: "canonical", href: url },
+				...(page > 1
+					? [
+							{
+								rel: "prev",
+								href:
+									page === 2
+										? `${SITE_URL}/blog`
+										: `${SITE_URL}/blog?page=${page - 1}`,
+							},
+						]
+					: []),
+				...(page < totalPages
+					? [{ rel: "next", href: `${SITE_URL}/blog?page=${page + 1}` }]
+					: []),
+			],
 		};
 	},
 	component: BlogRoute,

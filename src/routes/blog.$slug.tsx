@@ -45,8 +45,14 @@ export const Route = createFileRoute("/blog/$slug")({
 		}
 		const { post, isPreview } = loaderData;
 		const url = `${SITE_URL}/blog/${post.slug}`;
-		const title = `${post.metaTitle || post.title} | Unicorn Barber Training Academy`;
-		const description = post.metaDescription || post.excerpt || undefined;
+		const plainTitle = post.metaTitle || post.title;
+		const title = `${plainTitle} | Unicorn Barber Training Academy`;
+		const rawDescription = post.metaDescription || post.excerpt || undefined;
+		// Keep SERP snippets clean: clamp editor-controlled copy to ~155 chars.
+		const description =
+			rawDescription && rawDescription.length > 155
+				? `${rawDescription.slice(0, 152).trimEnd()}…`
+				: rawDescription;
 		const canonical = post.canonicalUrl || url;
 		const image = post.ogImageUrl || post.coverImageUrl;
 		const blocked = isPreview || post.noindex;
@@ -55,14 +61,27 @@ export const Route = createFileRoute("/blog/$slug")({
 			meta: [
 				{ title },
 				...(description ? [{ name: "description", content: description }] : []),
-				...(blocked ? [{ name: "robots", content: "noindex" }] : []),
-				{ property: "og:title", content: title },
+				{
+					name: "robots",
+					content: blocked
+						? "noindex"
+						: "index, follow, max-image-preview:large",
+				},
+				{ property: "og:title", content: plainTitle },
 				...(description
 					? [{ property: "og:description", content: description }]
 					: []),
 				{ property: "og:type", content: "article" },
 				{ property: "og:url", content: url },
 				...(image ? [{ property: "og:image", content: image }] : []),
+				...(image
+					? [
+							{
+								property: "og:image:alt",
+								content: post.coverImageAlt || plainTitle,
+							},
+						]
+					: []),
 				...(post.publishedAt
 					? [{ property: "article:published_time", content: post.publishedAt }]
 					: []),
@@ -70,6 +89,9 @@ export const Route = createFileRoute("/blog/$slug")({
 					property: "article:modified_time",
 					content: post.updatedAt,
 				},
+				...(post.category
+					? [{ property: "article:section", content: post.category.name }]
+					: []),
 				...[post.focusKeyword, ...post.tags]
 					.filter((tag): tag is string => Boolean(tag))
 					.map((tag) => ({ property: "article:tag", content: tag })),
@@ -82,6 +104,10 @@ export const Route = createFileRoute("/blog/$slug")({
 					content: "Unicorn Barber Training Academy",
 				},
 				{ name: "twitter:card", content: "summary_large_image" },
+				{ name: "twitter:title", content: plainTitle },
+				...(description
+					? [{ name: "twitter:description", content: description }]
+					: []),
 				...(image ? [{ name: "twitter:image", content: image }] : []),
 			],
 			links: [
