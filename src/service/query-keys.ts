@@ -26,6 +26,13 @@ export const queryKeys = {
 	intakes: () => ["intakes"] as const,
 	programs: () => ["programs"] as const,
 	programOptions: () => ["programs", "options"] as const,
+	users: (filters?: {
+		search?: string;
+		role?: string;
+		banned?: boolean;
+		page?: number;
+	}) => ["users", filters ?? {}] as const,
+	siteSettings: () => ["site-settings"] as const,
 	myApplications: () => ["my-applications"] as const,
 	openIntakes: () => ["open-intakes"] as const,
 

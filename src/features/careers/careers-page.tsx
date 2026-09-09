@@ -13,7 +13,9 @@ import {
 } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
 import { pic } from "@/data/images";
-import { CONTACT, SITE_URL } from "@/data/site";
+import { SITE_URL } from "@/data/site";
+import type { SiteContact } from "@/lib/settings";
+import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
 
 const BREADCRUMB_JSON_LD = {
@@ -70,7 +72,7 @@ const OPEN_ROLES = [
 	},
 ] as const;
 
-function jobPostingsJsonLd() {
+function jobPostingsJsonLd(contact: SiteContact) {
 	return {
 		"@context": "https://schema.org",
 		"@graph": OPEN_ROLES.map((role) => ({
@@ -89,22 +91,22 @@ function jobPostingsJsonLd() {
 				logo: `${SITE_URL}/logo.png`,
 				address: {
 					"@type": "PostalAddress",
-					streetAddress: CONTACT.streetAddress,
+					streetAddress: contact.streetAddress,
 					addressLocality: "Dhaka",
 					addressRegion: "Dhaka",
-					postalCode: CONTACT.postalCode,
-					addressCountry: CONTACT.addressCountry,
+					postalCode: contact.postalCode,
+					addressCountry: contact.addressCountry,
 				},
 			},
 			jobLocation: {
 				"@type": "Place",
 				address: {
 					"@type": "PostalAddress",
-					streetAddress: CONTACT.streetAddress,
+					streetAddress: contact.streetAddress,
 					addressLocality: "Dhaka",
 					addressRegion: "Dhaka",
-					postalCode: CONTACT.postalCode,
-					addressCountry: CONTACT.addressCountry,
+					postalCode: contact.postalCode,
+					addressCountry: contact.addressCountry,
 				},
 			},
 			applicantLocationRequirements: {
@@ -121,10 +123,11 @@ function jobPostingsJsonLd() {
 }
 
 export function CareersPage() {
+	const { contact } = useSite();
 	return (
 		<main>
 			<JsonLdScript data={BREADCRUMB_JSON_LD} />
-			<JsonLdScript data={jobPostingsJsonLd()} />
+			<JsonLdScript data={jobPostingsJsonLd(contact)} />
 			<CareersHero />
 			<OpenRoles />
 			<WhyTeach />

@@ -226,6 +226,25 @@ model ApplicationStatusLog {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Site settings (key-value). Admin-editable academy globals: contact email /
+// phone, address parts, hours, areas served, announcement banner. Values are
+// plain text; derived fields (tel: links, WhatsApp, Maps URLs, display
+// formatting) are computed in code (src/server/settings-db.ts) so visible UI
+// and JSON-LD can never drift apart. Missing keys fall back to the code
+// defaults in src/data/site.ts — an empty table renders byte-identical.
+// `site_url` is deliberately NOT stored here (canonicals must not change at
+// runtime).
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SiteSetting {
+  key       VarChar(80)  @id(map: "site_setting_pkey")
+  value     String
+  updatedAt Timestamptz  @default(now()) @map("updated_at")
+
+  @@map("site_setting")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Program catalog (operational control). The full marketing copy stays in
 // src/data/programs.ts for now; this table owns what admin controls:
 // which programs are live, the fee, and the default seat count.

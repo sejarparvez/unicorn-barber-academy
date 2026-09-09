@@ -44,6 +44,10 @@
       "model": "Session",
       "namespace": "public"
     },
+    "site_setting": {
+      "model": "SiteSetting",
+      "namespace": "public"
+    },
     "user": {
       "model": "User",
       "namespace": "public"
@@ -1620,6 +1624,50 @@
               },
               "namespaceId": "public",
               "table": "session"
+            }
+          },
+          "SiteSetting": {
+            "fields": {
+              "key": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/varchar@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 80
+                  }
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz@1",
+                  "kind": "scalar"
+                }
+              },
+              "value": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "key": {
+                  "column": "key"
+                },
+                "updatedAt": {
+                  "column": "updated_at"
+                },
+                "value": {
+                  "column": "value"
+                }
+              },
+              "namespaceId": "public",
+              "table": "site_setting"
             }
           },
           "User": {
@@ -3323,6 +3371,41 @@
                 }
               ]
             },
+            "site_setting": {
+              "columns": {
+                "key": {
+                  "codecId": "sql/varchar@1",
+                  "nativeType": "character varying",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 80
+                  }
+                },
+                "updated_at": {
+                  "codecId": "pg/timestamptz@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "value": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "key"
+                ],
+                "name": "site_setting_pkey"
+              },
+              "uniques": []
+            },
             "user": {
               "columns": {
                 "banExpires": {
@@ -3489,7 +3572,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7c956ddbae5c9731270a747db51936ddd92f22a4b3c9cc09c66b7c6f621610c3"
+    "storageHash": "f16fa6de1ca6ddfb9a68ad2ac586c6b7deb9bc11e6cac9ea4d2e001281dcc7d9"
   },
   "capabilities": {
     "postgres": {

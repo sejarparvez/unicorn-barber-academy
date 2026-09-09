@@ -1,11 +1,11 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { TOPIC_LABELS } from "@/data/contact";
-import { CONTACT } from "@/data/site";
 import { guardPublicEndpoint } from "@/server/api-guard";
 import { validateContactInput } from "@/server/contact-validate";
 import { contactInquiryEmail, sendMail } from "@/server/mail";
 import { clientIp } from "@/server/rate-limit";
+import { getSiteSettings } from "@/server/settings-db";
 
 export const Route = createFileRoute("/api/contact")({
 	server: {
@@ -28,8 +28,9 @@ export const Route = createFileRoute("/api/contact")({
 					}
 
 					const inquiryId = `MSG-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+					const { contact } = await getSiteSettings();
 					const sent = await sendMail({
-						to: CONTACT.email,
+						to: contact.email,
 						replyTo: validated.email,
 						subject: `[Website] ${TOPIC_LABELS[validated.subject]} — ${inquiryId}`,
 						html: contactInquiryEmail({

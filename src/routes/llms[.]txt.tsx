@@ -6,14 +6,16 @@
 // with the dynamic sitemap.
 import { createFileRoute } from "@tanstack/react-router";
 import { ALL_PROGRAMS } from "@/data/programs";
-import { CONTACT, SITE_URL } from "@/data/site";
+import { SITE_URL } from "@/data/site";
 import { listPublishedForLlms } from "@/server/blog-db";
+import { getSiteSettings } from "@/server/settings-db";
 
 export const Route = createFileRoute("/llms.txt")({
 	server: {
 		handlers: {
 			GET: async () => {
 				const posts = await listPublishedForLlms(50);
+				const { contact } = await getSiteSettings();
 
 				const blogSection =
 					posts.length > 0
@@ -66,11 +68,11 @@ ${ALL_PROGRAMS.filter((p) => p.track === "beauty")
 
 ## Contact & Location
 
-- Address: ${CONTACT.addressDisplay}
-- Phone: ${CONTACT.phoneDisplay} (${CONTACT.phoneE164})
-- Email: ${CONTACT.email}
-- WhatsApp: ${CONTACT.whatsapp}
-- Hours: ${CONTACT.hoursSummary}
+- Address: ${contact.addressDisplay}
+- Phone: ${contact.phoneDisplay} (${contact.phoneE164})
+- Email: ${contact.email}
+- WhatsApp: ${contact.whatsapp}
+- Hours: ${contact.hoursSummary}
 - [Contact page](${SITE_URL}/contact): Contact form, map, and full schedule details.
 
 ## Policies

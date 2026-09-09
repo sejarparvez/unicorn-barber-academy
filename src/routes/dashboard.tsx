@@ -7,6 +7,7 @@
 	IconLayoutDashboard,
 	IconMenu2,
 	IconSettings,
+	IconUsersGroup,
 } from "@tabler/icons-react";
 import {
 	createFileRoute,
@@ -86,6 +87,18 @@ const NAV_ITEMS: NavItem[] = [
 		label: "Admissions",
 		to: "/dashboard/enrollments",
 		icon: IconClipboardList,
+		visibleFor: "admin",
+	},
+	{
+		label: "Users",
+		to: "/dashboard/users",
+		icon: IconUsersGroup,
+		visibleFor: "admin",
+	},
+	{
+		label: "Site",
+		to: "/dashboard/site",
+		icon: IconSettings,
 		visibleFor: "admin",
 	},
 	{

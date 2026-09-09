@@ -12,10 +12,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { CONTACT } from "@/data/site";
 import type { VerifyResult } from "@/lib/certificates";
 import { formatLongDate } from "@/lib/date";
 import { COHORT_LABELS } from "@/lib/enrollment";
+import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
 import { verifyCertificateFn } from "@/server/certificate-fns";
 
@@ -113,6 +113,7 @@ function CodeForm({ initialCode }: { initialCode: string }) {
 }
 
 function ResultCard({ result }: { result: VerifyResult }) {
+	const { contact } = useSite();
 	if (result.kind !== "valid" && result.kind !== "revoked") {
 		const message =
 			result.kind === "rate-limited"
@@ -121,7 +122,7 @@ function ResultCard({ result }: { result: VerifyResult }) {
 		const hint =
 			result.kind === "rate-limited"
 				? "Please wait a moment before trying again."
-				: `Double-check the code printed on the document (format UBT-YYYY-NNNN). If it still doesn\u2019t resolve, contact us at ${CONTACT.phoneDisplay}.`;
+				: `Double-check the code printed on the document (format UBT-YYYY-NNNN). If it still doesn\u2019t resolve, contact us at ${contact.phoneDisplay}.`;
 		return (
 			<div className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
 				<IconSearch

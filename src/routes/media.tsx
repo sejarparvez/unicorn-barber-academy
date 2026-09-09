@@ -6,8 +6,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { MEDIA_FEATURES, MEDIA_TYPE_LABELS } from "@/data/media";
-import { CONTACT, SITE_URL } from "@/data/site";
+import { SITE_URL } from "@/data/site";
 import { formatLongDate } from "@/lib/date";
+import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/media")({
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/media")({
 });
 
 function MediaPage() {
+	const { contact } = useSite();
 	const features = [...MEDIA_FEATURES].sort((a, b) =>
 		b.publishedOn.localeCompare(a.publishedOn),
 	);
@@ -77,10 +79,10 @@ function MediaPage() {
 						We&rsquo;re gathering recent features and interviews. For press
 						enquiries in the meantime, reach us at{" "}
 						<a
-							href={`mailto:${CONTACT.email}`}
+							href={`mailto:${contact.email}`}
 							className="text-primary underline underline-offset-2"
 						>
-							{CONTACT.email}
+							{contact.email}
 						</a>
 						.
 					</p>

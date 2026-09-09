@@ -18,12 +18,9 @@ import { JsonLdScript } from "@/components/jsonld-script";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import {
-	AREAS_SERVED,
-	CONTACT,
-	OPENING_HOURS_SPEC,
-	SITE_URL,
-} from "@/data/site";
+import { OPENING_HOURS_SPEC, SITE_URL } from "@/data/site";
+import type { ResolvedSettings } from "@/lib/settings";
+import { useSite } from "@/lib/site-context";
 import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
@@ -63,79 +60,85 @@ const LEGAL_LINKS: FooterLink[] = [
 /**
  * LocalBusiness/EducationalOrganization structured data so search engines
  * and AI answer engines can surface address, phone, hours, and programs
- * directly. Keep this in sync with the markup below.
+ * directly. Built from the shared site settings (admin-editable) so JSON-LD
+ * and visible markup can never drift apart.
  *
  * NOTE: `logo`/`image` need a stable absolute production URL — if `logo.png`
  * is bundled/hashed by Vite, serve a static copy from /public instead
  * (e.g. /public/logo.png) and reference that path here.
  */
-const LOCAL_BUSINESS_JSON_LD = {
-	"@context": "https://schema.org",
-	// Dual-typed: EducationalOrganization describes what it is, LocalBusiness
-	// is what makes Google treat it as a local entity for map-pack results.
-	"@type": ["EducationalOrganization", "LocalBusiness"],
-	// Stable entity id so other JSON-LD blocks (Course, Review,
-	// BreadcrumbList) can reference the same organization via @id.
-	"@id": `${SITE_URL}/#academy`,
-	name: "Unicorn Barber Training Academy",
-	url: SITE_URL,
-	logo: `${SITE_URL}/logo.png`,
-	image: `${SITE_URL}/banner.png`,
-	telephone: CONTACT.phoneE164,
-	email: CONTACT.email,
-	priceRange: "$$",
-	geo: {
-		"@type": "GeoCoordinates",
-		latitude: 23.7536,
-		longitude: 90.4286,
-	},
-	address: {
-		"@type": "PostalAddress",
-		streetAddress: CONTACT.streetAddress,
-		addressLocality: CONTACT.addressLocality,
-		postalCode: CONTACT.postalCode,
-		addressCountry: CONTACT.addressCountry,
-	},
-	hasMap: CONTACT.mapsUrl,
-	areaServed: [...AREAS_SERVED],
-	openingHoursSpecification: OPENING_HOURS_SPEC,
-	contactPoint: [
-		{
-			"@type": "ContactPoint",
-			telephone: CONTACT.phoneE164,
-			email: CONTACT.email,
-			contactType: "customer service",
-			areaServed: "BD",
-			availableLanguage: ["en", "bn"],
+function localBusinessJsonLd(site: ResolvedSettings) {
+	const contact = site.contact;
+	return {
+		"@context": "https://schema.org",
+		// Dual-typed: EducationalOrganization describes what it is, LocalBusiness
+		// is what makes Google treat it as a local entity for map-pack results.
+		"@type": ["EducationalOrganization", "LocalBusiness"],
+		// Stable entity id so other JSON-LD blocks (Course, Review,
+		// BreadcrumbList) can reference the same organization via @id.
+		"@id": `${SITE_URL}/#academy`,
+		name: "Unicorn Barber Training Academy",
+		url: SITE_URL,
+		logo: `${SITE_URL}/logo.png`,
+		image: `${SITE_URL}/banner.png`,
+		telephone: contact.phoneE164,
+		email: contact.email,
+		priceRange: "$$",
+		geo: {
+			"@type": "GeoCoordinates",
+			latitude: 23.7536,
+			longitude: 90.4286,
 		},
-	],
-	sameAs: [
-		SOCIAL_URLS.instagram,
-		SOCIAL_URLS.facebook,
-		SOCIAL_URLS.youtube,
-		SOCIAL_URLS.tiktok,
-		SOCIAL_URLS.x,
-	],
-	hasOfferCatalog: {
-		"@type": "OfferCatalog",
-		name: "Barbering & Beauty Programs",
-		itemListElement: PROGRAMS.map((program) => ({
-			"@type": "Course",
-			name: program.label,
-			url: `${SITE_URL}${program.to}`,
-			provider: {
-				"@type": ["EducationalOrganization", "LocalBusiness"],
-				"@id": `${SITE_URL}/#academy`,
-				name: "Unicorn Barber Training Academy",
+		address: {
+			"@type": "PostalAddress",
+			streetAddress: contact.streetAddress,
+			addressLocality: contact.addressLocality,
+			postalCode: contact.postalCode,
+			addressCountry: contact.addressCountry,
+		},
+		hasMap: contact.mapsUrl,
+		areaServed: site.areasServed,
+		openingHoursSpecification: OPENING_HOURS_SPEC,
+		contactPoint: [
+			{
+				"@type": "ContactPoint",
+				telephone: contact.phoneE164,
+				email: contact.email,
+				contactType: "customer service",
+				areaServed: "BD",
+				availableLanguage: ["en", "bn"],
 			},
-		})),
-	},
-};
+		],
+		sameAs: [
+			SOCIAL_URLS.instagram,
+			SOCIAL_URLS.facebook,
+			SOCIAL_URLS.youtube,
+			SOCIAL_URLS.tiktok,
+			SOCIAL_URLS.x,
+		],
+		hasOfferCatalog: {
+			"@type": "OfferCatalog",
+			name: "Barbering & Beauty Programs",
+			itemListElement: PROGRAMS.map((program) => ({
+				"@type": "Course",
+				name: program.label,
+				url: `${SITE_URL}${program.to}`,
+				provider: {
+					"@type": ["EducationalOrganization", "LocalBusiness"],
+					"@id": `${SITE_URL}/#academy`,
+					name: "Unicorn Barber Training Academy",
+				},
+			})),
+		},
+	};
+}
 
 export default function Footer() {
+	const site = useSite();
+	const { contact } = site;
 	return (
 		<footer className="relative overflow-hidden">
-			<JsonLdScript data={LOCAL_BUSINESS_JSON_LD} />
+			<JsonLdScript data={localBusinessJsonLd(site)} />
 
 			{/* Top gradient hairline, echoing the header divider */}
 			<Separator
@@ -196,7 +199,7 @@ export default function Footer() {
 								onSubmit={(event) => {
 									event.preventDefault();
 									window.open(
-										CONTACT.whatsapp,
+										contact.whatsapp,
 										"_blank",
 										"noopener,noreferrer",
 									);
@@ -274,15 +277,15 @@ export default function Footer() {
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<span>{CONTACT.addressDisplay}</span>
+								<span>{contact.addressDisplay}</span>
 							</p>
 							<p className="flex items-start gap-3">
 								<IconPhone
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<a href={CONTACT.phoneHref} className="hover:text-primary">
-									{CONTACT.phoneDisplay}
+								<a href={contact.phoneHref} className="hover:text-primary">
+									{contact.phoneDisplay}
 								</a>
 							</p>
 							<p className="flex items-start gap-3">
@@ -291,10 +294,10 @@ export default function Footer() {
 									stroke={1.75}
 								/>
 								<a
-									href={`mailto:${CONTACT.email}`}
+									href={`mailto:${contact.email}`}
 									className="hover:text-primary"
 								>
-									{CONTACT.email}
+									{contact.email}
 								</a>
 							</p>
 							<p className="flex items-start gap-3">
@@ -302,7 +305,7 @@ export default function Footer() {
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<span>{CONTACT.hoursSummary}</span>
+								<span>{contact.hoursSummary}</span>
 							</p>
 						</address>
 					</div>

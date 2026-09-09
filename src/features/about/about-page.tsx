@@ -18,7 +18,9 @@ import { JsonLdScript } from "@/components/jsonld-script";
 import { Card, CardContent } from "@/components/ui/card";
 import { pic } from "@/data/images";
 import { INSTRUCTORS } from "@/data/instructors";
-import { CONTACT, SITE_URL } from "@/data/site";
+import { SITE_URL } from "@/data/site";
+import type { SiteContact } from "@/lib/settings";
+import { useSite } from "@/lib/site-context";
 import { SOCIAL_URLS } from "@/lib/social";
 
 const BREADCRUMB_JSON_LD = {
@@ -35,7 +37,7 @@ const BREADCRUMB_JSON_LD = {
 	],
 };
 
-const ORG_JSON_LD = {
+const ORG_JSON_LD_BASE = {
 	"@context": "https://schema.org",
 	// Same @id as the footer's LocalBusiness block — one merged entity for
 	// search engines, not two competing organizations.
@@ -52,20 +54,27 @@ const ORG_JSON_LD = {
 		SOCIAL_URLS.tiktok,
 		SOCIAL_URLS.x,
 	],
-	address: {
-		"@type": "PostalAddress",
-		streetAddress: CONTACT.streetAddress,
-		addressLocality: CONTACT.addressLocality,
-		postalCode: CONTACT.postalCode,
-		addressCountry: CONTACT.addressCountry,
-	},
-	contactPoint: {
-		"@type": "ContactPoint",
-		telephone: CONTACT.phoneE164,
-		contactType: "admissions",
-		availableLanguage: ["Bengali", "English"],
-	},
 };
+
+/** Organization block with admin-editable address/phone merged in. */
+function orgJsonLd(contact: SiteContact) {
+	return {
+		...ORG_JSON_LD_BASE,
+		address: {
+			"@type": "PostalAddress",
+			streetAddress: contact.streetAddress,
+			addressLocality: contact.addressLocality,
+			postalCode: contact.postalCode,
+			addressCountry: contact.addressCountry,
+		},
+		contactPoint: {
+			"@type": "ContactPoint",
+			telephone: contact.phoneE164,
+			contactType: "admissions",
+			availableLanguage: ["Bengali", "English"],
+		},
+	};
+}
 
 const ABOUT_PAGE_JSON_LD = {
 	"@context": "https://schema.org",
@@ -76,10 +85,11 @@ const ABOUT_PAGE_JSON_LD = {
 };
 
 export function AboutPage() {
+	const { contact } = useSite();
 	return (
 		<main>
 			<JsonLdScript data={BREADCRUMB_JSON_LD} />
-			<JsonLdScript data={ORG_JSON_LD} />
+			<JsonLdScript data={orgJsonLd(contact)} />
 			<JsonLdScript data={ABOUT_PAGE_JSON_LD} />
 			<AboutHero />
 			<OurStory />

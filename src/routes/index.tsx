@@ -2,7 +2,7 @@ import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
 import { buttonVariants } from "@/components/ui/button";
-import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
+import { SITE_URL } from "@/data/site";
 import Brand from "@/features/home/sections/brand";
 import CraftMarquee from "@/features/home/sections/craft-marquee";
 import Faq from "@/features/home/sections/faq";
@@ -13,6 +13,7 @@ import Stats from "@/features/home/sections/stats";
 import StudentLife from "@/features/home/sections/student-life";
 import Testimonials from "@/features/home/sections/testimonials";
 import WhyUnicorn from "@/features/home/sections/why-us";
+import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -76,6 +77,7 @@ function Home() {
 /* ----------------------------- Visit Us ----------------------------- */
 
 function VisitUs() {
+	const { contact, areasServed } = useSite();
 	return (
 		<section
 			className="border-t border-primary/15"
@@ -90,15 +92,15 @@ function VisitUs() {
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
 							/>
-							<span>{CONTACT.addressDisplay}</span>
+							<span>{contact.addressDisplay}</span>
 						</p>
 						<p className="flex items-start gap-3">
 							<IconPhone
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
 							/>
-							<a href={CONTACT.phoneHref} className="hover:text-primary">
-								{CONTACT.phoneDisplay}
+							<a href={contact.phoneHref} className="hover:text-primary">
+								{contact.phoneDisplay}
 							</a>
 						</p>
 						<p className="flex items-start gap-3">
@@ -106,7 +108,7 @@ function VisitUs() {
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
 							/>
-							<span>{CONTACT.hoursSummary}</span>
+							<span>{contact.hoursSummary}</span>
 						</p>
 						<p className="flex items-start gap-3">
 							<IconMapPin
@@ -115,12 +117,12 @@ function VisitUs() {
 							/>
 							<span>
 								Convenient for students from{" "}
-								{AREAS_SERVED.slice(0, 5).join(", ")} and across Dhaka.
+								{areasServed.slice(0, 5).join(", ")} and across Dhaka.
 							</span>
 						</p>
 					</address>
 					<a
-						href={CONTACT.mapsUrl}
+						href={contact.mapsUrl}
 						target="_blank"
 						rel="noreferrer"
 						className={cn(
@@ -134,7 +136,7 @@ function VisitUs() {
 				<div className="relative h-72 lg:h-auto">
 					<iframe
 						title="Google Map showing the location of Unicorn Barber Training Academy in Banasree, Rampura, Dhaka"
-						src={CONTACT.mapsEmbedUrl}
+						src={contact.mapsEmbedUrl}
 						loading="lazy"
 						referrerPolicy="no-referrer-when-downgrade"
 						allowFullScreen

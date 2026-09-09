@@ -5,10 +5,10 @@
 import { IconPrinter } from "@tabler/icons-react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import logo from "@/assets/logo/logo.png";
-import { CONTACT } from "@/data/site";
 import { formatLongDate } from "@/lib/date";
 import { COHORT_LABELS } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
+import { useSite } from "@/lib/site-context";
 import {
 	generateCertificateQrFn,
 	getMyCertificateFn,
@@ -46,6 +46,7 @@ export const Route = createFileRoute("/certificates/$id/print")({
 
 function CertificatePrintPage() {
 	const { certificate, qrDataUrl, verifyUrl } = Route.useLoaderData();
+	const { contact } = useSite();
 	const revoked = Boolean(certificate.revokedAt);
 
 	return (
@@ -132,9 +133,9 @@ function CertificatePrintPage() {
 							</p>
 						</div>
 						<p className="mt-4 text-[11px] leading-relaxed text-[#8a8474]">
-							{CONTACT.addressDisplay}
+							{contact.addressDisplay}
 							<br />
-							{CONTACT.phoneDisplay} · unicornbarberacademy.com
+							{contact.phoneDisplay} · unicornbarberacademy.com
 						</p>
 					</div>
 

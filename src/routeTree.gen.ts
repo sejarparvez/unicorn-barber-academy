@@ -36,6 +36,8 @@ import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardSiteRouteImport } from './routes/dashboard/site'
+import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
 import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
@@ -198,6 +200,16 @@ const DashboardAdminRoute = DashboardAdminRouteImport.update({
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSiteRoute = DashboardSiteRouteImport.update({
+  id: '/site',
+  path: '/site',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardUsersRoute = DashboardUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => DashboardRoute,
 } as any)
 const ProgramsIndexRoute = ProgramsIndexRouteImport.update({
@@ -373,6 +385,8 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/admin': typeof DashboardAdminRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/site': typeof DashboardSiteRoute
+  '/dashboard/users': typeof DashboardUsersRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/blog/': typeof BlogIndexRoute
@@ -429,6 +443,8 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/admin': typeof DashboardAdminRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/site': typeof DashboardSiteRoute
+  '/dashboard/users': typeof DashboardUsersRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/blog': typeof BlogIndexRoute
@@ -487,6 +503,8 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/admin': typeof DashboardAdminRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/site': typeof DashboardSiteRoute
+  '/dashboard/users': typeof DashboardUsersRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/blog/': typeof BlogIndexRoute
@@ -546,6 +564,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/admin'
     | '/dashboard/settings'
+    | '/dashboard/site'
+    | '/dashboard/users'
     | '/programs/$slug'
     | '/verify/$code'
     | '/blog/'
@@ -602,6 +622,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/admin'
     | '/dashboard/settings'
+    | '/dashboard/site'
+    | '/dashboard/users'
     | '/programs/$slug'
     | '/verify/$code'
     | '/blog'
@@ -659,6 +681,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/admin'
     | '/dashboard/settings'
+    | '/dashboard/site'
+    | '/dashboard/users'
     | '/programs/$slug'
     | '/verify/$code'
     | '/blog/'
@@ -923,6 +947,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/site': {
+      id: '/dashboard/site'
+      path: '/site'
+      fullPath: '/dashboard/site'
+      preLoaderRoute: typeof DashboardSiteRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/users': {
+      id: '/dashboard/users'
+      path: '/users'
+      fullPath: '/dashboard/users'
+      preLoaderRoute: typeof DashboardUsersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/programs/': {
       id: '/programs/'
       path: '/programs'
@@ -1125,6 +1163,8 @@ declare module '@tanstack/react-router' {
 interface DashboardRouteChildren {
   DashboardAdminRoute: typeof DashboardAdminRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardSiteRoute: typeof DashboardSiteRoute
+  DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardBlogCategoriesRoute: typeof DashboardBlogCategoriesRoute
   DashboardBlogNewRoute: typeof DashboardBlogNewRoute
@@ -1139,6 +1179,8 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdminRoute: DashboardAdminRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSiteRoute: DashboardSiteRoute,
+  DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardBlogCategoriesRoute: DashboardBlogCategoriesRoute,
   DashboardBlogNewRoute: DashboardBlogNewRoute,
@@ -1252,12 +1294,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

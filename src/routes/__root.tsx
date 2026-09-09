@@ -11,6 +11,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ScrollProgress } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
+import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { Analytics } from "@/components/providers/analytics";
@@ -20,15 +21,23 @@ import { RouteProgress } from "@/components/route-progress";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
+import type { ResolvedSettings } from "@/lib/settings";
 import type { SessionPayload } from "@/lib/types";
 import { getSession } from "@/server/session";
+import { getSiteSettingsFn } from "@/server/settings-fns";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
 	// Fetched on every document load so <Header/> renders the correct
-	// signed-in/out state during SSR — no hydration flicker.
-	loader: async (): Promise<{ session: SessionPayload | null }> => ({
+	// signed-in/out state during SSR — no hydration flicker. Site settings
+	// ride along so contact info + announcement stay admin-editable with a
+	// single shared object (visible UI and JSON-LD never drift apart).
+	loader: async (): Promise<{
+		session: SessionPayload | null;
+		site: ResolvedSettings;
+	}> => ({
 		session: await getSession(),
+		site: await getSiteSettingsFn(),
 	}),
 	head: () => ({
 		meta: [
@@ -168,6 +177,7 @@ function RootDocument() {
 				{isMarketing ? <ScrollProgress /> : null}
 				{/* Site chrome never prints — certificate pages rely on this. */}
 				<div className="print:hidden">
+					<AnnouncementBanner />
 					<Header session={session} />
 				</div>
 				<div id="main-content" className=" min-h-screen">

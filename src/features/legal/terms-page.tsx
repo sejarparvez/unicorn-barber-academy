@@ -1,8 +1,9 @@
 // src/features/legal/terms-page.tsx
 
 import { JsonLdScript } from "@/components/jsonld-script";
-import { CONTACT, SITE_URL } from "@/data/site";
+import { SITE_URL } from "@/data/site";
 import { LegalContent, LegalHero } from "@/features/legal/legal-layout";
+import { useSite } from "@/lib/site-context";
 
 const BREADCRUMB_JSON_LD = {
 	"@context": "https://schema.org",
@@ -19,6 +20,7 @@ const BREADCRUMB_JSON_LD = {
 };
 
 export function TermsPage() {
+	const { contact } = useSite();
 	return (
 		<main className="min-h-screen">
 			<JsonLdScript data={BREADCRUMB_JSON_LD} />
@@ -177,20 +179,20 @@ export function TermsPage() {
 					</p>
 					<address className="mt-3 not-italic text-base leading-relaxed text-muted-foreground">
 						<p>Unicorn Barber Training Academy</p>
-						<p>{CONTACT.addressDisplay}</p>
+						<p>{contact.addressDisplay}</p>
 						<p>
 							Email:{" "}
 							<a
-								href={`mailto:${CONTACT.email}`}
+								href={`mailto:${contact.email}`}
 								className="text-primary underline"
 							>
-								{CONTACT.email}
+								{contact.email}
 							</a>
 						</p>
 						<p>
 							Phone:{" "}
-							<a href={CONTACT.phoneHref} className="text-primary underline">
-								{CONTACT.phoneDisplay}
+							<a href={contact.phoneHref} className="text-primary underline">
+								{contact.phoneDisplay}
 							</a>
 						</p>
 					</address>

@@ -49,8 +49,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { SUBJECT_OPTIONS } from "@/data/contact";
 import { pic } from "@/data/images";
 import { ALL_PROGRAMS } from "@/data/programs";
-import { AREAS_SERVED, CONTACT, SITE_URL } from "@/data/site";
+import { SITE_URL } from "@/data/site";
 import { submitContactMessage } from "@/lib/api/contact";
+import { useSite } from "@/lib/site-context";
 import { useCopyToClipboard } from "@/lib/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
 
@@ -93,6 +94,7 @@ export function ContactPage() {
 
 function ContactHero() {
 	const fadeUp = useFadeUp();
+	const { contact } = useSite();
 
 	return (
 		<section className="relative overflow-hidden bg-secondary text-secondary-foreground">
@@ -159,14 +161,14 @@ function ContactHero() {
 					className="mt-9 flex flex-wrap items-center justify-center gap-3"
 				>
 					<a
-						href={CONTACT.phoneHref}
+						href={contact.phoneHref}
 						className="inline-flex items-center gap-2 border border-white/15 bg-white/5 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-secondary-foreground/85 backdrop-blur-sm transition-colors hover:border-primary hover:text-primary"
 					>
 						<IconPhone className="h-3.5 w-3.5" stroke={1.75} />
 						CALL
 					</a>
 					<a
-						href={CONTACT.whatsapp}
+						href={contact.whatsapp}
 						target="_blank"
 						rel="noreferrer"
 						className="inline-flex items-center gap-2 border border-white/15 bg-white/5 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-secondary-foreground/85 backdrop-blur-sm transition-colors hover:border-primary hover:text-primary"
@@ -175,7 +177,7 @@ function ContactHero() {
 						WHATSAPP
 					</a>
 					<a
-						href={CONTACT.mapsUrl}
+						href={contact.mapsUrl}
 						target="_blank"
 						rel="noreferrer"
 						className="inline-flex items-center gap-2 border border-white/15 bg-white/5 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-secondary-foreground/85 backdrop-blur-sm transition-colors hover:border-primary hover:text-primary"
@@ -210,6 +212,7 @@ const DESKS = [
 ];
 
 function ContactForm() {
+	const { contact } = useSite();
 	const submitMessage = useMutation({
 		mutationFn: submitContactMessage,
 	});
@@ -362,7 +365,7 @@ function ContactForm() {
 										<div className="flex flex-wrap items-center justify-between gap-4 pt-2">
 											<p className="text-xs text-muted-foreground">
 												Sent to{" "}
-												<span className="text-foreground">{CONTACT.email}</span>{" "}
+												<span className="text-foreground">{contact.email}</span>{" "}
 												&middot; we typically reply within 1&ndash;2 business
 												days
 											</p>
@@ -394,8 +397,8 @@ function ContactForm() {
 								</p>
 
 								<div className="mt-6 space-y-3">
-									<CopyRow icon={IconMail} value={CONTACT.email} />
-									<CopyRow icon={IconPhone} value={CONTACT.phoneDisplay} />
+									<CopyRow icon={IconMail} value={contact.email} />
+									<CopyRow icon={IconPhone} value={contact.phoneDisplay} />
 								</div>
 
 								<ul className="mt-8 space-y-4 border-t border-border pt-6">
@@ -508,6 +511,7 @@ function SealedConfirmation({ onReset }: { onReset: () => void }) {
 /* ----------------------------- Visit studio ----------------------------- */
 
 function VisitStudio() {
+	const { contact, areasServed } = useSite();
 	return (
 		<section id="visit" className="scroll-mt-20 border-t border-border">
 			<div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
@@ -520,7 +524,7 @@ function VisitStudio() {
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
 							/>
-							<span>{CONTACT.addressDisplay}</span>
+							<span>{contact.addressDisplay}</span>
 						</p>
 						<p className="flex items-start gap-3">
 							<IconParking
@@ -537,7 +541,7 @@ function VisitStudio() {
 						<p className="text-[11px] tracking-[0.18em] text-primary uppercase">
 							Convenient for students from
 						</p>
-						<p className="mt-2 leading-relaxed">{AREAS_SERVED.join(" · ")}</p>
+						<p className="mt-2 leading-relaxed">{areasServed.join(" · ")}</p>
 					</div>
 
 					<div className="mt-8 border-t border-white/10 pt-6">
@@ -546,7 +550,7 @@ function VisitStudio() {
 							STUDIO HOURS
 						</p>
 						<dl className="mt-4 space-y-2.5 text-sm">
-							{CONTACT.hours.map((h) => (
+							{contact.hours.map((h) => (
 								<div
 									key={h.day}
 									className="flex items-baseline justify-between gap-4 text-secondary-foreground/75"
@@ -572,7 +576,7 @@ function VisitStudio() {
 				<Reveal delay={0.1} className="relative h-72 lg:h-auto">
 					<iframe
 						title="Google Map showing the location of Unicorn Barber Training Academy in Banasree, Rampura, Dhaka"
-						src={CONTACT.mapsEmbedUrl}
+						src={contact.mapsEmbedUrl}
 						loading="lazy"
 						referrerPolicy="no-referrer-when-downgrade"
 						allowFullScreen
