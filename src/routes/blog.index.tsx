@@ -43,9 +43,13 @@ export const Route = createFileRoute("/blog/")({
 					title: validPage
 						? `Blog (page ${page}) | Unicorn Barber Training Academy`
 						: "Blog | Unicorn Barber Training Academy",
-					description:
+				},
+				{
+					name: "description",
+					content:
 						"Articles on barbering technique, beauty careers, and professional training in Dhaka from Unicorn Barber Training Academy.",
 				},
+				{ name: "robots", content: "index, follow" },
 				{
 					property: "og:title",
 					content: "Blog | Unicorn Barber Training Academy",

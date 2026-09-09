@@ -12,8 +12,9 @@ export const Route = createFileRoute("/programs/")({
 			{
 				name: "description",
 				content:
-					"Six hands-on barbering and beauty & cosmetology programs in Dhaka — from 4-week specialisations to full 16-week certifications. Day and evening cohorts available.",
+					"Six hands-on barbering and beauty programs in Dhaka — 4-week specialisations to 16-week certifications. Day and evening cohorts.",
 			},
+			{ name: "robots", content: "index, follow" },
 			{
 				property: "og:title",
 				content: "Programs | Unicorn Barber Training Academy",

@@ -33,6 +33,7 @@ export const Route = createFileRoute("/careers")({
 				content:
 					"We hire working professionals as instructors. No teaching experience required.",
 			},
+			{ name: "robots", content: "index, follow" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/careers` }],
 	}),

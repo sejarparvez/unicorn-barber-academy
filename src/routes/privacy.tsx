@@ -33,6 +33,7 @@ export const Route = createFileRoute("/privacy")({
 				content:
 					"Privacy policy for Unicorn Barber Training Academy — how we collect, use, and protect your personal information.",
 			},
+			{ name: "robots", content: "index, follow" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/privacy` }],
 	}),

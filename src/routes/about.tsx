@@ -42,6 +42,7 @@ export const Route = createFileRoute("/about")({
 				content:
 					"Dhaka's premier hands-on training academy for barbering and beauty & cosmetology.",
 			},
+			{ name: "robots", content: "index, follow" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
 	}),

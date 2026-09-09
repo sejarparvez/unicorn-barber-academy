@@ -15,8 +15,9 @@ export const Route = createFileRoute("/student-life")({
 			{
 				name: "description",
 				content:
-					"See what it's like to train at Unicorn Barber Training Academy — studio sessions, cohort bonding, graduation days, and the journey from student to professional.",
+					"Train at Unicorn Barber Training Academy — studio sessions, cohort bonding, graduation days, and the journey to professional.",
 			},
+			{ name: "robots", content: "index, follow" },
 			{
 				property: "og:title",
 				content: "Student Life | Unicorn Barber Training Academy",

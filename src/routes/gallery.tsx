@@ -38,6 +38,7 @@ export const Route = createFileRoute("/gallery")({
 				content:
 					"Before-and-after transformations and studio life from Unicorn Barber Training Academy.",
 			},
+			{ name: "robots", content: "index, follow" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/gallery` }],
 	}),

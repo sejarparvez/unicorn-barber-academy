@@ -15,8 +15,9 @@ export const Route = createFileRoute("/instructors")({
 			{
 				name: "description",
 				content:
-					"Meet the working barbers and beauty professionals teaching at Unicorn Barber Training Academy in Dhaka � every instructor still works a chair or a station.",
+					"Meet the working barbers and beauty pros teaching in Dhaka — every instructor still works a chair or a station.",
 			},
+			{ name: "robots", content: "index, follow" },
 			{
 				property: "og:title",
 				content: "Instructors | Unicorn Barber Training Academy",

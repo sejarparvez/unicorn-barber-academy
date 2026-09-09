@@ -41,6 +41,7 @@ export const Route = createFileRoute("/contact")({
 				content:
 					"Reach admissions, partnerships, or press at Unicorn Barber Training Academy.",
 			},
+			{ name: "robots", content: "index, follow" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/contact` }],
 	}),

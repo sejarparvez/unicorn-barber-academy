@@ -33,6 +33,7 @@ export const Route = createFileRoute("/terms")({
 				content:
 					"Terms of service for Unicorn Barber Training Academy — governing your use of our website and enrollment in our programs.",
 			},
+			{ name: "robots", content: "index, follow" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/terms` }],
 	}),
