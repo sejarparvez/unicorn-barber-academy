@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { parseApplicationStatus } from "@/lib/enrollment";
 import { requireAdminApi } from "@/server/admin-api";
+import { logAdminAction } from "@/server/audit-log";
 import { bulkUpdateApplicationStatus } from "@/server/enrollment-db";
 
 export const Route = createFileRoute("/api/admin/enrollments/bulk")({
@@ -50,6 +51,18 @@ export const Route = createFileRoute("/api/admin/enrollments/bulk")({
 					note,
 				});
 
+				await logAdminAction({
+					actorId: guard.userId,
+					action: "application.bulk-status",
+					targetType: "application",
+					targetId: `${ids.length} items`,
+					summary: `Bulk set ${result.applied} application(s) to ${status} (${result.failed.length} failed)`,
+					metadata: {
+						status,
+						applied: result.applied,
+						failed: result.failed.length,
+					},
+				});
 				return json(result);
 			},
 		},

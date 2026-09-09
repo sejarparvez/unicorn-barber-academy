@@ -12,11 +12,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ApplicationDetail, ApplicationStatus } from "@/lib/enrollment";
 import {
 	APPLICATION_STATUS_LABELS,
+	FEE_METHOD_LABELS,
+	formatFeePoisha,
 	formatStartsOn,
 	parseApplicationStatus,
 } from "@/lib/enrollment";
@@ -30,8 +33,9 @@ import {
 import {
 	useApplicationDetail,
 	useApplicationStatusLog,
-	useSetApplicationFee,
+	useRecordFeePayment,
 	useSetApplicationStatus,
+	useVoidFeePayment,
 } from "@/service/enrollment";
 
 const STATUS_FLOW: Array<{
@@ -68,9 +72,14 @@ export function ApplicationDetailPage({
 	});
 	const application = data?.application ?? initialApplication;
 
-	const setFee = useSetApplicationFee(application.id);
 	const setStatus = useSetApplicationStatus(application.id);
-	const busy = setFee.isPending || setStatus.isPending;
+	const recordPayment = useRecordFeePayment(application.id);
+	const voidPayment = useVoidFeePayment(application.id);
+	const busy =
+		recordPayment.isPending || voidPayment.isPending || setStatus.isPending;
+	const [amountTaka, setAmountTaka] = useState("");
+	const [payMethod, setPayMethod] = useState("cash");
+	const [receipt, setReceipt] = useState("");
 	const [note, setNote] = useState(application.decisionNote ?? "");
 	// If another admin saves a note while this page is open, the refetched
 	// value replaces our (untouched) local copy — but only when the local
@@ -100,10 +109,35 @@ export function ApplicationDetailPage({
 		}
 	}
 
-	async function toggleFee() {
+	async function recordFee(event: React.FormEvent) {
+		event.preventDefault();
+		const taka = Number.parseInt(amountTaka, 10);
+		if (!Number.isInteger(taka) || taka < 1) {
+			setError("Enter a valid amount in taka");
+			return;
+		}
 		setError(null);
+		setNotice(null);
 		try {
-			await setFee.mutateAsync(application.feeStatus !== "paid");
+			await recordPayment.mutateAsync({
+				amountTaka: taka,
+				method: payMethod,
+				receipt: receipt.trim() || null,
+			});
+			setAmountTaka("");
+			setReceipt("");
+			setNotice("Payment recorded.");
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Action failed");
+		}
+	}
+
+	async function voidFee(paymentId: number) {
+		setError(null);
+		setNotice(null);
+		try {
+			await voidPayment.mutateAsync(paymentId);
+			setNotice("Payment voided.");
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Action failed");
 		}
@@ -267,16 +301,89 @@ export function ApplicationDetailPage({
 							Registration fee
 						</h2>
 						<Label>Offline tracking — bKash / cash / bank at the academy</Label>
-						<Button
-							variant={application.feeStatus === "paid" ? "outline" : "default"}
-							disabled={busy}
-							onClick={toggleFee}
-							className="w-full"
+						<p className="text-sm">
+							<span className="font-semibold tabular-nums">
+								{formatFeePoisha(application.feePaidPoisha)}
+							</span>{" "}
+							<span className="text-muted-foreground">
+								of {formatFeePoisha(application.programFeePoisha)} paid
+							</span>
+						</p>
+						{application.payments.length > 0 ? (
+							<ul className="divide-y divide-border rounded-md border border-border">
+								{application.payments.map((payment) => (
+									<li
+										key={payment.id}
+										className="flex items-center gap-2 px-3 py-2 text-xs"
+									>
+										<span className="font-semibold tabular-nums">
+											{formatFeePoisha(payment.amountPoisha)}
+										</span>
+										<span className="text-muted-foreground">
+											{FEE_METHOD_LABELS[payment.method]}
+											{payment.receiptRef ? ` · ${payment.receiptRef}` : ""}
+											{payment.receivedByName
+												? ` · ${payment.receivedByName}`
+												: ""}
+											{" · "}
+											{new Date(payment.paidAt).toLocaleDateString("en-GB", {
+												day: "numeric",
+												month: "short",
+											})}
+										</span>
+										<button
+											type="button"
+											disabled={busy}
+											onClick={() => void voidFee(payment.id)}
+											className="ml-auto text-muted-foreground hover:text-destructive disabled:opacity-50"
+										>
+											Void
+										</button>
+									</li>
+								))}
+							</ul>
+						) : (
+							<p className="text-xs text-muted-foreground">
+								No payments recorded yet.
+							</p>
+						)}
+						<form
+							onSubmit={recordFee}
+							className="grid grid-cols-[1fr_auto] gap-2"
 						>
-							{application.feeStatus === "paid"
-								? "Mark as unpaid"
-								: "Mark as paid"}
-						</Button>
+							<Input
+								placeholder="Amount ৳"
+								value={amountTaka}
+								onChange={(e) => setAmountTaka(e.target.value)}
+								inputMode="numeric"
+								className="h-9"
+								aria-label="Payment amount in taka"
+							/>
+							<select
+								value={payMethod}
+								onChange={(e) => setPayMethod(e.target.value)}
+								className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+								aria-label="Payment method"
+							>
+								<option value="cash">Cash</option>
+								<option value="bkash">bKash</option>
+								<option value="bank">Bank</option>
+							</select>
+							<Input
+								placeholder="Receipt ref (optional)"
+								value={receipt}
+								onChange={(e) => setReceipt(e.target.value)}
+								className="h-9 col-span-2"
+								aria-label="Receipt reference"
+							/>
+							<Button
+								type="submit"
+								disabled={busy}
+								className="col-span-2 w-full"
+							>
+								Record payment
+							</Button>
+						</form>
 					</section>
 
 					<CertificatePanel applicationId={application.id} />

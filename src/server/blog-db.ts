@@ -46,6 +46,7 @@ type PostRow = {
 	author_id: number | null;
 	author_name: string | null;
 	reading_minutes: number;
+	view_count: number;
 	published_at: Date | null;
 	created_at: Date;
 	updated_at: Date;
@@ -59,7 +60,7 @@ const POST_COLUMNS = `
 	p.key_takeaways, p.faq, p.related_program_slugs, p.tags,
 	p.status, p.category_id, c.name AS category_name, c.slug AS category_slug,
 	p.author_id, u.name AS author_name,
-	p.reading_minutes, p.published_at, p.created_at, p.updated_at`;
+	p.reading_minutes, p.view_count, p.published_at, p.created_at, p.updated_at`;
 
 /** Slim projection for list views — skips content_md and SEO blobs so a
     page of summaries doesn't transfer hundreds of KB of article bodies. */
@@ -67,7 +68,7 @@ const SUMMARY_COLUMNS = `
 	p.id, p.slug, p.title, p.excerpt,
 	p.cover_image_url, p.cover_image_alt, p.tags,
 	p.status, p.category_id, c.name AS category_name, c.slug AS category_slug,
-	p.reading_minutes, p.published_at, p.updated_at`;
+	p.reading_minutes, p.view_count, p.published_at, p.updated_at`;
 
 type PostSummaryRow = Pick<
 	PostRow,
@@ -83,6 +84,7 @@ type PostSummaryRow = Pick<
 	| "category_name"
 	| "category_slug"
 	| "reading_minutes"
+	| "view_count"
 	| "published_at"
 	| "updated_at"
 >;
@@ -126,6 +128,7 @@ function rowToSummary(row: PostSummaryRow): BlogPostSummary {
 					}
 				: null,
 		readingMinutes: row.reading_minutes,
+		viewCount: row.view_count ?? 0,
 		publishedAt: toDate(row.published_at),
 		updatedAt: new Date(row.updated_at).toISOString(),
 	};
@@ -152,6 +155,18 @@ function rowToFull(row: PostRow): BlogPostFull {
 }
 
 /* ------------------------------- public --------------------------------- */
+
+/**
+ * Fire-and-forget page-view increment. Never awaited by callers and never
+ * throws — a counter failure must not break article renders.
+ */
+export function recordPostView(postId: number): void {
+	void q("UPDATE blog_post SET view_count = view_count + 1 WHERE id = $1", [
+		postId,
+	]).catch((error: unknown) => {
+		console.error("[blog] view increment failed:", error);
+	});
+}
 
 export async function listPublishedPosts(options: {
 	page?: number;
@@ -433,6 +448,7 @@ export async function listAllPosts(options: {
 	categoryId?: number;
 	page?: number;
 	perPage?: number;
+	sortByViews?: boolean;
 }): Promise<Paginated<BlogPostSummary>> {
 	const page = Math.max(1, options.page ?? 1);
 	const perPage = Math.min(50, Math.max(1, options.perPage ?? 20));
@@ -469,7 +485,7 @@ export async function listAllPosts(options: {
 
 	const res = await q<PostSummaryRow>(
 		`SELECT ${SUMMARY_COLUMNS} ${POST_JOINS} ${where}
-		 ORDER BY p.updated_at DESC
+		 ${options.sortByViews ? "ORDER BY p.view_count DESC, p.updated_at DESC" : "ORDER BY p.updated_at DESC"}
 		 LIMIT $1 OFFSET $2`,
 		params,
 	);

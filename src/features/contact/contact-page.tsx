@@ -51,6 +51,7 @@ import { pic } from "@/data/images";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import { submitContactMessage } from "@/lib/api/contact";
+import type { FaqView } from "@/lib/content";
 import { useSite } from "@/lib/site-context";
 import { useCopyToClipboard } from "@/lib/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
@@ -77,7 +78,7 @@ const CONTACT_PAGE_JSON_LD = {
 	mainEntity: { "@id": `${SITE_URL}/#academy` },
 };
 
-export function ContactPage() {
+export function ContactPage({ faqs }: { faqs: FaqView[] }) {
 	return (
 		<main>
 			<JsonLdScript data={JSON_LD} />
@@ -85,7 +86,7 @@ export function ContactPage() {
 			<ContactHero />
 			<ContactForm />
 			<VisitStudio />
-			<ContactFaq />
+			<ContactFaq items={faqs} />
 		</main>
 	);
 }
@@ -590,60 +591,37 @@ function VisitStudio() {
 
 /* ------------------------------- FAQ ------------------------------- */
 
-const CONTACT_FAQS = [
-	{
-		q: "Where exactly is the academy located?",
-		a: "House 04, Block F, Main Road, Banasree, Rampura, Dhaka 1219 — the academy is on the 1st floor, with the entrance on Main Road. There's a Google map on this page.",
-	},
-	{
-		q: "Which parts of Dhaka do students commute from?",
-		a: "Most students come from nearby Banasree, Rampura, Aftabnagar, Badda, Khilgaon, Gulshan and Mohakhali — but cohorts regularly include learners from across Dhaka.",
-	},
-	{
-		q: "Do I need an appointment to visit the studio?",
-		a: "Walk-ins are welcome during studio hours, but booking a visit means an instructor can actually walk you through a cohort in session.",
-	},
-	{
-		q: "How fast will I hear back?",
-		a: "Most messages get a same-day reply on weekdays, and within 1–2 business days otherwise.",
-	},
-	{
-		q: "Can I call instead of using the form?",
-		a: "Yes — the phone number above rings the front desk directly during studio hours, and WhatsApp works outside those hours too.",
-	},
-];
-
-const CONTACT_FAQ_JSON_LD = {
-	"@context": "https://schema.org",
-	"@type": "FAQPage",
-	mainEntity: CONTACT_FAQS.map((f) => ({
-		"@type": "Question",
-		name: f.q,
-		acceptedAnswer: { "@type": "Answer", text: f.a },
-	})),
-};
-
-function ContactFaq() {
+function ContactFaq({ items }: { items: FaqView[] }) {
 	return (
 		<section
 			className="section-light border-t border-border bg-background px-6 py-24 lg:px-10"
 			aria-labelledby="contact-faq-heading"
 		>
-			<JsonLdScript data={CONTACT_FAQ_JSON_LD} />
+			<JsonLdScript
+				data={{
+					"@context": "https://schema.org",
+					"@type": "FAQPage",
+					mainEntity: items.map((f) => ({
+						"@type": "Question",
+						name: f.question,
+						acceptedAnswer: { "@type": "Answer", text: f.answer },
+					})),
+				}}
+			/>
 			<div className="mx-auto max-w-3xl">
 				<SectionEyebrow title="Before You Reach Out" id="contact-faq-heading" />
 				<Accordion className="mt-10">
-					{CONTACT_FAQS.map((item, i) => (
+					{items.map((item, i) => (
 						<AccordionItem
-							key={item.q}
+							key={item.question}
 							value={`item-${i}`}
 							className="border-border py-1 first:border-t"
 						>
 							<AccordionTrigger className="py-4 text-base font-medium text-foreground hover:no-underline [&>svg]:text-primary">
-								{item.q}
+								{item.question}
 							</AccordionTrigger>
 							<AccordionContent className="text-sm leading-relaxed text-muted-foreground">
-								{item.a}
+								{item.answer}
 							</AccordionContent>
 						</AccordionItem>
 					))}

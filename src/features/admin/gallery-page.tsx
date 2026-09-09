@@ -88,13 +88,13 @@ export function GalleryAdminPage() {
 		}
 	}
 
-	async function onTogglePublish(item: GalleryAdmin) {
+	async function onToggle(
+		item: GalleryAdmin,
+		patch: { isPublished?: boolean; isFeatured?: boolean },
+	) {
 		setError(null);
 		try {
-			await updateMutation.mutateAsync({
-				id: item.id,
-				patch: { isPublished: !item.isPublished },
-			});
+			await updateMutation.mutateAsync({ id: item.id, patch });
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Update failed");
 		}
@@ -227,6 +227,11 @@ export function GalleryAdminPage() {
 									<Badge variant={item.isPublished ? "default" : "outline"}>
 										{item.isPublished ? "Live" : "Hidden"}
 									</Badge>
+									{item.isFeatured ? (
+										<Badge className="bg-primary/15 text-primary">
+											Featured
+										</Badge>
+									) : null}
 								</div>
 								<input
 									key={`${item.id}:${item.alt}`}
@@ -255,10 +260,23 @@ export function GalleryAdminPage() {
 										→
 									</Button>
 									<Button
+										variant={item.isFeatured ? "default" : "outline"}
+										size="sm"
+										disabled={busy}
+										onClick={() =>
+											void onToggle(item, { isFeatured: !item.isFeatured })
+										}
+										aria-label="Toggle home feature"
+									>
+										★
+									</Button>
+									<Button
 										variant="outline"
 										size="sm"
 										disabled={busy}
-										onClick={() => void onTogglePublish(item)}
+										onClick={() =>
+											void onToggle(item, { isPublished: !item.isPublished })
+										}
 									>
 										{item.isPublished ? "Hide" : "Show"}
 									</Button>

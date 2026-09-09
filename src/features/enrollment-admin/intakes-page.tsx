@@ -441,8 +441,7 @@ function ProgramsOverview({
 								{program.openIntakes} open intake
 								{program.openIntakes === 1 ? "" : "s"} · {program.seatsFilled}/
 								{program.seatsTotal} seats filled · {program.pendingCount}{" "}
-								pending review ·{" "}
-								{formatFeePoisha(program.paidCount * program.feePoisha)}{" "}
+								pending review · {formatFeePoisha(program.collectedPoisha)}{" "}
 								collected
 							</p>
 							<div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">

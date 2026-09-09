@@ -2,9 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
 import { ContactPage } from "@/features/contact/contact-page";
+import { listFaqsFn } from "@/server/content-fns";
 
 export const Route = createFileRoute("/contact")({
-	component: ContactPage,
+	loader: async () => ({
+		faqs: await listFaqsFn({ data: { placement: "contact" } }),
+	}),
+	component: ContactRoute,
 	head: () => ({
 		meta: [
 			{ title: "Contact | Unicorn Barber Training Academy" },
@@ -41,3 +45,8 @@ export const Route = createFileRoute("/contact")({
 		links: [{ rel: "canonical", href: `${SITE_URL}/contact` }],
 	}),
 });
+
+function ContactRoute() {
+	const { faqs } = Route.useLoaderData();
+	return <ContactPage faqs={faqs} />;
+}

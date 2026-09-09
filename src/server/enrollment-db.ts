@@ -22,6 +22,7 @@ import {
 	generateReference,
 	parseApplicationStatus,
 	parseCohort,
+	parseFeeMethod,
 	parseFeeStatus,
 } from "@/lib/enrollment";
 import { db, withTransaction } from "./db";
@@ -360,6 +361,8 @@ export async function getApplicationDetail(id: number) {
 		intake_open: boolean;
 		seats_total: number;
 		seats_occupied: number;
+		program_fee: number;
+		fee_paid: number;
 	}>(
 		`SELECT a.id, a.reference, a.status, a.fee_status, a.full_name, a.email,
 			a.phone, a.experience_note, a.hear_about, a.decided_at, a.decision_note,
@@ -368,7 +371,9 @@ export async function getApplicationDetail(id: number) {
 			i.is_open AS intake_open, i.seats_total,
 			(SELECT count(*) FROM enrollment_application x
 			 WHERE x.intake_id = i.id
-			   AND x.status IN ('pending','reviewing','approved'))::int AS seats_occupied
+			   AND x.status IN ('pending','reviewing','approved'))::int AS seats_occupied,
+			coalesce((SELECT p.fee_poisha FROM program p WHERE p.slug = i.program_slug), 0)::int AS program_fee,
+			coalesce((SELECT sum(f.amount_poisha) FROM fee_payment f WHERE f.application_id = a.id), 0)::int AS fee_paid
 		 FROM enrollment_application a
 		 JOIN program_intake i ON i.id = a.intake_id
 		 JOIN "user" u ON u.id = a.user_id
@@ -379,6 +384,7 @@ export async function getApplicationDetail(id: number) {
 	if (!row) return null;
 	const title = programTitle(row.program_slug);
 	if (!title) return null;
+	const payments = await listFeePayments(row.id);
 
 	return {
 		application: {
@@ -405,6 +411,9 @@ export async function getApplicationDetail(id: number) {
 			seatsTotal: row.seats_total,
 			seatsOccupied: row.seats_occupied,
 			updatedAt: new Date(row.updated_at).toISOString(),
+			programFeePoisha: row.program_fee,
+			feePaidPoisha: row.fee_paid,
+			payments,
 		},
 	};
 }
@@ -566,20 +575,118 @@ export async function updateApplicationStatus(options: {
 	});
 }
 
-/** Offline fee bookkeeping (bKash/cash/bank recorded at the academy). */
-export async function setApplicationFee(
-	id: number,
-	paid: boolean,
+/* ------------------------------ fee ledger ------------------------------ */
+
+export type FeeRecordResult =
+	| { ok: true; id?: number }
+	| { ok: false; reason: "not-found" | "invalid" };
+
+/**
+ * Recompute fee_status from the ledger: paid in full when Σ payments ≥ the
+ * intake program's fee. Called after every ledger write so the flag (and
+ * everything downstream — certificate gate, badges) stays truthful.
+ */
+async function recomputeFeeStatus(applicationId: number): Promise<void> {
+	await db().query(
+		`UPDATE enrollment_application a SET
+			fee_status = CASE
+				WHEN coalesce((
+					SELECT sum(f.amount_poisha) FROM fee_payment f
+					WHERE f.application_id = a.id
+				), 0) >= coalesce((
+					SELECT p.fee_poisha FROM program_intake i
+					JOIN program p ON p.slug = i.program_slug
+					WHERE i.id = a.intake_id
+				), 0) THEN 'paid' ELSE 'unpaid' END,
+			fee_paid_at = CASE
+				WHEN coalesce((
+					SELECT sum(f.amount_poisha) FROM fee_payment f
+					WHERE f.application_id = a.id
+				), 0) >= coalesce((
+					SELECT p.fee_poisha FROM program_intake i
+					JOIN program p ON p.slug = i.program_slug
+					WHERE i.id = a.intake_id
+				), 0) THEN coalesce(fee_paid_at, now()) ELSE NULL END,
+			updated_at = now()
+		 WHERE a.id = $1`,
+		[applicationId],
+	);
+}
+
+export async function recordFeePayment(input: {
+	applicationId: number;
+	amountPoisha: number;
+	method: string;
+	receiptRef: string | null;
+	receivedBy: number | null;
+	paidAt: string | null;
+}): Promise<FeeRecordResult> {
+	if (!Number.isInteger(input.amountPoisha) || input.amountPoisha <= 0) {
+		return { ok: false, reason: "invalid" };
+	}
+	const app = await db().query<{ one: number }>(
+		"SELECT 1 AS one FROM enrollment_application WHERE id = $1",
+		[input.applicationId],
+	);
+	if (app.rows.length === 0) return { ok: false, reason: "not-found" };
+	const res = await db().query<{ id: number }>(
+		`INSERT INTO fee_payment
+			(application_id, amount_poisha, method, receipt_ref, received_by, paid_at)
+		 VALUES ($1,$2,$3,$4,$5,coalesce($6::timestamptz, now()))
+		 RETURNING id`,
+		[
+			input.applicationId,
+			input.amountPoisha,
+			input.method,
+			input.receiptRef,
+			input.receivedBy,
+			input.paidAt,
+		],
+	);
+	await recomputeFeeStatus(input.applicationId);
+	return { ok: true, id: res.rows[0]?.id };
+}
+
+export async function deleteFeePayment(
+	applicationId: number,
+	paymentId: number,
 ): Promise<boolean> {
 	const res = await db().query(
-		`UPDATE enrollment_application SET
-			fee_status = $2::varchar,
-			fee_paid_at = CASE WHEN $2::text = 'paid' THEN now() ELSE NULL END,
-			updated_at = now()
-		 WHERE id = $1`,
-		[id, (paid ? "paid" : "unpaid") satisfies FeeStatus],
+		"DELETE FROM fee_payment WHERE id = $1 AND application_id = $2",
+		[paymentId, applicationId],
 	);
-	return (res.rowCount ?? 0) > 0;
+	if ((res.rowCount ?? 0) === 0) return false;
+	await recomputeFeeStatus(applicationId);
+	return true;
+}
+
+export async function listFeePayments(
+	applicationId: number,
+): Promise<import("@/lib/enrollment").FeePaymentRow[]> {
+	const res = await db().query<{
+		id: number;
+		amount_poisha: number;
+		method: string;
+		receipt_ref: string | null;
+		receiver_name: string | null;
+		paid_at: Date;
+	}>(
+		`SELECT f.id, f.amount_poisha, f.method, f.receipt_ref,
+			u.name AS receiver_name, f.paid_at
+		 FROM fee_payment f
+		 LEFT JOIN "user" u ON u.id = f.received_by
+		 WHERE f.application_id = $1
+		 ORDER BY f.paid_at DESC, f.id DESC`,
+		[applicationId],
+	);
+	return res.rows.map((row) => ({
+		id: row.id,
+		amountPoisha: row.amount_poisha,
+		method: parseFeeMethod(row.method) ?? "cash",
+		receiptRef: row.receipt_ref,
+		receivedByName: row.receiver_name,
+		paidAt: new Date(row.paid_at).toISOString(),
+	}));
 }
 
 /** Batch status update for the bulk action bar. Runs each transition

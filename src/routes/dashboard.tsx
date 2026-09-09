@@ -3,14 +3,16 @@
 	IconCertificate,
 	IconChevronRight,
 	IconClipboardList,
+	IconClockHour4,
 	IconGauge,
 	IconLayoutDashboard,
+	IconMail,
 	IconMenu2,
 	IconPhoto,
+	IconQuestionMark,
 	IconSettings,
 	IconStar,
 	IconUser,
-	IconUsersGroup,
 } from "@tabler/icons-react";
 import {
 	createFileRoute,
@@ -95,7 +97,19 @@ const NAV_ITEMS: NavItem[] = [
 	{
 		label: "Users",
 		to: "/dashboard/users",
-		icon: IconUsersGroup,
+		icon: IconUser,
+		visibleFor: "admin",
+	},
+	{
+		label: "Inbox",
+		to: "/dashboard/inbox",
+		icon: IconMail,
+		visibleFor: "admin",
+	},
+	{
+		label: "Activity",
+		to: "/dashboard/activity",
+		icon: IconClockHour4,
 		visibleFor: "admin",
 	},
 	{
@@ -114,6 +128,12 @@ const NAV_ITEMS: NavItem[] = [
 		label: "Testimonials",
 		to: "/dashboard/testimonials",
 		icon: IconStar,
+		visibleFor: "admin",
+	},
+	{
+		label: "FAQs",
+		to: "/dashboard/faqs",
+		icon: IconQuestionMark,
 		visibleFor: "admin",
 	},
 	{

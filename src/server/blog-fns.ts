@@ -17,6 +17,7 @@ import type {
 } from "@/lib/blog";
 import { parseBlogStatus } from "@/lib/blog";
 import { renderMarkdown } from "@/lib/markdown";
+import { parseRole } from "@/lib/roles";
 import {
 	getAdjacentPosts,
 	getAnyBySlug,
@@ -29,6 +30,7 @@ import {
 	listPublishedByCategory,
 	listPublishedPosts,
 	listRelatedPosts,
+	recordPostView,
 } from "@/server/blog-db";
 import {
 	clampId,
@@ -53,6 +55,7 @@ export const listAdminPostsFn = createServerFn({ method: "GET" })
 			search?: string;
 			category?: number;
 			page?: number;
+			sortByViews?: boolean;
 		}) => input,
 	)
 	.handler(async ({ data }): Promise<Paginated<BlogPostSummary>> => {
@@ -64,6 +67,7 @@ export const listAdminPostsFn = createServerFn({ method: "GET" })
 				categoryId: data?.category,
 				page: clampPage(data?.page),
 				perPage: 20,
+				sortByViews: data?.sortByViews === true,
 			}),
 		);
 	});
@@ -168,6 +172,17 @@ export const getPostForPublicHtmlFn = createServerFn({ method: "GET" })
 				});
 
 				if (result.kind !== "post") return result;
+
+				// Count the view for published reads only: previews are excluded,
+				// and so are signed-in admins (their own QA browsing shouldn't
+				// inflate numbers). Fire-and-forget — never blocks the render.
+				if (!result.isPreview) {
+					void getSession().then((session) => {
+						if (parseRole(session?.user.role) !== "admin") {
+							recordPostView(result.post.id);
+						}
+					});
+				}
 
 				const relatedPosts = await getRelatedPostsFn({
 					data: {

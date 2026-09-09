@@ -20,14 +20,28 @@ export async function setApplicationStatus(
 	}
 }
 
-export async function setApplicationFee(
+export async function recordFeePayment(
 	id: number,
-	paid: boolean,
+	input: { amountTaka: number; method: string; receipt?: string | null },
 ): Promise<void> {
 	try {
 		await http.patch(`/api/admin/enrollments/${id}`, {
-			action: "fee",
-			paid,
+			action: "record-payment",
+			...input,
+		});
+	} catch (error) {
+		throw new Error(await extractErrorMessage(error));
+	}
+}
+
+export async function voidFeePayment(
+	id: number,
+	paymentId: number,
+): Promise<void> {
+	try {
+		await http.patch(`/api/admin/enrollments/${id}`, {
+			action: "void-payment",
+			paymentId,
 		});
 	} catch (error) {
 		throw new Error(await extractErrorMessage(error));

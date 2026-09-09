@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	isValidFutureStartDate,
+	parseFeePaymentPayload,
 	parseIntakePayload,
 	validateApplicationPayload,
 } from "@/server/enrollment-validate";
@@ -174,5 +175,33 @@ describe("parseIntakePayload", () => {
 		expect(
 			(await parseIntakePayload({ ...validBase, seatsTotal: 200 })).ok,
 		).toBe(true);
+	});
+});
+
+describe("parseFeePaymentPayload", () => {
+	test("accepts taka amount with method", () => {
+		const result = parseFeePaymentPayload({
+			amountTaka: 15000,
+			method: "bkash",
+			receiptRef: "TRX123",
+		});
+		expect(result.ok).toBe(true);
+		if (result.ok) expect(result.value.amountPoisha).toBe(1500000);
+	});
+
+	test("rejects bad amounts, methods, future dates", () => {
+		expect(parseFeePaymentPayload({ amountTaka: 0, method: "cash" }).ok).toBe(
+			false,
+		);
+		expect(
+			parseFeePaymentPayload({ amountTaka: 5000, method: "card" }).ok,
+		).toBe(false);
+		expect(
+			parseFeePaymentPayload({
+				amountTaka: 5000,
+				method: "cash",
+				paidAt: "2099-01-01",
+			}).ok,
+		).toBe(false);
 	});
 });

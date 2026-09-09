@@ -8,62 +8,42 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import type { FaqView } from "@/lib/content";
 
-const FAQS = [
-	{
-		q: "Do I need prior experience to enroll?",
-		a: "No. Most students start with zero experience. Programs begin with fundamentals before moving into advanced technique.",
-	},
-	{
-		q: "Is the curriculum accredited?",
-		a: "Yes. Our programs follow the NTVQF curriculum standard and are recognised by our partner salons and barbershops for hiring.",
-	},
-	{
-		q: "What's included in the kit fee?",
-		a: "Barbering students receive clippers, shears, and a straight razor. Beauty students receive a professional makeup and styling kit. Both are yours to keep.",
-	},
-	{
-		q: "Can I combine barbering and beauty training?",
-		a: "Yes. Students can enroll in programs from both tracks; many graduates complete a barbering program and a styling or makeup program back to back.",
-	},
-	{
-		q: "Do you help graduates find work?",
-		a: "Yes. We introduce students to our 60+ partner salons and barbershops before graduation, and 97% of graduates are placed within three months.",
-	},
-];
+function faqJsonLd(faqs: FaqView[]) {
+	return {
+		"@context": "https://schema.org",
+		"@type": "FAQPage",
+		mainEntity: faqs.map((f) => ({
+			"@type": "Question",
+			name: f.question,
+			acceptedAnswer: { "@type": "Answer", text: f.answer },
+		})),
+	};
+}
 
-const FAQ_JSON_LD = {
-	"@context": "https://schema.org",
-	"@type": "FAQPage",
-	mainEntity: FAQS.map((f) => ({
-		"@type": "Question",
-		name: f.q,
-		acceptedAnswer: { "@type": "Answer", text: f.a },
-	})),
-};
-
-export default function Faq() {
+export default function Faq({ items }: { items: FaqView[] }) {
 	return (
 		<section
 			className="section-light border-t border-border bg-background px-4 py-24 lg:px-10"
 			aria-labelledby="faq-heading"
 		>
-			<JsonLdScript data={FAQ_JSON_LD} />
+			<JsonLdScript data={faqJsonLd(items)} />
 			<div className="mx-auto max-w-3xl">
 				<SectionEyebrow title="Frequently Asked" id="faq-heading" />
 
 				<Accordion className="mt-10">
-					{FAQS.map((item, i) => (
-						<Reveal key={item.q} delay={i * 0.05}>
+					{items.map((item, i) => (
+						<Reveal key={item.question} delay={i * 0.05}>
 							<AccordionItem
 								value={`item-${i}`}
 								className="border-border py-1 first:border-t"
 							>
 								<AccordionTrigger className="py-4 text-base font-medium text-foreground hover:no-underline [&>svg]:text-primary">
-									{item.q}
+									{item.question}
 								</AccordionTrigger>
 								<AccordionContent className="text-sm leading-relaxed text-muted-foreground">
-									{item.a}
+									{item.answer}
 								</AccordionContent>
 							</AccordionItem>
 						</Reveal>

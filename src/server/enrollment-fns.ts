@@ -21,15 +21,21 @@ import {
 	parseCohort,
 	parseFeeStatus,
 } from "@/lib/enrollment";
+import { logAdminAction } from "@/server/audit-log";
 import {
+	deleteFeePayment,
 	getApplicationDetail,
 	listApplicationStatusLog,
 	listApplicationsAdmin,
 	listIntakesAdmin,
 	listMyApplications,
 	listOpenIntakes,
+	recordFeePayment,
 } from "@/server/enrollment-db";
-import { parseProgramPatch } from "@/server/enrollment-validate";
+import {
+	parseFeePaymentPayload,
+	parseProgramPatch,
+} from "@/server/enrollment-validate";
 import {
 	clampId,
 	clampPage,
@@ -134,10 +140,82 @@ export const listProgramsAdminFn = createServerFn({ method: "GET" }).handler(
 export const updateProgramFn = createServerFn({ method: "POST" })
 	.validator((input: { slug: string; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const parsed = parseProgramPatch(data.patch);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => updateProgram(data.slug, parsed.value));
 		if (!result.ok) throw new Error("Program not found");
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "program.update",
+			targetType: "program",
+			targetId: data.slug,
+			summary: `Updated program ${data.slug}: ${Object.keys(parsed.value).join(", ")}`,
+			metadata: { patch: parsed.value },
+		});
+		return { ok: true };
+	});
+
+export const recordFeePaymentFn = createServerFn({ method: "POST" })
+	.validator(
+		(input: { applicationId: number; payment: Record<string, unknown> }) =>
+			input,
+	)
+	.handler(async ({ data }): Promise<{ id: number }> => {
+		const session = await requireAdminSession();
+		const applicationId = clampId(data.applicationId);
+		if (!applicationId) throw new Error("Invalid application id");
+		const parsed = parseFeePaymentPayload(data.payment);
+		if (!parsed.ok) throw new Error(parsed.message);
+		const result = await runSafe(() =>
+			recordFeePayment({
+				applicationId,
+				amountPoisha: parsed.value.amountPoisha,
+				method: parsed.value.method,
+				receiptRef: parsed.value.receiptRef,
+				receivedBy: Number(session.user.id),
+				paidAt: parsed.value.paidAt,
+			}),
+		);
+		if (!result.ok) {
+			throw new Error(
+				result.reason === "not-found"
+					? "Application not found"
+					: "Invalid payment",
+			);
+		}
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "application.fee",
+			targetType: "application",
+			targetId: applicationId,
+			summary: `Recorded ৳${(parsed.value.amountPoisha / 100).toLocaleString("en-US")} (${parsed.value.method}) for application #${applicationId}`,
+			metadata: {
+				amountPoisha: parsed.value.amountPoisha,
+				method: parsed.value.method,
+			},
+		});
+		return { id: result.id ?? 0 };
+	});
+
+export const deleteFeePaymentFn = createServerFn({ method: "POST" })
+	.validator((input: { applicationId: number; paymentId: number }) => input)
+	.handler(async ({ data }): Promise<{ ok: true }> => {
+		const session = await requireAdminSession();
+		const applicationId = clampId(data.applicationId);
+		const paymentId = clampId(data.paymentId);
+		if (!applicationId || !paymentId) throw new Error("Invalid id");
+		const deleted = await runSafe(() =>
+			deleteFeePayment(applicationId, paymentId),
+		);
+		if (!deleted) throw new Error("Payment not found");
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "application.fee",
+			targetType: "application",
+			targetId: applicationId,
+			summary: `Voided payment #${paymentId} on application #${applicationId}`,
+			metadata: { voidedPaymentId: paymentId },
+		});
 		return { ok: true };
 	});

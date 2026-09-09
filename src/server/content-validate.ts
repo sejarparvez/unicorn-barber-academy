@@ -1,6 +1,6 @@
 // src/server/content-validate.ts
 // Manual payload validation for content-collection endpoints (house style).
-import { parseGalleryCategory } from "@/lib/content";
+import { parseFaqPlacement, parseGalleryCategory } from "@/lib/content";
 import type { ValidationResult } from "./validate-utils";
 import { str } from "./validate-utils";
 
@@ -168,6 +168,36 @@ export function parseTestimonialPayload(body: unknown): ValidationResult<{
 			imageUrl,
 			imageAlt: str(b.imageAlt).slice(0, 300) || null,
 			rating,
+			sortOrder: Number.isInteger(Number(b.sortOrder))
+				? Number(b.sortOrder)
+				: 0,
+		},
+	};
+}
+
+export function parseFaqPayload(body: unknown): ValidationResult<{
+	placement: "home" | "contact";
+	question: string;
+	answer: string;
+	sortOrder: number;
+}> {
+	if (typeof body !== "object" || body === null) {
+		return { ok: false, message: "Invalid request body" };
+	}
+	const b = body as Record<string, unknown>;
+	const placement = parseFaqPlacement(b.placement);
+	if (!placement)
+		return { ok: false, message: "Placement must be home or contact" };
+	const question = str(b.question).slice(0, 300);
+	if (!question) return { ok: false, message: "Question is required" };
+	const answer = str(b.answer).slice(0, 2000);
+	if (!answer) return { ok: false, message: "Answer is required" };
+	return {
+		ok: true,
+		value: {
+			placement,
+			question,
+			answer,
 			sortOrder: Number.isInteger(Number(b.sortOrder))
 				? Number(b.sortOrder)
 				: 0,

@@ -1,7 +1,7 @@
 // src/server/enrollment-validate.ts
 // Manual payload validation for enrollment endpoints — house style (no schema
 // library), mirrors blog-validate.ts. Returns normalized values.
-import type { Cohort } from "@/lib/enrollment";
+import { type Cohort, parseFeeMethod } from "@/lib/enrollment";
 import { isProgramLive } from "@/server/program-db";
 import type { ValidationResult } from "./validate-utils";
 import { str } from "./validate-utils";
@@ -116,6 +116,42 @@ export async function parseIntakePayload(body: unknown): Promise<
 	return {
 		ok: true,
 		value: { programSlug, cohort, startsOn, seatsTotal },
+	};
+}
+
+/** Offline payment in whole taka (converted to poisha by the caller). */
+export function parseFeePaymentPayload(body: unknown): ValidationResult<{
+	amountPoisha: number;
+	method: string;
+	receiptRef: string | null;
+	paidAt: string | null;
+}> {
+	if (typeof body !== "object" || body === null) {
+		return { ok: false, message: "Invalid request body" };
+	}
+	const b = body as Record<string, unknown>;
+	const taka = Number.parseInt(String(b.amountTaka ?? ""), 10);
+	if (!Number.isInteger(taka) || taka < 1 || taka > 1_000_000) {
+		return { ok: false, message: "Amount must be ৳1–৳1,000,000" };
+	}
+	const method = parseFeeMethod(str(b.method));
+	if (!method)
+		return { ok: false, message: "Method must be bKash, cash, or bank" };
+	const receiptRef = str(b.receiptRef).slice(0, 120) || null;
+	let paidAt: string | null = null;
+	const rawDate = str(b.paidAt);
+	if (rawDate) {
+		if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+			return { ok: false, message: "Date must be yyyy-mm-dd" };
+		}
+		if (new Date(`${rawDate}T00:00:00Z`) > new Date()) {
+			return { ok: false, message: "Payment date cannot be in the future" };
+		}
+		paidAt = rawDate;
+	}
+	return {
+		ok: true,
+		value: { amountPoisha: taka * 100, method, receiptRef, paidAt },
 	};
 }
 

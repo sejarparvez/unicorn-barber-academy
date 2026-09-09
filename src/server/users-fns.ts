@@ -2,7 +2,9 @@
 // Admin-only server functions for user management. Every handler guards
 // the session in-handler (server fns are public RPC endpoints).
 import { createServerFn } from "@tanstack/react-start";
+import { ROLE_LABELS } from "@/lib/roles";
 import type { ListUsersResult } from "@/lib/users";
+import { logAdminAction } from "@/server/audit-log";
 import { runSafe } from "@/server/fn-utils";
 import { requireAdminSession } from "@/server/guards";
 import { listUsersAdmin, setUserBan, setUserRole } from "@/server/users-db";
@@ -38,6 +40,14 @@ export const setUserRoleFn = createServerFn({ method: "POST" })
 			setUserRole(parsed.value.targetId, parsed.value.role, callerId),
 		);
 		if (!result.ok) throw new Error(ROLE_MESSAGES[result.reason]);
+		await logAdminAction({
+			actorId: callerId,
+			action: "user.role",
+			targetType: "user",
+			targetId: parsed.value.targetId,
+			summary: `Changed ${result.email} from ${ROLE_LABELS[result.oldRole]} to ${ROLE_LABELS[parsed.value.role]}`,
+			metadata: { from: result.oldRole, to: parsed.value.role },
+		});
 		return { ok: true };
 	});
 
@@ -66,5 +76,17 @@ export const setUserBanFn = createServerFn({ method: "POST" })
 						: "User not found",
 			);
 		}
+		await logAdminAction({
+			actorId: callerId,
+			action: parsed.value.banned ? "user.ban" : "user.unban",
+			targetType: "user",
+			targetId: parsed.value.targetId,
+			summary: parsed.value.banned
+				? `Banned ${result.email} — ${parsed.value.banReason}`
+				: `Unbanned ${result.email}`,
+			metadata: parsed.value.banned
+				? { reason: parsed.value.banReason, days: parsed.value.banExpiresDays }
+				: {},
+		});
 		return { ok: true };
 	});

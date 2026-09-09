@@ -21,7 +21,6 @@ import { Separator } from "@/components/ui/separator";
 import { OPENING_HOURS_SPEC, SITE_URL } from "@/data/site";
 import type { ResolvedSettings } from "@/lib/settings";
 import { useSite } from "@/lib/site-context";
-import { SOCIAL_URLS } from "@/lib/social";
 
 type FooterLink = { label: string; to: string };
 
@@ -110,12 +109,12 @@ function localBusinessJsonLd(site: ResolvedSettings) {
 			},
 		],
 		sameAs: [
-			SOCIAL_URLS.instagram,
-			SOCIAL_URLS.facebook,
-			SOCIAL_URLS.youtube,
-			SOCIAL_URLS.tiktok,
-			SOCIAL_URLS.x,
-		],
+			site.social.instagram,
+			site.social.facebook,
+			site.social.youtube,
+			site.social.tiktok,
+			site.social.x,
+		].filter(Boolean),
 		hasOfferCatalog: {
 			"@type": "OfferCatalog",
 			name: "Barbering & Beauty Programs",
@@ -224,21 +223,31 @@ export default function Footer() {
 						</div>
 
 						<div className="mt-6 flex items-center gap-4">
-							<SocialIcon href={SOCIAL_URLS.instagram} label="Instagram">
-								<IconBrandInstagram className="h-4 w-4" stroke={1.75} />
-							</SocialIcon>
-							<SocialIcon href={SOCIAL_URLS.facebook} label="Facebook">
-								<IconBrandFacebook className="h-4 w-4" stroke={1.75} />
-							</SocialIcon>
-							<SocialIcon href={SOCIAL_URLS.youtube} label="YouTube">
-								<IconBrandYoutube className="h-4 w-4" stroke={1.75} />
-							</SocialIcon>
-							<SocialIcon href={SOCIAL_URLS.tiktok} label="TikTok">
-								<IconBrandTiktok className="h-4 w-4" stroke={1.75} />
-							</SocialIcon>
-							<SocialIcon href={SOCIAL_URLS.x} label="X (Twitter)">
-								<IconBrandX className="h-4 w-4" stroke={1.75} />
-							</SocialIcon>
+							{site.social.instagram ? (
+								<SocialIcon href={site.social.instagram} label="Instagram">
+									<IconBrandInstagram className="h-4 w-4" stroke={1.75} />
+								</SocialIcon>
+							) : null}
+							{site.social.facebook ? (
+								<SocialIcon href={site.social.facebook} label="Facebook">
+									<IconBrandFacebook className="h-4 w-4" stroke={1.75} />
+								</SocialIcon>
+							) : null}
+							{site.social.youtube ? (
+								<SocialIcon href={site.social.youtube} label="YouTube">
+									<IconBrandYoutube className="h-4 w-4" stroke={1.75} />
+								</SocialIcon>
+							) : null}
+							{site.social.tiktok ? (
+								<SocialIcon href={site.social.tiktok} label="TikTok">
+									<IconBrandTiktok className="h-4 w-4" stroke={1.75} />
+								</SocialIcon>
+							) : null}
+							{site.social.x ? (
+								<SocialIcon href={site.social.x} label="X (Twitter)">
+									<IconBrandX className="h-4 w-4" stroke={1.75} />
+								</SocialIcon>
+							) : null}
 						</div>
 					</div>
 

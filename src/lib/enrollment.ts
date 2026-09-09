@@ -41,6 +41,32 @@ export const SEAT_HOLDING_STATUSES: readonly ApplicationStatus[] = [
 export type FeeStatus = "unpaid" | "paid";
 export const FEE_STATUSES = ["unpaid", "paid"] as const;
 
+export const FEE_METHODS = ["bkash", "cash", "bank"] as const;
+export type FeeMethod = (typeof FEE_METHODS)[number];
+
+export function parseFeeMethod(value: unknown): FeeMethod | undefined {
+	return typeof value === "string" &&
+		(FEE_METHODS as readonly string[]).includes(value)
+		? (value as FeeMethod)
+		: undefined;
+}
+
+export const FEE_METHOD_LABELS: Record<FeeMethod, string> = {
+	bkash: "bKash",
+	cash: "Cash",
+	bank: "Bank transfer",
+};
+
+/** One offline payment row against an application. */
+export type FeePaymentRow = {
+	id: number;
+	amountPoisha: number;
+	method: FeeMethod;
+	receiptRef: string | null;
+	receivedByName: string | null;
+	paidAt: string;
+};
+
 export type Cohort = "day" | "evening";
 export const COHORTS = ["day", "evening"] as const;
 
@@ -118,6 +144,9 @@ export type ApplicationDetail = ApplicationSummary & {
 	seatsTotal: number;
 	seatsOccupied: number;
 	updatedAt: string;
+	programFeePoisha: number;
+	feePaidPoisha: number;
+	payments: FeePaymentRow[];
 };
 
 export type IntakeAdmin = {
@@ -156,7 +185,7 @@ export type ProgramAdmin = {
 	seatsTotal: number;
 	seatsFilled: number;
 	pendingCount: number;
-	paidCount: number;
+	collectedPoisha: number;
 };
 
 /** 4500000 → "৳45,000". Fees are stored as integer poisha (1 BDT = 100). */

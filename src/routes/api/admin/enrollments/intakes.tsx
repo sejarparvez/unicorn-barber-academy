@@ -3,6 +3,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
+import { logAdminAction } from "@/server/audit-log";
 import { createIntake } from "@/server/enrollment-db";
 import { parseIntakePayload } from "@/server/enrollment-validate";
 
@@ -41,6 +42,14 @@ export const Route = createFileRoute("/api/admin/enrollments/intakes")({
 						{ status: result.reason === "exists" ? 409 : 400 },
 					);
 				}
+				await logAdminAction({
+					actorId: guard.userId,
+					action: "intake.create",
+					targetType: "intake",
+					targetId: `${parsed.value.programSlug}/${parsed.value.cohort}/${parsed.value.startsOn}`,
+					summary: `Created intake: ${parsed.value.programSlug} ${parsed.value.cohort} starting ${parsed.value.startsOn} (${parsed.value.seatsTotal} seats)`,
+					metadata: { ...parsed.value },
+				});
 				return json({ ok: true }, { status: 201 });
 			},
 		},

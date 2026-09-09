@@ -4,6 +4,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
+import { logAdminAction } from "@/server/audit-log";
 import { issueCertificateForApplication } from "@/server/certificate-db";
 import { getApplicationDetail } from "@/server/enrollment-db";
 import { certificateIssuedEmail, sendMail } from "@/server/mail";
@@ -72,6 +73,14 @@ export const Route = createFileRoute("/api/admin/certificates")({
 					} catch (emailError) {
 						console.error("[certificates] issuance email failed:", emailError);
 					}
+					await logAdminAction({
+						actorId: guard.userId,
+						action: "certificate.issue",
+						targetType: "application",
+						targetId: applicationId,
+						summary: `Issued certificate ${result.code} for application #${applicationId}`,
+						metadata: { code: result.code },
+					});
 					return json({ ok: true, code: result.code });
 				} catch (error) {
 					console.error("[certificates] issue failed:", error);

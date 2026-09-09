@@ -2,6 +2,7 @@
 // TanStack Query hooks for admin content collections (admin-only).
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
+	FaqAdmin,
 	GalleryAdmin,
 	InstructorAdmin,
 	TestimonialAdmin,
@@ -36,6 +37,17 @@ export function useTestimonialsAdmin() {
 		queryFn: async (): Promise<TestimonialAdmin[]> => {
 			const { listTestimonialsAdminFn } = await import("@/server/content-fns");
 			return listTestimonialsAdminFn();
+		},
+		staleTime: 30_000,
+	});
+}
+
+export function useFaqsAdmin(placement?: "home" | "contact") {
+	return useQuery({
+		queryKey: [...queryKeys.content(), "faqs", placement ?? "all"] as const,
+		queryFn: async (): Promise<FaqAdmin[]> => {
+			const { listFaqsAdminFn } = await import("@/server/content-fns");
+			return listFaqsAdminFn({ data: placement ? { placement } : {} });
 		},
 		staleTime: 30_000,
 	});
@@ -93,3 +105,10 @@ export const useUpdateTestimonial = contentMutation<{
 export const useDeleteTestimonial = contentMutation<{ id: number }>(
 	"deleteTestimonialFn",
 );
+export const useCreateFaq =
+	contentMutation<Record<string, unknown>>("createFaqFn");
+export const useUpdateFaq = contentMutation<{
+	id: number;
+	patch: Record<string, unknown>;
+}>("updateFaqFn");
+export const useDeleteFaq = contentMutation<{ id: number }>("deleteFaqFn");

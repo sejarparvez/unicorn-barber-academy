@@ -3,37 +3,10 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Reveal } from "@/components/effects";
-import { pic } from "@/data/images";
+import type { GalleryView } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
-const GALLERY_ITEMS = [
-	{
-		seed: "unicorn-gallery-1",
-		alt: "Barbering students practicing fades on mannequin heads",
-	},
-	{
-		seed: "unicorn-gallery-2",
-		alt: "Close-up of a professional makeup kit laid out for class",
-	},
-	{
-		seed: "unicorn-gallery-3",
-		alt: "Instructor demonstrating a straight-razor technique",
-	},
-	{
-		seed: "unicorn-gallery-4",
-		alt: "Beauty student styling hair during a practical session",
-	},
-	{
-		seed: "unicorn-gallery-5",
-		alt: "Graduating cohort posing together at the academy",
-	},
-	{
-		seed: "unicorn-gallery-6",
-		alt: "Row of barber chairs and styling stations in the training studio",
-	},
-];
-
-export default function StudentLife() {
+export default function StudentLife({ items }: { items: GalleryView[] }) {
 	return (
 		<section
 			className="border-t border-primary/15  px-4 py-24  lg:px-10"
@@ -69,9 +42,9 @@ export default function StudentLife() {
 				</div>
 
 				<div className="mt-14 grid grid-cols-2 gap-3 lg:grid-cols-6">
-					{GALLERY_ITEMS.map((item, i) => (
+					{items.slice(0, 6).map((item, i) => (
 						<Reveal
-							key={item.seed}
+							key={item.id}
 							delay={(i % 6) * 0.05}
 							className={cn(
 								i === 0 || i === 3 ? "col-span-2 row-span-2" : "col-span-1",
@@ -79,7 +52,7 @@ export default function StudentLife() {
 						>
 							<div className="group relative h-full overflow-hidden">
 								<img
-									src={pic(item.seed, 700, 700)}
+									src={item.image}
 									alt={item.alt}
 									loading="lazy"
 									className="h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-110"

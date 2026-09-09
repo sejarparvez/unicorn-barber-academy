@@ -32,6 +32,8 @@ model User {
   enrollmentApplications                      EnrollmentApplication[] @relation(name: "enrollment_application_decided_by_fkey")
   enrollmentApplicationsEnrollmentApplication EnrollmentApplication[] @relation(name: "enrollment_application_user_id_fkey")
   statusLogActions                              ApplicationStatusLog[]
+  auditLogs                                     AdminAuditLog[]
+  receivedPayments                              FeePayment[] @relation(name: "fee_payment_received_by_fkey")
 
   @@map("user")
 }
@@ -89,6 +91,7 @@ model BlogPost {
   categoryId          Int?               @map("category_id")
   authorId            Int?               @map("author_id")
   readingMinutes      Int                @default(1) @map("reading_minutes")
+  viewCount           Int                @default(0) @map("view_count")
   publishedAt         Timestamptz?       @map("published_at")
   createdAt           Timestamptz        @default(now()) @map("created_at")
   updatedAt           Timestamptz        @default(now()) @map("updated_at")
@@ -147,6 +150,7 @@ model EnrollmentApplication {
   updatedAt      Timestamptz   @default(now()) @map("updated_at")
   certificate    Certificate?
   statusLogs     ApplicationStatusLog[]
+  payments       FeePayment[]
   user           User?         @relation(name: "enrollment_application_decided_by_fkey", fields: [decidedBy], references: [id], onDelete: SetNull, map: "enrollment_application_decided_by_fkey", index: false)
   intake         ProgramIntake @relation(fields: [intakeId], references: [id], onDelete: Restrict, map: "enrollment_application_intake_id_fkey")
   userUser       User          @relation(name: "enrollment_application_user_id_fkey", fields: [userId], references: [id], onDelete: Restrict, map: "enrollment_application_user_id_fkey")
@@ -289,6 +293,7 @@ model GalleryItem {
   caption     String?
   sortOrder   Int       @default(0) @map("sort_order")
   isPublished Boolean   @default(true) @map("is_published")
+  isFeatured  Boolean   @default(false) @map("is_featured")
   createdAt   Timestamptz @default(now()) @map("created_at")
 
   @@index([category, isPublished, sortOrder])
@@ -313,6 +318,93 @@ model Testimonial {
 
   @@index([isPublished, sortOrder])
   @@map("testimonial")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin audit log (Phase 3). Append-only trail of privileged mutations: who
+// did what to which record, with a human summary plus old/new metadata.
+// Writes never block the underlying mutation (helper catches internally).
+// No retention pruning — volume is tiny. Viewer is admin-only.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AdminAuditLog {
+  id         Int       @id @default(autoincrement())
+  actorId    Int       @map("actor_id")
+  actor      User      @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  action     VarChar(48)
+  targetType VarChar(48) @map("target_type")
+  targetId   VarChar(80) @map("target_id")
+  summary    String
+  metadata   Jsonb     @default(dbgenerated("'{}'::jsonb"))
+  createdAt  Timestamptz @default(now()) @map("created_at")
+
+  @@index([createdAt], map: "idx_audit_log_created")
+  @@index([actorId, createdAt], map: "idx_audit_log_actor")
+  @@map("admin_audit_log")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Contact inbox. Every website inquiry is stored here IN ADDITION to the
+// notification email, so a missed email never loses a lead. Admin triages
+// read/unread + replied + spam-delete from the dashboard Inbox page.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ContactInquiry {
+  id        Int       @id @default(autoincrement())
+  name      VarChar(160)
+  email     VarChar(200)
+  phone     VarChar(40)?
+  subject   VarChar(24)  @default("other")
+  program   VarChar(200)?
+  message   String
+  isRead    Boolean   @default(false) @map("is_read")
+  isReplied Boolean   @default(false) @map("is_replied")
+  createdAt Timestamptz @default(now()) @map("created_at")
+
+  @@index([isRead, createdAt], map: "idx_inquiry_unread")
+  @@map("contact_inquiry")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FAQs (home + contact placements). One table feeds both FAQ sections and
+// their FAQPage JSON-LD blocks, so answers stay consistent everywhere.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model FaqItem {
+  id          Int       @id @default(autoincrement())
+  placement   VarChar(16)
+  question    String
+  answer      String
+  sortOrder   Int       @default(0) @map("sort_order")
+  isPublished Boolean   @default(true) @map("is_published")
+  createdAt   Timestamptz @default(now()) @map("created_at")
+
+  @@index([placement, isPublished, sortOrder], map: "idx_faq_placement")
+  @@map("faq_item")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fee ledger. Every offline payment (bKash/cash/bank) is a row: amount in
+// poisha, method, optional receipt reference, receiving admin, timestamp.
+// enrollment_application.fee_status is DERIVED (see recomputeFeeStatus):
+// paid in full when Σ payments ≥ the intake program's fee. Supports
+// partials and discounts; deleting a payment re-derives the flag.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model FeePayment {
+  id            Int       @id @default(autoincrement())
+  applicationId Int       @map("application_id")
+  application   EnrollmentApplication @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  amountPoisha  Int       @map("amount_poisha")
+  method        VarChar(16)
+  receiptRef    VarChar(120)?  @map("receipt_ref")
+  receivedBy    Int?      @map("received_by")
+  receiver      User?     @relation(name: "fee_payment_received_by_fkey", fields: [receivedBy], references: [id], onDelete: SetNull)
+  paidAt        Timestamptz  @default(now()) @map("paid_at")
+  createdAt     Timestamptz @default(now()) @map("created_at")
+
+  @@index([applicationId, paidAt], map: "idx_fee_payment_application")
+  @@map("fee_payment")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

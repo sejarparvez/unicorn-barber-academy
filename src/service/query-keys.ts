@@ -34,6 +34,10 @@ export const queryKeys = {
 	}) => ["users", filters ?? {}] as const,
 	siteSettings: () => ["site-settings"] as const,
 	content: () => ["content"] as const,
+	auditLog: (filters?: { actorId?: number; action?: string; page?: number }) =>
+		["audit-log", filters ?? {}] as const,
+	inquiries: (filters?: { unreadOnly?: boolean; page?: number }) =>
+		["inquiries", filters ?? {}] as const,
 	myApplications: () => ["my-applications"] as const,
 	openIntakes: () => ["open-intakes"] as const,
 
@@ -52,6 +56,7 @@ export const queryKeys = {
 		search?: string;
 		category?: number;
 		page?: number;
+		sortByViews?: boolean;
 	}) => ["admin-posts", filters ?? {}] as const,
 	adminPost: (id: number) => ["admin-posts", "detail", id] as const,
 	blogCategories: () => ["blog-categories"] as const,

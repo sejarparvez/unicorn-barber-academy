@@ -10,7 +10,6 @@ import {
 } from "@tanstack/react-query";
 import {
 	bulkSetStatus,
-	setApplicationFee,
 	setApplicationStatus,
 } from "@/lib/api/enrollment-admin";
 import type {
@@ -182,56 +181,29 @@ export function useSetApplicationStatus(id: number) {
 	});
 }
 
-export function useSetApplicationFee(id: number) {
+export function useRecordFeePayment(id: number) {
 	const { invalidateApplication } = useInvalidateEnrollment();
-	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async (paid: boolean) => setApplicationFee(id, paid),
-		onMutate: async (paid) => {
-			await queryClient.cancelQueries({
-				queryKey: queryKeys.application(id),
-			});
-			await queryClient.cancelQueries({ queryKey: queryKeys.applications() });
-			const prevDetail = queryClient.getQueryData(queryKeys.application(id));
-			const prevLists = queryClient.getQueriesData({
-				queryKey: queryKeys.applications(),
-			});
-			const newFeeStatus = paid ? "paid" : "unpaid";
-			queryClient.setQueryData(
-				queryKeys.application(id),
-				(old: { application: ApplicationDetail } | undefined) => {
-					if (!old) return old;
-					return {
-						...old,
-						application: { ...old.application, feeStatus: newFeeStatus },
-					};
-				},
-			);
-			queryClient.setQueriesData(
-				{ queryKey: queryKeys.applications() },
-				(old: ListPage | undefined) => {
-					if (!old) return old;
-					return {
-						...old,
-						items: old.items.map((item) =>
-							item.id === id ? { ...item, feeStatus: newFeeStatus } : item,
-						),
-					};
-				},
-			);
-			return { prevDetail, prevLists };
+		mutationFn: async (input: {
+			amountTaka: number;
+			method: string;
+			receipt?: string | null;
+		}) => {
+			const { recordFeePayment } = await import("@/lib/api/enrollment-admin");
+			await recordFeePayment(id, input);
 		},
-		onError: (_err, _paid, context) => {
-			if (context?.prevDetail) {
-				queryClient.setQueryData(queryKeys.application(id), context.prevDetail);
-			}
-			if (context?.prevLists) {
-				for (const [key, data] of context.prevLists) {
-					queryClient.setQueryData(key, data);
-				}
-			}
+		onSuccess: () => invalidateApplication(id),
+	});
+}
+
+export function useVoidFeePayment(id: number) {
+	const { invalidateApplication } = useInvalidateEnrollment();
+	return useMutation({
+		mutationFn: async (paymentId: number) => {
+			const { voidFeePayment } = await import("@/lib/api/enrollment-admin");
+			await voidFeePayment(id, paymentId);
 		},
-		onSettled: () => invalidateApplication(id),
+		onSuccess: () => invalidateApplication(id),
 	});
 }
 

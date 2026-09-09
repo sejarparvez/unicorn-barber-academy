@@ -4,6 +4,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
+import { logAdminAction } from "@/server/audit-log";
 import { setCertificateRevocation } from "@/server/certificate-db";
 
 type Params = { id: string };
@@ -47,6 +48,16 @@ export const Route = createFileRoute("/api/admin/certificates/$id")({
 				if (!updated) {
 					return json({ message: "Certificate not found" }, { status: 404 });
 				}
+				await logAdminAction({
+					actorId: guard.userId,
+					action: "certificate.revoke",
+					targetType: "certificate",
+					targetId: id,
+					summary: body.revoked
+						? `Revoked certificate #${id}${reason ? ` — ${reason}` : ""}`
+						: `Restored certificate #${id}`,
+					metadata: { revoked: body.revoked, reason },
+				});
 				return json({ ok: true });
 			},
 		},

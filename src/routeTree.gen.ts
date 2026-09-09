@@ -34,8 +34,11 @@ import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardActivityRouteImport } from './routes/dashboard/activity'
 import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
+import { Route as DashboardFaqsRouteImport } from './routes/dashboard/faqs'
 import { Route as DashboardGalleryRouteImport } from './routes/dashboard/gallery'
+import { Route as DashboardInboxRouteImport } from './routes/dashboard/inbox'
 import { Route as DashboardInstructorsRouteImport } from './routes/dashboard/instructors'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardSiteRouteImport } from './routes/dashboard/site'
@@ -195,14 +198,29 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardActivityRoute = DashboardActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardAdminRoute = DashboardAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardFaqsRoute = DashboardFaqsRouteImport.update({
+  id: '/faqs',
+  path: '/faqs',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardGalleryRoute = DashboardGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInboxRoute = DashboardInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardInstructorsRoute = DashboardInstructorsRouteImport.update({
@@ -401,8 +419,11 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/gallery': typeof DashboardGalleryRoute
+  '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/instructors': typeof DashboardInstructorsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/site': typeof DashboardSiteRoute
@@ -462,8 +483,11 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/gallery': typeof DashboardGalleryRoute
+  '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/instructors': typeof DashboardInstructorsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/site': typeof DashboardSiteRoute
@@ -525,8 +549,11 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/gallery': typeof DashboardGalleryRoute
+  '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/instructors': typeof DashboardInstructorsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/site': typeof DashboardSiteRoute
@@ -589,8 +616,11 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/verify-email'
     | '/blog/$slug'
+    | '/dashboard/activity'
     | '/dashboard/admin'
+    | '/dashboard/faqs'
     | '/dashboard/gallery'
+    | '/dashboard/inbox'
     | '/dashboard/instructors'
     | '/dashboard/settings'
     | '/dashboard/site'
@@ -650,8 +680,11 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/verify-email'
     | '/blog/$slug'
+    | '/dashboard/activity'
     | '/dashboard/admin'
+    | '/dashboard/faqs'
     | '/dashboard/gallery'
+    | '/dashboard/inbox'
     | '/dashboard/instructors'
     | '/dashboard/settings'
     | '/dashboard/site'
@@ -712,8 +745,11 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/verify-email'
     | '/blog/$slug'
+    | '/dashboard/activity'
     | '/dashboard/admin'
+    | '/dashboard/faqs'
     | '/dashboard/gallery'
+    | '/dashboard/inbox'
     | '/dashboard/instructors'
     | '/dashboard/settings'
     | '/dashboard/site'
@@ -969,6 +1005,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/activity': {
+      id: '/dashboard/activity'
+      path: '/activity'
+      fullPath: '/dashboard/activity'
+      preLoaderRoute: typeof DashboardActivityRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/admin': {
       id: '/dashboard/admin'
       path: '/admin'
@@ -976,11 +1019,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/faqs': {
+      id: '/dashboard/faqs'
+      path: '/faqs'
+      fullPath: '/dashboard/faqs'
+      preLoaderRoute: typeof DashboardFaqsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/gallery': {
       id: '/dashboard/gallery'
       path: '/gallery'
       fullPath: '/dashboard/gallery'
       preLoaderRoute: typeof DashboardGalleryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/inbox': {
+      id: '/dashboard/inbox'
+      path: '/inbox'
+      fullPath: '/dashboard/inbox'
+      preLoaderRoute: typeof DashboardInboxRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/instructors': {
@@ -1218,8 +1275,11 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteChildren {
+  DashboardActivityRoute: typeof DashboardActivityRoute
   DashboardAdminRoute: typeof DashboardAdminRoute
+  DashboardFaqsRoute: typeof DashboardFaqsRoute
   DashboardGalleryRoute: typeof DashboardGalleryRoute
+  DashboardInboxRoute: typeof DashboardInboxRoute
   DashboardInstructorsRoute: typeof DashboardInstructorsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardSiteRoute: typeof DashboardSiteRoute
@@ -1237,8 +1297,11 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardActivityRoute: DashboardActivityRoute,
   DashboardAdminRoute: DashboardAdminRoute,
+  DashboardFaqsRoute: DashboardFaqsRoute,
   DashboardGalleryRoute: DashboardGalleryRoute,
+  DashboardInboxRoute: DashboardInboxRoute,
   DashboardInstructorsRoute: DashboardInstructorsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSiteRoute: DashboardSiteRoute,
@@ -1357,3 +1420,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

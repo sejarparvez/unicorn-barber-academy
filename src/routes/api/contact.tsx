@@ -3,6 +3,7 @@ import { json } from "@tanstack/react-start";
 import { TOPIC_LABELS } from "@/data/contact";
 import { guardPublicEndpoint } from "@/server/api-guard";
 import { validateContactInput } from "@/server/contact-validate";
+import { saveInquiry } from "@/server/inquiry-db";
 import { contactInquiryEmail, sendMail } from "@/server/mail";
 import { clientIp } from "@/server/rate-limit";
 import { getSiteSettings } from "@/server/settings-db";
@@ -29,6 +30,16 @@ export const Route = createFileRoute("/api/contact")({
 
 					const inquiryId = `MSG-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 					const { contact } = await getSiteSettings();
+					// Durable inbox record first (never blocks the response), then
+					// the notification email — a missed email no longer loses leads.
+					await saveInquiry({
+						name: validated.name,
+						email: validated.email,
+						phone: validated.phone ?? null,
+						subject: validated.subject,
+						program: validated.program ?? null,
+						message: validated.message,
+					});
 					const sent = await sendMail({
 						to: contact.email,
 						replyTo: validated.email,

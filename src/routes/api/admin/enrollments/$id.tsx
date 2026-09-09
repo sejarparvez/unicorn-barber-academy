@@ -5,12 +5,14 @@
 // (non-fatal on failure) — see updateApplicationStatus for DB side effects.
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
-import { parseApplicationStatus } from "@/lib/enrollment";
+import { parseApplicationStatus, parseFeeMethod } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
 import { requireAdminApi } from "@/server/admin-api";
+import { logAdminAction } from "@/server/audit-log";
 import {
+	deleteFeePayment,
 	getApplicationDetail,
-	setApplicationFee,
+	recordFeePayment,
 	updateApplicationStatus,
 } from "@/server/enrollment-db";
 import {
@@ -45,43 +47,111 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 				const action = typeof body.action === "string" ? body.action : null;
 
 				if (action === "fee") {
-					const updated = await setApplicationFee(id, body.paid === true);
-					if (!updated) {
-						return json({ message: "Application not found" }, { status: 404 });
+					return json(
+						{ message: "Fee toggle retired — record payments instead" },
+						{ status: 410 },
+					);
+				}
+
+				if (action === "record-payment") {
+					const taka = Number.parseInt(String(body.amountTaka ?? ""), 10);
+					const method = parseFeeMethod(
+						typeof body.method === "string" ? body.method : "",
+					);
+					if (!Number.isInteger(taka) || taka < 1 || taka > 1_000_000) {
+						return json(
+							{ message: "Amount must be ৳1–৳1,000,000" },
+							{ status: 400 },
+						);
 					}
-					// Send payment confirmation email when marking as paid.
-					if (body.paid === true) {
-						try {
-							const detail = await getApplicationDetail(id);
-							if (detail) {
-								const app = detail.application;
-								await sendMail({
-									to: app.email,
-									subject: `Payment confirmed (${app.reference}) | Unicorn Barber Training Academy`,
-									html: feePaymentConfirmedEmail({
-										reference: app.reference,
-										fullName: app.fullName,
-										programTitle: app.programTitle,
-										cohortLabel:
-											app.cohort === "day" ? "Day cohort" : "Evening cohort",
-										startsOnDisplay: new Date(app.startsOn).toLocaleDateString(
-											"en-US",
-											{
-												year: "numeric",
-												month: "long",
-												day: "numeric",
-											},
-										),
-									}),
-								});
-							}
-						} catch (error) {
-							console.error(
-								"[enrollments] fee confirmation email failed:",
-								error,
-							);
+					if (!method) {
+						return json(
+							{ message: "Method must be bKash, cash, or bank" },
+							{ status: 400 },
+						);
+					}
+					const receipt =
+						typeof body.receipt === "string" && body.receipt.trim()
+							? body.receipt.trim().slice(0, 120)
+							: null;
+					const result = await recordFeePayment({
+						applicationId: id,
+						amountPoisha: taka * 100,
+						method,
+						receiptRef: receipt,
+						receivedBy: guard.userId,
+						paidAt: null,
+					});
+					if (!result.ok) {
+						return json(
+							{
+								message:
+									result.reason === "not-found"
+										? "Application not found"
+										: "Invalid payment",
+							},
+							{ status: result.reason === "not-found" ? 404 : 400 },
+						);
+					}
+					await logAdminAction({
+						actorId: guard.userId,
+						action: "application.fee",
+						targetType: "application",
+						targetId: id,
+						summary: `Recorded ৳${taka.toLocaleString("en-US")} (${method}) for application #${id}`,
+						metadata: { amountPoisha: taka * 100, method },
+					});
+					// Payment confirmation email when the ledger flips paid in full.
+					try {
+						const detail = await getApplicationDetail(id);
+						if (detail && detail.application.feeStatus === "paid") {
+							const app = detail.application;
+							await sendMail({
+								to: app.email,
+								subject: `Payment confirmed (${app.reference}) | Unicorn Barber Training Academy`,
+								html: feePaymentConfirmedEmail({
+									reference: app.reference,
+									fullName: app.fullName,
+									programTitle: app.programTitle,
+									cohortLabel:
+										app.cohort === "day" ? "Day cohort" : "Evening cohort",
+									startsOnDisplay: new Date(app.startsOn).toLocaleDateString(
+										"en-US",
+										{
+											year: "numeric",
+											month: "long",
+											day: "numeric",
+										},
+									),
+								}),
+							});
 						}
+					} catch (error) {
+						console.error(
+							"[enrollments] fee confirmation email failed:",
+							error,
+						);
 					}
+					return json({ ok: true });
+				}
+
+				if (action === "void-payment") {
+					const paymentId = Number.parseInt(String(body.paymentId ?? ""), 10);
+					if (!Number.isInteger(paymentId) || paymentId < 1) {
+						return json({ message: "Invalid payment id" }, { status: 400 });
+					}
+					const deleted = await deleteFeePayment(id, paymentId);
+					if (!deleted) {
+						return json({ message: "Payment not found" }, { status: 404 });
+					}
+					await logAdminAction({
+						actorId: guard.userId,
+						action: "application.fee",
+						targetType: "application",
+						targetId: id,
+						summary: `Voided payment #${paymentId} on application #${id}`,
+						metadata: { voidedPaymentId: paymentId },
+					});
 					return json({ ok: true });
 				}
 
@@ -153,6 +223,14 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 						}
 					}
 
+					await logAdminAction({
+						actorId: guard.userId,
+						action: "application.status",
+						targetType: "application",
+						targetId: id,
+						summary: `Set application #${id} status to ${status}${result.userRoleUpgraded ? " (role upgraded to student)" : ""}`,
+						metadata: { status, userRoleUpgraded: result.userRoleUpgraded },
+					});
 					return json({
 						ok: true,
 						userRoleUpgraded: result.userRoleUpgraded,

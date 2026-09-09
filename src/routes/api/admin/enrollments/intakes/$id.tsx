@@ -4,6 +4,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
+import { logAdminAction } from "@/server/audit-log";
 import { deleteIntake, updateIntake } from "@/server/enrollment-db";
 import { isValidFutureStartDate } from "@/server/enrollment-validate";
 
@@ -78,6 +79,14 @@ export const Route = createFileRoute("/api/admin/enrollments/intakes/$id")({
 						{ status: result.reason === "not-found" ? 404 : 400 },
 					);
 				}
+				await logAdminAction({
+					actorId: guard.userId,
+					action: "intake.update",
+					targetType: "intake",
+					targetId: id,
+					summary: `Updated intake #${id}: ${Object.keys(patch).join(", ")}`,
+					metadata: { patch },
+				});
 				return json({ ok: true });
 			},
 			DELETE: async ({ request, params }) => {
@@ -97,6 +106,14 @@ export const Route = createFileRoute("/api/admin/enrollments/intakes/$id")({
 						{ status: result.reason === "not-found" ? 404 : 409 },
 					);
 				}
+				await logAdminAction({
+					actorId: guard.userId,
+					action: "intake.delete",
+					targetType: "intake",
+					targetId: id,
+					summary: `Deleted intake #${id}`,
+					metadata: {},
+				});
 				return json({ ok: true });
 			},
 		},

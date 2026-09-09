@@ -10,14 +10,8 @@ import {
 	useTransform,
 } from "motion/react";
 import { useEffect, useRef } from "react";
+import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
-
-const STATS = [
-	{ value: 1200, suffix: "+", label: "Graduates Placed" },
-	{ value: 97, suffix: "%", label: "Job Placement Rate" },
-	{ value: 12, suffix: "", label: "Years Training Barbers & Beauticians" },
-	{ value: 60, suffix: "+", label: "Partner Salons & Barbershops" },
-];
 
 const SPRING: Transition = { duration: 1.8, ease: [0.16, 1, 0.3, 1] };
 
@@ -36,6 +30,7 @@ function CountUp({
 }
 
 export default function Stats() {
+	const { stats } = useSite();
 	const ref = useRef<HTMLElement>(null);
 	const inView = useInView(ref, { once: true, margin: "-60px" });
 	const shouldReduceMotion = useReducedMotion();
@@ -48,7 +43,7 @@ export default function Stats() {
 	return (
 		<section ref={ref} aria-label="Academy statistics">
 			<div className="mx-auto grid max-w-7xl grid-cols-2 lg:grid-cols-4 lg:px-10">
-				{STATS.map((stat, i) => (
+				{stats.map((stat, i) => (
 					<div
 						key={stat.label}
 						className={cn(

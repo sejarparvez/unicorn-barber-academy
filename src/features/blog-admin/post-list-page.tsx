@@ -51,11 +51,13 @@ export function PostListPage({
 	search,
 	categoryFilter,
 	page = 1,
+	sortByViews = false,
 }: {
 	statusFilter?: BlogStatus;
 	search?: string;
 	categoryFilter?: number;
 	page?: number;
+	sortByViews?: boolean;
 }) {
 	const navigate = useNavigate();
 	const { data, isPending } = useAdminPosts({
@@ -63,6 +65,7 @@ export function PostListPage({
 		search,
 		category: categoryFilter,
 		page,
+		sortByViews,
 	});
 	const { data: categories } = useBlogCategories();
 	const setStatusMutation = useSetPostStatus();
@@ -75,6 +78,7 @@ export function PostListPage({
 		search?: string;
 		category?: number;
 		page?: number;
+		sort?: "views";
 	}) {
 		void navigate({
 			to: "/dashboard/blog",
@@ -83,6 +87,7 @@ export function PostListPage({
 				...(next.search ? { search: next.search } : {}),
 				...(next.category ? { category: next.category } : {}),
 				...(next.page && next.page > 1 ? { page: next.page } : {}),
+				...(next.sort ? { sort: next.sort } : {}),
 			},
 		});
 	}
@@ -206,6 +211,7 @@ export function PostListPage({
 						search: searchInput.trim() || undefined,
 						category: categoryFilter,
 						page: undefined,
+						sort: sortByViews ? "views" : undefined,
 					});
 				}}
 				className="flex items-center gap-2"
@@ -232,6 +238,7 @@ export function PostListPage({
 								search: undefined,
 								category: categoryFilter,
 								page: undefined,
+								sort: sortByViews ? "views" : undefined,
 							});
 						}}
 					>
@@ -250,6 +257,7 @@ export function PostListPage({
 								...(tab.status ? { status: tab.status } : {}),
 								...(search ? { search } : {}),
 								...(categoryFilter ? { category: categoryFilter } : {}),
+								...(sortByViews ? { sort: "views" as const } : {}),
 							}}
 							className={cn(
 								buttonVariants({ variant: "outline", size: "sm" }),
@@ -271,6 +279,7 @@ export function PostListPage({
 								search,
 								category: Number.isInteger(val) && val > 0 ? val : undefined,
 								page: undefined,
+								sort: sortByViews ? "views" : undefined,
 							});
 						}}
 						className="h-8 rounded-md border border-border bg-background px-2 text-sm"
@@ -286,6 +295,23 @@ export function PostListPage({
 				) : null}
 
 				<span className="flex-1" />
+				<Button
+					type="button"
+					variant={sortByViews ? "default" : "outline"}
+					size="sm"
+					onClick={() =>
+						navigateWith({
+							status: statusFilter,
+							search,
+							category: categoryFilter,
+							page: undefined,
+							sort: sortByViews ? undefined : "views",
+						})
+					}
+					aria-pressed={sortByViews}
+				>
+					Top viewed
+				</Button>
 				<Link
 					to="/dashboard/blog/categories"
 					className={buttonVariants({ variant: "ghost", size: "sm" })}
@@ -380,6 +406,9 @@ export function PostListPage({
 										{post.publishedAt
 											? ` · published ${formatPostDate(post.publishedAt)}`
 											: ""}
+										{post.status === "published"
+											? ` · ${post.viewCount.toLocaleString("en-US")} views`
+											: ""}
 									</p>
 								</div>
 
@@ -448,7 +477,12 @@ export function PostListPage({
 							variant="outline"
 							size="sm"
 							onClick={() =>
-								navigateWith({ status: statusFilter, search, page: page - 1 })
+								navigateWith({
+									status: statusFilter,
+									search,
+									page: page - 1,
+									sort: sortByViews ? "views" : undefined,
+								})
 							}
 						>
 							Previous
@@ -464,7 +498,12 @@ export function PostListPage({
 							variant="outline"
 							size="sm"
 							onClick={() =>
-								navigateWith({ status: statusFilter, search, page: page + 1 })
+								navigateWith({
+									status: statusFilter,
+									search,
+									page: page + 1,
+									sort: sortByViews ? "views" : undefined,
+								})
 							}
 						>
 							Next

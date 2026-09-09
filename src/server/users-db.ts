@@ -95,7 +95,7 @@ export async function listUsersAdmin(options: {
 }
 
 export type RoleChangeResult =
-	| { ok: true }
+	| { ok: true; email: string; oldRole: Role }
 	| { ok: false; reason: "not-found" | "self" | "admin" };
 
 /**
@@ -113,12 +113,18 @@ export async function setUserRole(
 	if (targetId === callerId) return { ok: false, reason: "self" };
 	if (!ROLES.includes(role)) return { ok: false, reason: "not-found" };
 
-	const current = await db().query<{ role: string | null }>(
-		'SELECT role FROM "user" WHERE id = $1',
+	const current = await db().query<{ email: string; role: string | null }>(
+		'SELECT email, role FROM "user" WHERE id = $1',
 		[targetId],
 	);
 	if (current.rows.length === 0) return { ok: false, reason: "not-found" };
-	if (current.rows[0]?.role === role) return { ok: true };
+	if (current.rows[0]?.role === role) {
+		return {
+			ok: true,
+			email: current.rows[0]?.email ?? "",
+			oldRole: parseRole(current.rows[0]?.role) ?? "user",
+		};
+	}
 
 	if (current.rows[0]?.role === "admin") {
 		return { ok: false, reason: "admin" };
@@ -128,11 +134,15 @@ export async function setUserRole(
 		'UPDATE "user" SET role = $1, "updatedAt" = now() WHERE id = $2',
 		[role, targetId],
 	);
-	return { ok: true };
+	return {
+		ok: true,
+		email: current.rows[0]?.email ?? "",
+		oldRole: parseRole(current.rows[0]?.role) ?? "user",
+	};
 }
 
 export type BanResult =
-	| { ok: true }
+	| { ok: true; email: string }
 	| { ok: false; reason: "not-found" | "self" | "admin" };
 
 /**
@@ -154,8 +164,8 @@ export async function setUserBan(
 	banExpiresDays: number | null,
 ): Promise<BanResult> {
 	if (targetId === callerId) return { ok: false, reason: "self" };
-	const target = await db().query<{ role: string | null }>(
-		'SELECT role FROM "user" WHERE id = $1',
+	const target = await db().query<{ email: string; role: string | null }>(
+		'SELECT email, role FROM "user" WHERE id = $1',
 		[targetId],
 	);
 	if (target.rows.length === 0) return { ok: false, reason: "not-found" };
@@ -171,5 +181,5 @@ export async function setUserBan(
 		'UPDATE "user" SET banned = $1, "banReason" = $2, "banExpires" = $3, "updatedAt" = now() WHERE id = $4',
 		[banned, banned ? banReason : null, expires, targetId],
 	);
-	return { ok: true };
+	return { ok: true, email: target.rows[0]?.email ?? "" };
 }

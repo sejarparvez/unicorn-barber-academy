@@ -112,6 +112,54 @@ export function parseSettingsPatch(
 				}
 				patch[key] = value;
 				break;
+			case "social_instagram":
+			case "social_facebook":
+			case "social_youtube":
+			case "social_tiktok":
+			case "social_x":
+				if (value.length > 200) {
+					return {
+						ok: false,
+						message: "Social URL must be under 200 characters",
+					};
+				}
+				if (value && !/^https:\/\//.test(value)) {
+					return {
+						ok: false,
+						message: "Social URL must start with https://",
+					};
+				}
+				patch[key] = value;
+				break;
+			case "stat_1_value":
+			case "stat_2_value":
+			case "stat_3_value":
+			case "stat_4_value": {
+				const digits = value.replace(/[^0-9]/g, "");
+				if (!digits || digits.length > 9) {
+					return { ok: false, message: "Stat value must be a number" };
+				}
+				patch[key] = digits;
+				break;
+			}
+			case "stat_1_suffix":
+			case "stat_2_suffix":
+			case "stat_3_suffix":
+			case "stat_4_suffix":
+				if (value.length > 8) {
+					return { ok: false, message: "Stat suffix must be short" };
+				}
+				patch[key] = value;
+				break;
+			case "stat_1_label":
+			case "stat_2_label":
+			case "stat_3_label":
+			case "stat_4_label":
+				if (!value || value.length > 80) {
+					return { ok: false, message: "Stat label must be 1–80 characters" };
+				}
+				patch[key] = value;
+				break;
 		}
 	}
 

@@ -78,6 +78,7 @@ export type GalleryAdmin = {
 	caption: string | null;
 	sortOrder: number;
 	isPublished: boolean;
+	isFeatured: boolean;
 };
 
 export type TestimonialAdmin = {
@@ -89,6 +90,27 @@ export type TestimonialAdmin = {
 	cohort: string;
 	image: string | null;
 	rating: number;
+	sortOrder: number;
+	isPublished: boolean;
+};
+
+export type FaqPlacement = "home" | "contact";
+
+export function parseFaqPlacement(value: unknown): FaqPlacement | undefined {
+	return value === "home" || value === "contact" ? value : undefined;
+}
+
+/** Public FAQ entry shared by the home + contact sections. */
+export type FaqView = {
+	question: string;
+	answer: string;
+};
+
+export type FaqAdmin = {
+	id: number;
+	placement: FaqPlacement;
+	question: string;
+	answer: string;
 	sortOrder: number;
 	isPublished: boolean;
 };

@@ -55,7 +55,7 @@ export async function listProgramsAdmin(): Promise<ProgramAdmin[]> {
 		seats_total: number;
 		seats_filled: number;
 		pending_count: number;
-		paid_count: number;
+		collected_poisha: number;
 	}>(
 		`SELECT p.slug, p.title, p.track, p.duration, p.fee_poisha,
 			p.default_seats, p.is_published,
@@ -70,9 +70,10 @@ export async function listProgramsAdmin(): Promise<ProgramAdmin[]> {
 				WHERE a.intake_id = i.id AND a.status = 'pending'
 			) END), 0)::int AS pending_count,
 			coalesce(sum(CASE WHEN i.is_open = TRUE AND i.starts_on >= CURRENT_DATE THEN (
-				SELECT count(*) FROM enrollment_application a
-				WHERE a.intake_id = i.id AND a.fee_status = 'paid'
-			) END), 0)::int AS paid_count
+				SELECT coalesce(sum(f.amount_poisha), 0) FROM fee_payment f
+				JOIN enrollment_application a ON a.id = f.application_id
+				WHERE a.intake_id = i.id
+			) END), 0)::int AS collected_poisha
 		 FROM program p
 		 LEFT JOIN program_intake i ON i.program_slug = p.slug
 		 GROUP BY p.slug, p.title, p.track, p.duration, p.fee_poisha,
@@ -92,7 +93,7 @@ export async function listProgramsAdmin(): Promise<ProgramAdmin[]> {
 		seatsTotal: row.seats_total,
 		seatsFilled: row.seats_filled,
 		pendingCount: row.pending_count,
-		paidCount: row.paid_count,
+		collectedPoisha: row.collected_poisha,
 	}));
 }
 

@@ -11,6 +11,7 @@ type BlogSearch = {
 	search?: string;
 	category?: number;
 	page?: number;
+	sort?: "views";
 };
 
 export const Route = createFileRoute("/dashboard/blog/")({
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/dashboard/blog/")({
 			...(searchStr ? { search: searchStr } : {}),
 			...(Number.isInteger(category) && category > 0 ? { category } : {}),
 			...(Number.isInteger(page) && page > 1 ? { page } : {}),
+			...(search.sort === "views" ? { sort: "views" as const } : {}),
 		};
 	},
 	beforeLoad: async ({ location }) => {
@@ -48,13 +50,14 @@ export const Route = createFileRoute("/dashboard/blog/")({
 });
 
 function PostListRoute() {
-	const { status, search, category, page } = Route.useSearch();
+	const { status, search, category, page, sort } = Route.useSearch();
 	return (
 		<PostListPage
 			statusFilter={status}
 			search={search}
 			categoryFilter={category}
 			page={page ?? 1}
+			sortByViews={sort === "views"}
 		/>
 	);
 }

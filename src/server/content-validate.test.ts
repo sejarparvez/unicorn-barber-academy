@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	parseFaqPayload,
 	parseGalleryPayload,
 	parseInstructorPayload,
 	parseTestimonialPayload,
@@ -61,5 +62,20 @@ describe("parseTestimonialPayload", () => {
 			true,
 		);
 		expect(parseTestimonialPayload({ quote: "", name: "A" }).ok).toBe(false);
+	});
+});
+
+describe("parseFaqPayload", () => {
+	test("requires placement, question, answer", () => {
+		expect(
+			parseFaqPayload({ placement: "home", question: "Q?", answer: "A." }).ok,
+		).toBe(true);
+		expect(
+			parseFaqPayload({ placement: "sidebar", question: "Q?", answer: "A." })
+				.ok,
+		).toBe(false);
+		expect(
+			parseFaqPayload({ placement: "home", question: "", answer: "A." }).ok,
+		).toBe(false);
 	});
 });

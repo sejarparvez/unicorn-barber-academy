@@ -40,6 +40,7 @@ export type BlogPostSummary = {
 	status: BlogStatus;
 	category: { id: number; name: string; slug: string } | null;
 	readingMinutes: number;
+	viewCount: number;
 	publishedAt: string | null;
 	updatedAt: string;
 };

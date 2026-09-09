@@ -21,7 +21,6 @@ import { SITE_URL } from "@/data/site";
 import type { InstructorView } from "@/lib/content";
 import type { SiteContact } from "@/lib/settings";
 import { useSite } from "@/lib/site-context";
-import { SOCIAL_URLS } from "@/lib/social";
 
 const BREADCRUMB_JSON_LD = {
 	"@context": "https://schema.org",
@@ -47,19 +46,28 @@ const ORG_JSON_LD_BASE = {
 	url: SITE_URL,
 	logo: `${SITE_URL}/logo.png`,
 	foundingDate: "2016",
-	sameAs: [
-		SOCIAL_URLS.instagram,
-		SOCIAL_URLS.facebook,
-		SOCIAL_URLS.youtube,
-		SOCIAL_URLS.tiktok,
-		SOCIAL_URLS.x,
-	],
 };
 
-/** Organization block with admin-editable address/phone merged in. */
-function orgJsonLd(contact: SiteContact) {
+/** Organization block with admin-editable address/phone/socials merged in. */
+function orgJsonLd(
+	contact: SiteContact,
+	social: {
+		instagram: string;
+		facebook: string;
+		youtube: string;
+		tiktok: string;
+		x: string;
+	},
+) {
 	return {
 		...ORG_JSON_LD_BASE,
+		sameAs: [
+			social.instagram,
+			social.facebook,
+			social.youtube,
+			social.tiktok,
+			social.x,
+		].filter(Boolean),
 		address: {
 			"@type": "PostalAddress",
 			streetAddress: contact.streetAddress,
@@ -85,11 +93,11 @@ const ABOUT_PAGE_JSON_LD = {
 };
 
 export function AboutPage({ instructors }: { instructors: InstructorView[] }) {
-	const { contact } = useSite();
+	const { contact, social } = useSite();
 	return (
 		<main>
 			<JsonLdScript data={BREADCRUMB_JSON_LD} />
-			<JsonLdScript data={orgJsonLd(contact)} />
+			<JsonLdScript data={orgJsonLd(contact, social)} />
 			<JsonLdScript data={ABOUT_PAGE_JSON_LD} />
 			<AboutHero instructors={instructors} />
 			<OurStory />

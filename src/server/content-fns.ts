@@ -2,6 +2,8 @@
 // Public reads (no guard) + admin-only mutations for content collections.
 import { createServerFn } from "@tanstack/react-start";
 import type {
+	FaqAdmin,
+	FaqView,
 	GalleryAdmin,
 	GalleryView,
 	InstructorAdmin,
@@ -10,24 +12,32 @@ import type {
 	TestimonialView,
 } from "@/lib/content";
 import { parseGalleryCategory } from "@/lib/content";
+import { logAdminAction } from "@/server/audit-log";
 import {
+	createFaq,
 	createGalleryItem,
 	createInstructor,
 	createTestimonial,
+	deleteFaq,
 	deleteGalleryItem,
 	deleteInstructor,
 	deleteTestimonial,
+	listFaqsAdmin,
+	listFaqsPublic,
+	listFeaturedGallery,
 	listGalleryAdmin,
 	listGalleryPublic,
 	listInstructorsAdmin,
 	listInstructorsPublic,
 	listTestimonialsAdmin,
 	listTestimonialsPublic,
+	updateFaq,
 	updateGalleryItem,
 	updateInstructor,
 	updateTestimonial,
 } from "@/server/content-db";
 import {
+	parseFaqPayload,
 	parseGalleryPayload,
 	parseInstructorPayload,
 	parseTestimonialPayload,
@@ -53,6 +63,17 @@ export const listTestimonialsFn = createServerFn({ method: "GET" }).handler(
 		runSafe(() => listTestimonialsPublic()),
 );
 
+export const listFaqsFn = createServerFn({ method: "GET" })
+	.validator((input: { placement: string }) => input)
+	.handler(async ({ data }): Promise<FaqView[]> => {
+		const placement = data.placement === "contact" ? "contact" : "home";
+		return runSafe(() => listFaqsPublic(placement));
+	});
+
+export const listFeaturedGalleryFn = createServerFn({ method: "GET" }).handler(
+	async (): Promise<GalleryView[]> => runSafe(() => listFeaturedGallery(6)),
+);
+
 /* --------------------------------- admin --------------------------------- */
 
 const MUTATION_MESSAGES = {
@@ -75,18 +96,26 @@ export const listInstructorsAdminFn = createServerFn({ method: "GET" }).handler(
 export const createInstructorFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ id: number }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const parsed = parseInstructorPayload(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => createInstructor(parsed.value));
 		if (!result.ok) throw mutationError(result.reason);
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "instructor.create",
+			targetType: "instructor",
+			targetId: result.id ?? 0,
+			summary: `Added instructor ${parsed.value.name}`,
+			metadata: { slug: parsed.value.slug },
+		});
 		return { id: result.id ?? 0 };
 	});
 
 export const updateInstructorFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const b = data.patch;
@@ -159,17 +188,33 @@ export const updateInstructorFn = createServerFn({ method: "POST" })
 			updateInstructor(id, clean as Parameters<typeof updateInstructor>[1]),
 		);
 		if (!result.ok) throw mutationError(result.reason);
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "instructor.update",
+			targetType: "instructor",
+			targetId: id,
+			summary: `Updated instructor #${id}: ${Object.keys(clean).join(", ")}`,
+			metadata: { fields: Object.keys(clean) },
+		});
 		return { ok: true };
 	});
 
 export const deleteInstructorFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const deleted = await runSafe(() => deleteInstructor(id));
 		if (!deleted) throw new Error("Not found");
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "instructor.delete",
+			targetType: "instructor",
+			targetId: id,
+			summary: `Deleted instructor #${id}`,
+			metadata: {},
+		});
 		return { ok: true };
 	});
 
@@ -183,18 +228,26 @@ export const listGalleryAdminFn = createServerFn({ method: "GET" }).handler(
 export const createGalleryItemFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ id: number }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const parsed = parseGalleryPayload(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => createGalleryItem(parsed.value));
 		if (!result.ok) throw mutationError(result.reason);
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "gallery.create",
+			targetType: "gallery_item",
+			targetId: result.id ?? 0,
+			summary: `Added gallery photo (${parsed.value.category})`,
+			metadata: { category: parsed.value.category },
+		});
 		return { id: result.id ?? 0 };
 	});
 
 export const updateGalleryItemFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const b = data.patch;
@@ -220,22 +273,39 @@ export const updateGalleryItemFn = createServerFn({ method: "POST" })
 		if (b.sortOrder !== undefined)
 			clean.sortOrder = Number.parseInt(String(b.sortOrder), 10) || 0;
 		if (b.isPublished !== undefined) clean.isPublished = b.isPublished === true;
+		if (b.isFeatured !== undefined) clean.isFeatured = b.isFeatured === true;
 		if (Object.keys(clean).length === 0) return { ok: true };
 		const result = await runSafe(() =>
 			updateGalleryItem(id, clean as Parameters<typeof updateGalleryItem>[1]),
 		);
 		if (!result.ok) throw mutationError(result.reason);
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "gallery.update",
+			targetType: "gallery_item",
+			targetId: id,
+			summary: `Updated gallery photo #${id}: ${Object.keys(clean).join(", ")}`,
+			metadata: { fields: Object.keys(clean) },
+		});
 		return { ok: true };
 	});
 
 export const deleteGalleryItemFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const deleted = await runSafe(() => deleteGalleryItem(id));
 		if (!deleted) throw new Error("Not found");
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "gallery.delete",
+			targetType: "gallery_item",
+			targetId: id,
+			summary: `Deleted gallery photo #${id}`,
+			metadata: {},
+		});
 		return { ok: true };
 	});
 
@@ -246,21 +316,98 @@ export const listTestimonialsAdminFn = createServerFn({
 	return runSafe(() => listTestimonialsAdmin());
 });
 
-export const createTestimonialFn = createServerFn({ method: "POST" })
+export const listFaqsAdminFn = createServerFn({ method: "GET" })
+	.validator((input?: { placement?: string }) => input)
+	.handler(async ({ data }): Promise<FaqAdmin[]> => {
+		await requireAdminSession();
+		const placement =
+			data?.placement === "home" || data?.placement === "contact"
+				? data.placement
+				: undefined;
+		return runSafe(() => listFaqsAdmin(placement));
+	});
+
+export const createFaqFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ id: number }> => {
 		await requireAdminSession();
+		const parsed = parseFaqPayload(data);
+		if (!parsed.ok) throw new Error(parsed.message);
+		const result = await runSafe(() => createFaq(parsed.value));
+		if (!result.ok) throw mutationError(result.reason);
+		return { id: result.id ?? 0 };
+	});
+
+export const updateFaqFn = createServerFn({ method: "POST" })
+	.validator((input: { id: number; patch: Record<string, unknown> }) => input)
+	.handler(async ({ data }): Promise<{ ok: true }> => {
+		await requireAdminSession();
+		const id = clampId(data.id);
+		if (!id) throw new Error("Invalid id");
+		const b = data.patch;
+		const clean: Record<string, unknown> = {};
+		if (b.placement !== undefined) {
+			if (b.placement !== "home" && b.placement !== "contact") {
+				throw new Error("Invalid placement");
+			}
+			clean.placement = b.placement;
+		}
+		if (b.question !== undefined) {
+			const v = String(b.question).trim().slice(0, 300);
+			if (!v) throw new Error("Question cannot be empty");
+			clean.question = v;
+		}
+		if (b.answer !== undefined) {
+			const v = String(b.answer).trim().slice(0, 2000);
+			if (!v) throw new Error("Answer cannot be empty");
+			clean.answer = v;
+		}
+		if (b.sortOrder !== undefined) {
+			clean.sortOrder = Number.parseInt(String(b.sortOrder), 10) || 0;
+		}
+		if (b.isPublished !== undefined) clean.isPublished = b.isPublished === true;
+		if (Object.keys(clean).length === 0) return { ok: true };
+		const result = await runSafe(() =>
+			updateFaq(id, clean as Parameters<typeof updateFaq>[1]),
+		);
+		if (!result.ok) throw mutationError(result.reason);
+		return { ok: true };
+	});
+
+export const deleteFaqFn = createServerFn({ method: "POST" })
+	.validator((input: { id: number }) => input)
+	.handler(async ({ data }): Promise<{ ok: true }> => {
+		await requireAdminSession();
+		const id = clampId(data.id);
+		if (!id) throw new Error("Invalid id");
+		const deleted = await runSafe(() => deleteFaq(id));
+		if (!deleted) throw new Error("Not found");
+		return { ok: true };
+	});
+
+export const createTestimonialFn = createServerFn({ method: "POST" })
+	.validator((input: Record<string, unknown>) => input)
+	.handler(async ({ data }): Promise<{ id: number }> => {
+		const session = await requireAdminSession();
 		const parsed = parseTestimonialPayload(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => createTestimonial(parsed.value));
 		if (!result.ok) throw mutationError(result.reason);
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "testimonial.create",
+			targetType: "testimonial",
+			targetId: result.id ?? 0,
+			summary: `Added testimonial from ${parsed.value.name}`,
+			metadata: {},
+		});
 		return { id: result.id ?? 0 };
 	});
 
 export const updateTestimonialFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const b = data.patch as Record<string, unknown>;
@@ -290,16 +437,32 @@ export const updateTestimonialFn = createServerFn({ method: "POST" })
 			updateTestimonial(id, clean as Parameters<typeof updateTestimonial>[1]),
 		);
 		if (!result.ok) throw mutationError(result.reason);
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "testimonial.update",
+			targetType: "testimonial",
+			targetId: id,
+			summary: `Updated testimonial #${id}: ${Object.keys(clean).join(", ")}`,
+			metadata: { fields: Object.keys(clean) },
+		});
 		return { ok: true };
 	});
 
 export const deleteTestimonialFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		const session = await requireAdminSession();
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const deleted = await runSafe(() => deleteTestimonial(id));
 		if (!deleted) throw new Error("Not found");
+		await logAdminAction({
+			actorId: Number(session.user.id),
+			action: "testimonial.delete",
+			targetType: "testimonial",
+			targetId: id,
+			summary: `Deleted testimonial #${id}`,
+			metadata: {},
+		});
 		return { ok: true };
 	});

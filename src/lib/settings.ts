@@ -5,6 +5,7 @@
 // swaps are mechanical. DB rows overlay code defaults per-key (see
 // src/server/settings-db.ts) — an empty table renders byte-identical.
 import { AREAS_SERVED, CONTACT } from "@/data/site";
+import { SOCIAL_URLS } from "@/lib/social";
 
 export const SETTING_KEYS = [
 	"contact_email",
@@ -18,6 +19,23 @@ export const SETTING_KEYS = [
 	"areas_served",
 	"announcement_text",
 	"announcement_to",
+	"social_instagram",
+	"social_facebook",
+	"social_youtube",
+	"social_tiktok",
+	"social_x",
+	"stat_1_value",
+	"stat_1_suffix",
+	"stat_1_label",
+	"stat_2_value",
+	"stat_2_suffix",
+	"stat_2_label",
+	"stat_3_value",
+	"stat_3_suffix",
+	"stat_3_label",
+	"stat_4_value",
+	"stat_4_suffix",
+	"stat_4_label",
 ] as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[number];
@@ -63,6 +81,38 @@ export const SETTING_LABELS: SettingLabels = {
 		label: "Announcement link",
 		hint: "Optional path, e.g. /enroll. Empty = no link.",
 	},
+	social_instagram: {
+		label: "Instagram URL",
+		hint: "Footer icon + JSON-LD. Empty hides the icon.",
+	},
+	social_facebook: {
+		label: "Facebook URL",
+		hint: "Footer icon + JSON-LD. Empty hides the icon.",
+	},
+	social_youtube: {
+		label: "YouTube URL",
+		hint: "Footer icon + JSON-LD. Empty hides the icon.",
+	},
+	social_tiktok: {
+		label: "TikTok URL",
+		hint: "Footer icon + JSON-LD. Empty hides the icon.",
+	},
+	social_x: {
+		label: "X URL",
+		hint: "Footer icon + JSON-LD. Empty hides the icon.",
+	},
+	stat_1_value: { label: "Stat 1 value", hint: "Number, e.g. 1200." },
+	stat_1_suffix: { label: "Stat 1 suffix", hint: "e.g. +. Empty for none." },
+	stat_1_label: { label: "Stat 1 label", hint: "e.g. Graduates Placed." },
+	stat_2_value: { label: "Stat 2 value", hint: "Number, e.g. 97." },
+	stat_2_suffix: { label: "Stat 2 suffix", hint: "e.g. %." },
+	stat_2_label: { label: "Stat 2 label", hint: "e.g. Job Placement Rate." },
+	stat_3_value: { label: "Stat 3 value", hint: "Number, e.g. 12." },
+	stat_3_suffix: { label: "Stat 3 suffix", hint: "Empty for none." },
+	stat_3_label: { label: "Stat 3 label", hint: "e.g. Years Training." },
+	stat_4_value: { label: "Stat 4 value", hint: "Number, e.g. 60." },
+	stat_4_suffix: { label: "Stat 4 suffix", hint: "e.g. +." },
+	stat_4_label: { label: "Stat 4 label", hint: "e.g. Partner Salons." },
 };
 
 /** Base values: what admin edits. Defaults mirror data/site.ts. */
@@ -79,6 +129,23 @@ export function defaultBaseValues(): Record<SettingKey, string> {
 		areas_served: [...AREAS_SERVED].join(", "),
 		announcement_text: "",
 		announcement_to: "",
+		social_instagram: SOCIAL_URLS.instagram,
+		social_facebook: SOCIAL_URLS.facebook,
+		social_youtube: SOCIAL_URLS.youtube,
+		social_tiktok: SOCIAL_URLS.tiktok,
+		social_x: SOCIAL_URLS.x,
+		stat_1_value: "1200",
+		stat_1_suffix: "+",
+		stat_1_label: "Graduates Placed",
+		stat_2_value: "97",
+		stat_2_suffix: "%",
+		stat_2_label: "Job Placement Rate",
+		stat_3_value: "12",
+		stat_3_suffix: "",
+		stat_3_label: "Years Training Barbers & Beauticians",
+		stat_4_value: "60",
+		stat_4_suffix: "+",
+		stat_4_label: "Partner Salons & Barbershops",
 	};
 }
 
@@ -89,6 +156,14 @@ export type ResolvedSettings = {
 	contact: SiteContact;
 	areasServed: string[];
 	announcement: SiteAnnouncement;
+	social: {
+		instagram: string;
+		facebook: string;
+		youtube: string;
+		tiktok: string;
+		x: string;
+	};
+	stats: Array<{ value: number; suffix: string; label: string }>;
 };
 
 /** BD phone formatting: 11-digit 01… numbers → 01337-229944 style. */
@@ -175,5 +250,21 @@ export function resolveSettings(
 			announcementText.length > 0
 				? { text: announcementText, to: announcementTo || null }
 				: null,
+		social: {
+			instagram: v("social_instagram"),
+			facebook: v("social_facebook"),
+			youtube: v("social_youtube"),
+			tiktok: v("social_tiktok"),
+			x: v("social_x"),
+		},
+		stats: [1, 2, 3, 4].map((n) => {
+			const raw = v(`stat_${n}_value` as SettingKey);
+			const parsed = Number.parseInt(raw.replace(/[^0-9]/g, ""), 10);
+			return {
+				value: Number.isInteger(parsed) ? parsed : 0,
+				suffix: v(`stat_${n}_suffix` as SettingKey).slice(0, 8),
+				label: v(`stat_${n}_label` as SettingKey).slice(0, 80),
+			};
+		}),
 	};
 }

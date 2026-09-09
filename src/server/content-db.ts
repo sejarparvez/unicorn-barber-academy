@@ -7,6 +7,9 @@
 import { pic } from "@/data/images";
 import { ALL_PROGRAMS, getProgramBySlug } from "@/data/programs";
 import type {
+	FaqAdmin,
+	FaqPlacement,
+	FaqView,
 	GalleryAdmin,
 	GalleryCategory,
 	GalleryView,
@@ -15,7 +18,7 @@ import type {
 	TestimonialAdmin,
 	TestimonialView,
 } from "@/lib/content";
-import { parseGalleryCategory } from "@/lib/content";
+import { parseFaqPlacement, parseGalleryCategory } from "@/lib/content";
 import { db } from "./db";
 import { PG_UNIQUE_VIOLATION } from "./pg-codes";
 
@@ -250,6 +253,7 @@ type GalleryRow = {
 	caption: string | null;
 	sort_order: number;
 	is_published: boolean;
+	is_featured: boolean;
 };
 
 function galleryImage(row: GalleryRow): string {
@@ -298,6 +302,7 @@ export async function listGalleryAdmin(): Promise<GalleryAdmin[]> {
 		caption: row.caption,
 		sortOrder: row.sort_order,
 		isPublished: row.is_published,
+		isFeatured: row.is_featured,
 	}));
 }
 
@@ -332,6 +337,7 @@ export async function updateGalleryItem(
 		caption?: string | null;
 		sortOrder?: number;
 		isPublished?: boolean;
+		isFeatured?: boolean;
 	},
 ): Promise<ContentMutationResult> {
 	const column: Record<string, string> = {
@@ -341,6 +347,7 @@ export async function updateGalleryItem(
 		caption: "caption",
 		sortOrder: "sort_order",
 		isPublished: "is_published",
+		isFeatured: "is_featured",
 	};
 	const sets: string[] = [];
 	const params: unknown[] = [];
@@ -371,6 +378,37 @@ export async function updateGalleryItem(
 export async function deleteGalleryItem(id: number): Promise<boolean> {
 	const res = await db().query("DELETE FROM gallery_item WHERE id = $1", [id]);
 	return (res.rowCount ?? 0) > 0;
+}
+
+/**
+ * Home "Inside the Academy" strip: featured published photos first; when
+ * nothing is featured yet, the first published photos stand in.
+ */
+export async function listFeaturedGallery(limit = 6): Promise<GalleryView[]> {
+	const featured = await db().query<GalleryRow>(
+		`SELECT * FROM gallery_item
+		 WHERE is_published = TRUE AND is_featured = TRUE
+		 ORDER BY sort_order ASC, id ASC LIMIT $1`,
+		[limit],
+	);
+	const rows =
+		featured.rows.length > 0
+			? featured.rows
+			: (
+					await db().query<GalleryRow>(
+						`SELECT * FROM gallery_item WHERE is_published = TRUE
+						 ORDER BY sort_order ASC, id ASC LIMIT $1`,
+						[limit],
+					)
+				).rows;
+	return rows.map((row) => ({
+		id: row.id,
+		image: galleryImage(row),
+		alt: row.image_alt || row.caption || "Academy gallery photo",
+		category: parseGalleryCategory(row.category) ?? "studio",
+		w: 700,
+		h: 700,
+	}));
 }
 
 /* ------------------------------ testimonials ---------------------------- */
@@ -521,5 +559,109 @@ export async function updateTestimonial(
 
 export async function deleteTestimonial(id: number): Promise<boolean> {
 	const res = await db().query("DELETE FROM testimonial WHERE id = $1", [id]);
+	return (res.rowCount ?? 0) > 0;
+}
+
+/* --------------------------------- faqs --------------------------------- */
+
+export async function listFaqsPublic(
+	placement: FaqPlacement,
+): Promise<FaqView[]> {
+	const res = await db().query<{ question: string; answer: string }>(
+		`SELECT question, answer FROM faq_item
+		 WHERE placement = $1 AND is_published = TRUE
+		 ORDER BY sort_order ASC, id ASC`,
+		[placement],
+	);
+	return res.rows.map((row) => ({
+		question: row.question,
+		answer: row.answer,
+	}));
+}
+
+export async function listFaqsAdmin(
+	placement?: FaqPlacement,
+): Promise<FaqAdmin[]> {
+	const res = await db().query<{
+		id: number;
+		placement: string;
+		question: string;
+		answer: string;
+		sort_order: number;
+		is_published: boolean;
+	}>(
+		`SELECT id, placement, question, answer, sort_order, is_published
+		 FROM faq_item ${placement ? "WHERE placement = $1" : ""}
+		 ORDER BY placement ASC, sort_order ASC, id ASC`,
+		placement ? [placement] : [],
+	);
+	return res.rows.map((row) => ({
+		id: row.id,
+		placement: parseFaqPlacement(row.placement) ?? "home",
+		question: row.question,
+		answer: row.answer,
+		sortOrder: row.sort_order,
+		isPublished: row.is_published,
+	}));
+}
+
+export async function createFaq(input: {
+	placement: FaqPlacement;
+	question: string;
+	answer: string;
+	sortOrder: number;
+}): Promise<ContentMutationResult> {
+	const res = await db().query<{ id: number }>(
+		`INSERT INTO faq_item (placement, question, answer, sort_order, is_published)
+		 VALUES ($1,$2,$3,$4,TRUE) RETURNING id`,
+		[input.placement, input.question, input.answer, input.sortOrder],
+	);
+	return { ok: true, id: res.rows[0]?.id };
+}
+
+export async function updateFaq(
+	id: number,
+	patch: {
+		placement?: FaqPlacement;
+		question?: string;
+		answer?: string;
+		sortOrder?: number;
+		isPublished?: boolean;
+	},
+): Promise<ContentMutationResult> {
+	const column: Record<string, string> = {
+		placement: "placement",
+		question: "question",
+		answer: "answer",
+		sortOrder: "sort_order",
+		isPublished: "is_published",
+	};
+	const sets: string[] = [];
+	const params: unknown[] = [];
+	for (const [key, value] of Object.entries(patch)) {
+		if (value === undefined || !column[key]) continue;
+		params.push(value);
+		sets.push(`${column[key]} = $${params.length + 1}`);
+	}
+	if (sets.length === 0) {
+		const exists = await db().query("SELECT 1 FROM faq_item WHERE id = $1", [
+			id,
+		]);
+		return exists.rows.length > 0
+			? { ok: true }
+			: { ok: false, reason: "not-found" };
+	}
+	params.unshift(id);
+	const res = await db().query(
+		`UPDATE faq_item SET ${sets.join(", ")} WHERE id = $1`,
+		params,
+	);
+	return (res.rowCount ?? 0) > 0
+		? { ok: true }
+		: { ok: false, reason: "not-found" };
+}
+
+export async function deleteFaq(id: number): Promise<boolean> {
+	const res = await db().query("DELETE FROM faq_item WHERE id = $1", [id]);
 	return (res.rowCount ?? 0) > 0;
 }

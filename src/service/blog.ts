@@ -39,6 +39,7 @@ export function useAdminPosts(
 		search?: string;
 		category?: number;
 		page?: number;
+		sortByViews?: boolean;
 	},
 	options?: { initialData?: ListPage },
 ) {
@@ -52,6 +53,7 @@ export function useAdminPosts(
 					search: filters.search,
 					category: filters.category,
 					page: filters.page ?? 1,
+					sortByViews: filters.sortByViews ?? false,
 				},
 			});
 		},
