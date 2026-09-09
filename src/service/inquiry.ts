@@ -13,7 +13,7 @@ export function useInquiries(unreadOnly: boolean, page: number) {
 	return useQuery({
 		queryKey: queryKeys.inquiries({ unreadOnly, page }),
 		queryFn: async (): Promise<InquiryListResult> => {
-			const { listInquiriesFn } = await import("@/server/inquiry-fns");
+			const { listInquiriesFn } = await import("@/server/inquiry/inquiry-fns");
 			return listInquiriesFn({ data: { unreadOnly, page } });
 		},
 		placeholderData: keepPreviousData,
@@ -35,7 +35,7 @@ export function useMarkInquiry() {
 			id: number;
 			patch: { isRead?: boolean; isReplied?: boolean };
 		}) => {
-			const { markInquiryFn } = await import("@/server/inquiry-fns");
+			const { markInquiryFn } = await import("@/server/inquiry/inquiry-fns");
 			await markInquiryFn({ data: input });
 		},
 		onSuccess: () => invalidate(),
@@ -46,7 +46,7 @@ export function useDeleteInquiry() {
 	const invalidate = useInvalidateInbox();
 	return useMutation({
 		mutationFn: async (id: number) => {
-			const { deleteInquiryFn } = await import("@/server/inquiry-fns");
+			const { deleteInquiryFn } = await import("@/server/inquiry/inquiry-fns");
 			await deleteInquiryFn({ data: { id } });
 		},
 		onSuccess: () => invalidate(),

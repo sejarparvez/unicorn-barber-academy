@@ -1,7 +1,7 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { GalleryPage } from "@/features/gallery/gallery-page";
-import { listGalleryFn } from "@/server/content-fns";
+import { listGalleryFn } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/gallery")({
 	loader: async () => ({ items: await listGalleryFn() }),

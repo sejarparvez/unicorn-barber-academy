@@ -67,8 +67,10 @@ src/features/     domain components (about, auth, blog, enrollment, ...)
 src/components/   shared UI: layout/, providers/, ui/ (shadcn-style primitives)
 src/service/      client-side TanStack Query services + query-keys
 src/lib/          isomorphic shared code: types, env parsing, roles, api clients
-src/server/       SERVER-ONLY: db access, session, auth, mail, rate-limit, storage
-src/data/         static site content (programs, instructors, gallery, site config)
+src/server/<domain>/  SERVER-ONLY per domain: db.ts, validate.ts, fns.ts
+src/data/         seed sources + truly static content (program copy, image seeds)
+docs/             admin manual, architecture, workflows, decision records
+scripts/          set-role.ts (live tool) + seeds/ (one-time, re-runnable)
 ```
 
 ## Architecture
@@ -76,17 +78,18 @@ src/data/         static site content (programs, instructors, gallery, site conf
 Code flows in one direction:
 
 ```
-src/routes/  →  src/features/  →  src/service/  →  src/server/
-     ↓                                    ↓
-  loaders                          createServerFn
-     ↓                                    ↓
-  src/server/*-fns.ts              src/server/*-db.ts
+src/routes/  →  src/features/  →  src/service/  →  src/server/<domain>/
+     ↓                                              ↓
+  loaders                                      createServerFn
+     ↓                                              ↓
+  src/server/<domain>/fns.ts              src/server/<domain>/db.ts
 ```
 
-- Route loaders must not import `*-db.ts` directly — wrap calls in `*-fns.ts`
+- Route loaders must not import `db.ts` directly — wrap calls in `fns.ts`
 - `src/features/**` and `src/components/**` cannot import `@/server/**`
 - Every query key lives in `src/service/query-keys.ts`
 - Auth roles: `"user" | "student" | "instructor" | "admin"` (plain text, not Postgres enum)
+- Docs for humans: `docs/admin-manual.md` (dashboard how-tos), `docs/architecture.md`, `docs/workflows.md`, `docs/decisions/`
 
 ## Testing
 

@@ -21,7 +21,7 @@ export function useUsersList(filters: UserFilters) {
 	return useQuery({
 		queryKey: queryKeys.users(filters),
 		queryFn: async (): Promise<ListUsersResult> => {
-			const { listUsersAdminFn } = await import("@/server/users-fns");
+			const { listUsersAdminFn } = await import("@/server/users/users-fns");
 			return listUsersAdminFn({ data: filters });
 		},
 		placeholderData: keepPreviousData,
@@ -33,7 +33,7 @@ export function useSetUserRole() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (input: { targetId: number; role: Role }) => {
-			const { setUserRoleFn } = await import("@/server/users-fns");
+			const { setUserRoleFn } = await import("@/server/users/users-fns");
 			await setUserRoleFn({ data: input });
 		},
 		onSuccess: () => {
@@ -51,7 +51,7 @@ export function useSetUserBan() {
 			banReason?: string | null;
 			banExpiresDays?: number | null;
 		}) => {
-			const { setUserBanFn } = await import("@/server/users-fns");
+			const { setUserBanFn } = await import("@/server/users/users-fns");
 			await setUserBanFn({ data: input });
 		},
 		onSuccess: () => {

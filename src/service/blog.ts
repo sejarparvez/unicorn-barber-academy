@@ -46,7 +46,7 @@ export function useAdminPosts(
 	return useQuery({
 		queryKey: queryKeys.adminPosts(filters),
 		queryFn: async (): Promise<ListPage> => {
-			const { listAdminPostsFn } = await import("@/server/blog-fns");
+			const { listAdminPostsFn } = await import("@/server/blog/blog-fns");
 			return listAdminPostsFn({
 				data: {
 					status: filters.status,
@@ -67,7 +67,7 @@ export function useBlogCategories(options?: { initialData?: BlogCategory[] }) {
 	return useQuery({
 		queryKey: queryKeys.blogCategories(),
 		queryFn: async (): Promise<BlogCategory[]> => {
-			const { listCategoriesFn } = await import("@/server/blog-fns");
+			const { listCategoriesFn } = await import("@/server/blog/blog-fns");
 			return listCategoriesFn();
 		},
 		initialData: options?.initialData,

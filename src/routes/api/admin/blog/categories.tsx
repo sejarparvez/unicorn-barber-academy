@@ -3,8 +3,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
-import { createCategory, uniqueCategorySlug } from "@/server/blog-db";
-import { parseCategoryPayload } from "@/server/blog-validate";
+import { createCategory, uniqueCategorySlug } from "@/server/blog/blog-db";
+import { parseCategoryPayload } from "@/server/blog/blog-validate";
 
 export const Route = createFileRoute("/api/admin/blog/categories")({
 	server: {

@@ -10,8 +10,8 @@ import {
 	getPostById,
 	uniqueSlug,
 	updatePost,
-} from "@/server/blog-db";
-import { parsePostPayload } from "@/server/blog-validate";
+} from "@/server/blog/blog-db";
+import { parsePostPayload } from "@/server/blog/blog-validate";
 import { deleteImage, keyFromUrl } from "@/server/storage";
 
 type Params = { id: string };

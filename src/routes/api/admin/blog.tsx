@@ -4,8 +4,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
-import { createPost, getPostById, uniqueSlug } from "@/server/blog-db";
-import { parsePostPayload } from "@/server/blog-validate";
+import { createPost, getPostById, uniqueSlug } from "@/server/blog/blog-db";
+import { parsePostPayload } from "@/server/blog/blog-validate";
 
 export const Route = createFileRoute("/api/admin/blog")({
 	server: {

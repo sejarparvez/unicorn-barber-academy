@@ -6,7 +6,7 @@
 // text/markdown) and from llms.txt. Published posts only.
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
-import { getPublishedBySlug } from "@/server/blog-db";
+import { getPublishedBySlug } from "@/server/blog/blog-db";
 
 export const Route = createFileRoute("/md/blog/$slug")({
 	server: {
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/md/blog/$slug")({
 				// Renamed? Permanent redirect preserves the indexed URL.
 				if (!post) {
 					const { getSlugRedirectTarget } = await import(
-						"../../server/blog-db"
+						"../../server/blog/blog-db"
 					);
 					const toSlug = await getSlugRedirectTarget(params.slug);
 					if (toSlug) {

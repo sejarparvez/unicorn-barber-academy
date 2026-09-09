@@ -8,7 +8,7 @@ import { SITE_URL } from "@/data/site";
 import {
 	listCategoriesWithCounts,
 	listRecentPublished,
-} from "@/server/blog-db";
+} from "@/server/blog/blog-db";
 
 // Mirrors CATEGORY_MIN_INDEX_POSTS — thin archives stay out of the sitemap
 // (they also ship meta robots noindex from their route).

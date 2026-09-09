@@ -2,7 +2,7 @@
 // Admissions decision page. Admin-only.
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ApplicationDetailPage } from "@/features/enrollment-admin/application-detail-page";
-import { getApplicationAdminFn } from "@/server/enrollment-fns";
+import { getApplicationAdminFn } from "@/server/enrollment/enrollment-fns";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/enrollments/$id")({

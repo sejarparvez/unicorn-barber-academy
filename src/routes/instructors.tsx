@@ -1,7 +1,7 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { InstructorsPage } from "@/features/instructors/instructors-page";
-import { listInstructorsFn } from "@/server/content-fns";
+import { listInstructorsFn } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/instructors")({
 	loader: async () => ({ instructors: await listInstructorsFn() }),
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/instructors")({
 			{
 				name: "description",
 				content:
-					"Meet the working barbers and beauty professionals teaching at Unicorn Barber Training Academy in Dhaka — every instructor still works a chair or a station.",
+					"Meet the working barbers and beauty professionals teaching at Unicorn Barber Training Academy in Dhaka � every instructor still works a chair or a station.",
 			},
 			{
 				property: "og:title",

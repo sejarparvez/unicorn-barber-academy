@@ -12,7 +12,7 @@ import { useSite } from "@/lib/site-context";
 import {
 	generateCertificateQrFn,
 	getMyCertificateFn,
-} from "@/server/certificate-fns";
+} from "@/server/certificate/certificate-fns";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/certificates/$id/print")({

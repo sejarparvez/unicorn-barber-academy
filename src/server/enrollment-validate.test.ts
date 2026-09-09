@@ -4,7 +4,7 @@ import {
 	parseFeePaymentPayload,
 	parseIntakePayload,
 	validateApplicationPayload,
-} from "@/server/enrollment-validate";
+} from "@/server/enrollment/enrollment-validate";
 
 function futureDate(daysAhead = 30): string {
 	const d = new Date();

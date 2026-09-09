@@ -4,7 +4,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { BlogPage } from "@/features/blog/blog-page";
-import { listCategoriesFn, listPublishedPostsFn } from "@/server/blog-fns";
+import { listCategoriesFn, listPublishedPostsFn } from "@/server/blog/blog-fns";
 
 type BlogIndexSearch = { page?: number };
 

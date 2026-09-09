@@ -13,7 +13,9 @@ export function useInstructorsAdmin() {
 	return useQuery({
 		queryKey: [...queryKeys.content(), "instructors"] as const,
 		queryFn: async (): Promise<InstructorAdmin[]> => {
-			const { listInstructorsAdminFn } = await import("@/server/content-fns");
+			const { listInstructorsAdminFn } = await import(
+				"@/server/content/content-fns"
+			);
 			return listInstructorsAdminFn();
 		},
 		staleTime: 30_000,
@@ -24,7 +26,9 @@ export function useGalleryAdmin() {
 	return useQuery({
 		queryKey: [...queryKeys.content(), "gallery"] as const,
 		queryFn: async (): Promise<GalleryAdmin[]> => {
-			const { listGalleryAdminFn } = await import("@/server/content-fns");
+			const { listGalleryAdminFn } = await import(
+				"@/server/content/content-fns"
+			);
 			return listGalleryAdminFn();
 		},
 		staleTime: 30_000,
@@ -35,7 +39,9 @@ export function useTestimonialsAdmin() {
 	return useQuery({
 		queryKey: [...queryKeys.content(), "testimonials"] as const,
 		queryFn: async (): Promise<TestimonialAdmin[]> => {
-			const { listTestimonialsAdminFn } = await import("@/server/content-fns");
+			const { listTestimonialsAdminFn } = await import(
+				"@/server/content/content-fns"
+			);
 			return listTestimonialsAdminFn();
 		},
 		staleTime: 30_000,
@@ -46,7 +52,7 @@ export function useFaqsAdmin(placement?: "home" | "contact") {
 	return useQuery({
 		queryKey: [...queryKeys.content(), "faqs", placement ?? "all"] as const,
 		queryFn: async (): Promise<FaqAdmin[]> => {
-			const { listFaqsAdminFn } = await import("@/server/content-fns");
+			const { listFaqsAdminFn } = await import("@/server/content/content-fns");
 			return listFaqsAdminFn({ data: placement ? { placement } : {} });
 		},
 		staleTime: 30_000,
@@ -65,7 +71,7 @@ function contentMutation<TInput>(fnName: string) {
 		const invalidate = useInvalidateContent();
 		return useMutation({
 			mutationFn: async (input: TInput) => {
-				const fns = await import("@/server/content-fns");
+				const fns = await import("@/server/content/content-fns");
 				const fn = fns[fnName as keyof typeof fns] as (args: {
 					data: TInput;
 				}) => Promise<unknown>;

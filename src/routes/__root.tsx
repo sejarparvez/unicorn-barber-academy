@@ -1,4 +1,4 @@
-﻿import { IconArrowRight } from "@tabler/icons-react";
+import { IconArrowRight } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import {
 	createRootRoute,
@@ -24,12 +24,12 @@ import { SITE_URL } from "@/data/site";
 import type { ResolvedSettings } from "@/lib/settings";
 import type { SessionPayload } from "@/lib/types";
 import { getSession } from "@/server/session";
-import { getSiteSettingsFn } from "@/server/settings-fns";
+import { getSiteSettingsFn } from "@/server/settings/settings-fns";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
 	// Fetched on every document load so <Header/> renders the correct
-	// signed-in/out state during SSR — no hydration flicker. Site settings
+	// signed-in/out state during SSR � no hydration flicker. Site settings
 	// ride along so contact info + announcement stay admin-editable with a
 	// single shared object (visible UI and JSON-LD never drift apart).
 	loader: async (): Promise<{
@@ -72,7 +72,7 @@ export const Route = createRootRoute({
 			{
 				name: "twitter:description",
 				content:
-					"Hands-on barbering and beauty training in Banasree, Dhaka — taught by working barbers and stylists. Enroll today.",
+					"Hands-on barbering and beauty training in Banasree, Dhaka � taught by working barbers and stylists. Enroll today.",
 			},
 			{ name: "twitter:image", content: `${SITE_URL}/banner.png` },
 		],
@@ -83,7 +83,7 @@ export const Route = createRootRoute({
 			},
 			{ rel: "icon", type: "image/png", href: "/favicon.png" },
 			{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-			// RSS autodiscovery — /feed.xml exists but was undiscoverable.
+			// RSS autodiscovery � /feed.xml exists but was undiscoverable.
 			{
 				rel: "alternate",
 				type: "application/rss+xml",
@@ -124,7 +124,7 @@ function RootError({ error }: { error: Error }) {
 				Something went wrong
 			</h1>
 			<p className="mt-3 text-sm text-muted-foreground">
-				An unexpected error occurred while loading this page. Please try again —
+				An unexpected error occurred while loading this page. Please try again �
 				if the problem persists, contact us.
 			</p>
 			{import.meta.env.DEV && error ? (
@@ -167,7 +167,7 @@ function RootDocument() {
 			</head>
 			<body>
 				<RouteProgress />
-				{/* Skip link — keyboard users jump straight past the header. */}
+				{/* Skip link � keyboard users jump straight past the header. */}
 				<a
 					href="#main-content"
 					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
@@ -175,7 +175,7 @@ function RootDocument() {
 					Skip to content
 				</a>
 				{isMarketing ? <ScrollProgress /> : null}
-				{/* Site chrome never prints — certificate pages rely on this. */}
+				{/* Site chrome never prints � certificate pages rely on this. */}
 				<div className="print:hidden">
 					<AnnouncementBanner />
 					<Header session={session} />

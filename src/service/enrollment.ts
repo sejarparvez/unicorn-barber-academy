@@ -51,7 +51,7 @@ export function useApplicationsList(
 		queryKey: queryKeys.applications(filters),
 		queryFn: async (): Promise<ListPage> => {
 			const { listApplicationsAdminFn } = await import(
-				"@/server/enrollment-fns"
+				"@/server/enrollment/enrollment-fns"
 			);
 			const result = await listApplicationsAdminFn({ data: filters });
 			return result;
@@ -69,7 +69,9 @@ export function useApplicationDetail(
 	return useQuery({
 		queryKey: queryKeys.application(id),
 		queryFn: async (): Promise<{ application: ApplicationDetail }> => {
-			const { getApplicationAdminFn } = await import("@/server/enrollment-fns");
+			const { getApplicationAdminFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
 			return (await getApplicationAdminFn({ data: { id } })) as {
 				application: ApplicationDetail;
 			};
@@ -83,7 +85,9 @@ export function useIntakesAdmin(options?: { initialData?: IntakeAdmin[] }) {
 	return useQuery({
 		queryKey: queryKeys.intakes(),
 		queryFn: async (): Promise<IntakeAdmin[]> => {
-			const { listIntakesAdminFn } = await import("@/server/enrollment-fns");
+			const { listIntakesAdminFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
 			return listIntakesAdminFn();
 		},
 		initialData: options?.initialData,
@@ -95,7 +99,9 @@ export function useProgramOptions() {
 	return useQuery({
 		queryKey: queryKeys.programOptions(),
 		queryFn: async (): Promise<ProgramOption[]> => {
-			const { listProgramOptionsFn } = await import("@/server/enrollment-fns");
+			const { listProgramOptionsFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
 			return listProgramOptionsFn();
 		},
 		staleTime: 60_000,
@@ -106,7 +112,9 @@ export function useProgramsAdmin() {
 	return useQuery({
 		queryKey: queryKeys.programs(),
 		queryFn: async (): Promise<ProgramAdmin[]> => {
-			const { listProgramsAdminFn } = await import("@/server/enrollment-fns");
+			const { listProgramsAdminFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
 			return listProgramsAdminFn();
 		},
 		staleTime: 30_000,
@@ -126,7 +134,9 @@ export function useUpdateProgram() {
 				isPublished?: boolean;
 			};
 		}) => {
-			const { updateProgramFn } = await import("@/server/enrollment-fns");
+			const { updateProgramFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
 			await updateProgramFn({ data: input });
 		},
 		onSuccess: () => {
@@ -274,7 +284,7 @@ export function useApplicationStatusLog(applicationId: number) {
 		queryKey: queryKeys.applicationLog(applicationId),
 		queryFn: async () => {
 			const { listApplicationStatusLogFn } = await import(
-				"@/server/enrollment-fns"
+				"@/server/enrollment/enrollment-fns"
 			);
 			return listApplicationStatusLogFn({ data: { applicationId } });
 		},

@@ -14,7 +14,7 @@ export function useAuditLog(filters: AuditFilters) {
 	return useQuery({
 		queryKey: queryKeys.auditLog(filters),
 		queryFn: async (): Promise<AuditListResult> => {
-			const { listAuditLogFn } = await import("@/server/audit-fns");
+			const { listAuditLogFn } = await import("@/server/audit/audit-fns");
 			return listAuditLogFn({ data: filters });
 		},
 		placeholderData: keepPreviousData,

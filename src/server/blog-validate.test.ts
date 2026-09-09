@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { ALL_PROGRAMS } from "@/data/programs";
-import { parseCategoryPayload, parsePostPayload } from "@/server/blog-validate";
+import {
+	parseCategoryPayload,
+	parsePostPayload,
+} from "@/server/blog/blog-validate";
 
 const validPost = {
 	title: "  Fade fundamentals  ",

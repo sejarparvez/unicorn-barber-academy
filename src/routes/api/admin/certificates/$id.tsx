@@ -4,8 +4,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
-import { logAdminAction } from "@/server/audit-log";
-import { setCertificateRevocation } from "@/server/certificate-db";
+import { logAdminAction } from "@/server/audit/audit-log";
+import { setCertificateRevocation } from "@/server/certificate/certificate-db";
 
 type Params = { id: string };
 

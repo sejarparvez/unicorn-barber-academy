@@ -3,8 +3,11 @@ import { json } from "@tanstack/react-start";
 import { formatStartsOn } from "@/lib/enrollment";
 import { guardPublicEndpoint } from "@/server/api-guard";
 import { auth } from "@/server/auth";
-import { listOpenIntakes, submitApplication } from "@/server/enrollment-db";
-import { validateApplicationPayload } from "@/server/enrollment-validate";
+import {
+	listOpenIntakes,
+	submitApplication,
+} from "@/server/enrollment/enrollment-db";
+import { validateApplicationPayload } from "@/server/enrollment/enrollment-validate";
 import { applicationReceivedEmail, sendMail } from "@/server/mail";
 import { clientIp } from "@/server/rate-limit";
 

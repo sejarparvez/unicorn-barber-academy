@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { MyApplicationsCard } from "@/features/enrollment/my-applications-card";
 import { isStaff, parseRole, ROLE_LABELS, type Role } from "@/lib/roles";
 import { cn, getInitials } from "@/lib/utils";
-import { listMyApplicationsFn } from "@/server/enrollment-fns";
+import { listMyApplicationsFn } from "@/server/enrollment/enrollment-fns";
 
 export const Route = createFileRoute("/dashboard/")({
 	// Staff never render MyApplicationsCard — skip the query for them.

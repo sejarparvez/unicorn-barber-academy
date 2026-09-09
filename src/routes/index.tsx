@@ -20,7 +20,7 @@ import {
 	listFeaturedGalleryFn,
 	listInstructorsFn,
 	listTestimonialsFn,
-} from "@/server/content-fns";
+} from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/")({
 	loader: async () => ({

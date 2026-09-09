@@ -1,4 +1,4 @@
-﻿// routes/programs.$slug.tsx
+// routes/programs.$slug.tsx
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { getProgramBySlug } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
@@ -6,7 +6,7 @@ import {
 	ProgramDetailPage,
 	ProgramNotFound,
 } from "@/features/programs/program-detail-page";
-import { listInstructorsFn } from "@/server/content-fns";
+import { listInstructorsFn } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/programs/$slug")({
 	loader: async ({ params }) => {

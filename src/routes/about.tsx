@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
 import { AboutPage } from "@/features/about/about-page";
-import { listInstructorsFn } from "@/server/content-fns";
+import { listInstructorsFn } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/about")({
 	loader: async () => ({ instructors: await listInstructorsFn() }),

@@ -4,9 +4,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
-import { logAdminAction } from "@/server/audit-log";
-import { deleteIntake, updateIntake } from "@/server/enrollment-db";
-import { isValidFutureStartDate } from "@/server/enrollment-validate";
+import { logAdminAction } from "@/server/audit/audit-log";
+import { deleteIntake, updateIntake } from "@/server/enrollment/enrollment-db";
+import { isValidFutureStartDate } from "@/server/enrollment/enrollment-validate";
 
 type Params = { id: string };
 

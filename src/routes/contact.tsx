@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
 import { ContactPage } from "@/features/contact/contact-page";
-import { listFaqsFn } from "@/server/content-fns";
+import { listFaqsFn } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/contact")({
 	loader: async () => ({

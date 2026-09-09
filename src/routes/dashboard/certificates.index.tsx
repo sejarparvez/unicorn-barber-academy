@@ -19,7 +19,7 @@ import { formatLongDate } from "@/lib/date";
 import { COHORT_LABELS } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
 import { cn } from "@/lib/utils";
-import { listMyCertificatesFn } from "@/server/certificate-fns";
+import { listMyCertificatesFn } from "@/server/certificate/certificate-fns";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/certificates/")({

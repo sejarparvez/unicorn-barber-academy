@@ -4,9 +4,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
-import type { RenameCategoryResult } from "@/server/blog-db";
-import { deleteCategory, renameCategory } from "@/server/blog-db";
-import { parseCategoryPayload } from "@/server/blog-validate";
+import type { RenameCategoryResult } from "@/server/blog/blog-db";
+import { deleteCategory, renameCategory } from "@/server/blog/blog-db";
+import { parseCategoryPayload } from "@/server/blog/blog-validate";
 
 type Params = { id: string };
 

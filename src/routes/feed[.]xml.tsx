@@ -5,7 +5,7 @@
 // that carry meta robots noindex.
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
-import { listPublishedPosts } from "@/server/blog-db";
+import { listPublishedPosts } from "@/server/blog/blog-db";
 
 function xmlEscape(value: string): string {
 	return value

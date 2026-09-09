@@ -7,8 +7,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
-import { listPublishedForLlms } from "@/server/blog-db";
-import { getSiteSettings } from "@/server/settings-db";
+import { listPublishedForLlms } from "@/server/blog/blog-db";
+import { getSiteSettings } from "@/server/settings/settings-db";
 
 export const Route = createFileRoute("/llms.txt")({
 	server: {

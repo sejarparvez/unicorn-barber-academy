@@ -2,7 +2,7 @@
 // Create-post editor. Admin-only.
 import { createFileRoute } from "@tanstack/react-router";
 import { PostEditorPage } from "@/features/blog-admin/post-editor-page";
-import { listCategoriesFn } from "@/server/blog-fns";
+import { listCategoriesFn } from "@/server/blog/blog-fns";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/blog/new")({

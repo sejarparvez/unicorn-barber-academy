@@ -31,11 +31,11 @@ Check items as you go: `[ ]` → `[x]`.
 |---|---|---|
 | 0.1 | `bun install` completes | No errors |
 | 0.2 | `.env` exists with `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL=http://localhost:3000` | App boots without fail-fast errors |
-| 0.3 | `bun run db:status` | Migrations applied, including `004_certificates.sql` |
-| 0.4 | `bun run db:blog` | All 4 SQL files apply idempotently, no failures |
+| 0.3 | `bun run db:status` | Contract matches DB, no pending migrations |
+| 0.4 | `bun scripts/seeds/*.ts` | All seeds re-runnable (upsert/skip), no failures |
 | 0.5 | `bun run dev` | Server starts on http://localhost:3000, no Vite externalization warnings (`path`/`fs`/`url`/`source-map-js`), no `error loading dynamically imported module` |
 | 0.6 | `bun run typecheck` | No type errors |
-| 0.7 | `bun run test` | All tests pass (150 across 15 files at time of writing) |
+| 0.7 | `bun run test` | All tests pass (isolated runs green; full parallel runs may flake the 4 db-health connectivity probes under pool load — re-run the file alone to confirm) |
 | 0.8 | `bun run check` | Biome clean (format + lint) |
 
 **Degraded-mode notes (test BOTH if possible):**
@@ -68,7 +68,7 @@ mobile layout at ~375px width.
 
 | # | Page | Extra checks |
 |---|---|---|
-| 1.1 | `/` Home | **Headings render in Fraunces serif** (not Inter — check the hero "Master the fade."); gradient "Earn the chair." has a slow shimmer sweep; clipper-guard gauge (#0–#4 with mm hints) animates in between copy and photo; photo parallaxes gently on scroll; craft-words marquee (FADES · TAPERS · …) scrolls below hero and pauses on hover; stats count up when scrolled into view; all sections render (Why, Stats, Programs, Student Life, Instructors, Testimonials, FAQ accordion opens/closes); Visit-Us shows a **live Google Maps embed** (not placeholder image); phone displays `01337-229944`; address shows Banasree/Rampura; "GET DIRECTIONS" opens Google Maps in new tab |
+| 1.1 | `/` Home | **Headings render in Fraunces serif** (not Inter — check the hero "Master the fade."); gradient "Earn the chair." has a slow shimmer sweep; desktop: clipper-guard gauge between copy and photo, photo parallaxes gently on scroll; mobile: brand banner first, fluid clamp headline, stacked full-width CTAs, fade into marquee; craft-words marquee (FADES · TAPERS · …) scrolls below hero and pauses on hover; stats count up when scrolled into view; all sections render (Why, Stats, Programs, Student Life, Instructors, Testimonials, FAQ accordion opens/closes); Visit-Us shows a **live Google Maps embed** (not placeholder image); phone displays the configured number; address shows Banasree/Rampura; "GET DIRECTIONS" opens Google Maps in new tab |
 | 1.1b | `/` Home extras | Floating WhatsApp button bottom-right (hidden on print); on mobile (~375px): after scrolling past hero a sticky "Enrollment open / ENROLL" bar appears at the bottom and disappears near the footer |
 | 1.2 | `/about` | JSON-LD renders (view-source: sameAs includes all 5 social URLs incl. TikTok & X); content accurate |
 | 1.3 | `/programs` | All program cards listed |
@@ -177,7 +177,7 @@ mobile layout at ~375px width.
 
 | # | Step | Expected |
 |---|---|---|
-| 3.1 | `/dashboard` shows the role-aware sidebar; admins see Overview, Certificates, Admissions, Console, Blog, Settings | Sidebar visible on desktop; hamburger drawer on mobile with exactly those items |
+| 3.1 | `/dashboard` shows the role-aware sidebar; admins see Overview, Certificates, Admissions, Users, Inbox, Site, Instructors, Gallery, Testimonials, FAQs, Activity, Console, Blog, Settings | Sidebar visible on desktop; hamburger drawer on mobile with exactly those items |
 | 3.2 | `/dashboard/admin` console | Stat cards render (zeros fine); "Upcoming intake seats" empty-state prompts to create intake |
 | 3.3 | `/dashboard/enrollments/intakes` → create intake (future date, seats 12) | Appears in list; open-intake flag on |
 | 3.4 | Create duplicate (same program/cohort/date) | Blocked with friendly "identical intake" error |
@@ -200,7 +200,7 @@ mobile layout at ~375px width.
 | 3.14 | Export CSV | Button reads **"Export page (CSV)"** — it exports only the current page; downloads fine, opens in Excel/LibreOffice; any cell starting with `=`,`+`,`-`,`@` was neutralized (leading `'`) |
 | 3.15 | Open application detail | All applicant data renders; decision-note textarea labeled. If another admin saves a note, your (untouched) textarea picks up their text on refetch; once you type, your draft is never overwritten |
 | 3.16 | Transition pending→reviewing→approved | Badges update; approval email in terminal; applicant role upgraded to `student` (verify via set-role script listing or DB) |
-| 3.17 | Mark fee paid → unpaid toggle | Badge flips both ways |
+| 3.17 | Record partial fee → badge stays unpaid with paid-of-total progress; record remainder → flips paid + confirmation email in terminal; void a payment → flips back | Ledger history shows method/receipt/receiver; void restores derivation |
 | 3.18 | Mark **completed** | Status becomes Completed; NO email sent (silent transition) |
 | 3.19 | Console `/dashboard/admin` refresh | Counts updated; latest-applications table shows newest 8; intake fill bar reflects occupied seat |
 
@@ -293,14 +293,14 @@ Sign in as the STUDENT (the one who graduated).
 | 5.14 | `/blog` | Cards, categories sidebar, pagination; dates render via the shared date-fns helpers ("Mar 1, 2026" style) |
 | 5.15 | `/blog?page=999` | **404** (not "coming soon") — regression check |
 | 5.16 | Category archive ≥3 posts | Lists; thin archive (<3) ships noindex + excluded from sitemap |
-| 5.17 | Post page | Reading time, TOC anchors jump, related posts, **FAQ accordion (shadcn Accordion primitive — animated open/close)**, JSON-LD (BlogPosting/Breadcrumb/FAQ) |
+| 5.17 | Post page | Reading time, cover hero, **TOC rail (desktop, active-highlight + auto-scroll) / bottom sheet (mobile)**, related posts with covers, **FAQ accordion**, author card, **prev/next article rows**, related programs, JSON-LD (BlogPosting/Breadcrumb/FAQ); tables scroll inside their container on mobile |
 | 5.18 | `/md/blog/<slug>` | Raw markdown mirror; renamed slugs redirect here too |
 
 ### 5. Contact form
 
 | # | Step | Expected |
 |---|---|---|
-| 5.19 | Submit valid message | Success state with reference `MSG-…`; **email arrives at hello@unicornbta.com** (with Resend) OR terminal logs skipped-send warning (without) |
+| 5.19 | Submit valid message | Success state with reference `MSG-…`; **row appears in Dashboard → Inbox even with Resend off**; email arrives at configured inbox (with Resend) OR terminal logs skipped-send warning (without) |
 | 5.20 | Received email | Reply-To = visitor's address; topic label; escaped HTML (try `<b>` in message — shows literally) |
 | 5.21 | Invalid email / bad subject / oversized message (>5000 chars truncated-or-rejected per validation) | Proper 400 messages |
 | 5.22 | Rate limit: 6 submissions in 1 min from same IP | 6th gets 429 "Too many requests" |
@@ -356,15 +356,53 @@ Repeat key pages at **375px**, **768px**, **1440px**:
 
 ---
 
+## PHASE 6 — Admin control surface (post-launch additions)
+
+> Sign in as **ADMIN**. Covers everything added after the initial build:
+> users, site settings, inbox, fee ledger, content collections, activity,
+> blog view counts.
+
+### 6. Users & safety rails
+
+| # | Step | Expected |
+|---|---|---|
+| 6.1 | `/dashboard/users` | Search + role filter + pagination; own row's role dropdown disabled; admin rows show Protected instead of Ban |
+| 6.2 | Change a user's role | AlertDialog confirms (extra-strict copy for admin grants); list refreshes |
+| 6.3 | Ban (reason + optional days) / unban | Badge flips; banned account cannot sign in (verify in incognito) |
+| 6.4 | Attempt self-demote / self-ban / admin-ban / admin-demote (via crafted requests if needed) | All rejected server-side; console never orphaned |
+
+### 6. Site settings & banner
+
+| # | Step | Expected |
+|---|---|---|
+| 6.5 | `/dashboard/site` → change phone + save | Footer, contact page, Visit-Us, JSON-LD, llms.txt all show the new number; tel:/WhatsApp/map links re-derive |
+| 6.6 | Set announcement text (+ optional link) | Gold banner appears above header site-wide; dismiss persists per session; clearing the text hides it |
+| 6.7 | Invalid inputs (bad email, short phone, `javascript:` link) | Field-level rejection, nothing saved |
+| 6.8 | Change a homepage stat | Home stats row updates after reload |
+
+### 6. Inbox, ledger, content, activity, views
+
+| # | Step | Expected |
+|---|---|---|
+| 6.9 | Submit contact form → open Inbox | Row appears unread; expand, reply-by-email marks replied; delete asks confirm |
+| 6.10 | Application detail → record partial + full payment | Progress `paid/of` updates; Paid badge + confirmation email only at full; void reverts |
+| 6.11 | Intakes page programs overview | Collected figures are actual ledger sums, not estimates |
+| 6.12 | Instructors/Gallery/Testimonials/FAQs CRUD | Create → live on public pages; hide → disappears; reorder works; deletes ask confirm; gallery ★ marks home-strip features |
+| 6.13 | Perform edits across sections → `/dashboard/activity` | Each action logged with actor + summary; action filter narrows; append-only (no edit/delete) |
+| 6.14 | `/dashboard/blog` | Views column on published rows; Top viewed toggle reorders; load a public post → count increments (admin's own views excluded) |
+
+---
+
 ## Known intentional gaps (do NOT file as bugs)
 
 - Instructor role has no dedicated tools yet (sees Overview/Certificates/Settings only).
 - Admissions area is admin-only end-to-end (guards + API).
 - `/media` is empty until real press entries are added to `src/data/media.ts`.
-- All photos are `_placeholder.jpg` until real assets land in `src/assets/images/`.
-- Emails require `RESEND_API_KEY`; otherwise links print to the dev terminal.
+- Instructor/gallery/testimonial photos fall back to bundled seeds until re-uploaded via Cloudinary.
+- Emails require `RESEND_API_KEY`; otherwise links print to the dev terminal (inbox rows still save).
 - No `aggregateRating` on the LocalBusiness JSON-LD — deliberately omitted until real Google review stats exist; do not fabricate.
 - Careers JobPosting `datePosted` is a placeholder (`2026-01-01`) — update when roles actually open/close.
 - Footer WhatsApp capture opens wa.me directly — no backend lead storage yet.
 - Analytics is a hook point only: nothing loads until `VITE_PLAUSIBLE_DOMAIN` is set.
-- Geo coordinates in `src/data/site.ts` need verification against the actual campus Google Maps pin.
+- Geo coordinates need verification against the actual campus Google Maps pin.
+- Blog view counts are page loads, not unique humans (previews + admin visits excluded).

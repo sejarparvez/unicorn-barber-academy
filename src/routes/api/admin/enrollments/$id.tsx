@@ -8,13 +8,13 @@ import { json } from "@tanstack/react-start";
 import { parseApplicationStatus, parseFeeMethod } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
 import { requireAdminApi } from "@/server/admin-api";
-import { logAdminAction } from "@/server/audit-log";
+import { logAdminAction } from "@/server/audit/audit-log";
 import {
 	deleteFeePayment,
 	getApplicationDetail,
 	recordFeePayment,
 	updateApplicationStatus,
-} from "@/server/enrollment-db";
+} from "@/server/enrollment/enrollment-db";
 import {
 	applicationApprovedEmail,
 	applicationRejectedEmail,

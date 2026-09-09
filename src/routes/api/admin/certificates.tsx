@@ -4,9 +4,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
-import { logAdminAction } from "@/server/audit-log";
-import { issueCertificateForApplication } from "@/server/certificate-db";
-import { getApplicationDetail } from "@/server/enrollment-db";
+import { logAdminAction } from "@/server/audit/audit-log";
+import { issueCertificateForApplication } from "@/server/certificate/certificate-db";
+import { getApplicationDetail } from "@/server/enrollment/enrollment-db";
 import { certificateIssuedEmail, sendMail } from "@/server/mail";
 
 const REASON_MESSAGES = {

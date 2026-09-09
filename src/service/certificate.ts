@@ -15,7 +15,7 @@ export function useApplicationCertificate(applicationId: number) {
 		queryKey: queryKeys.applicationCertificate(applicationId),
 		queryFn: async (): Promise<CertificateRecord | null> => {
 			const { getCertificateForApplicationFn } = await import(
-				"@/server/certificate-fns"
+				"@/server/certificate/certificate-fns"
 			);
 			return getCertificateForApplicationFn({
 				data: { applicationId },

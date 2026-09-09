@@ -5,7 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { parseBlogStatus } from "@/lib/blog";
 import { requireAdminApi } from "@/server/admin-api";
-import { bulkDeletePosts, bulkUpdatePostStatus } from "@/server/blog-db";
+import { bulkDeletePosts, bulkUpdatePostStatus } from "@/server/blog/blog-db";
 
 export const Route = createFileRoute("/api/admin/blog/bulk")({
 	server: {

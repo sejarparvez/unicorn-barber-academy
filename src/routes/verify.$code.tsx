@@ -17,7 +17,7 @@ import { formatLongDate } from "@/lib/date";
 import { COHORT_LABELS } from "@/lib/enrollment";
 import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
-import { verifyCertificateFn } from "@/server/certificate-fns";
+import { verifyCertificateFn } from "@/server/certificate/certificate-fns";
 
 export const Route = createFileRoute("/verify/$code")({
 	loader: async ({ params }) => {

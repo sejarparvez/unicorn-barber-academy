@@ -1,12 +1,12 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { TOPIC_LABELS } from "@/data/contact";
 import { guardPublicEndpoint } from "@/server/api-guard";
 import { validateContactInput } from "@/server/contact-validate";
-import { saveInquiry } from "@/server/inquiry-db";
+import { saveInquiry } from "@/server/inquiry/inquiry-db";
 import { contactInquiryEmail, sendMail } from "@/server/mail";
 import { clientIp } from "@/server/rate-limit";
-import { getSiteSettings } from "@/server/settings-db";
+import { getSiteSettings } from "@/server/settings/settings-db";
 
 export const Route = createFileRoute("/api/contact")({
 	server: {
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/api/contact")({
 					const inquiryId = `MSG-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 					const { contact } = await getSiteSettings();
 					// Durable inbox record first (never blocks the response), then
-					// the notification email — a missed email no longer loses leads.
+					// the notification email � a missed email no longer loses leads.
 					await saveInquiry({
 						name: validated.name,
 						email: validated.email,
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/api/contact")({
 					const sent = await sendMail({
 						to: contact.email,
 						replyTo: validated.email,
-						subject: `[Website] ${TOPIC_LABELS[validated.subject]} — ${inquiryId}`,
+						subject: `[Website] ${TOPIC_LABELS[validated.subject]} � ${inquiryId}`,
 						html: contactInquiryEmail({
 							name: validated.name,
 							email: validated.email,
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/api/contact")({
 					});
 					if (!sent) {
 						console.warn(
-							`[contact] inquiry ${inquiryId} could not be emailed — RESEND_API_KEY unset or delivery failed`,
+							`[contact] inquiry ${inquiryId} could not be emailed � RESEND_API_KEY unset or delivery failed`,
 						);
 					}
 

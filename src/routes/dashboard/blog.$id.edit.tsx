@@ -2,7 +2,7 @@
 // Edit-post editor. Admin-only. Loads the full post (raw markdown included).
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PostEditorPage } from "@/features/blog-admin/post-editor-page";
-import { getAdminPostFn, listCategoriesFn } from "@/server/blog-fns";
+import { getAdminPostFn, listCategoriesFn } from "@/server/blog/blog-fns";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/blog/$id/edit")({

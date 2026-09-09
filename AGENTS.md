@@ -67,27 +67,29 @@ src/server/      SERVER-ONLY: db access, session, auth, mail, rate-limit, storag
 src/data/        seed sources + truly static content (programs copy, image seeds)
 ```
 
-### Server layer pattern (`src/server/`)
+### Server layer pattern (`src/server/<domain>/`)
 
-Per domain (blog, enrollment, users, settings, content), three file types:
+Per domain (blog, enrollment, users, settings, content, audit, inquiry,
+certificate, program), three file types:
 
-- `<domain>-db.ts` — Prisma data-access functions only.
-- `<domain>-validate.ts` — input validation for mutations.
-- `<domain>-fns.ts` — `createServerFn` wrappers that routes/loaders import.
+- `db.ts` — data-access functions only (e.g. `src/server/blog/db.ts`).
+- `validate.ts` — input validation for mutations.
+- `fns.ts` — `createServerFn` wrappers that routes/loaders import.
 
-(`content-*` covers three small collections — instructors, gallery,
+(`content/` covers three small collections — instructors, gallery,
 testimonials — in one trio instead of three.)
 
-Plus cross-cutting modules: `guards.ts` (`requireRoles`), `session.ts`
-(`getSession`), `auth.ts`, `mail.ts`, `rate-limit.ts`, `storage.ts`.
+Plus cross-cutting modules at `src/server/` root: `guards.ts`
+(`requireRoles`), `session.ts` (`getSession`), `auth.ts`, `mail.ts`,
+`rate-limit.ts`, `storage.ts`, `db.ts`, `console-fns.ts`, `program-utils.ts`.
 
 Rules:
 
-- Route loaders must **not** import `*-db.ts` directly. Wrap DB calls in
-  `createServerFn` inside `*-fns.ts` so client-side navigations re-run on the server.
+- Route loaders must **not** import `db.ts` directly. Wrap DB calls in
+  `createServerFn` inside `fns.ts` so client-side navigations re-run on the server.
 - `src/features/**` and `src/components/**` are Biome-enforced forbidden from
-  importing `@/server/**`. Import types from `@/lib/types`, or call a server
-  function from `*-fns.ts`.
+  importing `@/server/**`. Import types from `@/lib/*`, or call a server
+  function from `fns.ts`.
 - Mutating server functions validate input via `*-validate.ts` before touching
   `-db.ts`; respect `rate-limit.ts` on public write endpoints.
 

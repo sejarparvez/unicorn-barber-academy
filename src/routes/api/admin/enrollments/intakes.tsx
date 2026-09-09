@@ -3,9 +3,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { requireAdminApi } from "@/server/admin-api";
-import { logAdminAction } from "@/server/audit-log";
-import { createIntake } from "@/server/enrollment-db";
-import { parseIntakePayload } from "@/server/enrollment-validate";
+import { logAdminAction } from "@/server/audit/audit-log";
+import { createIntake } from "@/server/enrollment/enrollment-db";
+import { parseIntakePayload } from "@/server/enrollment/enrollment-validate";
 
 export const Route = createFileRoute("/api/admin/enrollments/intakes")({
 	server: {

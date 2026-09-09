@@ -4,7 +4,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { EnrollPage } from "@/features/enrollment/enroll-page";
-import { listOpenIntakesFn } from "@/server/enrollment-fns";
+import { listOpenIntakesFn } from "@/server/enrollment/enrollment-fns";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/enroll")({

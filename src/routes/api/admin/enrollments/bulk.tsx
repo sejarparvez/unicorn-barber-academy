@@ -5,8 +5,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { parseApplicationStatus } from "@/lib/enrollment";
 import { requireAdminApi } from "@/server/admin-api";
-import { logAdminAction } from "@/server/audit-log";
-import { bulkUpdateApplicationStatus } from "@/server/enrollment-db";
+import { logAdminAction } from "@/server/audit/audit-log";
+import { bulkUpdateApplicationStatus } from "@/server/enrollment/enrollment-db";
 
 export const Route = createFileRoute("/api/admin/enrollments/bulk")({
 	server: {

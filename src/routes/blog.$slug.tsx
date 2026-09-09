@@ -6,7 +6,7 @@
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { PostDetailPage, PostNotFound } from "@/features/blog/post-detail-page";
-import { getPostForPublicHtmlFn } from "@/server/blog-fns";
+import { getPostForPublicHtmlFn } from "@/server/blog/blog-fns";
 
 export const Route = createFileRoute("/blog/$slug")({
 	loader: async ({ params }) => {

@@ -8,7 +8,7 @@ import {
 	CATEGORY_MIN_INDEX_POSTS,
 	CategoryArchivePage,
 } from "@/features/blog/category-archive-page";
-import { getCategoryArchiveFn } from "@/server/blog-fns";
+import { getCategoryArchiveFn } from "@/server/blog/blog-fns";
 
 type ArchiveSearch = { page?: number };
 
