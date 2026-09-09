@@ -17,8 +17,8 @@ import {
 import { JsonLdScript } from "@/components/jsonld-script";
 import { Card, CardContent } from "@/components/ui/card";
 import { pic } from "@/data/images";
-import { INSTRUCTORS } from "@/data/instructors";
 import { SITE_URL } from "@/data/site";
+import type { InstructorView } from "@/lib/content";
 import type { SiteContact } from "@/lib/settings";
 import { useSite } from "@/lib/site-context";
 import { SOCIAL_URLS } from "@/lib/social";
@@ -84,17 +84,17 @@ const ABOUT_PAGE_JSON_LD = {
 	mainEntity: { "@id": `${SITE_URL}/#academy` },
 };
 
-export function AboutPage() {
+export function AboutPage({ instructors }: { instructors: InstructorView[] }) {
 	const { contact } = useSite();
 	return (
 		<main>
 			<JsonLdScript data={BREADCRUMB_JSON_LD} />
 			<JsonLdScript data={orgJsonLd(contact)} />
 			<JsonLdScript data={ABOUT_PAGE_JSON_LD} />
-			<AboutHero />
+			<AboutHero instructors={instructors} />
 			<OurStory />
 			<OurApproach />
-			<LedBy />
+			<LedBy instructors={instructors} />
 			<TheGuild />
 			<FinalCta
 				title="Want to see it for yourself?"
@@ -110,11 +110,11 @@ export function AboutPage() {
 /* ----------------------------- Hero ----------------------------- */
 /* A manifesto, not a data panel or a photo backdrop. The two lead
    instructors' portraits sit offset and overlapping — a founders'
-   duo, pulled live from INSTRUCTORS rather than hardcoded — paired
+   duo, pulled live from the instructor roster rather than hardcoded — paired
    with an actual attributed quote instead of a generic tagline. */
 
-function AboutHero() {
-	const leads = INSTRUCTORS.filter((i) => i.lead);
+function AboutHero({ instructors }: { instructors: InstructorView[] }) {
+	const leads = instructors.filter((i) => i.lead);
 	const [primaryLead, secondaryLead] = leads;
 
 	return (
@@ -332,8 +332,8 @@ function OurApproach() {
 /* Names the actual people, not just the philosophy — the two lead
    instructors, pulled from the same data the Instructors page uses. */
 
-function LedBy() {
-	const leads = INSTRUCTORS.filter((i) => i.lead);
+function LedBy({ instructors }: { instructors: InstructorView[] }) {
+	const leads = instructors.filter((i) => i.lead);
 
 	if (leads.length === 0) return null;
 

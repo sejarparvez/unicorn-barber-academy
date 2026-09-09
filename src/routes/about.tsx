@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
 import { AboutPage } from "@/features/about/about-page";
+import { listInstructorsFn } from "@/server/content-fns";
 
 export const Route = createFileRoute("/about")({
-	component: AboutPage,
+	loader: async () => ({ instructors: await listInstructorsFn() }),
+	component: AboutRoute,
 	head: () => ({
 		meta: [
 			{ title: "About Us | Unicorn Barber Training Academy" },
@@ -41,3 +43,8 @@ export const Route = createFileRoute("/about")({
 		links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
 	}),
 });
+
+function AboutRoute() {
+	const { instructors } = Route.useLoaderData();
+	return <AboutPage instructors={instructors} />;
+}

@@ -1,9 +1,11 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { GalleryPage } from "@/features/gallery/gallery-page";
+import { listGalleryFn } from "@/server/content-fns";
 
 export const Route = createFileRoute("/gallery")({
-	component: GalleryPage,
+	loader: async () => ({ items: await listGalleryFn() }),
+	component: GalleryRoute,
 	head: () => ({
 		meta: [
 			{ title: "Gallery | Unicorn Barber Training Academy" },
@@ -37,3 +39,8 @@ export const Route = createFileRoute("/gallery")({
 		links: [{ rel: "canonical", href: `${SITE_URL}/gallery` }],
 	}),
 });
+
+function GalleryRoute() {
+	const { items } = Route.useLoaderData();
+	return <GalleryPage items={items} />;
+}

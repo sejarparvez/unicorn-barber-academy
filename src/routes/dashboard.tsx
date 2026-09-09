@@ -6,7 +6,10 @@
 	IconGauge,
 	IconLayoutDashboard,
 	IconMenu2,
+	IconPhoto,
 	IconSettings,
+	IconStar,
+	IconUser,
 	IconUsersGroup,
 } from "@tabler/icons-react";
 import {
@@ -93,6 +96,24 @@ const NAV_ITEMS: NavItem[] = [
 		label: "Users",
 		to: "/dashboard/users",
 		icon: IconUsersGroup,
+		visibleFor: "admin",
+	},
+	{
+		label: "Instructors",
+		to: "/dashboard/instructors",
+		icon: IconUser,
+		visibleFor: "admin",
+	},
+	{
+		label: "Gallery",
+		to: "/dashboard/gallery",
+		icon: IconPhoto,
+		visibleFor: "admin",
+	},
+	{
+		label: "Testimonials",
+		to: "/dashboard/testimonials",
+		icon: IconStar,
 		visibleFor: "admin",
 	},
 	{

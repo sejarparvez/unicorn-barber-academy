@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { StudentLifePage } from "@/features/student-life/student-life-page";
+import { listGalleryFn } from "@/server/content-fns";
 
 export const Route = createFileRoute("/student-life")({
-	component: StudentLifePage,
+	loader: async () => ({ gallery: await listGalleryFn() }),
+	component: StudentLifeRoute,
 	head: () => ({
 		meta: [
 			{ title: "Student Life | Unicorn Barber Training Academy" },
@@ -37,3 +39,8 @@ export const Route = createFileRoute("/student-life")({
 		links: [{ rel: "canonical", href: `${SITE_URL}/student-life` }],
 	}),
 });
+
+function StudentLifeRoute() {
+	const { gallery } = Route.useLoaderData();
+	return <StudentLifePage gallery={gallery} />;
+}

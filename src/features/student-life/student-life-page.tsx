@@ -12,9 +12,9 @@ import {
 	useFadeUp,
 } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
-import { GALLERY_ITEMS } from "@/data/gallery";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
+import type { GalleryView } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 const BREADCRUMB_JSON_LD = {
@@ -31,17 +31,16 @@ const BREADCRUMB_JSON_LD = {
 	],
 };
 
-const STUDIO_ITEMS = GALLERY_ITEMS.filter((g) => g.category === "studio");
-const GRAD_ITEMS = GALLERY_ITEMS.filter((g) => g.category === "graduation");
-
-export function StudentLifePage() {
+export function StudentLifePage({ gallery }: { gallery: GalleryView[] }) {
+	const studioItems = gallery.filter((g) => g.category === "studio");
+	const gradItems = gallery.filter((g) => g.category === "graduation");
 	return (
 		<main>
 			<JsonLdScript data={BREADCRUMB_JSON_LD} />
 			<StudentLifeHero />
-			<StudioFloor />
+			<StudioFloor items={studioItems} />
 			<CohortLife />
-			<GraduationDays />
+			<GraduationDays items={gradItems} />
 			<FinalCta
 				title="Your cohort is waiting."
 				accent="Apply to join them."
@@ -126,7 +125,7 @@ function StudentLifeHero() {
 	);
 }
 
-function StudioFloor() {
+function StudioFloor({ items }: { items: GalleryView[] }) {
 	return (
 		<section
 			className="section-light bg-background px-6 py-24 lg:px-10"
@@ -139,14 +138,14 @@ function StudioFloor() {
 					where you'll spend 80% of your time — not in a lecture hall.
 				</p>
 				<div className="mt-14 columns-2 gap-4 sm:columns-3 lg:columns-4">
-					{STUDIO_ITEMS.map((item, i) => (
+					{items.map((item, i) => (
 						<Reveal
 							key={item.id}
 							delay={(i % 8) * 0.04}
 							className="mb-4 break-inside-avoid"
 						>
 							<Image
-								src={pic(item.seed, item.w, item.h)}
+								src={item.image}
 								alt={item.alt}
 								width={item.w}
 								height={item.h}
@@ -211,7 +210,7 @@ function CohortLife() {
 	);
 }
 
-function GraduationDays() {
+function GraduationDays({ items }: { items: GalleryView[] }) {
 	return (
 		<section
 			className="section-light border-t border-border bg-background px-6 py-24 lg:px-10"
@@ -224,14 +223,14 @@ function GraduationDays() {
 					the quiet realisation that you're now the professional.
 				</p>
 				<div className="mt-14 columns-2 gap-4 sm:columns-3 lg:columns-4">
-					{GRAD_ITEMS.map((item, i) => (
+					{items.map((item, i) => (
 						<Reveal
 							key={item.id}
 							delay={(i % 8) * 0.04}
 							className="mb-4 break-inside-avoid"
 						>
 							<Image
-								src={pic(item.seed, item.w, item.h)}
+								src={item.image}
 								alt={item.alt}
 								width={item.w}
 								height={item.h}

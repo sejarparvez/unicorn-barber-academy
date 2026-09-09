@@ -245,6 +245,77 @@ model SiteSetting {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Content collections (Phase 2). Admin-managed marketing content previously
+// hardcoded in src/data/*. Image strategy: image_url holds a Cloudinary URL
+// from the existing upload endpoint; when null, pages fall back to the
+// bundled pic() seeds so migration is gradual and pages never break.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Instructor {
+  id          Int       @id @default(autoincrement())
+  slug        VarChar(120) @unique(map: "instructor_slug_key")
+  name        VarChar(160)
+  title       VarChar(200)
+  track       VarChar(16)
+  memberNo    VarChar(24)  @unique(map: "instructor_member_no_key") @map("member_no")
+  years       Int          @default(0)
+  bio         String       @default("")
+  specialties String[]     @default([])
+  imageUrl    String?      @map("image_url")
+  imageAlt    String?      @map("image_alt")
+  // Legacy bridge: pic() seed from src/data/*.ts used when image_url is
+  // null, so existing bundled photos keep rendering until admin re-uploads.
+  imageSeed   VarChar(120)? @map("image_seed")
+  instagram   String? 
+  programSlug VarChar(120)?  @map("program_slug")
+  lead        Boolean      @default(false)
+  quote       String?
+  sortOrder   Int          @default(0) @map("sort_order")
+  isPublished Boolean      @default(true) @map("is_published")
+  createdAt   Timestamptz  @default(now()) @map("created_at")
+  updatedAt   Timestamptz  @default(now()) @map("updated_at")
+
+  @@index([track, isPublished, sortOrder])
+  @@map("instructor")
+}
+
+model GalleryItem {
+  id          Int       @id @default(autoincrement())
+  category    VarChar(16)
+  imageUrl    String?   @map("image_url")
+  imageAlt    String    @default("") @map("image_alt")
+  // Legacy bridge: pic() seed, same rule as Instructor.imageSeed.
+  imageSeed   VarChar(120)? @map("image_seed")
+  caption     String?
+  sortOrder   Int       @default(0) @map("sort_order")
+  isPublished Boolean   @default(true) @map("is_published")
+  createdAt   Timestamptz @default(now()) @map("created_at")
+
+  @@index([category, isPublished, sortOrder])
+  @@map("gallery_item")
+}
+
+model Testimonial {
+  id          Int       @id @default(autoincrement())
+  quote       String
+  name        VarChar(160)
+  programSlug VarChar(120)? @map("program_slug")
+  programName VarChar(200) @default("") @map("program_name")
+  cohort      VarChar(24)  @default("") 
+  imageUrl    String?   @map("image_url")
+  imageAlt    String?   @map("image_alt")
+  // Legacy bridge: pic() seed, same rule as Instructor.imageSeed.
+  imageSeed   VarChar(120)? @map("image_seed")
+  rating      Int       @default(5)
+  sortOrder   Int       @default(0) @map("sort_order")
+  isPublished Boolean   @default(true) @map("is_published")
+  createdAt   Timestamptz @default(now()) @map("created_at")
+
+  @@index([isPublished, sortOrder])
+  @@map("testimonial")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Program catalog (operational control). The full marketing copy stays in
 // src/data/programs.ts for now; this table owns what admin controls:
 // which programs are live, the fee, and the default seat count.

@@ -1,9 +1,11 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
 import { InstructorsPage } from "@/features/instructors/instructors-page";
+import { listInstructorsFn } from "@/server/content-fns";
 
 export const Route = createFileRoute("/instructors")({
-	component: InstructorsPage,
+	loader: async () => ({ instructors: await listInstructorsFn() }),
+	component: InstructorsRoute,
 	head: () => ({
 		meta: [
 			{ title: "Instructors | Unicorn Barber Training Academy" },
@@ -37,3 +39,8 @@ export const Route = createFileRoute("/instructors")({
 		links: [{ rel: "canonical", href: `${SITE_URL}/instructors` }],
 	}),
 });
+
+function InstructorsRoute() {
+	const { instructors } = Route.useLoaderData();
+	return <InstructorsPage instructors={instructors} />;
+}

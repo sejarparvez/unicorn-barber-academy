@@ -7,29 +7,30 @@ import { Reveal, SectionEyebrow } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Instructor } from "@/data/instructors";
-import { INSTRUCTORS } from "@/data/instructors";
 import { SITE_URL } from "@/data/site";
+import type { InstructorView } from "@/lib/content";
 
-const INSTRUCTORS_JSON_LD = {
-	"@context": "https://schema.org",
-	"@type": "ItemList",
-	itemListElement: INSTRUCTORS.map((person, i) => ({
-		"@type": "Person",
-		position: i + 1,
-		name: person.name,
-		jobTitle: person.title,
-		description: person.bio,
-		knowsAbout: person.specialties,
-		worksFor: {
-			"@type": "EducationalOrganization",
-			name: "Unicorn Barber Training Academy",
-			sameAs: SITE_URL,
-		},
-	})),
-};
+function instructorsJsonLd(instructors: InstructorView[]) {
+	return {
+		"@context": "https://schema.org",
+		"@type": "ItemList",
+		itemListElement: instructors.map((person, i) => ({
+			"@type": "Person",
+			position: i + 1,
+			name: person.name,
+			jobTitle: person.title,
+			description: person.bio,
+			knowsAbout: person.specialties,
+			worksFor: {
+				"@type": "EducationalOrganization",
+				name: "Unicorn Barber Training Academy",
+				sameAs: SITE_URL,
+			},
+		})),
+	};
+}
 
-function InstructorCard({ instructor }: { instructor: Instructor }) {
+function InstructorCard({ instructor }: { instructor: InstructorView }) {
 	return (
 		<Card className="gap-0 overflow-hidden hover:shadow-xl transition-all duration-300 rounded-none border-border p-0">
 			<div className="relative h-80 overflow-hidden bg-secondary">
@@ -78,13 +79,17 @@ function InstructorCard({ instructor }: { instructor: Instructor }) {
 	);
 }
 
-export default function Instructors() {
+export default function Instructors({
+	instructors,
+}: {
+	instructors: InstructorView[];
+}) {
 	return (
 		<section
 			className="section-light border-t border-border bg-background px-4 py-24 lg:px-10"
 			aria-labelledby="instructors-heading"
 		>
-			<JsonLdScript data={INSTRUCTORS_JSON_LD} />
+			<JsonLdScript data={instructorsJsonLd(instructors)} />
 			<div className="mx-auto max-w-7xl">
 				<div className="flex flex-wrap items-end justify-between gap-6">
 					<SectionEyebrow title="Instructors" id="instructors-heading" />
@@ -101,7 +106,7 @@ export default function Instructors() {
 				</div>
 
 				<div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-					{INSTRUCTORS.map((instructor, i) => (
+					{instructors.map((instructor, i) => (
 						<Reveal key={instructor.name} delay={i * 0.08}>
 							<InstructorCard instructor={instructor} />
 						</Reveal>

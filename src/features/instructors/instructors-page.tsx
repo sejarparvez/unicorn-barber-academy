@@ -11,27 +11,28 @@ import {
 import { JsonLdScript } from "@/components/jsonld-script";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Instructor } from "@/data/instructors";
-import { INSTRUCTORS } from "@/data/instructors";
 import { SITE_URL } from "@/data/site";
+import type { InstructorView } from "@/lib/content";
 
-const INSTRUCTORS_JSON_LD = {
-	"@context": "https://schema.org",
-	"@type": "ItemList",
-	itemListElement: INSTRUCTORS.map((person, i) => ({
-		"@type": "Person",
-		position: i + 1,
-		name: person.name,
-		jobTitle: person.title,
-		description: person.bio,
-		knowsAbout: person.specialties,
-		worksFor: {
-			"@type": "EducationalOrganization",
-			name: "Unicorn Barber Training Academy",
-			sameAs: SITE_URL,
-		},
-	})),
-};
+function instructorsJsonLd(instructors: InstructorView[]) {
+	return {
+		"@context": "https://schema.org",
+		"@type": "ItemList",
+		itemListElement: instructors.map((person, i) => ({
+			"@type": "Person",
+			position: i + 1,
+			name: person.name,
+			jobTitle: person.title,
+			description: person.bio,
+			knowsAbout: person.specialties,
+			worksFor: {
+				"@type": "EducationalOrganization",
+				name: "Unicorn Barber Training Academy",
+				sameAs: SITE_URL,
+			},
+		})),
+	};
+}
 
 const BREADCRUMB_JSON_LD = {
 	"@context": "https://schema.org",
@@ -47,19 +48,23 @@ const BREADCRUMB_JSON_LD = {
 	],
 };
 
-export function InstructorsPage() {
-	const leads = INSTRUCTORS.filter((i) => i.lead);
-	const barberingFaculty = INSTRUCTORS.filter(
+export function InstructorsPage({
+	instructors,
+}: {
+	instructors: InstructorView[];
+}) {
+	const leads = instructors.filter((i) => i.lead);
+	const barberingFaculty = instructors.filter(
 		(i) => !i.lead && i.track === "barbering",
 	);
-	const beautyFaculty = INSTRUCTORS.filter(
+	const beautyFaculty = instructors.filter(
 		(i) => !i.lead && i.track === "beauty",
 	);
 
 	return (
 		<main>
 			<JsonLdScript data={BREADCRUMB_JSON_LD} />
-			<JsonLdScript data={INSTRUCTORS_JSON_LD} />
+			<JsonLdScript data={instructorsJsonLd(instructors)} />
 			<Spotlight leads={leads} />
 			<FacultyGroup title="Barbering Faculty" instructors={barberingFaculty} />
 			<FacultyGroup
@@ -79,7 +84,7 @@ export function InstructorsPage() {
 /* The two lead instructors, presented as oversized membership cards —
    the guild-member motif carried to its most detailed form. */
 
-function Spotlight({ leads }: { leads: Instructor[] }) {
+function Spotlight({ leads }: { leads: InstructorView[] }) {
 	return (
 		<section
 			className="section-light bg-background px-6 py-24 lg:px-10"
@@ -163,7 +168,7 @@ function FacultyGroup({
 	instructors,
 }: {
 	title: string;
-	instructors: Instructor[];
+	instructors: InstructorView[];
 }) {
 	const headingId = `faculty-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 	return (
@@ -185,7 +190,7 @@ function FacultyGroup({
 	);
 }
 
-function MembershipCard({ instructor }: { instructor: Instructor }) {
+function MembershipCard({ instructor }: { instructor: InstructorView }) {
 	return (
 		<Card className="group h-full gap-0 overflow-hidden rounded-none border-border bg-background p-0 transition-colors hover:border-primary/40">
 			<div className="relative aspect-4/5 overflow-hidden">

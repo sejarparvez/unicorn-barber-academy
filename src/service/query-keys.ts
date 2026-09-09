@@ -33,6 +33,7 @@ export const queryKeys = {
 		page?: number;
 	}) => ["users", filters ?? {}] as const,
 	siteSettings: () => ["site-settings"] as const,
+	content: () => ["content"] as const,
 	myApplications: () => ["my-applications"] as const,
 	openIntakes: () => ["open-intakes"] as const,
 

@@ -15,8 +15,13 @@ import Testimonials from "@/features/home/sections/testimonials";
 import WhyUnicorn from "@/features/home/sections/why-us";
 import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
+import { listInstructorsFn, listTestimonialsFn } from "@/server/content-fns";
 
 export const Route = createFileRoute("/")({
+	loader: async () => ({
+		instructors: await listInstructorsFn(),
+		testimonials: await listTestimonialsFn(),
+	}),
 	component: Home,
 	head: () => ({
 		meta: [
@@ -52,6 +57,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+	const { instructors, testimonials } = Route.useLoaderData();
 	return (
 		<main>
 			<Hero />
@@ -61,8 +67,8 @@ function Home() {
 			<Stats />
 			<Programs />
 			<StudentLife />
-			<Instructors />
-			<Testimonials />
+			<Instructors instructors={instructors} />
+			<Testimonials items={testimonials} />
 			<Faq />
 			<VisitUs />
 			<FinalCta

@@ -6,12 +6,13 @@ import {
 	ProgramDetailPage,
 	ProgramNotFound,
 } from "@/features/programs/program-detail-page";
+import { listInstructorsFn } from "@/server/content-fns";
 
 export const Route = createFileRoute("/programs/$slug")({
-	loader: ({ params }) => {
+	loader: async ({ params }) => {
 		const program = getProgramBySlug(params.slug);
 		if (!program) throw notFound();
-		return { program };
+		return { program, instructors: await listInstructorsFn() };
 	},
 	head: ({ loaderData }) => {
 		if (!loaderData) {

@@ -64,16 +64,19 @@ src/components/  shared UI: layout/, providers/, ui/ (shadcn-style primitives)
 src/service/     client-side TanStack Query services + query-keys.ts (single source for keys)
 src/lib/         isomorphic shared code: types, env parsing, roles, api clients, markdown
 src/server/      SERVER-ONLY: db access, session, auth, mail, rate-limit, storage
-src/data/        static site content (programs, instructors, gallery, site config)
+src/data/        seed sources + truly static content (programs copy, image seeds)
 ```
 
 ### Server layer pattern (`src/server/`)
 
-Per domain (blog, enrollment), three file types:
+Per domain (blog, enrollment, users, settings, content), three file types:
 
 - `<domain>-db.ts` — Prisma data-access functions only.
 - `<domain>-validate.ts` — input validation for mutations.
 - `<domain>-fns.ts` — `createServerFn` wrappers that routes/loaders import.
+
+(`content-*` covers three small collections — instructors, gallery,
+testimonials — in one trio instead of three.)
 
 Plus cross-cutting modules: `guards.ts` (`requireRoles`), `session.ts`
 (`getSession`), `auth.ts`, `mail.ts`, `rate-limit.ts`, `storage.ts`.
@@ -109,7 +112,10 @@ beforeLoad: async ({ location }) => ({
 
 The root route loader fetches the session on every document load so `<Header/>`
 renders the correct signed-in/out state during SSR without hydration flicker —
-keep this intact.
+keep this intact. It also loads site settings once (`getSiteSettingsFn`);
+all contact info reads `useSite()` from `@/lib/site-context` — never import
+`CONTACT` from `@/data/site` in components (it only remains as DB fallback
+defaults + tests).
 
 ### Data fetching
 

@@ -35,8 +35,11 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
+import { Route as DashboardGalleryRouteImport } from './routes/dashboard/gallery'
+import { Route as DashboardInstructorsRouteImport } from './routes/dashboard/instructors'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardSiteRouteImport } from './routes/dashboard/site'
+import { Route as DashboardTestimonialsRouteImport } from './routes/dashboard/testimonials'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
 import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
@@ -197,6 +200,16 @@ const DashboardAdminRoute = DashboardAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardGalleryRoute = DashboardGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInstructorsRoute = DashboardInstructorsRouteImport.update({
+  id: '/instructors',
+  path: '/instructors',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -205,6 +218,11 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
 const DashboardSiteRoute = DashboardSiteRouteImport.update({
   id: '/site',
   path: '/site',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTestimonialsRoute = DashboardTestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardUsersRoute = DashboardUsersRouteImport.update({
@@ -384,8 +402,11 @@ export interface FileRoutesByFullPath {
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/gallery': typeof DashboardGalleryRoute
+  '/dashboard/instructors': typeof DashboardInstructorsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/site': typeof DashboardSiteRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -442,8 +463,11 @@ export interface FileRoutesByTo {
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/gallery': typeof DashboardGalleryRoute
+  '/dashboard/instructors': typeof DashboardInstructorsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/site': typeof DashboardSiteRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -502,8 +526,11 @@ export interface FileRoutesById {
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/gallery': typeof DashboardGalleryRoute
+  '/dashboard/instructors': typeof DashboardInstructorsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/site': typeof DashboardSiteRoute
+  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/programs/$slug': typeof ProgramsSlugRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -563,8 +590,11 @@ export interface FileRouteTypes {
     | '/auth/verify-email'
     | '/blog/$slug'
     | '/dashboard/admin'
+    | '/dashboard/gallery'
+    | '/dashboard/instructors'
     | '/dashboard/settings'
     | '/dashboard/site'
+    | '/dashboard/testimonials'
     | '/dashboard/users'
     | '/programs/$slug'
     | '/verify/$code'
@@ -621,8 +651,11 @@ export interface FileRouteTypes {
     | '/auth/verify-email'
     | '/blog/$slug'
     | '/dashboard/admin'
+    | '/dashboard/gallery'
+    | '/dashboard/instructors'
     | '/dashboard/settings'
     | '/dashboard/site'
+    | '/dashboard/testimonials'
     | '/dashboard/users'
     | '/programs/$slug'
     | '/verify/$code'
@@ -680,8 +713,11 @@ export interface FileRouteTypes {
     | '/auth/verify-email'
     | '/blog/$slug'
     | '/dashboard/admin'
+    | '/dashboard/gallery'
+    | '/dashboard/instructors'
     | '/dashboard/settings'
     | '/dashboard/site'
+    | '/dashboard/testimonials'
     | '/dashboard/users'
     | '/programs/$slug'
     | '/verify/$code'
@@ -940,6 +976,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/gallery': {
+      id: '/dashboard/gallery'
+      path: '/gallery'
+      fullPath: '/dashboard/gallery'
+      preLoaderRoute: typeof DashboardGalleryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/instructors': {
+      id: '/dashboard/instructors'
+      path: '/instructors'
+      fullPath: '/dashboard/instructors'
+      preLoaderRoute: typeof DashboardInstructorsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/settings': {
       id: '/dashboard/settings'
       path: '/settings'
@@ -952,6 +1002,13 @@ declare module '@tanstack/react-router' {
       path: '/site'
       fullPath: '/dashboard/site'
       preLoaderRoute: typeof DashboardSiteRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/testimonials': {
+      id: '/dashboard/testimonials'
+      path: '/testimonials'
+      fullPath: '/dashboard/testimonials'
+      preLoaderRoute: typeof DashboardTestimonialsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/users': {
@@ -1162,8 +1219,11 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardAdminRoute: typeof DashboardAdminRoute
+  DashboardGalleryRoute: typeof DashboardGalleryRoute
+  DashboardInstructorsRoute: typeof DashboardInstructorsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardSiteRoute: typeof DashboardSiteRoute
+  DashboardTestimonialsRoute: typeof DashboardTestimonialsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardBlogCategoriesRoute: typeof DashboardBlogCategoriesRoute
@@ -1178,8 +1238,11 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdminRoute: DashboardAdminRoute,
+  DashboardGalleryRoute: DashboardGalleryRoute,
+  DashboardInstructorsRoute: DashboardInstructorsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSiteRoute: DashboardSiteRoute,
+  DashboardTestimonialsRoute: DashboardTestimonialsRoute,
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardBlogCategoriesRoute: DashboardBlogCategoriesRoute,

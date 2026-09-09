@@ -30,7 +30,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'adcaa3e13b6d91a338d6be5fd7613f8f1c233b233a3c68e1a79d244c648f52c2'>;
+  StorageHashBase<'3546a9898236cf158aa3cd71bc3e46b8e72b393b94060e85473fe58cf2ba1a1c'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -246,7 +246,6 @@ export type FieldOutputTypes = {
       readonly category: Varchar<16>;
       readonly imageUrl: CodecTypes['pg/text@1']['output'] | null;
       readonly imageAlt: CodecTypes['pg/text@1']['output'];
-      readonly imageSeed: Varchar<120> | null;
       readonly caption: CodecTypes['pg/text@1']['output'] | null;
       readonly sortOrder: CodecTypes['pg/int4@1']['output'];
       readonly isPublished: CodecTypes['pg/bool@1']['output'];
@@ -264,7 +263,6 @@ export type FieldOutputTypes = {
       readonly specialties: ReadonlyArray<CodecTypes['pg/text@1']['output']>;
       readonly imageUrl: CodecTypes['pg/text@1']['output'] | null;
       readonly imageAlt: CodecTypes['pg/text@1']['output'] | null;
-      readonly imageSeed: Varchar<120> | null;
       readonly instagram: CodecTypes['pg/text@1']['output'] | null;
       readonly programSlug: Varchar<120> | null;
       readonly lead: CodecTypes['pg/bool@1']['output'];
@@ -319,7 +317,6 @@ export type FieldOutputTypes = {
       readonly cohort: Varchar<24>;
       readonly imageUrl: CodecTypes['pg/text@1']['output'] | null;
       readonly imageAlt: CodecTypes['pg/text@1']['output'] | null;
-      readonly imageSeed: Varchar<120> | null;
       readonly rating: CodecTypes['pg/int4@1']['output'];
       readonly sortOrder: CodecTypes['pg/int4@1']['output'];
       readonly isPublished: CodecTypes['pg/bool@1']['output'];
@@ -452,7 +449,6 @@ export type FieldInputTypes = {
       readonly category: CodecTypes['sql/varchar@1']['input'];
       readonly imageUrl: CodecTypes['pg/text@1']['input'] | null;
       readonly imageAlt: CodecTypes['pg/text@1']['input'];
-      readonly imageSeed: CodecTypes['sql/varchar@1']['input'] | null;
       readonly caption: CodecTypes['pg/text@1']['input'] | null;
       readonly sortOrder: CodecTypes['pg/int4@1']['input'];
       readonly isPublished: CodecTypes['pg/bool@1']['input'];
@@ -470,7 +466,6 @@ export type FieldInputTypes = {
       readonly specialties: ReadonlyArray<CodecTypes['pg/text@1']['input']>;
       readonly imageUrl: CodecTypes['pg/text@1']['input'] | null;
       readonly imageAlt: CodecTypes['pg/text@1']['input'] | null;
-      readonly imageSeed: CodecTypes['sql/varchar@1']['input'] | null;
       readonly instagram: CodecTypes['pg/text@1']['input'] | null;
       readonly programSlug: CodecTypes['sql/varchar@1']['input'] | null;
       readonly lead: CodecTypes['pg/bool@1']['input'];
@@ -525,7 +520,6 @@ export type FieldInputTypes = {
       readonly cohort: CodecTypes['sql/varchar@1']['input'];
       readonly imageUrl: CodecTypes['pg/text@1']['input'] | null;
       readonly imageAlt: CodecTypes['pg/text@1']['input'] | null;
-      readonly imageSeed: CodecTypes['sql/varchar@1']['input'] | null;
       readonly rating: CodecTypes['pg/int4@1']['input'];
       readonly sortOrder: CodecTypes['pg/int4@1']['input'];
       readonly isPublished: CodecTypes['pg/bool@1']['input'];
@@ -659,7 +653,6 @@ export type StorageColumnTypes = {
       readonly created_at: CodecTypes['pg/timestamptz@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly image_alt: CodecTypes['pg/text@1']['output'];
-      readonly image_seed: Varchar<120> | null;
       readonly image_url: CodecTypes['pg/text@1']['output'] | null;
       readonly is_published: CodecTypes['pg/bool@1']['output'];
       readonly sort_order: CodecTypes['pg/int4@1']['output'];
@@ -669,7 +662,6 @@ export type StorageColumnTypes = {
       readonly created_at: CodecTypes['pg/timestamptz@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly image_alt: CodecTypes['pg/text@1']['output'] | null;
-      readonly image_seed: Varchar<120> | null;
       readonly image_url: CodecTypes['pg/text@1']['output'] | null;
       readonly instagram: CodecTypes['pg/text@1']['output'] | null;
       readonly is_published: CodecTypes['pg/bool@1']['output'];
@@ -727,7 +719,6 @@ export type StorageColumnTypes = {
       readonly created_at: CodecTypes['pg/timestamptz@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly image_alt: CodecTypes['pg/text@1']['output'] | null;
-      readonly image_seed: Varchar<120> | null;
       readonly image_url: CodecTypes['pg/text@1']['output'] | null;
       readonly is_published: CodecTypes['pg/bool@1']['output'];
       readonly name: Varchar<160>;
@@ -865,7 +856,6 @@ export type StorageColumnInputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly image_alt: CodecTypes['pg/text@1']['input'];
-      readonly image_seed: CodecTypes['sql/varchar@1']['input'] | null;
       readonly image_url: CodecTypes['pg/text@1']['input'] | null;
       readonly is_published: CodecTypes['pg/bool@1']['input'];
       readonly sort_order: CodecTypes['pg/int4@1']['input'];
@@ -875,7 +865,6 @@ export type StorageColumnInputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly image_alt: CodecTypes['pg/text@1']['input'] | null;
-      readonly image_seed: CodecTypes['sql/varchar@1']['input'] | null;
       readonly image_url: CodecTypes['pg/text@1']['input'] | null;
       readonly instagram: CodecTypes['pg/text@1']['input'] | null;
       readonly is_published: CodecTypes['pg/bool@1']['input'];
@@ -933,7 +922,6 @@ export type StorageColumnInputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly image_alt: CodecTypes['pg/text@1']['input'] | null;
-      readonly image_seed: CodecTypes['sql/varchar@1']['input'] | null;
       readonly image_url: CodecTypes['pg/text@1']['input'] | null;
       readonly is_published: CodecTypes['pg/bool@1']['input'];
       readonly name: CodecTypes['sql/varchar@1']['input'];
@@ -1863,12 +1851,6 @@ type ContractBase = Omit<
                     readonly value: DefaultLiteralValue<'pg/text@1', ''>;
                   };
                 };
-                readonly image_seed: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly nullable: true;
-                  readonly typeParams: { readonly length: 120 };
-                };
                 readonly caption: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
@@ -1988,12 +1970,6 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
-                };
-                readonly image_seed: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly nullable: true;
-                  readonly typeParams: { readonly length: 120 };
                 };
                 readonly instagram: {
                   readonly nativeType: 'text';
@@ -2384,12 +2360,6 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
-                };
-                readonly image_seed: {
-                  readonly nativeType: 'character varying';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly nullable: true;
-                  readonly typeParams: { readonly length: 120 };
                 };
                 readonly rating: {
                   readonly nativeType: 'int4';
@@ -3414,14 +3384,6 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly imageSeed: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 120 };
-                };
-              };
               readonly caption: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -3448,7 +3410,6 @@ type ContractBase = Omit<
                 readonly category: { readonly column: 'category' };
                 readonly imageUrl: { readonly column: 'image_url' };
                 readonly imageAlt: { readonly column: 'image_alt' };
-                readonly imageSeed: { readonly column: 'image_seed' };
                 readonly caption: { readonly column: 'caption' };
                 readonly sortOrder: { readonly column: 'sort_order' };
                 readonly isPublished: { readonly column: 'is_published' };
@@ -3523,14 +3484,6 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly imageSeed: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 120 };
-                };
-              };
               readonly instagram: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -3584,7 +3537,6 @@ type ContractBase = Omit<
                 readonly specialties: { readonly column: 'specialties' };
                 readonly imageUrl: { readonly column: 'image_url' };
                 readonly imageAlt: { readonly column: 'image_alt' };
-                readonly imageSeed: { readonly column: 'image_seed' };
                 readonly instagram: { readonly column: 'instagram' };
                 readonly programSlug: { readonly column: 'program_slug' };
                 readonly lead: { readonly column: 'lead' };
@@ -3879,14 +3831,6 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly imageSeed: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'sql/varchar@1';
-                  readonly typeParams: { readonly length: 120 };
-                };
-              };
               readonly rating: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
@@ -3917,7 +3861,6 @@ type ContractBase = Omit<
                 readonly cohort: { readonly column: 'cohort' };
                 readonly imageUrl: { readonly column: 'image_url' };
                 readonly imageAlt: { readonly column: 'image_alt' };
-                readonly imageSeed: { readonly column: 'image_seed' };
                 readonly rating: { readonly column: 'rating' };
                 readonly sortOrder: { readonly column: 'sort_order' };
                 readonly isPublished: { readonly column: 'is_published' };

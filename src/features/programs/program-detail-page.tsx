@@ -11,7 +11,6 @@ import { FinalCta, Reveal, SectionEyebrow } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { INSTRUCTORS } from "@/data/instructors";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
 import { ProgramCard } from "@/features/programs/program-card";
@@ -38,12 +37,12 @@ export function ProgramNotFound() {
 }
 
 export function ProgramDetailPage() {
-	const { program } = Route.useLoaderData();
+	const { program, instructors } = Route.useLoaderData();
 
 	const trackLabel =
 		program.track === "barbering" ? "Barbering" : "Beauty & Cosmetology";
 
-	const teachers = INSTRUCTORS.filter(
+	const teachers = instructors.filter(
 		(instructor) => instructor.teaches.to === program.to,
 	);
 

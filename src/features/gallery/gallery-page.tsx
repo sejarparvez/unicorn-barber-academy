@@ -6,13 +6,8 @@ import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { FinalCta, Reveal, SectionEyebrow } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
-import {
-	GALLERY_ITEMS,
-	type GalleryCategory,
-	type GalleryItem,
-} from "@/data/gallery";
-import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
+import type { GalleryCategory, GalleryView } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 const JSON_LD = {
@@ -29,25 +24,27 @@ const JSON_LD = {
 	],
 };
 
-const IMAGE_GALLERY_JSON_LD = {
-	"@context": "https://schema.org",
-	"@type": "ImageGallery",
-	name: "Unicorn Barber Training Academy — Studio & Cohort Gallery",
-	url: `${SITE_URL}/gallery`,
-	image: GALLERY_ITEMS.map((item) => ({
-		"@type": "ImageObject",
-		contentUrl: pic(item.seed, item.w, item.h),
-		alt: item.alt,
-		width: item.w,
-		height: item.h,
-	})),
-};
+function imageGalleryJsonLd(items: GalleryView[]) {
+	return {
+		"@context": "https://schema.org",
+		"@type": "ImageGallery",
+		name: "Unicorn Barber Training Academy — Studio & Cohort Gallery",
+		url: `${SITE_URL}/gallery`,
+		image: items.map((item) => ({
+			"@type": "ImageObject",
+			contentUrl: item.image,
+			alt: item.alt,
+			width: item.w,
+			height: item.h,
+		})),
+	};
+}
 
-export function GalleryPage() {
+export function GalleryPage({ items }: { items: GalleryView[] }) {
 	return (
 		<main>
 			<JsonLdScript data={JSON_LD} />
-			<JsonLdScript data={IMAGE_GALLERY_JSON_LD} />
+			<JsonLdScript data={imageGalleryJsonLd(items)} />
 			<section className="mx-auto max-w-7xl px-6 pt-24 lg:px-10">
 				<p className="text-[11px] font-medium tracking-[0.22em] text-primary uppercase">
 					Our work
@@ -60,7 +57,7 @@ export function GalleryPage() {
 					everyday moments that make up life at Unicorn Barber Training Academy.
 				</p>
 			</section>
-			<MasonryGallery />
+			<MasonryGallery items={items} />
 			<FinalCta
 				title="Your before-and-after"
 				accent="starts with an application."
@@ -80,17 +77,15 @@ const FILTERS: { key: "all" | GalleryCategory; label: string }[] = [
 	{ key: "graduation", label: "Graduation Day" },
 ];
 
-function MasonryGallery() {
+function MasonryGallery({ items }: { items: GalleryView[] }) {
 	const [active, setActive] = useState<"all" | GalleryCategory>("all");
 	const [selected, setSelected] = useState<number | null>(null);
 	const shouldReduceMotion = useReducedMotion();
 
 	const visible = useMemo(
 		() =>
-			active === "all"
-				? GALLERY_ITEMS
-				: GALLERY_ITEMS.filter((g) => g.category === active),
-		[active],
+			active === "all" ? items : items.filter((g) => g.category === active),
+		[active, items],
 	);
 
 	useEffect(() => {
@@ -160,7 +155,7 @@ function MasonryGallery() {
 								className="group relative block w-full overflow-hidden text-left focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-primary"
 							>
 								<Image
-									src={pic(item.seed, item.w, item.h)}
+									src={item.image}
 									alt={item.alt}
 									width={item.w}
 									height={item.h}
@@ -198,7 +193,7 @@ function Lightbox({
 	onClose,
 	onNavigate,
 }: {
-	items: GalleryItem[];
+	items: GalleryView[];
 	index: number | null;
 	onClose: () => void;
 	onNavigate: (i: number) => void;
@@ -270,7 +265,7 @@ function Lightbox({
 								}}
 							>
 								<img
-									src={pic(item.seed, item.w * 2, item.h * 2)}
+									src={item.image}
 									alt={item.alt}
 									decoding="async"
 									className="max-h-[75vh] w-auto object-contain"
