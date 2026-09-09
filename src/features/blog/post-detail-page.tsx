@@ -598,7 +598,7 @@ function ShareRail({ title, url }: { title: string; url: string }) {
 			aria-hidden={false}
 			className="fixed top-1/2 left-8 z-30 hidden -translate-y-1/2 flex-col gap-2 min-[1500px]:flex print:hidden"
 		>
-			<span className="mb-1 text-[10px] font-semibold tracking-[0.22em] text-muted-foreground uppercase [writing-mode:vertical-lr]">
+			<span className="mb-1 text-[10px] items-center justify-center ml-2 font-semibold tracking-[0.22em] text-muted-foreground uppercase [writing-mode:vertical-lr]">
 				Share
 			</span>
 			<a
