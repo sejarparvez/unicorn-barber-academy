@@ -164,6 +164,9 @@ function RootDocument() {
 						"@type": "WebSite",
 						name: "Unicorn Barber Training Academy",
 						url: SITE_URL,
+						publisher: {
+							"@id": `${SITE_URL}/#academy`,
+						},
 					}}
 				/>
 				<HeadContent />

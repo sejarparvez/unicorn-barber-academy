@@ -4,7 +4,7 @@
 // (JSON-LD) can never drift apart.
 // Photo slot resolution lives in ./images.ts.
 
-export const SITE_URL = "https://unicornbarberacademy.com";
+export const SITE_URL = "https://www.unicornbarberacademy.com";
 
 /** Query used for every Google Maps link/embed on the site. */
 const MAPS_QUERY =

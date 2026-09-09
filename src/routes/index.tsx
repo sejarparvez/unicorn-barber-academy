@@ -45,13 +45,14 @@ export const Route = createFileRoute("/")({
 			{
 				name: "description",
 				content:
-					"Hands-on barbering and beauty & cosmetology training in Dhaka. Working-professional instructors, full kit included, job placement support. Enrollment open for the Fall cohort.",
+					"Barbering & beauty training in Dhaka — working-professional instructors, full kit included, job placement support. Enroll now.",
 			},
+			{ name: "robots", content: "index, follow" },
 			{ property: "og:title", content: "Unicorn Barber Training Academy" },
 			{
 				property: "og:description",
 				content:
-					"Hands-on barbering and beauty & cosmetology training taught by working professionals. Enrollment open for the Fall cohort.",
+					"Barbering & beauty training in Dhaka — working-professional instructors, full kit included, job placement support. Enroll now.",
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: SITE_URL },
@@ -62,7 +63,7 @@ export const Route = createFileRoute("/")({
 			{
 				name: "twitter:description",
 				content:
-					"Hands-on barbering and beauty & cosmetology training in Dhaka — taught by working professionals.",
+					"Barbering & beauty training in Dhaka — working-professional instructors, full kit included, job placement support.",
 			},
 		],
 		links: [{ rel: "canonical", href: SITE_URL }],
