@@ -45,18 +45,6 @@ export function GalleryPage({ items }: { items: GalleryView[] }) {
 		<main>
 			<JsonLdScript data={JSON_LD} />
 			<JsonLdScript data={imageGalleryJsonLd(items)} />
-			<section className="mx-auto max-w-7xl px-6 pt-24 lg:px-10">
-				<p className="text-[11px] font-medium tracking-[0.22em] text-primary uppercase">
-					Our work
-				</p>
-				<h1 className="mt-2 font-heading text-4xl font-semibold tracking-tight sm:text-5xl">
-					Studio &amp; cohort gallery
-				</h1>
-				<p className="mt-4 max-w-2xl text-muted-foreground">
-					A look inside the studio — fades in progress, graduation day, and the
-					everyday moments that make up life at Unicorn Barber Training Academy.
-				</p>
-			</section>
 			<MasonryGallery items={items} />
 			<FinalCta
 				title="Your before-and-after"

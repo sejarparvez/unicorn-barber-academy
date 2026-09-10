@@ -185,7 +185,13 @@ const CmdK = lazy(() =>
 );
 
 function DashboardLayout() {
-	const { session } = Route.useRouteContext();
+	const { session } = Route.useRouteContext() as {
+		session?: SessionPayload;
+	};
+	// beforeLoad redirects anonymous visitors to sign-in, but the layout
+	// can render a beat without context during that transition — bail out
+	// instead of crashing on `session.user`.
+	if (!session) return null;
 	return (
 		<main className="min-h-[calc(100svh-4rem)] bg-muted/25">
 			<Suspense>

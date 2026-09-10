@@ -158,13 +158,13 @@ export function ApplicationsListPage({
 					<h1 className="mt-1 font-heading text-2xl font-semibold tracking-tight">
 						Applications
 					</h1>
-					<p className="text-sm text-muted-foreground">
+					<div className="text-sm text-muted-foreground">
 						{data ? (
 							`${data.total} total`
 						) : (
 							<Skeleton className="h-4 w-16 inline-block" />
 						)}
-					</p>
+					</div>
 				</div>
 				<div className="flex items-center gap-2">
 					<Button

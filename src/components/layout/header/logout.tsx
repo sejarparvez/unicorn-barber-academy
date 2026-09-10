@@ -52,6 +52,7 @@ export function SignOut() {
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
 			<AlertDialogTrigger
+				nativeButton={false}
 				render={
 					<DropdownMenuItem
 						className="flex w-full cursor-pointer items-center gap-3 py-2.5 text-destructive focus:text-destructive"
