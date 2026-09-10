@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import Logo from "@/assets/logo/logo.png";
+import Logo96 from "@/assets/logo/logo-96.webp";
+import Logo192 from "@/assets/logo/logo-192.webp";
 
 export function LogoLink({ onNavigate }: { onNavigate?: () => void }) {
 	return (
@@ -11,13 +12,21 @@ export function LogoLink({ onNavigate }: { onNavigate?: () => void }) {
 			className="flex min-w-0 shrink-0 items-center gap-2.5 sm:gap-4"
 			aria-label="Unicorn Barber Training Academy, home"
 		>
-			<Image
-				src={Logo}
-				alt="Unicorn Barber Training Academy logo"
-				className="h-8 w-auto shrink-0 sm:h-10"
-				width={550}
-				height={454}
-			/>
+			<picture className="contents">
+				<source
+					type="image/webp"
+					srcSet={`${Logo96} 96w, ${Logo192} 192w`}
+					sizes="48px"
+				/>
+				<img
+					src={Logo}
+					alt="Unicorn Barber Training Academy logo"
+					className="h-8 w-auto shrink-0 sm:h-10"
+					width={550}
+					height={454}
+					loading="eager"
+				/>
+			</picture>
 
 			<span
 				aria-hidden="true"

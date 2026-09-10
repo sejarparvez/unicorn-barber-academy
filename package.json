@@ -67,6 +67,7 @@
     "dotenv": "^17.4.2",
     "prisma-next": "^8.0.0-rc.1",
     "shadcn": "^4.19.0",
+    "sharp": "^0.35.4",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
   }

@@ -8,6 +8,7 @@ import {
 } from "motion/react";
 import type { PropsWithChildren } from "react";
 import banner from "@/assets/logo/banner.png";
+import banner896 from "@/assets/logo/banner-896.webp";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -290,14 +291,17 @@ export function FinalCta({
 				animate={shouldReduceMotion ? {} : { rotate: 360 }}
 				transition={{ duration: 90, ease: "linear", repeat: Infinity }}
 			>
-				<img
-					src={banner}
-					alt=""
-					className="h-auto w-full opacity-[0.04]"
-					width={4001}
-					height={2001}
-					loading="lazy"
-				/>
+				<picture>
+					<source type="image/webp" srcSet={banner896} />
+					<img
+						src={banner}
+						alt=""
+						className="h-auto w-full opacity-[0.04]"
+						width={4001}
+						height={2001}
+						loading="lazy"
+					/>
+				</picture>
 			</motion.div>
 			<Reveal className="relative mx-auto max-w-2xl">
 				<h2 className="font-heading text-4xl font-medium sm:text-5xl">

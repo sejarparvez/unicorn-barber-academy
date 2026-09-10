@@ -3,9 +3,10 @@
 // compact centered card. Deliberately hero-free — the sticky site header
 // above and the footer below already carry the branding.
 import { Link } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import type { ReactNode } from "react";
 import Logo from "@/assets/logo/logo.png";
+import Logo96 from "@/assets/logo/logo-96.webp";
+import Logo192 from "@/assets/logo/logo-192.webp";
 
 export function AuthCard({
 	title,
@@ -25,13 +26,20 @@ export function AuthCard({
 					className="mx-auto flex w-fit items-center"
 					aria-label="Unicorn Barber Training Academy, home"
 				>
-					<Image
-						src={Logo}
-						alt=""
-						className="h-10 w-auto"
-						width={550}
-						height={454}
-					/>
+					<picture className="contents">
+						<source
+							type="image/webp"
+							srcSet={`${Logo96} 96w, ${Logo192} 192w`}
+							sizes="48px"
+						/>
+						<img
+							src={Logo}
+							alt=""
+							className="h-10 w-auto"
+							width={550}
+							height={454}
+						/>
+					</picture>
 				</Link>
 
 				<div className="mt-5 text-center">

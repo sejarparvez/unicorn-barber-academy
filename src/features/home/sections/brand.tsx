@@ -1,5 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import banner from "@/assets/logo/banner.png";
+import banner896 from "@/assets/logo/banner-896.webp";
+import banner1344 from "@/assets/logo/banner-1344.webp";
 import { Reveal } from "@/components/effects";
 
 export default function Brand() {
@@ -17,15 +19,22 @@ export default function Brand() {
 						viewport={{ once: true, margin: "-80px" }}
 						transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
 					>
-						<img
-							src={banner}
-							alt="Unicorn Barber Training Academy"
-							className="mx-auto h-auto w-full max-w-2xl"
-							width={4001}
-							height={2001}
-							loading="eager"
-							fetchPriority="high"
-						/>
+						<picture>
+							<source
+								type="image/webp"
+								srcSet={`${banner896} 896w, ${banner1344} 1344w`}
+								sizes="(max-width: 672px) 100vw, 672px"
+							/>
+							<img
+								src={banner}
+								alt="Unicorn Barber Training Academy"
+								className="mx-auto h-auto w-full max-w-2xl"
+								width={4001}
+								height={2001}
+								loading="eager"
+								fetchPriority="high"
+							/>
+						</picture>
 					</motion.div>
 				</Reveal>
 				<motion.div

@@ -10,6 +10,8 @@ import {
 } from "motion/react";
 import { useRef } from "react";
 import banner from "@/assets/logo/banner.png";
+import banner896 from "@/assets/logo/banner-896.webp";
+import banner1344 from "@/assets/logo/banner-1344.webp";
 import { buttonVariants } from "@/components/ui/button";
 import { pic } from "@/data/images";
 import { cn } from "@/lib/utils";
@@ -54,15 +56,22 @@ export default function Hero() {
 			<div className="relative mx-auto grid max-w-350 grid-cols-1 lg:grid-cols-[1fr_auto_1fr]">
 				{/* Brand banner — mobile only, shows first */}
 				<div className="order-1 flex items-center justify-center bg-[#0d0d0f] -ml-8 pt-6 pb-5 lg:hidden">
-					<img
-						src={banner}
-						alt="Unicorn Barber Training Academy"
-						className="h-auto w-full"
-						width={4001}
-						height={2001}
-						fetchPriority="high"
-						loading="eager"
-					/>
+					<picture>
+						<source
+							type="image/webp"
+							srcSet={`${banner896} 896w, ${banner1344} 1344w`}
+							sizes="100vw"
+						/>
+						<img
+							src={banner}
+							alt="Unicorn Barber Training Academy"
+							className="h-auto w-full"
+							width={4001}
+							height={2001}
+							fetchPriority="high"
+							loading="eager"
+						/>
+					</picture>
 				</div>
 
 				{/* Content column */}

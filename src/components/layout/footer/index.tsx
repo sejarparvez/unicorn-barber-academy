@@ -11,9 +11,10 @@ import {
 	IconPhone,
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
+import logo96 from "@/assets/logo/logo-96.webp";
+import logo192 from "@/assets/logo/logo-192.webp";
 import { JsonLdScript } from "@/components/jsonld-script";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -146,15 +147,22 @@ export default function Footer() {
 			/>
 
 			{/* Faint watermark crest for texture */}
-			<Image
-				src={logo}
-				alt=""
-				aria-hidden="true"
-				className="pointer-events-none absolute -right-12 -bottom-16 h-auto w-64 opacity-[0.04]"
-				width={550}
-				height={454}
-				loading="lazy"
-			/>
+			<picture>
+				<source
+					type="image/webp"
+					srcSet={`${logo96} 96w, ${logo192} 192w`}
+					sizes="256px"
+				/>
+				<img
+					src={logo}
+					alt=""
+					aria-hidden="true"
+					className="pointer-events-none absolute -right-12 -bottom-16 h-auto w-64 opacity-[0.04]"
+					width={550}
+					height={454}
+					loading="lazy"
+				/>
+			</picture>
 
 			<div className="relative mx-auto max-w-7xl px-4 py-16 lg:px-10">
 				<div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.3fr_1px_1fr_1px_1fr_1px_1fr]">
@@ -165,13 +173,21 @@ export default function Footer() {
 							className="flex shrink-0 items-center gap-2.5 sm:gap-4 min-w-0"
 							aria-label="Unicorn Barber Training Academy, home"
 						>
-							<Image
-								src={logo}
-								alt="Unicorn Barber Training Academy logo"
-								className="h-8 w-auto shrink-0 sm:h-10"
-								width={550}
-								height={454}
-							/>
+							<picture className="contents">
+								<source
+									type="image/webp"
+									srcSet={`${logo96} 96w, ${logo192} 192w`}
+									sizes="48px"
+								/>
+								<img
+									src={logo}
+									alt="Unicorn Barber Training Academy logo"
+									className="h-8 w-auto shrink-0 sm:h-10"
+									width={550}
+									height={454}
+									loading="eager"
+								/>
+							</picture>
 							<span className="h-7 w-px shrink-0 bg-linear-to-b from-chart-1 via-primary to-chart-4 sm:h-8" />
 							<span className="flex flex-col min-w-0 leading-none">
 								<span className="bg-[linear-gradient(90deg,var(--chart-1),var(--primary),var(--chart-4))] bg-clip-text text-base sm:text-xl tracking-[0.12em] sm:tracking-[0.14em] text-transparent truncate font-semibold">
