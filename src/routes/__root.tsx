@@ -15,11 +15,11 @@ import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { Analytics } from "@/components/providers/analytics";
+import { LazyToaster } from "@/components/providers/lazy-toaster";
 import { MotionProvider } from "@/components/providers/motion-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { RouteProgress } from "@/components/route-progress";
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
 import type { ResolvedSettings } from "@/lib/settings";
@@ -200,7 +200,7 @@ function RootDocument() {
 					</div>
 					<Analytics />
 					<SmoothScroll />
-					<Toaster position="bottom-right" richColors closeButton />
+					<LazyToaster />
 				</MotionProvider>
 				{import.meta.env.DEV && (
 					<TanStackDevtools
