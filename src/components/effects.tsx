@@ -303,7 +303,7 @@ export function FinalCta({
 				<h2 className="font-heading text-4xl font-medium sm:text-5xl">
 					{title} <span className={cn("italic", GOLD_TEXT)}>{accent}</span>
 				</h2>
-				<p className="mt-5 text-base leading-relaxed text-secondary-foreground/65">
+				<p className="mt-5 text-base leading-relaxed text-secondary-foreground/80">
 					{subtitle}
 				</p>
 				<div className="mt-10 flex justify-center">

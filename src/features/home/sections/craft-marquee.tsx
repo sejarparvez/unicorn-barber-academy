@@ -30,12 +30,12 @@ export default function CraftMarquee() {
 						}`}
 						className="flex items-center gap-10"
 					>
-						<span className="font-heading text-xl font-medium tracking-[0.18em] text-secondary-foreground/50 italic sm:text-2xl">
+						<span className="font-heading text-xl font-medium tracking-[0.18em] text-secondary-foreground/85 italic sm:text-2xl">
 							{word}
 						</span>
 						<svg
 							viewBox="0 0 24 24"
-							className="h-4 w-4 shrink-0 text-primary/60"
+							className="h-4 w-4 shrink-0 text-primary/80"
 							fill="none"
 							stroke="currentColor"
 							strokeWidth="1.75"

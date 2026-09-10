@@ -129,7 +129,7 @@ function AboutHero({ instructors }: { instructors: InstructorView[] }) {
 		<section className="border-b border-border px-6 pt-28 pb-20 lg:px-10 lg:pt-36 lg:pb-24">
 			<h1 className="sr-only">About Unicorn Barber Training Academy</h1>
 			<div className="mx-auto max-w-7xl">
-				<div className="flex items-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/65">
+				<div className="flex items-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/80">
 					<Link to="/" className="hover:text-primary">
 						HOME
 					</Link>
@@ -208,7 +208,7 @@ function AboutHero({ instructors }: { instructors: InstructorView[] }) {
 								/>
 								<span className="absolute inset-x-0 bottom-0 bg-secondary/85 px-3 py-2 text-[10px] tracking-[0.14em] text-primary backdrop-blur-sm">
 									{primaryLead.name.toUpperCase()}
-									<span className="block text-secondary-foreground/60">
+									<span className="block text-secondary-foreground/80">
 										{primaryLead.title}
 									</span>
 								</span>

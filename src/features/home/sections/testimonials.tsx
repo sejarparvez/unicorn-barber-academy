@@ -71,7 +71,7 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialView }) {
 							<span className="block text-sm font-semibold">
 								{testimonial.name}
 							</span>
-							<span className="block text-xs text-secondary-foreground/65">
+							<span className="block text-xs text-secondary-foreground/80">
 								{testimonial.program}, {testimonial.cohort}
 							</span>
 						</span>

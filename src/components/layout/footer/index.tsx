@@ -177,20 +177,20 @@ export default function Footer() {
 								<span className="bg-[linear-gradient(90deg,var(--chart-1),var(--primary),var(--chart-4))] bg-clip-text text-base sm:text-xl tracking-[0.12em] sm:tracking-[0.14em] text-transparent truncate font-semibold">
 									UNICORN
 								</span>
-								<span className="mt-1 text-[8px] sm:text-[10px] text-secondary-foreground/65 truncate">
+								<span className="mt-1 text-[8px] sm:text-[10px] text-secondary-foreground/80 truncate">
 									BARBER TRAINING ACADEMY
 								</span>
 							</span>
 						</Link>
 
-						<p className="mt-5 max-w-xs text-sm leading-relaxed text-secondary-foreground/65">
+						<p className="mt-5 max-w-xs text-sm leading-relaxed text-secondary-foreground/80">
 							Sharpening tomorrow&apos;s master barbers, one blade at a time.
 							Hands-on training, taught by working professionals.
 						</p>
 
 						{/* Enrollment updates — WhatsApp-first capture, no backend yet */}
 						<div className="mt-6 max-w-xs">
-							<p className="text-[11px] font-medium tracking-[0.18em] text-secondary-foreground/60 uppercase">
+							<p className="text-[11px] font-medium tracking-[0.18em] text-secondary-foreground/80 uppercase">
 								Cohort announcements
 							</p>
 							<form
@@ -323,7 +323,7 @@ export default function Footer() {
 
 			{/* Bottom bar */}
 			<div className="relative border-t border-primary/15">
-				<div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-secondary-foreground/65 sm:flex-row lg:px-10">
+				<div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-secondary-foreground/80 sm:flex-row lg:px-10">
 					<p>
 						&copy;{" "}
 						{/* Server and client can straddle a year boundary — suppress the

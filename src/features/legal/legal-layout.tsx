@@ -14,7 +14,7 @@ export function LegalHero({ title }: { title: string }) {
 			<div className="relative mx-auto max-w-3xl px-6 py-24 text-center lg:py-32">
 				<motion.div
 					{...fadeUp(0)}
-					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/65"
+					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/80"
 				>
 					<Link to="/" className="hover:text-primary">
 						HOME

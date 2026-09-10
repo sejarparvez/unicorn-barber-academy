@@ -29,7 +29,7 @@ export function LogoLink({ onNavigate }: { onNavigate?: () => void }) {
 					UNICORN
 				</span>
 
-				<span className="mt-1 truncate text-[6px] tracking-[0.2em] text-secondary-foreground/65 sm:text-[10px] sm:tracking-[0.32em]">
+				<span className="mt-1 truncate text-[6px] tracking-[0.2em] text-secondary-foreground/80 sm:text-[10px] sm:tracking-[0.32em]">
 					BARBER TRAINING ACADEMY
 				</span>
 			</span>
