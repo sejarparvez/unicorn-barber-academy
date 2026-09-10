@@ -1,7 +1,7 @@
 // src/features/careers/careers-page.tsx
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import {
 	FinalCta,
 	GOLD_TEXT,
@@ -174,7 +174,7 @@ function CareersHero() {
 			<Grain />
 
 			<div className="relative mx-auto max-w-3xl px-6 py-24 text-center lg:py-32">
-				<motion.div
+				<m.div
 					{...fadeUp(0)}
 					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/80"
 				>
@@ -183,27 +183,27 @@ function CareersHero() {
 					</Link>
 					<span aria-hidden="true">/</span>
 					<span className="text-primary">CAREERS</span>
-				</motion.div>
+				</m.div>
 
-				<motion.div {...fadeUp(0.06)}>
+				<m.div {...fadeUp(0.06)}>
 					<GuildSeal className="mx-auto mb-6 mt-6 h-12 w-12 text-primary/85" />
-				</motion.div>
+				</m.div>
 
-				<motion.h1
+				<m.h1
 					{...fadeUp(0.12)}
 					className="font-heading text-5xl font-medium leading-[1.08] sm:text-6xl"
 				>
 					Teach the craft{" "}
 					<span className={cn("italic font-normal", GOLD_TEXT)}>you live.</span>
-				</motion.h1>
-				<motion.p
+				</m.h1>
+				<m.p
 					{...fadeUp(0.18)}
 					className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-secondary-foreground/70 sm:text-lg"
 				>
 					We don't hire career academics. We hire barbers, colourists, and
 					makeup artists who still love the chair — and want to shape the next
 					generation.
-				</motion.p>
+				</m.p>
 			</div>
 		</section>
 	);

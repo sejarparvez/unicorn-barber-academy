@@ -2,15 +2,11 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import {
-	motion,
-	useReducedMotion,
-	useScroll,
-	useTransform,
-} from "motion/react";
+import { m, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import banner from "@/assets/logo/banner.png";
 import banner640 from "@/assets/logo/banner-640.webp";
+import banner768 from "@/assets/logo/banner-768.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
 import banner1344 from "@/assets/logo/banner-1344.webp";
 import { buttonVariants } from "@/components/ui/button";
@@ -59,7 +55,7 @@ function HeroPhoto({
 
 	return (
 		<div className="relative hidden overflow-hidden lg:block lg:h-[88vh]">
-			<motion.div
+			<m.div
 				style={
 					shouldReduceMotion ? undefined : { y: photoY, scale: photoScale }
 				}
@@ -74,7 +70,7 @@ function HeroPhoto({
 					loading="eager"
 					className="h-full w-full object-cover contrast-[1.05] grayscale-15"
 				/>
-			</motion.div>
+			</m.div>
 			<div
 				aria-hidden="true"
 				className="pointer-events-none absolute inset-0 bg-linear-to-l from-transparent via-transparent to-background/20"
@@ -116,7 +112,7 @@ export default function Hero() {
 					<picture>
 						<source
 							type="image/webp"
-							srcSet={`${banner640} 640w, ${banner896} 896w, ${banner1344} 1344w`}
+							srcSet={`${banner640} 640w, ${banner768} 768w, ${banner896} 896w, ${banner1344} 1344w`}
 							sizes="100vw"
 						/>
 						<img

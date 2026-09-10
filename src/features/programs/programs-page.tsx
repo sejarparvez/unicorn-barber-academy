@@ -12,7 +12,7 @@ import {
 } from "@tabler/icons-react";
 
 import { Link } from "@tanstack/react-router";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { useMemo, useState } from "react";
 import {
 	FinalCta,
@@ -216,7 +216,7 @@ function ProgramCatalogue() {
 						>
 							{f.label.toUpperCase()}
 							{active === f.key && (
-								<motion.span
+								<m.span
 									layoutId="programs-tab-underline"
 									className="absolute inset-x-0 -bottom-px h-0.5 bg-primary"
 									transition={
@@ -230,13 +230,13 @@ function ProgramCatalogue() {
 					))}
 				</fieldset>
 
-				<motion.div
+				<m.div
 					layout
 					className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
 				>
 					<AnimatePresence mode="popLayout">
 						{visible.map((program, i) => (
-							<motion.div
+							<m.div
 								key={program.title}
 								layout
 								initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
@@ -249,10 +249,10 @@ function ProgramCatalogue() {
 								}}
 							>
 								<ProgramCard program={program} />
-							</motion.div>
+							</m.div>
 						))}
 					</AnimatePresence>
-				</motion.div>
+				</m.div>
 
 				{visible.length === 0 && (
 					<p className="mt-10 text-sm text-muted-foreground">

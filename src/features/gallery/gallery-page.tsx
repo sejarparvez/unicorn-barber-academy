@@ -2,7 +2,7 @@
 import { Dialog } from "@base-ui/react/dialog";
 import { IconChevronLeft, IconChevronRight, IconX } from "@tabler/icons-react";
 import { Image } from "@unpic/react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { FinalCta, Reveal, SectionEyebrow } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
@@ -128,7 +128,7 @@ function MasonryGallery({ items }: { items: GalleryView[] }) {
 						>
 							{f.label.toUpperCase()}
 							{active === f.key && (
-								<motion.span
+								<m.span
 									layoutId="gallery-tab-underline"
 									className="absolute inset-x-0 -bottom-px h-0.5 bg-primary"
 									transition={
@@ -252,7 +252,7 @@ function Lightbox({
 								<IconChevronRight className="h-5 w-5" stroke={1.75} />
 							</button>
 
-							<motion.figure
+							<m.figure
 								key={item.id}
 								className="flex max-h-full max-w-3xl flex-col items-center"
 								initial={
@@ -281,7 +281,7 @@ function Lightbox({
 										/ {items.length}
 									</span>
 								</figcaption>
-							</motion.figure>
+							</m.figure>
 						</>
 					)}
 				</Dialog.Popup>

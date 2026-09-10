@@ -1,5 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 
 export function RouteProgress() {
 	const isLoading = useRouterState({
@@ -10,7 +10,7 @@ export function RouteProgress() {
 	if (!isLoading) return null;
 
 	return (
-		<motion.div
+		<m.div
 			className="fixed inset-x-0 top-0 z-[100] h-0.5 bg-primary"
 			initial={shouldReduceMotion ? { scaleX: 1 } : { scaleX: 0, originX: 0 }}
 			animate={

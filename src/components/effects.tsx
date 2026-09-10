@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
-	motion,
+	m,
 	useReducedMotion,
 	useScroll,
 	useSpring,
@@ -36,7 +36,7 @@ export function ScrollProgress() {
 	});
 	if (shouldReduceMotion) return null;
 	return (
-		<motion.div
+		<m.div
 			aria-hidden="true"
 			className="fixed inset-x-0 top-0 z-[60] h-0.5 origin-left bg-linear-to-r from-chart-1 via-primary to-chart-4"
 			style={{ scaleX }}
@@ -54,7 +54,7 @@ export function Reveal({
 		return <div className={className}>{children}</div>;
 	}
 	return (
-		<motion.div
+		<m.div
 			className={className}
 			initial="hidden"
 			whileInView="visible"
@@ -63,7 +63,7 @@ export function Reveal({
 			transition={{ delay }}
 		>
 			{children}
-		</motion.div>
+		</m.div>
 	);
 }
 
@@ -187,7 +187,7 @@ export function SectionEyebrow({
 	const Title = as;
 	return (
 		<div className="flex items-center gap-4">
-			<motion.span
+			<m.span
 				className="h-6 w-px origin-top bg-linear-to-b from-chart-1 via-primary to-chart-4"
 				aria-hidden="true"
 				initial={shouldReduceMotion ? {} : { scaleY: 0 }}
@@ -244,7 +244,7 @@ export function TrustBar() {
 			aria-label="Accreditation"
 		>
 			<span className="sr-only">{CREDENTIALS.join(" — ")}</span>
-			<motion.div
+			<m.div
 				aria-hidden="true"
 				className="flex w-max items-center gap-14"
 				animate={{ x: ["0%", "-50%"] }}
@@ -262,7 +262,7 @@ export function TrustBar() {
 						<span className="h-1 w-1 shrink-0 rounded-full bg-primary/50" />
 					</span>
 				))}
-			</motion.div>
+			</m.div>
 		</section>
 	);
 }
@@ -285,7 +285,7 @@ export function FinalCta({
 	return (
 		<section className="relative overflow-hidden border-t border-primary/15 px-4 py-28 text-center lg:px-10">
 			<Grain />
-			<motion.div
+			<m.div
 				aria-hidden="true"
 				className="pointer-events-none absolute left-1/2 top-1/2 hidden w-72 -translate-x-1/2 -translate-y-1/2 sm:block sm:w-96"
 				animate={shouldReduceMotion ? {} : { rotate: 360 }}
@@ -302,7 +302,7 @@ export function FinalCta({
 						loading="lazy"
 					/>
 				</picture>
-			</motion.div>
+			</m.div>
 			<Reveal className="relative mx-auto max-w-2xl">
 				<h2 className="font-heading text-4xl font-medium sm:text-5xl">
 					{title} <span className={cn("italic", GOLD_TEXT)}>{accent}</span>

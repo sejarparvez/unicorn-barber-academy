@@ -17,7 +17,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import type { FormEvent } from "react";
 import {
 	GOLD_TEXT,
@@ -126,7 +126,7 @@ function ContactHero() {
 			<Grain />
 
 			<div className="relative mx-auto max-w-3xl px-6 py-24 text-center lg:py-28">
-				<motion.div
+				<m.div
 					{...fadeUp(0)}
 					className="flex items-center justify-center gap-2 text-[11px] tracking-[0.22em] text-secondary-foreground/80"
 				>
@@ -135,29 +135,29 @@ function ContactHero() {
 					</Link>
 					<span aria-hidden="true">/</span>
 					<span className="text-primary">CONTACT</span>
-				</motion.div>
+				</m.div>
 
-				<motion.div {...fadeUp(0.06)}>
+				<m.div {...fadeUp(0.06)}>
 					<GuildSeal className="mx-auto mb-6 mt-6 h-12 w-12 text-primary/85" />
-				</motion.div>
+				</m.div>
 
-				<motion.h1
+				<m.h1
 					{...fadeUp(0.12)}
 					className="font-heading text-5xl font-medium leading-[1.08] sm:text-6xl"
 				>
 					Let&rsquo;s{" "}
 					<span className={cn("italic font-normal", GOLD_TEXT)}>talk.</span>
-				</motion.h1>
-				<motion.p
+				</m.h1>
+				<m.p
 					{...fadeUp(0.18)}
 					className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-secondary-foreground/70 sm:text-lg"
 				>
 					Questions about a program, a partnership, or just want to see the
 					studio in person? One message reaches us — tell us what it&rsquo;s
 					about below.
-				</motion.p>
+				</m.p>
 
-				<motion.div
+				<m.div
 					{...fadeUp(0.26)}
 					className="mt-9 flex flex-wrap items-center justify-center gap-3"
 				>
@@ -186,7 +186,7 @@ function ContactHero() {
 						<IconMapPin className="h-3.5 w-3.5" stroke={1.75} />
 						GET DIRECTIONS
 					</a>
-				</motion.div>
+				</m.div>
 			</div>
 		</section>
 	);
@@ -251,7 +251,7 @@ function ContactForm() {
 										onReset={() => submitMessage.reset()}
 									/>
 								) : (
-									<motion.form
+									<m.form
 										key="form"
 										initial={{ opacity: 0 }}
 										animate={{ opacity: 1 }}
@@ -379,7 +379,7 @@ function ContactForm() {
 												<IconSend className="ml-2 h-3.5 w-3.5" stroke={1.75} />
 											</Button>
 										</div>
-									</motion.form>
+									</m.form>
 								)}
 							</AnimatePresence>
 						</div>
@@ -472,7 +472,7 @@ function CopyRow({
 function SealedConfirmation({ onReset }: { onReset: () => void }) {
 	const shouldReduceMotion = useReducedMotion();
 	return (
-		<motion.div
+		<m.div
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			exit={{ opacity: 0 }}
@@ -480,7 +480,7 @@ function SealedConfirmation({ onReset }: { onReset: () => void }) {
 			className="flex flex-col items-center py-10 text-center"
 			role="status"
 		>
-			<motion.div
+			<m.div
 				initial={
 					shouldReduceMotion
 						? { opacity: 0 }
@@ -490,7 +490,7 @@ function SealedConfirmation({ onReset }: { onReset: () => void }) {
 				transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
 			>
 				<GuildSeal className="h-20 w-20 text-primary" />
-			</motion.div>
+			</m.div>
 			<h3 className="mt-6 font-heading text-2xl font-medium text-foreground">
 				Sealed.
 			</h3>
@@ -505,7 +505,7 @@ function SealedConfirmation({ onReset }: { onReset: () => void }) {
 			>
 				SEND ANOTHER MESSAGE
 			</button>
-		</motion.div>
+		</m.div>
 	);
 }
 

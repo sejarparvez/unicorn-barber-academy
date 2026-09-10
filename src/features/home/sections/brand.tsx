@@ -1,6 +1,7 @@
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import banner from "@/assets/logo/banner.png";
 import banner640 from "@/assets/logo/banner-640.webp";
+import banner768 from "@/assets/logo/banner-768.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
 import banner1344 from "@/assets/logo/banner-1344.webp";
 import { Reveal } from "@/components/effects";
@@ -14,7 +15,7 @@ export default function Brand() {
 		>
 			<div className="mx-auto max-w-4xl text-center">
 				<Reveal>
-					<motion.div
+					<m.div
 						initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.96 }}
 						whileInView={{ opacity: 1, scale: 1 }}
 						viewport={{ once: true, margin: "-80px" }}
@@ -23,7 +24,7 @@ export default function Brand() {
 						<picture>
 							<source
 								type="image/webp"
-								srcSet={`${banner640} 640w, ${banner896} 896w, ${banner1344} 1344w`}
+								srcSet={`${banner640} 640w, ${banner768} 768w, ${banner896} 896w, ${banner1344} 1344w`}
 								sizes="(max-width: 672px) 100vw, 672px"
 							/>
 							<img
@@ -36,9 +37,9 @@ export default function Brand() {
 								fetchPriority="high"
 							/>
 						</picture>
-					</motion.div>
+					</m.div>
 				</Reveal>
-				<motion.div
+				<m.div
 					aria-hidden="true"
 					className="mx-auto mt-8 h-px w-24 bg-linear-to-r from-transparent via-primary to-transparent"
 					initial={shouldReduceMotion ? {} : { scaleX: 0 }}

@@ -15,6 +15,7 @@ import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { Analytics } from "@/components/providers/analytics";
+import { MotionProvider } from "@/components/providers/motion-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { RouteProgress } from "@/components/route-progress";
@@ -172,33 +173,35 @@ function RootDocument() {
 				<HeadContent />
 			</head>
 			<body>
-				<RouteProgress />
-				{/* Skip link � keyboard users jump straight past the header. */}
-				<a
-					href="#main-content"
-					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-				>
-					Skip to content
-				</a>
-				{isMarketing ? <ScrollProgress /> : null}
-				{/* Site chrome never prints � certificate pages rely on this. */}
-				<div className="print:hidden">
-					<AnnouncementBanner />
-					<Header session={session} />
-				</div>
-				<div id="main-content" className=" min-h-screen">
-					<TooltipProvider>
-						<QueryProvider>
-							<Outlet />
-						</QueryProvider>
-					</TooltipProvider>
-				</div>
-				<div className="print:hidden">
-					<Footer />
-				</div>
-				<Analytics />
-				<SmoothScroll />
-				<Toaster position="bottom-right" richColors closeButton />
+				<MotionProvider>
+					<RouteProgress />
+					{/* Skip link � keyboard users jump straight past the header. */}
+					<a
+						href="#main-content"
+						className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+					>
+						Skip to content
+					</a>
+					{isMarketing ? <ScrollProgress /> : null}
+					{/* Site chrome never prints � certificate pages rely on this. */}
+					<div className="print:hidden">
+						<AnnouncementBanner />
+						<Header session={session} />
+					</div>
+					<div id="main-content" className=" min-h-screen">
+						<TooltipProvider>
+							<QueryProvider>
+								<Outlet />
+							</QueryProvider>
+						</TooltipProvider>
+					</div>
+					<div className="print:hidden">
+						<Footer />
+					</div>
+					<Analytics />
+					<SmoothScroll />
+					<Toaster position="bottom-right" richColors closeButton />
+				</MotionProvider>
 				{import.meta.env.DEV && (
 					<TanStackDevtools
 						config={{

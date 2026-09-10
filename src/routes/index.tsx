@@ -2,6 +2,7 @@ import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 import banner640 from "@/assets/logo/banner-640.webp";
+import banner768 from "@/assets/logo/banner-768.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
 import { CardGridSkeleton } from "@/components/route-skeletons";
@@ -69,7 +70,7 @@ export const Route = createFileRoute("/")({
 			{
 				rel: "preload",
 				as: "image",
-				imageSrcSet: `${banner640} 640w, ${banner896} 896w`,
+				imageSrcSet: `${banner640} 640w, ${banner768} 768w, ${banner896} 896w`,
 				imageSizes: "100vw",
 				fetchPriority: "high",
 			},

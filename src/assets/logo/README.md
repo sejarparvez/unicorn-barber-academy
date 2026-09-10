@@ -10,8 +10,8 @@ The same two images exist in two places **on purpose**:
 If you replace the brand assets, update **both** locations and keep the
 hashes identical. Do not "clean up" one side without migrating its consumers.
 
-Responsive variants (`banner-640.webp`, `banner-896.webp`, `banner-1344.webp`,
-`logo-64.webp`, `logo-96.webp`, `logo-192.webp`) are generated from the PNGs with `sharp`
+Responsive variants (`banner-640.webp`, `banner-768.webp`, `banner-896.webp`,
+`banner-1344.webp`, `logo-64.webp`, `logo-96.webp`, `logo-192.webp`) are generated from the PNGs with `sharp`
 (`bun -e "...sharp..."`, see git history) and served WebP-first via
 `<picture>` with PNG fallback. Regenerate them after replacing the PNGs.
 `public/` copies stay PNG for og:image crawlers.
