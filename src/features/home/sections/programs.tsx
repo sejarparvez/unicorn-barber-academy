@@ -125,7 +125,7 @@ function ProgramTrack({
 					{icon}
 					<h3
 						id={trackId}
-						className="text-[12px] font-semibold tracking-[0.24em] text-primary"
+						className="text-[12px] font-semibold tracking-[0.24em] text-[#8B6914]"
 					>
 						{label.toUpperCase()}
 					</h3>
@@ -178,7 +178,7 @@ export default function Programs() {
 						trackId="barbering-track"
 						icon={
 							<IconScissors
-								className="h-4 w-4 text-primary"
+								className="h-4 w-4 text-[#8B6914]"
 								stroke={1.75}
 								aria-hidden="true"
 							/>
@@ -190,7 +190,7 @@ export default function Programs() {
 						trackId="beauty-track"
 						icon={
 							<IconSparkles
-								className="h-4 w-4 text-primary"
+								className="h-4 w-4 text-[#8B6914]"
 								stroke={1.75}
 								aria-hidden="true"
 							/>
