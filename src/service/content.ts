@@ -1,13 +1,78 @@
 // src/service/content.ts
-// TanStack Query hooks for admin content collections (admin-only).
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+// TanStack Query hooks for admin content collections (admin-only) plus the
+// public home-page sections. The public hooks use `useSuspenseQuery` so the
+// home route can render its static hero (and LCP image) immediately and let
+// the DB-backed sections stream in behind Suspense boundaries instead of
+// blocking the whole route loader.
+import {
+	useMutation,
+	useQuery,
+	useQueryClient,
+	useSuspenseQuery,
+} from "@tanstack/react-query";
 import type {
 	FaqAdmin,
+	FaqView,
 	GalleryAdmin,
+	GalleryView,
 	InstructorAdmin,
+	InstructorView,
 	TestimonialAdmin,
+	TestimonialView,
 } from "@/lib/content";
 import { queryKeys } from "./query-keys";
+
+const HOME_STALE_TIME = 60_000;
+
+export function useHomeInstructors() {
+	return useSuspenseQuery({
+		queryKey: queryKeys.homeInstructors(),
+		queryFn: async (): Promise<InstructorView[]> => {
+			const { listInstructorsFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listInstructorsFn();
+		},
+		staleTime: HOME_STALE_TIME,
+	});
+}
+
+export function useHomeTestimonials() {
+	return useSuspenseQuery({
+		queryKey: queryKeys.homeTestimonials(),
+		queryFn: async (): Promise<TestimonialView[]> => {
+			const { listTestimonialsFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listTestimonialsFn();
+		},
+		staleTime: HOME_STALE_TIME,
+	});
+}
+
+export function useHomeFaqs() {
+	return useSuspenseQuery({
+		queryKey: queryKeys.homeFaqs(),
+		queryFn: async (): Promise<FaqView[]> => {
+			const { listFaqsFn } = await import("@/server/content/content-fns");
+			return listFaqsFn({ data: { placement: "home" } });
+		},
+		staleTime: HOME_STALE_TIME,
+	});
+}
+
+export function useFeaturedGallery() {
+	return useSuspenseQuery({
+		queryKey: queryKeys.featuredGallery(),
+		queryFn: async (): Promise<GalleryView[]> => {
+			const { listFeaturedGalleryFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listFeaturedGalleryFn();
+		},
+		staleTime: HOME_STALE_TIME,
+	});
+}
 
 export function useInstructorsAdmin() {
 	return useQuery({

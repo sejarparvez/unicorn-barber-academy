@@ -28,17 +28,12 @@ export function SmoothScroll() {
 			duration: 1.1,
 			easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
 			touchMultiplier: 1.4,
+			// Drive the raf loop internally only while settling — avoids a
+			// permanent per-frame callback (and its layout reads) when idle.
+			autoRaf: true,
 		});
 
-		let frame: number;
-		function raf(time: number) {
-			lenis.raf(time);
-			frame = requestAnimationFrame(raf);
-		}
-		frame = requestAnimationFrame(raf);
-
 		return () => {
-			cancelAnimationFrame(frame);
 			lenis.destroy();
 		};
 	}, [shouldReduceMotion, isMarketing]);

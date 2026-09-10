@@ -34,6 +34,10 @@ export const queryKeys = {
 	}) => ["users", filters ?? {}] as const,
 	siteSettings: () => ["site-settings"] as const,
 	content: () => ["content"] as const,
+	homeInstructors: () => ["content", "home", "instructors"] as const,
+	homeTestimonials: () => ["content", "home", "testimonials"] as const,
+	homeFaqs: () => ["content", "home", "faqs"] as const,
+	featuredGallery: () => ["content", "home", "featured-gallery"] as const,
 	auditLog: (filters?: { actorId?: number; action?: string; page?: number }) =>
 		["audit-log", filters ?? {}] as const,
 	inquiries: (filters?: { unreadOnly?: boolean; page?: number }) =>

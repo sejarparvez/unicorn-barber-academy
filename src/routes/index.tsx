@@ -1,7 +1,10 @@
 import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Suspense } from "react";
+import banner640 from "@/assets/logo/banner-640.webp";
+import banner896 from "@/assets/logo/banner-896.webp";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
-import { HomeHeroSkeleton } from "@/components/route-skeletons";
+import { CardGridSkeleton } from "@/components/route-skeletons";
 import { buttonVariants } from "@/components/ui/button";
 import { SITE_URL } from "@/data/site";
 import Brand from "@/features/home/sections/brand";
@@ -17,24 +20,17 @@ import WhyUnicorn from "@/features/home/sections/why-us";
 import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
 import {
-	listFaqsFn,
-	listFeaturedGalleryFn,
-	listInstructorsFn,
-	listTestimonialsFn,
-} from "@/server/content/content-fns";
+	useFeaturedGallery,
+	useHomeFaqs,
+	useHomeInstructors,
+	useHomeTestimonials,
+} from "@/service/content";
 
 export const Route = createFileRoute("/")({
-	loader: async () => {
-		const [instructors, testimonials, faqs, featured] = await Promise.all([
-			listInstructorsFn(),
-			listTestimonialsFn(),
-			listFaqsFn({ data: { placement: "home" } }),
-			listFeaturedGalleryFn(),
-		]);
-		return { instructors, testimonials, faqs, featured };
-	},
-	staleTime: 60_000,
-	pendingComponent: HomeHeroSkeleton,
+	// No route loader on purpose: the hero (and LCP image) is fully static,
+	// so Home renders and streams immediately while the DB-backed sections
+	// below resolve independently behind Suspense. A loader would hold the
+	// entire page — LCP included — on four content queries.
 	component: Home,
 	head: () => ({
 		meta: [
@@ -66,12 +62,42 @@ export const Route = createFileRoute("/")({
 					"Barbering & beauty training in Dhaka — working-professional instructors, full kit included, job placement support.",
 			},
 		],
-		links: [{ rel: "canonical", href: SITE_URL }],
+		links: [
+			{ rel: "canonical", href: SITE_URL },
+			// LCP image preload: the mobile hero banner. `imagesrcset` lets
+			// the browser pick the right variant before parsing the body.
+			{
+				rel: "preload",
+				as: "image",
+				imageSrcSet: `${banner640} 640w, ${banner896} 896w`,
+				imageSizes: "100vw",
+				fetchPriority: "high",
+			},
+		],
 	}),
 });
 
+function StudentLifeSection() {
+	const { data: featured } = useFeaturedGallery();
+	return <StudentLife items={featured} />;
+}
+
+function InstructorsSection() {
+	const { data: instructors } = useHomeInstructors();
+	return <Instructors instructors={instructors} />;
+}
+
+function TestimonialsSection() {
+	const { data: testimonials } = useHomeTestimonials();
+	return <Testimonials items={testimonials} />;
+}
+
+function FaqSection() {
+	const { data: faqs } = useHomeFaqs();
+	return <Faq items={faqs} />;
+}
+
 function Home() {
-	const { instructors, testimonials, faqs, featured } = Route.useLoaderData();
 	return (
 		<main>
 			<Hero />
@@ -80,10 +106,18 @@ function Home() {
 			<Brand />
 			<Stats />
 			<Programs />
-			<StudentLife items={featured} />
-			<Instructors instructors={instructors} />
-			<Testimonials items={testimonials} />
-			<Faq items={faqs} />
+			<Suspense fallback={<CardGridSkeleton count={4} />}>
+				<StudentLifeSection />
+			</Suspense>
+			<Suspense fallback={<CardGridSkeleton count={4} />}>
+				<InstructorsSection />
+			</Suspense>
+			<Suspense fallback={<CardGridSkeleton count={3} />}>
+				<TestimonialsSection />
+			</Suspense>
+			<Suspense fallback={<CardGridSkeleton count={4} />}>
+				<FaqSection />
+			</Suspense>
 			<VisitUs />
 			<FinalCta
 				title="Your chair — or your studio —"

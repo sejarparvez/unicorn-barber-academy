@@ -8,7 +8,7 @@ import {
 	useScroll,
 	useTransform,
 } from "motion/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import banner from "@/assets/logo/banner.png";
 import banner640 from "@/assets/logo/banner-640.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
@@ -26,8 +26,28 @@ import { cn } from "@/lib/utils";
 const gradientText =
 	"bg-linear-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-transparent";
 
-export default function Hero() {
-	const sectionRef = useRef<HTMLElement>(null);
+/** Desktop-only (matches `lg:`): running `useScroll` against the hero section
+ *  forces layout measurement on every scroll — pointless on mobile where the
+ *  photo column is `hidden`. */
+function useDesktop() {
+	const [desktop, setDesktop] = useState(false);
+	useEffect(() => {
+		const mq = window.matchMedia("(min-width: 1024px)");
+		setDesktop(mq.matches);
+		const onChange = (e: MediaQueryListEvent) => setDesktop(e.matches);
+		mq.addEventListener("change", onChange);
+		return () => mq.removeEventListener("change", onChange);
+	}, []);
+	return desktop;
+}
+
+/** Parallax photo column — own component so the scroll subscription and its
+ *  layout measurements only exist when actually rendered (desktop). */
+function HeroPhoto({
+	sectionRef,
+}: {
+	sectionRef: React.RefObject<HTMLElement | null>;
+}) {
 	const shouldReduceMotion = useReducedMotion();
 	// Gentle scroll-linked parallax on the photo column.
 	const { scrollYProgress } = useScroll({
@@ -36,6 +56,42 @@ export default function Hero() {
 	});
 	const photoY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
 	const photoScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+
+	return (
+		<div className="relative hidden overflow-hidden lg:block lg:h-[88vh]">
+			<motion.div
+				style={
+					shouldReduceMotion ? undefined : { y: photoY, scale: photoScale }
+				}
+				className="h-full w-full"
+			>
+				<Image
+					src={pic("unicorn-hero-barbering", 1400, 1700)}
+					alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
+					layout="fullWidth"
+					sizes="(min-width: 1024px) 50vw, 100vw"
+					fetchPriority="high"
+					loading="eager"
+					className="h-full w-full object-cover contrast-[1.05] grayscale-15"
+				/>
+			</motion.div>
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-0 bg-linear-to-l from-transparent via-transparent to-background/20"
+			/>
+			{/* Gold hairline framing the photo edge */}
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-y-0 left-0 hidden w-px bg-linear-to-b from-transparent via-primary/40 to-transparent lg:block"
+			/>
+		</div>
+	);
+}
+
+export default function Hero() {
+	const sectionRef = useRef<HTMLElement>(null);
+	const shouldReduceMotion = useReducedMotion();
+	const desktop = useDesktop();
 
 	return (
 		<section
@@ -142,34 +198,9 @@ export default function Hero() {
 					className="relative hidden w-14 shrink-0 lg:flex lg:flex-col lg:items-center lg:justify-center"
 				></div>
 
-				{/* Photo column — desktop only; mobile shows the brand banner instead */}
-				<div className="relative hidden overflow-hidden lg:block lg:h-[88vh]">
-					<motion.div
-						style={
-							shouldReduceMotion ? undefined : { y: photoY, scale: photoScale }
-						}
-						className="h-full w-full"
-					>
-						<Image
-							src={pic("unicorn-hero-barbering", 1400, 1700)}
-							alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
-							layout="fullWidth"
-							sizes="(min-width: 1024px) 50vw, 100vw"
-							fetchPriority="high"
-							loading="eager"
-							className="h-full w-full object-cover contrast-[1.05] grayscale-15"
-						/>
-					</motion.div>
-					<div
-						aria-hidden="true"
-						className="pointer-events-none absolute inset-0 bg-linear-to-l from-transparent via-transparent to-background/20"
-					/>
-					{/* Gold hairline framing the photo edge */}
-					<div
-						aria-hidden="true"
-						className="pointer-events-none absolute inset-y-0 left-0 hidden w-px bg-linear-to-b from-transparent via-primary/40 to-transparent lg:block"
-					/>
-				</div>
+				{/* Photo column — desktop only; mobile shows the brand banner instead.
+				    Not rendered at all on mobile so no scroll-measurement work runs. */}
+				{desktop && <HeroPhoto sectionRef={sectionRef} />}
 			</div>
 			{/* Bottom fade into the marquee — mobile only, softens the exit */}
 			<div
