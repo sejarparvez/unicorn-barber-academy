@@ -3,15 +3,35 @@
 // Data flows through useApplicationsList (service layer) — filter changes
 // fetch under their own query keys; mutations invalidate precisely.
 import {
+	IconCheck,
 	IconChevronDown,
 	IconChevronUp,
+	IconDots,
 	IconDownload,
-	IconPencil,
+	IconInbox,
+	IconX,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { ListPagination } from "@/components/list-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -21,6 +41,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { downloadApplicationsCsv } from "@/lib/api/enrollment-admin";
 import type { ApplicationStatus, Cohort, FeeStatus } from "@/lib/enrollment";
@@ -39,7 +60,6 @@ import {
 	useBulkSetApplicationStatus,
 } from "@/service/enrollment";
 import { BulkActionBar } from "./bulk-action-bar";
-import { ListPagination } from "./list-pagination";
 
 const TABS: Array<{ label: string; status?: ApplicationStatus }> = [
 	{ label: "All", status: undefined },
@@ -202,19 +222,22 @@ export function ApplicationsListPage({
 			</header>
 
 			<div className="flex flex-wrap items-center gap-2">
-				{TABS.map((tab) => (
-					<button
-						key={tab.label}
-						type="button"
-						onClick={() => navigateWith({ status: tab.status })}
-						className={cn(
-							buttonVariants({ variant: "outline", size: "sm" }),
-							statusFilter === tab.status && "border-primary text-primary",
-						)}
-					>
-						{tab.label}
-					</button>
-				))}
+				<Tabs
+					value={statusFilter ?? "all"}
+					onValueChange={(v) =>
+						navigateWith({
+							status: TABS.find((t) => (t.status ?? "all") === v)?.status,
+						})
+					}
+				>
+					<TabsList>
+						{TABS.map((tab) => (
+							<TabsTrigger key={tab.label} value={tab.status ?? "all"}>
+								{tab.label}
+							</TabsTrigger>
+						))}
+					</TabsList>
+				</Tabs>
 				<span className="flex-1" />
 				<form
 					onSubmit={(e) => {
@@ -395,11 +418,33 @@ export function ApplicationsListPage({
 					))}
 				</ul>
 			) : (data?.items.length ?? 0) === 0 ? (
-				<section className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
-					<p className="text-sm text-muted-foreground">
-						No applications found.
-					</p>
-				</section>
+				<Empty>
+					<EmptyHeader>
+						<EmptyMedia variant="icon">
+							<IconInbox />
+						</EmptyMedia>
+						<EmptyTitle>No applications found</EmptyTitle>
+						<EmptyDescription>
+							{statusFilter || search || programSlug || cohort || feeStatus
+								? "Try widening the filters — or clear them to see everything."
+								: "New applications will land here as soon as students enroll."}
+						</EmptyDescription>
+					</EmptyHeader>
+					{statusFilter || search || programSlug || cohort || feeStatus ? (
+						<EmptyContent>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => {
+									setSearchInput("");
+									navigateWith({});
+								}}
+							>
+								Clear all filters
+							</Button>
+						</EmptyContent>
+					) : null}
+				</Empty>
 			) : (
 				<>
 					<BulkActionBar
@@ -415,11 +460,10 @@ export function ApplicationsListPage({
 
 					<ul className="divide-y divide-border rounded-xl border border-border bg-card">
 						<li className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-muted-foreground">
-							<input
-								type="checkbox"
+							<Checkbox
 								checked={allSelected}
-								onChange={toggleAll}
-								className="h-4 w-4 accent-primary"
+								indeterminate={!allSelected && selectedIds.size > 0}
+								onCheckedChange={() => toggleAll()}
 								aria-label="Select all"
 							/>
 							<span className="w-24">Ref</span>
@@ -432,11 +476,9 @@ export function ApplicationsListPage({
 								key={application.id}
 								className="flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap"
 							>
-								<input
-									type="checkbox"
+								<Checkbox
 									checked={selectedIds.has(application.id)}
-									onChange={() => toggleOne(application.id)}
-									className="h-4 w-4 accent-primary"
+									onCheckedChange={() => toggleOne(application.id)}
 									aria-label={`Select ${application.reference}`}
 								/>
 								<div className="min-w-0 flex-1">
@@ -475,17 +517,56 @@ export function ApplicationsListPage({
 										{formatStartsOn(application.startsOn)} · {application.email}
 									</p>
 								</div>
-								<Link
-									to="/dashboard/enrollments/$id"
-									params={{ id: String(application.id) }}
-									aria-label="Review application"
-									className={cn(
-										buttonVariants({ variant: "ghost", size: "icon" }),
-										"text-muted-foreground",
-									)}
-								>
-									<IconPencil className="h-4 w-4" />
-								</Link>
+								<DropdownMenu>
+									<DropdownMenuTrigger
+										render={
+											<Button
+												variant="ghost"
+												size="icon"
+												aria-label={`Actions for ${application.reference}`}
+												className="text-muted-foreground"
+											/>
+										}
+									>
+										<IconDots className="h-4 w-4" />
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end">
+										<DropdownMenuItem
+											onClick={() =>
+												navigate({
+													to: "/dashboard/enrollments/$id",
+													params: { id: String(application.id) },
+												})
+											}
+										>
+											Review application
+										</DropdownMenuItem>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem
+											onClick={() =>
+												bulkMutation.mutate({
+													ids: [application.id],
+													status: "approved",
+												})
+											}
+										>
+											<IconCheck className="h-4 w-4 text-emerald-600" />
+											Approve
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											variant="destructive"
+											onClick={() =>
+												bulkMutation.mutate({
+													ids: [application.id],
+													status: "rejected",
+												})
+											}
+										>
+											<IconX className="h-4 w-4" />
+											Reject
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
 							</li>
 						))}
 					</ul>
@@ -496,24 +577,15 @@ export function ApplicationsListPage({
 				page={page}
 				totalPages={totalPages}
 				total={data?.total ?? 0}
-				onPrevious={() =>
+				itemNoun="applications"
+				onPage={(nextPage) =>
 					navigateWith({
 						status: statusFilter,
 						search,
 						programSlug,
 						cohort,
 						feeStatus,
-						page: page - 1,
-					})
-				}
-				onNext={() =>
-					navigateWith({
-						status: statusFilter,
-						search,
-						programSlug,
-						cohort,
-						feeStatus,
-						page: page + 1,
+						page: nextPage,
 					})
 				}
 			/>

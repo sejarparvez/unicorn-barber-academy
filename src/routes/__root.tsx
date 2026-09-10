@@ -156,6 +156,11 @@ function RootDocument() {
 		!pathname.startsWith("/auth") &&
 		!pathname.startsWith("/verify") &&
 		!pathname.includes("/print");
+	// Dashboard routes run their own app shell (sidebar + breadcrumb bar),
+	// so the marketing header, announcement banner, and footer stay off —
+	// no double navigation, no competing sticky bars. Auth pages keep the
+	// public chrome; they are visitor-facing.
+	const isDashboard = pathname.startsWith("/dashboard");
 	return (
 		<html lang="en">
 			<head>
@@ -183,11 +188,14 @@ function RootDocument() {
 						Skip to content
 					</a>
 					{isMarketing ? <ScrollProgress /> : null}
-					{/* Site chrome never prints � certificate pages rely on this. */}
-					<div className="print:hidden">
-						<AnnouncementBanner />
-						<Header session={session} />
-					</div>
+					{/* Site chrome never prints � certificate pages rely on this.
+				    Dashboard routes hide it entirely — they own the viewport. */}
+					{!isDashboard ? (
+						<div className="print:hidden">
+							<AnnouncementBanner />
+							<Header session={session} />
+						</div>
+					) : null}
 					<div id="main-content" className=" min-h-screen">
 						<TooltipProvider>
 							<QueryProvider>
@@ -195,9 +203,11 @@ function RootDocument() {
 							</QueryProvider>
 						</TooltipProvider>
 					</div>
-					<div className="print:hidden">
-						<Footer />
-					</div>
+					{!isDashboard ? (
+						<div className="print:hidden">
+							<Footer />
+						</div>
+					) : null}
 					<Analytics />
 					<SmoothScroll />
 					<LazyToaster />

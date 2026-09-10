@@ -4,6 +4,13 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Table,
@@ -63,22 +70,29 @@ export function ActivityPage() {
 			</header>
 
 			<div className="flex flex-wrap gap-3">
-				<select
-					value={action}
-					onChange={(e) => {
-						setAction(e.target.value);
+				<Select
+					value={action || "all"}
+					onValueChange={(v) => {
+						const next = v ?? "all";
+						setAction(next === "all" ? "" : next);
 						setPage(1);
 					}}
-					className="h-9 rounded-md border border-border bg-background px-3 text-sm"
-					aria-label="Filter by action"
 				>
-					<option value="">All actions</option>
-					{ACTION_GROUPS.map((a) => (
-						<option key={a} value={a}>
-							{a}
-						</option>
-					))}
-				</select>
+					<SelectTrigger
+						className="h-9 w-48 text-sm"
+						aria-label="Filter by action"
+					>
+						<SelectValue placeholder="All actions" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All actions</SelectItem>
+						{ACTION_GROUPS.map((a) => (
+							<SelectItem key={a} value={a}>
+								{a}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
 			</div>
 
 			<div className="overflow-x-auto rounded-xl border border-border bg-card">

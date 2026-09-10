@@ -1,6 +1,8 @@
 // src/features/admin/faqs-page.tsx
 // FAQ management for the home + contact placements: create/edit Q&As,
 // ordering, publish. Feeds both FAQ sections and their JSON-LD blocks.
+
+import { IconQuestionMark } from "@tabler/icons-react";
 import { useState } from "react";
 import {
 	AlertDialog,
@@ -14,6 +16,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	Empty,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -206,8 +215,18 @@ export function FaqsPage() {
 						<Skeleton className="h-4 w-full" />
 					</li>
 				) : (items ?? []).length === 0 ? (
-					<li className="p-8 text-center text-sm text-muted-foreground">
-						No FAQs here yet — add the first one above.
+					<li>
+						<Empty>
+							<EmptyHeader>
+								<EmptyMedia variant="icon">
+									<IconQuestionMark />
+								</EmptyMedia>
+								<EmptyTitle>No FAQs here yet</EmptyTitle>
+								<EmptyDescription>
+									Add the first one with the form above.
+								</EmptyDescription>
+							</EmptyHeader>
+						</Empty>
 					</li>
 				) : (
 					(items ?? []).map((f) => (

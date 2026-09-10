@@ -3,6 +3,7 @@
 // (publish / unpublish / archive / delete). Reads + mutations flow through
 // the service layer (src/service/blog.ts).
 import {
+	IconDots,
 	IconEye,
 	IconPencil,
 	IconPlus,
@@ -11,6 +12,7 @@ import {
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { ListPagination } from "@/components/list-pagination";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -23,8 +25,32 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPostDate } from "@/lib/api/blog-admin";
 import type { BlogPostSummary } from "@/lib/blog";
 import { BLOG_STATUS_LABELS, type BlogStatus } from "@/lib/blog";
@@ -248,32 +274,32 @@ export function PostListPage({
 			</form>
 
 			<div className="flex flex-wrap items-center gap-3">
-				<nav className="flex flex-wrap gap-2">
-					{TABS.map((tab) => (
-						<Link
-							key={tab.label}
-							to="/dashboard/blog"
-							search={{
-								...(tab.status ? { status: tab.status } : {}),
-								...(search ? { search } : {}),
-								...(categoryFilter ? { category: categoryFilter } : {}),
-								...(sortByViews ? { sort: "views" as const } : {}),
-							}}
-							className={cn(
-								buttonVariants({ variant: "outline", size: "sm" }),
-								statusFilter === tab.status && "border-primary text-primary",
-							)}
-						>
-							{tab.label}
-						</Link>
-					))}
-				</nav>
+				<Tabs
+					value={statusFilter ?? "all"}
+					onValueChange={(v) =>
+						navigateWith({
+							status: TABS.find((t) => (t.status ?? "all") === v)?.status,
+							search,
+							category: categoryFilter,
+							page: undefined,
+							sort: sortByViews ? "views" : undefined,
+						})
+					}
+				>
+					<TabsList>
+						{TABS.map((tab) => (
+							<TabsTrigger key={tab.label} value={tab.status ?? "all"}>
+								{tab.label}
+							</TabsTrigger>
+						))}
+					</TabsList>
+				</Tabs>
 
 				{categories && categories.length > 0 ? (
-					<select
-						value={categoryFilter ?? ""}
-						onChange={(e) => {
-							const val = Number.parseInt(e.target.value, 10);
+					<Select
+						value={categoryFilter ? String(categoryFilter) : "all"}
+						onValueChange={(v) => {
+							const val = Number.parseInt(v ?? "all", 10);
 							navigateWith({
 								status: statusFilter,
 								search,
@@ -282,16 +308,22 @@ export function PostListPage({
 								sort: sortByViews ? "views" : undefined,
 							});
 						}}
-						className="h-8 rounded-md border border-border bg-background px-2 text-sm"
-						aria-label="Filter by category"
 					>
-						<option value="">All categories</option>
-						{categories.map((cat) => (
-							<option key={cat.id} value={cat.id}>
-								{cat.name}
-							</option>
-						))}
-					</select>
+						<SelectTrigger
+							className="h-9 w-44 text-sm"
+							aria-label="Filter by category"
+						>
+							<SelectValue placeholder="All categories" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">All categories</SelectItem>
+							{categories.map((cat) => (
+								<SelectItem key={cat.id} value={String(cat.id)}>
+									{cat.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				) : null}
 
 				<span className="flex-1" />
@@ -341,36 +373,38 @@ export function PostListPage({
 					))}
 				</ul>
 			) : (data?.items.length ?? 0) === 0 ? (
-				<section className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
-					<h2 className="font-heading text-lg font-semibold">
-						No posts here yet
-					</h2>
-					<p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-						Write your first article — it becomes a crawlable page with
-						structured data the moment you publish.
-					</p>
-					<Link
-						to="/dashboard/blog/new"
-						className={cn(
-							buttonVariants({ variant: "outline" }),
-							"mt-5 gap-1.5",
-						)}
-					>
-						<IconPlus className="h-4 w-4" /> Write a post
-					</Link>
-				</section>
+				<Empty>
+					<EmptyHeader>
+						<EmptyMedia variant="icon">
+							<IconPlus />
+						</EmptyMedia>
+						<EmptyTitle>No posts here yet</EmptyTitle>
+						<EmptyDescription>
+							Write your first article — it becomes a crawlable page with
+							structured data the moment you publish.
+						</EmptyDescription>
+					</EmptyHeader>
+					<EmptyContent>
+						<Link
+							to="/dashboard/blog/new"
+							className={cn(buttonVariants({ variant: "outline" }), "gap-1.5")}
+						>
+							<IconPlus className="h-4 w-4" /> Write a post
+						</Link>
+					</EmptyContent>
+				</Empty>
 			) : (
 				<>
 					{allIds.length > 0 ? (
-						<label className="flex items-center gap-2 text-xs text-muted-foreground">
-							<input
-								type="checkbox"
+						<div className="flex items-center gap-2 text-xs text-muted-foreground">
+							<Checkbox
 								checked={allSelected}
-								onChange={toggleSelectAll}
-								className="accent-[var(--primary)]"
+								indeterminate={!allSelected && selectedIds.size > 0}
+								onCheckedChange={() => toggleSelectAll()}
+								aria-label="Select all posts"
 							/>
 							Select all ({allIds.length})
-						</label>
+						</div>
 					) : null}
 					<ul className="divide-y divide-border rounded-xl border border-border bg-card">
 						{(data?.items ?? []).map((post) => (
@@ -378,11 +412,10 @@ export function PostListPage({
 								key={post.id}
 								className="flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap"
 							>
-								<input
-									type="checkbox"
+								<Checkbox
 									checked={selectedIds.has(post.id)}
-									onChange={() => toggleSelect(post.id)}
-									className="accent-[var(--primary)]"
+									onCheckedChange={() => toggleSelect(post.id)}
+									aria-label={`Select ${post.title}`}
 								/>
 								<div className="min-w-0 flex-1">
 									<div className="flex flex-wrap items-center gap-2">
@@ -412,107 +445,84 @@ export function PostListPage({
 									</p>
 								</div>
 
-								<div className="flex shrink-0 items-center gap-1">
-									<Link
-										to="/dashboard/blog/$id/edit"
-										params={{ id: String(post.id) }}
-										aria-label="Edit"
-										className={cn(
-											buttonVariants({ variant: "ghost", size: "icon" }),
-											"text-muted-foreground",
-										)}
-									>
-										<IconPencil className="h-4 w-4" />
-									</Link>
-									{post.status === "published" ? (
-										<a
-											href={`/blog/${post.slug}`}
-											target="_blank"
-											rel="noreferrer"
-											aria-label="View live"
-											className={cn(
-												buttonVariants({ variant: "ghost", size: "icon" }),
-											)}
-										>
-											<IconEye className="h-4 w-4" />
-										</a>
-									) : null}
-									<Button
-										variant="outline"
-										size="sm"
-										disabled={mutatingId === post.id || !post.slug}
-										onClick={() =>
-											setStatus(
-												post,
-												post.status === "published" ? "draft" : "published",
-											)
+								<DropdownMenu>
+									<DropdownMenuTrigger
+										render={
+											<Button
+												variant="ghost"
+												size="icon"
+												aria-label={`Actions for ${post.title}`}
+												className="text-muted-foreground"
+											/>
 										}
 									>
-										{mutatingId === post.id
-											? "…"
-											: post.status === "published"
-												? "Unpublish"
-												: "Publish"}
-									</Button>
-									<Button
-										variant="ghost"
-										size="icon"
-										aria-label="Delete"
-										disabled={mutatingId === post.id}
-										onClick={() => setDeleteTarget(post)}
-									>
-										<IconTrash className="h-4 w-4" />
-									</Button>
-								</div>
+										<IconDots className="h-4 w-4" />
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end">
+										<DropdownMenuItem
+											onClick={() =>
+												navigate({
+													to: "/dashboard/blog/$id/edit",
+													params: { id: String(post.id) },
+												})
+											}
+										>
+											<IconPencil className="h-4 w-4" />
+											Edit
+										</DropdownMenuItem>
+										{post.status === "published" ? (
+											<DropdownMenuItem
+												onClick={() =>
+													window.open(`/blog/${post.slug}`, "_blank")
+												}
+											>
+												<IconEye className="h-4 w-4" />
+												View live
+											</DropdownMenuItem>
+										) : null}
+										<DropdownMenuSeparator />
+										<DropdownMenuItem
+											disabled={mutatingId === post.id || !post.slug}
+											onClick={() =>
+												setStatus(
+													post,
+													post.status === "published" ? "draft" : "published",
+												)
+											}
+										>
+											{post.status === "published" ? "Unpublish" : "Publish"}
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											variant="destructive"
+											disabled={mutatingId === post.id}
+											onClick={() => setDeleteTarget(post)}
+										>
+											<IconTrash className="h-4 w-4" />
+											Delete
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
 							</li>
 						))}
 					</ul>
 				</>
 			)}
 
-			{totalPages > 1 ? (
-				<footer className="flex items-center justify-between text-sm">
-					{page > 1 ? (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() =>
-								navigateWith({
-									status: statusFilter,
-									search,
-									page: page - 1,
-									sort: sortByViews ? "views" : undefined,
-								})
-							}
-						>
-							Previous
-						</Button>
-					) : (
-						<span className="text-muted-foreground">Previous</span>
-					)}
-					<span className="text-muted-foreground">
-						Page {page} of {totalPages} · {data?.total ?? 0} posts
-					</span>
-					{data && page < totalPages ? (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() =>
-								navigateWith({
-									status: statusFilter,
-									search,
-									page: page + 1,
-									sort: sortByViews ? "views" : undefined,
-								})
-							}
-						>
-							Next
-						</Button>
-					) : (
-						<span className="text-muted-foreground">Next</span>
-					)}
-				</footer>
-			) : null}
+			<ListPagination
+				page={page}
+				totalPages={totalPages}
+				total={data?.total ?? 0}
+				itemNoun="posts"
+				onPage={(nextPage) =>
+					navigateWith({
+						status: statusFilter,
+						search,
+						category: categoryFilter,
+						page: nextPage,
+						sort: sortByViews ? "views" : undefined,
+					})
+				}
+			/>
 
 			<BlogBulkActionBar
 				selectedIds={selectedIds}

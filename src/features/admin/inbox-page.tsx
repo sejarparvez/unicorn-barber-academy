@@ -1,6 +1,8 @@
 // src/features/admin/inbox-page.tsx
 // Contact-inquiry triage: unread-first list, expandable messages with
 // reply-via-email links, mark read/replied, spam delete with confirm.
+
+import { IconMail } from "@tabler/icons-react";
 import { useState } from "react";
 import {
 	AlertDialog,
@@ -14,6 +16,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	Empty,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { InquiryRow } from "@/lib/inquiry";
 import {
@@ -103,8 +112,22 @@ export function InboxPage() {
 						<Skeleton className="h-4 w-full" />
 					</li>
 				) : (data?.items.length ?? 0) === 0 ? (
-					<li className="p-8 text-center text-sm text-muted-foreground">
-						{unreadOnly ? "Inbox zero — nothing unread." : "No inquiries yet."}
+					<li>
+						<Empty>
+							<EmptyHeader>
+								<EmptyMedia variant="icon">
+									<IconMail />
+								</EmptyMedia>
+								<EmptyTitle>
+									{unreadOnly ? "Inbox zero" : "No inquiries yet"}
+								</EmptyTitle>
+								<EmptyDescription>
+									{unreadOnly
+										? "Nothing unread — every inquiry has been triaged."
+										: "Contact-form inquiries will land here."}
+								</EmptyDescription>
+							</EmptyHeader>
+						</Empty>
 					</li>
 				) : (
 					(data?.items ?? []).map((item) => {

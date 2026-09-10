@@ -1,13 +1,13 @@
 ﻿import {
 	IconArticle,
 	IconCertificate,
-	IconChevronRight,
 	IconClipboardList,
 	IconClockHour4,
 	IconGauge,
+	IconHome,
 	IconLayoutDashboard,
+	IconLogout,
 	IconMail,
-	IconMenu2,
 	IconPhoto,
 	IconQuestionMark,
 	IconSettings,
@@ -19,20 +19,49 @@ import {
 	Link,
 	Outlet,
 	useMatches,
+	useNavigate,
+	useRouter,
 } from "@tanstack/react-router";
-import { lazy, Suspense, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { lazy, Suspense } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import {
-	Sheet,
-	SheetContent,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger,
-} from "@/components/ui/sheet";
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarHeader,
+	SidebarInset,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarProvider,
+	SidebarTrigger,
+	useSidebar,
+} from "@/components/ui/sidebar";
+import { authClient } from "@/lib/auth-client";
 import { parseRole } from "@/lib/roles";
 import type { SessionPayload } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard")({
@@ -75,109 +104,160 @@ type NavItem = {
 	visibleFor: "all" | "staff" | "admin";
 };
 
-const NAV_ITEMS: NavItem[] = [
+type NavGroup = {
+	label: string;
+	items: NavItem[];
+};
+
+const NAV_GROUPS: NavGroup[] = [
 	{
 		label: "Overview",
-		to: "/dashboard",
-		icon: IconLayoutDashboard,
-		visibleFor: "all",
-	},
-	{
-		label: "Certificates",
-		to: "/dashboard/certificates",
-		icon: IconCertificate,
-		visibleFor: "all",
+		items: [
+			{
+				label: "Overview",
+				to: "/dashboard",
+				icon: IconLayoutDashboard,
+				visibleFor: "all",
+			},
+			{
+				label: "Certificates",
+				to: "/dashboard/certificates",
+				icon: IconCertificate,
+				visibleFor: "all",
+			},
+		],
 	},
 	{
 		label: "Admissions",
-		to: "/dashboard/enrollments",
-		icon: IconClipboardList,
-		visibleFor: "admin",
+		items: [
+			{
+				label: "Applications",
+				to: "/dashboard/enrollments",
+				icon: IconClipboardList,
+				visibleFor: "admin",
+			},
+			{
+				label: "Intakes",
+				to: "/dashboard/enrollments/intakes",
+				icon: IconClockHour4,
+				visibleFor: "admin",
+			},
+		],
 	},
 	{
-		label: "Users",
-		to: "/dashboard/users",
-		icon: IconUser,
-		visibleFor: "admin",
+		label: "Content",
+		items: [
+			{
+				label: "Blog",
+				to: "/dashboard/blog",
+				icon: IconArticle,
+				visibleFor: "admin",
+			},
+			{
+				label: "Instructors",
+				to: "/dashboard/instructors",
+				icon: IconUser,
+				visibleFor: "admin",
+			},
+			{
+				label: "Gallery",
+				to: "/dashboard/gallery",
+				icon: IconPhoto,
+				visibleFor: "admin",
+			},
+			{
+				label: "Testimonials",
+				to: "/dashboard/testimonials",
+				icon: IconStar,
+				visibleFor: "admin",
+			},
+			{
+				label: "FAQs",
+				to: "/dashboard/faqs",
+				icon: IconQuestionMark,
+				visibleFor: "admin",
+			},
+		],
 	},
 	{
-		label: "Inbox",
-		to: "/dashboard/inbox",
-		icon: IconMail,
-		visibleFor: "admin",
-	},
-	{
-		label: "Activity",
-		to: "/dashboard/activity",
-		icon: IconClockHour4,
-		visibleFor: "admin",
-	},
-	{
-		label: "Instructors",
-		to: "/dashboard/instructors",
-		icon: IconUser,
-		visibleFor: "admin",
-	},
-	{
-		label: "Gallery",
-		to: "/dashboard/gallery",
-		icon: IconPhoto,
-		visibleFor: "admin",
-	},
-	{
-		label: "Testimonials",
-		to: "/dashboard/testimonials",
-		icon: IconStar,
-		visibleFor: "admin",
-	},
-	{
-		label: "FAQs",
-		to: "/dashboard/faqs",
-		icon: IconQuestionMark,
-		visibleFor: "admin",
-	},
-	{
-		label: "Site",
-		to: "/dashboard/site",
-		icon: IconSettings,
-		visibleFor: "admin",
-	},
-	{
-		label: "Console",
-		to: "/dashboard/admin",
-		icon: IconGauge,
-		visibleFor: "admin",
-	},
-	{
-		label: "Blog",
-		to: "/dashboard/blog",
-		icon: IconArticle,
-		visibleFor: "admin",
-	},
-	{
-		label: "Settings",
-		to: "/dashboard/settings",
-		icon: IconSettings,
-		visibleFor: "all",
+		label: "System",
+		items: [
+			{
+				label: "Users",
+				to: "/dashboard/users",
+				icon: IconUser,
+				visibleFor: "admin",
+			},
+			{
+				label: "Inbox",
+				to: "/dashboard/inbox",
+				icon: IconMail,
+				visibleFor: "admin",
+			},
+			{
+				label: "Site",
+				to: "/dashboard/site",
+				icon: IconSettings,
+				visibleFor: "admin",
+			},
+			{
+				label: "Console",
+				to: "/dashboard/admin",
+				icon: IconGauge,
+				visibleFor: "admin",
+			},
+			{
+				label: "Settings",
+				to: "/dashboard/settings",
+				icon: IconSettings,
+				visibleFor: "all",
+			},
+		],
 	},
 ];
 
-function visibleNav(role: string | undefined): NavItem[] {
-	if (role === "admin") return NAV_ITEMS;
-	if (role === "instructor" || role === "student") {
-		return NAV_ITEMS.filter((item) =>
-			role === "instructor"
+function visibleNav(role: string | undefined): NavGroup[] {
+	const keep = (item: NavItem) => {
+		if (role === "admin") return true;
+		if (role === "instructor" || role === "student") {
+			return role === "instructor"
 				? item.visibleFor !== "admin"
-				: item.visibleFor === "all",
-		);
-	}
-	return NAV_ITEMS.filter((item) => item.visibleFor === "all");
+				: item.visibleFor === "all";
+		}
+		return item.visibleFor === "all";
+	};
+	return NAV_GROUPS.map((group) => ({
+		...group,
+		items: group.items.filter(keep),
+	})).filter((group) => group.items.length > 0);
 }
 
 function isActive(pathname: string, to: string): boolean {
 	return to === "/dashboard"
 		? pathname === "/dashboard"
 		: pathname === to || pathname.startsWith(`${to}/`);
+}
+
+/** Human label for the current section, used by the mobile trigger + breadcrumb. */
+function sectionLabel(pathname: string, groups: NavGroup[]): string {
+	let best: NavItem | null = null;
+	for (const group of groups) {
+		for (const item of group.items) {
+			if (
+				item.to !== "/dashboard" &&
+				isActive(pathname, item.to) &&
+				(!best || item.to.length > best.to.length)
+			) {
+				best = item;
+			}
+		}
+	}
+	if (best) {
+		// Detail views: "/dashboard/enrollments/12" -> "Applications / #12".
+		const rest = pathname.slice(best.to.length).replace(/^\//, "");
+		return rest ? `${best.label} / ${rest}` : best.label;
+	}
+	return "Overview";
 }
 
 const CmdK = lazy(() =>
@@ -192,109 +272,242 @@ function DashboardLayout() {
 	// can render a beat without context during that transition — bail out
 	// instead of crashing on `session.user`.
 	if (!session) return null;
+	const role = parseRole(session.user.role) ?? undefined;
+	const groups = visibleNav(role);
 	return (
-		<main className="min-h-[calc(100svh-4rem)] bg-muted/25">
-			<Suspense>
-				<CmdK />
-			</Suspense>
-			<div className="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
-				<Sidebar session={session} />
-				<div className="min-w-0 flex-1">
-					<MobileNav session={session} />
-					<Outlet />
+		<SidebarProvider>
+			<DashboardSidebar groups={groups} session={session} />
+			<SidebarInset>
+				<Suspense>
+					<CmdK />
+				</Suspense>
+				<DashboardHeader groups={groups} />
+				<div className="min-w-0 flex-1 bg-muted/25 px-4 py-8 sm:px-6 lg:px-8">
+					<div className="mx-auto max-w-7xl">
+						<Outlet />
+					</div>
 				</div>
-			</div>
-		</main>
+				<footer className="border-t border-border bg-background px-4 py-4 text-center text-xs text-muted-foreground sm:px-6 lg:px-8">
+					© {new Date().getFullYear()} Unicorn Barber Training Academy ·{" "}
+					<Link to="/" className="underline-offset-4 hover:underline">
+						View site
+					</Link>
+				</footer>
+			</SidebarInset>
+		</SidebarProvider>
 	);
 }
 
-function useCurrentSection(session: SessionPayload) {
-	const matches = useMatches();
-	const role = parseRole(session.user.role);
-	const items = visibleNav(role ?? undefined);
-	const last = matches[matches.length - 1];
-	const pathname = last?.pathname ?? "/dashboard";
-	return (
-		items.find(
-			(item) => isActive(pathname, item.to) && item.to !== "/dashboard",
-		) ?? items[0]
-	);
+function userInitials(name: string): string {
+	const parts = name.trim().split(/\s+/);
+	return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase() || "U";
 }
 
-function NavLinks({
+function DashboardSidebar({
+	groups,
 	session,
-	onNavigate,
 }: {
+	groups: NavGroup[];
 	session: SessionPayload;
-	onNavigate?: () => void;
 }) {
 	const matches = useMatches();
 	const pathname = matches.at(-1)?.pathname ?? "/dashboard";
-	const items = visibleNav(parseRole(session.user.role) ?? undefined);
+	const role = parseRole(session.user.role);
+	const { setOpenMobile } = useSidebar();
+	// The mobile sidebar is a Sheet — route changes don't dismiss it
+	// automatically, so close it explicitly on every nav tap.
+	const closeMobileNav = () => setOpenMobile(false);
 	return (
-		<nav className="space-y-1" aria-label="Dashboard sections">
-			{items.map((item) => {
-				const active = isActive(pathname, item.to);
-				return (
-					<Link
-						key={item.to}
-						to={item.to}
-						onClick={onNavigate}
-						aria-current={active ? "page" : undefined}
-						className={cn(
-							"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-							active
-								? "bg-primary/10 text-primary"
-								: "text-muted-foreground hover:bg-muted hover:text-foreground",
-						)}
-					>
-						<item.icon className="h-4 w-4 shrink-0" stroke={1.75} />
-						{item.label}
-						{active ? (
-							<IconChevronRight className="ml-auto h-3.5 w-3.5 opacity-60" />
-						) : null}
-					</Link>
-				);
-			})}
-		</nav>
+		<Sidebar collapsible="icon">
+			<SidebarHeader>
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<SidebarMenuButton size="lg" render={<Link to="/dashboard" />}>
+							<span className="flex size-8 items-center justify-center rounded-md bg-primary font-heading text-sm font-semibold text-primary-foreground">
+								U
+							</span>
+							<span className="grid flex-1 text-left text-sm leading-tight">
+								<span className="truncate font-semibold">Unicorn</span>
+								<span className="truncate text-xs text-muted-foreground">
+									Academy admin
+								</span>
+							</span>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarHeader>
+			<SidebarContent>
+				{groups.map((group) => (
+					<SidebarGroup key={group.label}>
+						<SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								{group.items.map((item) => (
+									<SidebarMenuItem key={item.to}>
+										<SidebarMenuButton
+											render={<Link to={item.to} onClick={closeMobileNav} />}
+											isActive={isActive(pathname, item.to)}
+											tooltip={item.label}
+										>
+											<item.icon stroke={1.75} />
+											<span>{item.label}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								))}
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</SidebarGroup>
+				))}
+			</SidebarContent>
+			<SidebarFooter>
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<UserMenu session={session} role={role} />
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarFooter>
+		</Sidebar>
 	);
 }
 
-function Sidebar({ session }: { session: SessionPayload }) {
-	return (
-		<aside className="sticky top-24 hidden h-fit w-52 shrink-0 self-start lg:block">
-			<p className="px-3 text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-				Dashboard
-			</p>
-			<Separator className="my-3" />
-			<NavLinks session={session} />
-		</aside>
-	);
-}
+/** Account menu behind the sidebar avatar: dashboard home, settings,
+ *  back-to-site, and sign out. */
+function UserMenu({
+	session,
+	role,
+}: {
+	session: SessionPayload;
+	role: string | undefined;
+}) {
+	const navigate = useNavigate();
+	const router = useRouter();
+	const { setOpenMobile } = useSidebar();
 
-function MobileNav({ session }: { session: SessionPayload }) {
-	const [open, setOpen] = useState(false);
-	const section = useCurrentSection(session);
+	async function handleSignOut() {
+		setOpenMobile(false);
+		await authClient.signOut({
+			fetchOptions: {
+				onSuccess: () => {
+					void navigate({ to: "/" });
+					void router.invalidate();
+				},
+			},
+		});
+	}
+
 	return (
-		<div className="mb-6 lg:hidden">
-			<Sheet open={open} onOpenChange={setOpen}>
-				<SheetTrigger
-					render={<Button variant="outline" size="sm" className="gap-2" />}
+		<DropdownMenu>
+			<DropdownMenuTrigger
+				// Plain button on purpose: nesting SidebarMenuButton here breaks
+				// Base UI's trigger ref/prop merging (it wraps itself in a
+				// Tooltip when `tooltip` is set) and crashed on open.
+				render={
+					<button
+						type="button"
+						aria-label={`Account menu for ${session.user.name}`}
+						title={`${session.user.name} · ${role ?? "staff"}`}
+						className="flex h-12 w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden transition-colors group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&_svg]:size-4 [&_svg]:shrink-0"
+					/>
+				}
+			>
+				<Avatar className="size-8 rounded-md">
+					{session.user.image ? (
+						<AvatarImage src={session.user.image} alt={session.user.name} />
+					) : null}
+					<AvatarFallback className="rounded-md">
+						{userInitials(session.user.name)}
+					</AvatarFallback>
+				</Avatar>
+				<span className="grid flex-1 text-left text-sm leading-tight">
+					<span className="truncate font-semibold">{session.user.name}</span>
+					<span className="truncate text-xs text-muted-foreground">
+						{session.user.email}
+					</span>
+				</span>
+				{role ? (
+					<Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+						{role}
+					</Badge>
+				) : null}
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" side="top" className="w-56">
+				<DropdownMenuGroup>
+					<DropdownMenuLabel className="font-normal">
+						<span className="block truncate text-sm font-medium">
+							{session.user.name}
+						</span>
+						<span className="block truncate text-xs text-muted-foreground">
+							{session.user.email}
+						</span>
+					</DropdownMenuLabel>
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem
+					onClick={() => {
+						setOpenMobile(false);
+						void navigate({ to: "/dashboard" });
+					}}
 				>
-					<IconMenu2 className="h-4 w-4" stroke={1.75} />
-					{section?.label ?? "Dashboard"}
-				</SheetTrigger>
-				<SheetContent side="left" className="w-72 p-0">
-					<SheetHeader className="border-b border-border px-5 py-4">
-						<SheetTitle className="font-heading text-base font-semibold">
+					<IconLayoutDashboard className="h-4 w-4" />
+					Dashboard
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() => {
+						setOpenMobile(false);
+						void navigate({ to: "/dashboard/settings" });
+					}}
+				>
+					<IconSettings className="h-4 w-4" />
+					Account settings
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() => {
+						setOpenMobile(false);
+						void navigate({ to: "/" });
+					}}
+				>
+					<IconHome className="h-4 w-4" />
+					View site
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+					<IconLogout className="h-4 w-4" />
+					Log out
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
+
+function DashboardHeader({ groups }: { groups: NavGroup[] }) {
+	const matches = useMatches();
+	const pathname = matches.at(-1)?.pathname ?? "/dashboard";
+	const label = sectionLabel(pathname, groups);
+	return (
+		<header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background px-4 transition-[width,height] ease-linear">
+			<SidebarTrigger className="-ml-1 shrink-0" />
+			<Separator orientation="vertical" className="mr-2 h-4 shrink-0" />
+			<Breadcrumb className="min-w-0 flex-1">
+				<BreadcrumbList className="flex-nowrap">
+					<BreadcrumbItem className="shrink-0">
+						<BreadcrumbLink
+							render={<Link to="/" aria-label="Back to home page" />}
+						>
+							<IconHome className="h-4 w-4" stroke={1.75} />
+						</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator className="shrink-0" />
+					<BreadcrumbItem className="hidden shrink-0 md:block">
+						<BreadcrumbLink render={<Link to="/dashboard" />}>
 							Dashboard
-						</SheetTitle>
-					</SheetHeader>
-					<div className="p-3">
-						<NavLinks session={session} onNavigate={() => setOpen(false)} />
-					</div>
-				</SheetContent>
-			</Sheet>
-		</div>
+						</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator className="hidden shrink-0 md:block" />
+					<BreadcrumbItem className="min-w-0">
+						<BreadcrumbPage className="truncate">{label}</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
+		</header>
 	);
 }

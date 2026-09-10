@@ -19,6 +19,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Table,
@@ -166,22 +173,29 @@ export function UsersPage() {
 					className="h-9 max-w-xs"
 					aria-label="Search users"
 				/>
-				<select
-					value={role}
-					onChange={(e) => {
-						setRole(e.target.value as Role | "");
+				<Select
+					value={role || "all"}
+					onValueChange={(v) => {
+						const next = v ?? "all";
+						setRole((next === "all" ? "" : next) as Role | "");
 						setPage(1);
 					}}
-					className="h-9 rounded-md border border-border bg-background px-3 text-sm"
-					aria-label="Filter by role"
 				>
-					<option value="">All roles</option>
-					{ROLES.map((r) => (
-						<option key={r} value={r}>
-							{ROLE_LABELS[r]}
-						</option>
-					))}
-				</select>
+					<SelectTrigger
+						className="h-9 w-44 text-sm"
+						aria-label="Filter by role"
+					>
+						<SelectValue placeholder="All roles" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All roles</SelectItem>
+						{ROLES.map((r) => (
+							<SelectItem key={r} value={r}>
+								{ROLE_LABELS[r]}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
 			</div>
 
 			<div className="overflow-x-auto rounded-xl border border-border bg-card">

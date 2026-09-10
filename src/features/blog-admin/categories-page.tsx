@@ -24,6 +24,13 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
+import {
+	Empty,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
@@ -146,8 +153,18 @@ export function CategoriesPage() {
 
 			<ul className="divide-y divide-border rounded-xl border border-border bg-card">
 				{categories.length === 0 ? (
-					<li className="p-8 text-center text-sm text-muted-foreground">
-						No categories yet.
+					<li>
+						<Empty>
+							<EmptyHeader>
+								<EmptyMedia variant="icon">
+									<IconPlus />
+								</EmptyMedia>
+								<EmptyTitle>No categories yet</EmptyTitle>
+								<EmptyDescription>
+									Create the first one with the form above.
+								</EmptyDescription>
+							</EmptyHeader>
+						</Empty>
 					</li>
 				) : (
 					categories.map((category) => (
