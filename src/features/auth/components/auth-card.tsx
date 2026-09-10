@@ -28,9 +28,9 @@ export function AuthCard({
 					<Image
 						src={Logo}
 						alt=""
-						className="h-10 w-10"
-						width={400}
-						height={400}
+						className="h-10 w-auto"
+						width={550}
+						height={454}
 					/>
 				</Link>
 

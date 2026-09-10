@@ -151,8 +151,8 @@ export default function Footer() {
 				alt=""
 				aria-hidden="true"
 				className="pointer-events-none absolute -right-12 -bottom-16 h-auto w-64 opacity-[0.04]"
-				width={400}
-				height={400}
+				width={550}
+				height={454}
 				loading="lazy"
 			/>
 
@@ -168,9 +168,9 @@ export default function Footer() {
 							<Image
 								src={logo}
 								alt="Unicorn Barber Training Academy logo"
-								className="h-8 w-8 shrink-0 sm:h-10 sm:w-10"
-								width={400}
-								height={400}
+								className="h-8 w-auto shrink-0 sm:h-10"
+								width={550}
+								height={454}
 							/>
 							<span className="h-7 w-px shrink-0 bg-linear-to-b from-chart-1 via-primary to-chart-4 sm:h-8" />
 							<span className="flex flex-col min-w-0 leading-none">

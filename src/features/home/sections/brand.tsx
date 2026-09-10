@@ -21,8 +21,8 @@ export default function Brand() {
 							src={banner}
 							alt="Unicorn Barber Training Academy"
 							className="mx-auto h-auto w-full max-w-2xl"
-							width={1698}
-							height={365}
+							width={4001}
+							height={2001}
 							loading="eager"
 							fetchPriority="high"
 						/>

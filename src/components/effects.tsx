@@ -286,16 +286,16 @@ export function FinalCta({
 			<Grain />
 			<motion.div
 				aria-hidden="true"
-				className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-auto -translate-x-1/2 -translate-y-1/2"
+				className="pointer-events-none absolute left-1/2 top-1/2 hidden w-72 -translate-x-1/2 -translate-y-1/2 sm:block sm:w-96"
 				animate={shouldReduceMotion ? {} : { rotate: 360 }}
 				transition={{ duration: 90, ease: "linear", repeat: Infinity }}
 			>
 				<img
 					src={banner}
 					alt=""
-					className="h-full w-auto opacity-[0.04]"
-					width={1698}
-					height={365}
+					className="h-auto w-full opacity-[0.04]"
+					width={4001}
+					height={2001}
 					loading="lazy"
 				/>
 			</motion.div>

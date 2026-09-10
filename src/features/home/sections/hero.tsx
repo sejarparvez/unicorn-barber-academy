@@ -58,8 +58,8 @@ export default function Hero() {
 						src={banner}
 						alt="Unicorn Barber Training Academy"
 						className="h-auto w-full"
-						width={1698}
-						height={365}
+						width={4001}
+						height={2001}
 						fetchPriority="high"
 						loading="eager"
 					/>
