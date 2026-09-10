@@ -5,6 +5,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import Logo from "@/assets/logo/logo.png";
+import Logo64 from "@/assets/logo/logo-64.webp";
 import Logo96 from "@/assets/logo/logo-96.webp";
 import Logo192 from "@/assets/logo/logo-192.webp";
 
@@ -29,7 +30,7 @@ export function AuthCard({
 					<picture className="contents">
 						<source
 							type="image/webp"
-							srcSet={`${Logo96} 96w, ${Logo192} 192w`}
+							srcSet={`${Logo64} 64w, ${Logo96} 96w, ${Logo192} 192w`}
 							sizes="48px"
 						/>
 						<img

@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import banner from "@/assets/logo/banner.png";
+import banner640 from "@/assets/logo/banner-640.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
 import banner1344 from "@/assets/logo/banner-1344.webp";
 import { Reveal } from "@/components/effects";
@@ -22,7 +23,7 @@ export default function Brand() {
 						<picture>
 							<source
 								type="image/webp"
-								srcSet={`${banner896} 896w, ${banner1344} 1344w`}
+								srcSet={`${banner640} 640w, ${banner896} 896w, ${banner1344} 1344w`}
 								sizes="(max-width: 672px) 100vw, 672px"
 							/>
 							<img

@@ -13,6 +13,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import logo from "@/assets/logo/logo.png";
+import logo64 from "@/assets/logo/logo-64.webp";
 import logo96 from "@/assets/logo/logo-96.webp";
 import logo192 from "@/assets/logo/logo-192.webp";
 import { JsonLdScript } from "@/components/jsonld-script";
@@ -150,7 +151,7 @@ export default function Footer() {
 			<picture>
 				<source
 					type="image/webp"
-					srcSet={`${logo96} 96w, ${logo192} 192w`}
+					srcSet={`${logo64} 64w, ${logo96} 96w, ${logo192} 192w`}
 					sizes="256px"
 				/>
 				<img
@@ -176,7 +177,7 @@ export default function Footer() {
 							<picture className="contents">
 								<source
 									type="image/webp"
-									srcSet={`${logo96} 96w, ${logo192} 192w`}
+									srcSet={`${logo64} 64w, ${logo96} 96w, ${logo192} 192w`}
 									sizes="48px"
 								/>
 								<img

@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 import { useRef } from "react";
 import banner from "@/assets/logo/banner.png";
+import banner640 from "@/assets/logo/banner-640.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
 import banner1344 from "@/assets/logo/banner-1344.webp";
 import { buttonVariants } from "@/components/ui/button";
@@ -59,7 +60,7 @@ export default function Hero() {
 					<picture>
 						<source
 							type="image/webp"
-							srcSet={`${banner896} 896w, ${banner1344} 1344w`}
+							srcSet={`${banner640} 640w, ${banner896} 896w, ${banner1344} 1344w`}
 							sizes="100vw"
 						/>
 						<img
