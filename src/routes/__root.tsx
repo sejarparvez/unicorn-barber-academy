@@ -19,7 +19,6 @@ import { Analytics } from "@/components/providers/analytics";
 import { LazyToaster } from "@/components/providers/lazy-toaster";
 import { MotionProvider } from "@/components/providers/motion-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
-import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { RouteProgress } from "@/components/route-progress";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
@@ -219,7 +218,6 @@ function RootDocument() {
 						</div>
 					) : null}
 					<Analytics />
-					<SmoothScroll />
 					<LazyToaster />
 				</MotionProvider>
 				{import.meta.env.DEV && (
