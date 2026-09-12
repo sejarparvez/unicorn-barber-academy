@@ -1,6 +1,6 @@
 import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 import banner480 from "@/assets/logo/banner-480.webp";
 import banner640 from "@/assets/logo/banner-640.webp";
 import banner768 from "@/assets/logo/banner-768.webp";
@@ -17,8 +17,15 @@ import Instructors from "@/features/home/sections/instructors";
 import Programs from "@/features/home/sections/programs";
 import Stats from "@/features/home/sections/stats";
 import StudentLife from "@/features/home/sections/student-life";
-import Testimonials from "@/features/home/sections/testimonials";
 import WhyUnicorn from "@/features/home/sections/why-us";
+
+// Testimonials pulls in embla-carousel (~30 KB) but sits far below the fold:
+// split it into its own chunk so it neither downloads nor evaluates before
+// LCP. Crawlers render JS, so the content stays indexed.
+const Testimonials = lazy(
+	() => import("@/features/home/sections/testimonials"),
+);
+
 import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
 import {

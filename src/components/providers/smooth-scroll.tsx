@@ -22,26 +22,51 @@ export function SmoothScroll() {
 	useEffect(() => {
 		if (shouldReduceMotion || !isMarketing) return;
 
-		// Dynamic import keeps lenis (~18 KB) out of the initial bundle.
-		// Smoothing engages a fraction after mount — imperceptible, since
-		// no meaningful scroll can happen before hydration anyway.
+		// Touch devices keep native scroll: Lenis intercepts touch input and
+		// forces layout reads on every frame (PageSpeed "forced reflow"),
+		// and native momentum scrolling already feels right on mobile.
+		// This also keeps the ~18 KB lenis chunk off mobile entirely.
+		if (window.matchMedia("(pointer: coarse)").matches) return;
+
+		// Dynamic import keeps lenis out of the initial bundle; idle-defer
+		// keeps its evaluation + first layout reads off the critical path.
+		// Smoothing engages shortly after load — imperceptible, since no
+		// meaningful scroll can happen before hydration anyway.
 		let lenis: { destroy: () => void } | undefined;
 		let cancelled = false;
-		void import("lenis").then(({ default: Lenis }) => {
-			if (cancelled) return;
-			lenis = new Lenis({
-				// Gentle, premium feel — not floaty.
-				duration: 1.1,
-				easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
-				touchMultiplier: 1.4,
-				// Drive the raf loop internally only while settling — avoids a
-				// permanent per-frame callback (and its layout reads) when idle.
-				autoRaf: true,
+		let idleId: number | undefined;
+		let fallbackId = 0;
+		const init = () => {
+			if (cancelled || lenis) return;
+			cleanup();
+			void import("lenis").then(({ default: Lenis }) => {
+				if (cancelled) return;
+				lenis = new Lenis({
+					// Gentle, premium feel — not floaty.
+					duration: 1.1,
+					easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
+					touchMultiplier: 1.4,
+					// Drive the raf loop internally only while settling — avoids a
+					// permanent per-frame callback (and its layout reads) when idle.
+					autoRaf: true,
+				});
 			});
-		});
+		};
+		const cleanup = () => {
+			window.removeEventListener("scroll", init);
+			if (idleId !== undefined) window.cancelIdleCallback(idleId);
+			window.clearTimeout(fallbackId);
+		};
+		window.addEventListener("scroll", init, { passive: true });
+		if (typeof window.requestIdleCallback === "function") {
+			idleId = window.requestIdleCallback(init, { timeout: 3000 });
+		} else {
+			fallbackId = window.setTimeout(init, 2000);
+		}
 
 		return () => {
 			cancelled = true;
+			cleanup();
 			lenis?.destroy();
 		};
 	}, [shouldReduceMotion, isMarketing]);
