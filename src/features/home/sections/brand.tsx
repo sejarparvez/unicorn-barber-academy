@@ -1,5 +1,4 @@
 import { m, useReducedMotion } from "motion/react";
-import banner from "@/assets/logo/banner.png";
 import banner640 from "@/assets/logo/banner-640.webp";
 import banner768 from "@/assets/logo/banner-768.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
@@ -28,13 +27,13 @@ export default function Brand() {
 								sizes="(max-width: 672px) 100vw, 672px"
 							/>
 							<img
-								src={banner}
+								src={banner768}
 								alt="Unicorn Barber Training Academy"
 								className="mx-auto h-auto w-full max-w-2xl"
-								width={4001}
-								height={2001}
-								loading="eager"
-								fetchPriority="high"
+								width={768}
+								height={384}
+								loading="lazy"
+								decoding="async"
 							/>
 						</picture>
 					</m.div>

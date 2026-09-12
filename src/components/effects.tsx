@@ -7,7 +7,8 @@ import {
 	type Variants,
 } from "motion/react";
 import type { PropsWithChildren } from "react";
-import banner from "@/assets/logo/banner.png";
+import { useEffect, useState } from "react";
+import banner640 from "@/assets/logo/banner-640.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,23 @@ const revealVariants: Variants = {
 
 /** Thin gold reading-progress bar pinned to the top of the viewport. */
 export function ScrollProgress() {
+	const [scrolled, setScrolled] = useState(false);
+	useEffect(() => {
+		// Mount the scroll subscription lazily on first scroll: at page load
+		// the bar is invisible (progress 0) and `useScroll` would only add
+		// layout-measurement work to the critical path.
+		const onScroll = () => setScrolled(true);
+		window.addEventListener("scroll", onScroll, {
+			passive: true,
+			once: true,
+		});
+		return () => window.removeEventListener("scroll", onScroll);
+	}, []);
+	if (!scrolled) return null;
+	return <ScrollProgressInner />;
+}
+
+function ScrollProgressInner() {
 	const shouldReduceMotion = useReducedMotion();
 	const { scrollYProgress } = useScroll();
 	const scaleX = useSpring(scrollYProgress, {
@@ -294,12 +312,13 @@ export function FinalCta({
 				<picture>
 					<source type="image/webp" srcSet={banner896} />
 					<img
-						src={banner}
+						src={banner640}
 						alt=""
 						className="h-auto w-full opacity-[0.04]"
-						width={4001}
-						height={2001}
+						width={896}
+						height={448}
 						loading="lazy"
+						decoding="async"
 					/>
 				</picture>
 			</m.div>

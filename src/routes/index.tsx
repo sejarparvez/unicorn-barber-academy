@@ -1,6 +1,7 @@
 import { IconClockHour4, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
+import banner480 from "@/assets/logo/banner-480.webp";
 import banner640 from "@/assets/logo/banner-640.webp";
 import banner768 from "@/assets/logo/banner-768.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
@@ -70,7 +71,7 @@ export const Route = createFileRoute("/")({
 			{
 				rel: "preload",
 				as: "image",
-				imageSrcSet: `${banner640} 640w, ${banner768} 768w, ${banner896} 896w`,
+				imageSrcSet: `${banner480} 480w, ${banner640} 640w, ${banner768} 768w, ${banner896} 896w`,
 				imageSizes: "100vw",
 				// Mobile-only LCP candidate — desktop uses the photo column.
 				media: "(max-width: 1023px)",

@@ -3,7 +3,8 @@ import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import { m, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import banner480 from "@/assets/logo/banner-480.webp";
 import banner640 from "@/assets/logo/banner-640.webp";
 import banner768 from "@/assets/logo/banner-768.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
@@ -23,7 +24,71 @@ const gradientText =
 /** Desktop-only (matches `lg:`): running `useScroll` against the hero section
  *  forces layout measurement on every scroll — pointless on mobile where the
  *  photo column is `hidden`. */
+function HeroPhotoStatic() {
+	return (
+		<div className="relative hidden overflow-hidden lg:block lg:h-[88vh]">
+			{/* Lazy + low priority on purpose: this column is `display: none`
+			    on mobile, but eager images download even when CSS-hidden —
+			    a 278 KiB hidden fetch would starve the mobile LCP banner.
+			    On desktop (initial viewport) lazy still loads immediately,
+			    just after the eager above-fold content. */}
+			<Image
+				src={pic("unicorn-hero-barbering", 1400, 1700)}
+				alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
+				layout="fullWidth"
+				sizes="(min-width: 1024px) 50vw, 100vw"
+				loading="lazy"
+				fetchPriority="low"
+				className="h-full w-full object-cover contrast-[1.05] grayscale-15"
+			/>
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-0 bg-linear-to-l from-transparent via-transparent to-background/20"
+			/>
+			{/* Gold hairline framing the photo edge */}
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-y-0 left-0 hidden w-px bg-linear-to-b from-transparent via-primary/40 to-transparent lg:block"
+			/>
+		</div>
+	);
+}
+
+/** Parallax upgrade: subscribes to scroll-linked motion only after the
+ *  browser is idle (or the user first scrolls), so `useScroll` layout
+ *  measurements never compete with LCP. Before upgrade, the static photo
+ *  above paints immediately — same pixels, no pop-in (cached src). */
 function HeroPhoto({
+	sectionRef,
+}: {
+	sectionRef: React.RefObject<HTMLElement | null>;
+}) {
+	const [parallax, setParallax] = useState(false);
+	useEffect(() => {
+		let idleId: number | undefined;
+		let fallbackId = 0;
+		const enable = () => {
+			setParallax(true);
+			cleanup();
+		};
+		const cleanup = () => {
+			window.removeEventListener("scroll", enable);
+			if (idleId !== undefined) window.cancelIdleCallback(idleId);
+			window.clearTimeout(fallbackId);
+		};
+		window.addEventListener("scroll", enable, { passive: true });
+		if (typeof window.requestIdleCallback === "function") {
+			idleId = window.requestIdleCallback(enable, { timeout: 2500 });
+		} else {
+			fallbackId = window.setTimeout(enable, 1500);
+		}
+		return cleanup;
+	}, []);
+	if (!parallax) return <HeroPhotoStatic />;
+	return <HeroPhotoParallax sectionRef={sectionRef} />;
+}
+
+function HeroPhotoParallax({
 	sectionRef,
 }: {
 	sectionRef: React.RefObject<HTMLElement | null>;
@@ -50,8 +115,8 @@ function HeroPhoto({
 					alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
 					layout="fullWidth"
 					sizes="(min-width: 1024px) 50vw, 100vw"
-					fetchPriority="high"
-					loading="eager"
+					loading="lazy"
+					fetchPriority="low"
 					className="h-full w-full object-cover contrast-[1.05] grayscale-15"
 				/>
 			</m.div>
@@ -95,15 +160,15 @@ export default function Hero() {
 					<picture>
 						<source
 							type="image/webp"
-							srcSet={`${banner640} 640w, ${banner768} 768w, ${banner896} 896w`}
+							srcSet={`${banner480} 480w, ${banner640} 640w, ${banner768} 768w, ${banner896} 896w`}
 							sizes="100vw"
 						/>
 						<img
-							src={banner768}
+							src={banner480}
 							alt="Unicorn Barber Training Academy"
 							className="h-auto w-full"
-							width={768}
-							height={384}
+							width={480}
+							height={240}
 							fetchPriority="high"
 							loading="eager"
 							decoding="async"
