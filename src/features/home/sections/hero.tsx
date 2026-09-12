@@ -1,7 +1,6 @@
 // components/Hero.tsx
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import { Image } from "@unpic/react";
 import { m, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import banner480 from "@/assets/logo/banner-480.webp";
@@ -24,23 +23,51 @@ const gradientText =
 /** Desktop-only (matches `lg:`): running `useScroll` against the hero section
  *  forces layout measurement on every scroll — pointless on mobile where the
  *  photo column is `hidden`. */
+const HERO_PHOTO_ALT =
+	"Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy";
+
+/** Media-gated photo: the `<source media>` (not CSS `display`) decides what
+ *  downloads, so mobile fetches zero bytes for this column while desktop
+ *  gets an eager, high-priority LCP image. (CSS-hidden `eager` images still
+ *  download — that cost mobile a hidden 278 KiB fetch.) */
+function HeroPhotoImg({ eager }: { eager: boolean }) {
+	const src = pic("unicorn-hero-barbering", 1400, 1700);
+	if (!eager) {
+		return (
+			<img
+				src={src}
+				alt={HERO_PHOTO_ALT}
+				width={900}
+				height={597}
+				loading="lazy"
+				decoding="async"
+				className="h-full w-full object-cover contrast-[1.05] grayscale-15"
+			/>
+		);
+	}
+	return (
+		<picture className="contents">
+			<source media="(min-width: 1024px)" srcSet={src} type="image/webp" />
+			<img
+				// Zero-byte fallback: only fetched when NO source matches
+				// (mobile) — the desktop source above is used otherwise.
+				src="data:,"
+				alt={HERO_PHOTO_ALT}
+				width={900}
+				height={597}
+				fetchPriority="high"
+				loading="eager"
+				decoding="async"
+				className="h-full w-full object-cover contrast-[1.05] grayscale-15"
+			/>
+		</picture>
+	);
+}
+
 function HeroPhotoStatic() {
 	return (
 		<div className="relative hidden overflow-hidden lg:block lg:h-[88vh]">
-			{/* Lazy + low priority on purpose: this column is `display: none`
-			    on mobile, but eager images download even when CSS-hidden —
-			    a 278 KiB hidden fetch would starve the mobile LCP banner.
-			    On desktop (initial viewport) lazy still loads immediately,
-			    just after the eager above-fold content. */}
-			<Image
-				src={pic("unicorn-hero-barbering", 1400, 1700)}
-				alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
-				layout="fullWidth"
-				sizes="(min-width: 1024px) 50vw, 100vw"
-				loading="lazy"
-				fetchPriority="low"
-				className="h-full w-full object-cover contrast-[1.05] grayscale-15"
-			/>
+			<HeroPhotoImg eager />
 			<div
 				aria-hidden="true"
 				className="pointer-events-none absolute inset-0 bg-linear-to-l from-transparent via-transparent to-background/20"
@@ -54,10 +81,10 @@ function HeroPhotoStatic() {
 	);
 }
 
-/** Parallax upgrade: subscribes to scroll-linked motion only after the
- *  browser is idle (or the user first scrolls), so `useScroll` layout
- *  measurements never compete with LCP. Before upgrade, the static photo
- *  above paints immediately — same pixels, no pop-in (cached src). */
+/** Parallax upgrade: subscribes to scroll-linked motion only once the browser
+ *  is idle, so `useScroll` layout measurements never compete with LCP (and
+ *  never subscribe mid-scroll, which reads as forced reflow). Before upgrade,
+ *  the static photo above paints immediately — same pixels, no pop-in. */
 function HeroPhoto({
 	sectionRef,
 }: {
@@ -66,23 +93,16 @@ function HeroPhoto({
 	const [parallax, setParallax] = useState(false);
 	useEffect(() => {
 		let idleId: number | undefined;
-		let fallbackId = 0;
-		const enable = () => {
-			setParallax(true);
-			cleanup();
-		};
-		const cleanup = () => {
-			window.removeEventListener("scroll", enable);
+		const fallbackId = window.setTimeout(() => setParallax(true), 3000);
+		if (typeof window.requestIdleCallback === "function") {
+			idleId = window.requestIdleCallback(() => setParallax(true), {
+				timeout: 2500,
+			});
+		}
+		return () => {
 			if (idleId !== undefined) window.cancelIdleCallback(idleId);
 			window.clearTimeout(fallbackId);
 		};
-		window.addEventListener("scroll", enable, { passive: true });
-		if (typeof window.requestIdleCallback === "function") {
-			idleId = window.requestIdleCallback(enable, { timeout: 2500 });
-		} else {
-			fallbackId = window.setTimeout(enable, 1500);
-		}
-		return cleanup;
 	}, []);
 	if (!parallax) return <HeroPhotoStatic />;
 	return <HeroPhotoParallax sectionRef={sectionRef} />;
@@ -110,15 +130,7 @@ function HeroPhotoParallax({
 				}
 				className="h-full w-full"
 			>
-				<Image
-					src={pic("unicorn-hero-barbering", 1400, 1700)}
-					alt="Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy"
-					layout="fullWidth"
-					sizes="(min-width: 1024px) 50vw, 100vw"
-					loading="lazy"
-					fetchPriority="low"
-					className="h-full w-full object-cover contrast-[1.05] grayscale-15"
-				/>
+				<HeroPhotoImg eager={false} />
 			</m.div>
 			<div
 				aria-hidden="true"
@@ -155,16 +167,18 @@ export default function Hero() {
 			/>
 
 			<div className="relative mx-auto grid max-w-350 grid-cols-1 lg:grid-cols-[1fr_auto_1fr]">
-				{/* Brand banner — mobile only, shows first */}
+				{/* Brand banner — mobile only. The `<source media>` (not CSS)
+				    decides what downloads: desktop fetches zero bytes here. */}
 				<div className="order-1 flex items-center justify-center bg-[#0d0d0f] -ml-8 pt-6 pb-5 lg:hidden">
 					<picture>
 						<source
+							media="(max-width: 1023px)"
 							type="image/webp"
 							srcSet={`${banner480} 480w, ${banner640} 640w, ${banner768} 768w, ${banner896} 896w`}
 							sizes="100vw"
 						/>
 						<img
-							src={banner480}
+							src="data:,"
 							alt="Unicorn Barber Training Academy"
 							className="h-auto w-full"
 							width={480}

@@ -8,6 +8,7 @@ import banner896 from "@/assets/logo/banner-896.webp";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
 import { CardGridSkeleton } from "@/components/route-skeletons";
 import { buttonVariants } from "@/components/ui/button";
+import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
 import Brand from "@/features/home/sections/brand";
 import CraftMarquee from "@/features/home/sections/craft-marquee";
@@ -82,6 +83,14 @@ export const Route = createFileRoute("/")({
 				imageSizes: "100vw",
 				// Mobile-only LCP candidate — desktop uses the photo column.
 				media: "(max-width: 1023px)",
+				fetchPriority: "high",
+			},
+			// Desktop LCP candidate: the hero photo column.
+			{
+				rel: "preload",
+				as: "image",
+				href: pic("unicorn-hero-barbering", 1400, 1700),
+				media: "(min-width: 1024px)",
 				fetchPriority: "high",
 			},
 		],
