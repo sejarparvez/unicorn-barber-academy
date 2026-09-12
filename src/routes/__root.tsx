@@ -1,3 +1,4 @@
+import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import { IconArrowRight } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import {
@@ -81,6 +82,15 @@ export const Route = createRootRoute({
 			{ name: "twitter:image", content: `${SITE_URL}/banner.png` },
 		],
 		links: [
+			// Preload the only webfont left (Inter latin): breaks the
+			// CSS -> font discovery chain so text paints at FCP.
+			{
+				rel: "preload",
+				href: interLatin,
+				as: "font",
+				type: "font/woff2",
+				crossOrigin: "anonymous",
+			},
 			{
 				rel: "stylesheet",
 				href: appCss,

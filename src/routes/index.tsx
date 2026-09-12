@@ -72,6 +72,8 @@ export const Route = createFileRoute("/")({
 				as: "image",
 				imageSrcSet: `${banner640} 640w, ${banner768} 768w, ${banner896} 896w`,
 				imageSizes: "100vw",
+				// Mobile-only LCP candidate — desktop uses the photo column.
+				media: "(max-width: 1023px)",
 				fetchPriority: "high",
 			},
 		],

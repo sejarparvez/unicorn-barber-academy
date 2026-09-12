@@ -3,12 +3,10 @@ import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
 import { m, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef, useState } from "react";
-import banner from "@/assets/logo/banner.png";
+import { useRef } from "react";
 import banner640 from "@/assets/logo/banner-640.webp";
 import banner768 from "@/assets/logo/banner-768.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
-import banner1344 from "@/assets/logo/banner-1344.webp";
 import { buttonVariants } from "@/components/ui/button";
 import { pic } from "@/data/images";
 import { cn } from "@/lib/utils";
@@ -25,20 +23,6 @@ const gradientText =
 /** Desktop-only (matches `lg:`): running `useScroll` against the hero section
  *  forces layout measurement on every scroll — pointless on mobile where the
  *  photo column is `hidden`. */
-function useDesktop() {
-	const [desktop, setDesktop] = useState(false);
-	useEffect(() => {
-		const mq = window.matchMedia("(min-width: 1024px)");
-		setDesktop(mq.matches);
-		const onChange = (e: MediaQueryListEvent) => setDesktop(e.matches);
-		mq.addEventListener("change", onChange);
-		return () => mq.removeEventListener("change", onChange);
-	}, []);
-	return desktop;
-}
-
-/** Parallax photo column — own component so the scroll subscription and its
- *  layout measurements only exist when actually rendered (desktop). */
 function HeroPhoto({
 	sectionRef,
 }: {
@@ -87,7 +71,6 @@ function HeroPhoto({
 export default function Hero() {
 	const sectionRef = useRef<HTMLElement>(null);
 	const shouldReduceMotion = useReducedMotion();
-	const desktop = useDesktop();
 
 	return (
 		<section
@@ -112,17 +95,18 @@ export default function Hero() {
 					<picture>
 						<source
 							type="image/webp"
-							srcSet={`${banner640} 640w, ${banner768} 768w, ${banner896} 896w, ${banner1344} 1344w`}
+							srcSet={`${banner640} 640w, ${banner768} 768w, ${banner896} 896w`}
 							sizes="100vw"
 						/>
 						<img
-							src={banner}
+							src={banner768}
 							alt="Unicorn Barber Training Academy"
 							className="h-auto w-full"
-							width={4001}
-							height={2001}
+							width={768}
+							height={384}
 							fetchPriority="high"
 							loading="eager"
+							decoding="async"
 						/>
 					</picture>
 				</div>
@@ -194,9 +178,10 @@ export default function Hero() {
 					className="relative hidden w-14 shrink-0 lg:flex lg:flex-col lg:items-center lg:justify-center"
 				></div>
 
-				{/* Photo column — desktop only; mobile shows the brand banner instead.
-				    Not rendered at all on mobile so no scroll-measurement work runs. */}
-				{desktop && <HeroPhoto sectionRef={sectionRef} />}
+				{/* Photo column — desktop only via CSS (`hidden lg:block` inside),
+				    so the LCP element exists in SSR HTML instead of mounting
+				    after a `matchMedia` effect. */}
+				<HeroPhoto sectionRef={sectionRef} />
 			</div>
 			{/* Bottom fade into the marquee — mobile only, softens the exit */}
 			<div
