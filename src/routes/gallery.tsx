@@ -28,7 +28,7 @@ export const Route = createFileRoute("/gallery")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/gallery` },
-			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
 			{
 				name: "twitter:title",
 				content: "Gallery | Unicorn Barber Training Academy",

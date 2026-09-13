@@ -23,7 +23,7 @@ export const Route = createFileRoute("/careers")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/careers` },
-			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
 			{
 				name: "twitter:title",
 				content: "Careers | Unicorn Barber Training Academy",

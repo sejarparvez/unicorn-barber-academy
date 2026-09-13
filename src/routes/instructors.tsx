@@ -29,7 +29,7 @@ export const Route = createFileRoute("/instructors")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/instructors` },
-			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
 			{
 				name: "twitter:title",
 				content: "Instructors | Unicorn Barber Training Academy",

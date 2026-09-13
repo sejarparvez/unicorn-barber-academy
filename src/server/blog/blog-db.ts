@@ -467,19 +467,21 @@ export async function listAllPosts(options: {
 	if (options.search?.trim()) {
 		params.push(`%${escapeLike(options.search.trim())}%`);
 		conditions.push(
-			`(p.title ILIKE $${params.length} OR p.slug ILIKE $${params.length} OR p.excerpt ILIKE $${params.length})`,
+			`(p.title ILIKE $${params.length} ESCAPE '\\' OR p.slug ILIKE $${params.length} ESCAPE '\\' OR p.excerpt ILIKE $${params.length} ESCAPE '\\')`,
 		);
 	}
 	const where =
 		conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-	// Count query: rebind params without LIMIT/OFFSET ($1, $2 are always LIMIT/OFFSET in the list query).
+	// Count query: renumber $3.. → $1.. since LIMIT/OFFSET params are dropped.
 	const countParams = params.slice(2);
-	const countPlaceholders = countParams.map((_, i) => `$${i + 1}`).join(", ");
-
+	let countWhere = where;
+	for (let i = 0; i < countParams.length; i++) {
+		countWhere = countWhere.split(`$${i + 3}`).join(`$${i + 1}`);
+	}
 	const totalRes = await q<{ count: string }>(
-		`SELECT count(*)::text AS count FROM blog_post p ${where}`,
-		countPlaceholders ? countParams : [],
+		`SELECT count(*)::text AS count FROM blog_post p ${countWhere}`,
+		countParams,
 	);
 	const total = Number.parseInt(totalRes.rows[0]?.count ?? "0", 10);
 	const totalPages = Math.max(1, Math.ceil(total / perPage));

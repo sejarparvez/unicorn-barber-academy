@@ -8,6 +8,7 @@ import type { Role } from "@/lib/roles";
 import { parseRole, ROLES } from "@/lib/roles";
 import type { AdminUserRow, ListUsersResult } from "@/lib/users";
 import { db } from "../db";
+import { escapeLike } from "../fn-utils";
 
 const PAGE_SIZE = 20;
 
@@ -45,9 +46,9 @@ export async function listUsersAdmin(options: {
 	const conditions: string[] = [];
 	const params: unknown[] = [];
 	if (options.search) {
-		params.push(`%${options.search}%`);
+		params.push(`%${escapeLike(options.search)}%`);
 		conditions.push(
-			`(u.email ILIKE $${params.length} OR u.name ILIKE $${params.length})`,
+			`(u.email ILIKE $${params.length} ESCAPE '' OR u.name ILIKE $${params.length} ESCAPE ''')`,
 		);
 	}
 	if (options.role) {

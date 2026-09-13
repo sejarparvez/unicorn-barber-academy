@@ -1,7 +1,7 @@
 // src/server/contact-validate.test.ts
 import { describe, expect, test } from "bun:test";
 import { CONTACT_SUBJECTS } from "@/data/contact";
-import { validateContactInput } from "@/server/contact-validate";
+import { validateContactInput } from "@/server/inquiry/inquiry-validate";
 
 const validInput = {
 	name: "Rahim Uddin",

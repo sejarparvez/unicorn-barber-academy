@@ -255,7 +255,7 @@ export async function listApplicationsAdmin(options: {
 		countParams.push(`%${escapeLike(options.search.trim())}%`);
 		const n = countParams.length;
 		conditions.push(
-			`(a.reference ILIKE $${n} OR a.full_name ILIKE $${n} OR a.email ILIKE $${n} OR a.phone ILIKE $${n})`,
+			`(a.reference ILIKE $${n} ESCAPE '' OR a.full_name ILIKE $${n} ESCAPE '' OR a.email ILIKE $${n} ESCAPE '' OR a.phone ILIKE $${n} ESCAPE ''')`,
 		);
 	}
 	if (options.programSlug) {

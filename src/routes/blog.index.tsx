@@ -52,7 +52,7 @@ export const Route = createFileRoute("/blog/")({
 				{ property: "og:description", content: description },
 				{ property: "og:type", content: "website" },
 				{ property: "og:url", content: url },
-				{ property: "og:image", content: `${SITE_URL}/banner.png` },
+				{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
 				{
 					property: "og:image:alt",
 					content: "Unicorn Barber Training Academy banner",
@@ -63,7 +63,7 @@ export const Route = createFileRoute("/blog/")({
 					content: title,
 				},
 				{ name: "twitter:description", content: description },
-				{ name: "twitter:image", content: `${SITE_URL}/banner.png` },
+				{ name: "twitter:image", content: `${SITE_URL}/og-image.jpg` },
 			],
 			links: [
 				{ rel: "canonical", href: url },

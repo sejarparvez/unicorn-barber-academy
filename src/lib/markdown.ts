@@ -41,6 +41,11 @@ export function renderMarkdown(markdown: string): string {
 			h5: ["id"],
 			h6: ["id"],
 		},
+		allowedSchemes: ["http", "https", "mailto", "tel"],
+		allowedSchemesByTag: {
+			img: ["http", "https", "data"],
+		},
+		allowProtocolRelative: false,
 		transformTags: {
 			// Never let authored links create new top-level browsing contexts
 			// without rel hygiene. Protocol-relative hrefs ("//host") are
@@ -54,10 +59,21 @@ export function renderMarkdown(markdown: string): string {
 						: {}),
 				},
 			}),
-			img: (tagName, attribs) => ({
-				tagName,
-				attribs: { ...attribs, loading: "lazy", decoding: "async" },
-			}),
+			img: (tagName, attribs) => {
+				// Block non-image data: URIs (e.g. data:text/html) on images.
+				const src = attribs.src ?? "";
+				const cleanSrc =
+					src.startsWith("data:") && !src.startsWith("data:image/") ? "" : src;
+				return {
+					tagName,
+					attribs: {
+						...attribs,
+						src: cleanSrc,
+						loading: "lazy",
+						decoding: "async",
+					},
+				};
+			},
 		},
 	});
 }

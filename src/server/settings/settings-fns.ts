@@ -13,8 +13,25 @@ import {
 import { parseSettingsPatch } from "@/server/settings/settings-validate";
 
 export const getSiteSettingsFn = createServerFn({ method: "GET" }).handler(
-	async (): Promise<ResolvedSettings> => runSafe(() => getSiteSettings()),
+	async (): Promise<ResolvedSettings> => runSafe(() => getCachedSiteSettings()),
 );
+
+const SETTINGS_TTL_MS = 5 * 60_000;
+let settingsCache: { value: ResolvedSettings; at: number } | null = null;
+
+/** In-memory 5-min cache: settings change only via admin writes, which
+    invalidate through updateSettingsFn below. */
+export async function getCachedSiteSettings(): Promise<ResolvedSettings> {
+	if (settingsCache && Date.now() - settingsCache.at < SETTINGS_TTL_MS)
+		return settingsCache.value;
+	const value = await getSiteSettings();
+	settingsCache = { value, at: Date.now() };
+	return value;
+}
+
+export function invalidateSettingsCache(): void {
+	settingsCache = null;
+}
 
 export const getSettingsBaseFn = createServerFn({ method: "GET" }).handler(
 	async (): Promise<Record<SettingKey, string>> => {
@@ -31,6 +48,7 @@ export const updateSettingsFn = createServerFn({ method: "POST" })
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => updateSiteSettings(parsed.value));
 		if (!result.ok) throw new Error("Unknown setting key");
+		invalidateSettingsCache();
 		await logAdminAction({
 			actorId: Number(session.user.id),
 			action: "settings.update",

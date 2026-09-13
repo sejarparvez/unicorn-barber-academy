@@ -8,19 +8,16 @@ import {
 	setCertificateRevoked,
 } from "@/lib/api/certificate-admin";
 import type { CertificateRecord } from "@/lib/certificates";
+import { getCertificateForApplicationFn } from "@/server/certificate/certificate-fns";
 import { queryKeys } from "./query-keys";
 
 export function useApplicationCertificate(applicationId: number) {
 	return useQuery({
 		queryKey: queryKeys.applicationCertificate(applicationId),
-		queryFn: async (): Promise<CertificateRecord | null> => {
-			const { getCertificateForApplicationFn } = await import(
-				"@/server/certificate/certificate-fns"
-			);
-			return getCertificateForApplicationFn({
+		queryFn: (): Promise<CertificateRecord | null> =>
+			getCertificateForApplicationFn({
 				data: { applicationId },
-			});
-		},
+			}),
 		staleTime: 60_000,
 	});
 }

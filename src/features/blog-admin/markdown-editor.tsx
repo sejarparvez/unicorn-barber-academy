@@ -25,6 +25,7 @@ import {
 import { useId, useRef, useState } from "react";
 import { uploadImage } from "@/lib/api/blog-admin";
 import { renderMarkdownPreview } from "@/lib/preview-markdown";
+import { sanitizePreviewHtml } from "@/lib/sanitize-client";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -92,6 +93,10 @@ export function MarkdownEditor({
 			setUploading(false);
 		}
 	}
+
+	const previewHtml = sanitizePreviewHtml(
+		renderMarkdownPreview(value || "*Nothing to preview yet.*"),
+	);
 
 	const tools = [
 		{ icon: IconH2, title: "Heading 2", run: () => linePrefix("## ") },
@@ -227,20 +232,18 @@ export function MarkdownEditor({
 					/>
 					<div
 						className="prose prose-sm dark:prose-invert w-1/2 px-4 py-4 overflow-y-auto"
-						// biome-ignore lint/security/noDangerouslySetInnerHtml: draft preview for the admin editor only
+						// biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized via DOMPurify previewHtml
 						dangerouslySetInnerHTML={{
-							__html: renderMarkdownPreview(
-								value || "*Nothing to preview yet.*",
-							),
+							__html: previewHtml,
 						}}
 					/>
 				</div>
 			) : viewMode === "preview" ? (
 				<div
 					className="prose prose-sm dark:prose-invert min-h-[420px] max-w-none px-4 py-4"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: draft preview for the admin editor only
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized via DOMPurify previewHtml
 					dangerouslySetInnerHTML={{
-						__html: renderMarkdownPreview(value || "*Nothing to preview yet.*"),
+						__html: previewHtml,
 					}}
 				/>
 			) : (

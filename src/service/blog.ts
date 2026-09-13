@@ -21,6 +21,7 @@ import {
 	updatePost,
 } from "@/lib/api/blog-admin";
 import type { BlogCategory, BlogPostSummary, BlogStatus } from "@/lib/blog";
+import { listAdminPostsFn, listCategoriesFn } from "@/server/blog/blog-fns";
 import { queryKeys } from "./query-keys";
 
 /* -------------------------------- reads --------------------------------- */
@@ -45,9 +46,8 @@ export function useAdminPosts(
 ) {
 	return useQuery({
 		queryKey: queryKeys.adminPosts(filters),
-		queryFn: async (): Promise<ListPage> => {
-			const { listAdminPostsFn } = await import("@/server/blog/blog-fns");
-			return listAdminPostsFn({
+		queryFn: (): Promise<ListPage> =>
+			listAdminPostsFn({
 				data: {
 					status: filters.status,
 					search: filters.search,
@@ -55,8 +55,7 @@ export function useAdminPosts(
 					page: filters.page ?? 1,
 					sortByViews: filters.sortByViews ?? false,
 				},
-			});
-		},
+			}),
 		initialData: options?.initialData,
 		staleTime: 30_000,
 		placeholderData: keepPreviousData,
@@ -66,10 +65,7 @@ export function useAdminPosts(
 export function useBlogCategories(options?: { initialData?: BlogCategory[] }) {
 	return useQuery({
 		queryKey: queryKeys.blogCategories(),
-		queryFn: async (): Promise<BlogCategory[]> => {
-			const { listCategoriesFn } = await import("@/server/blog/blog-fns");
-			return listCategoriesFn();
-		},
+		queryFn: (): Promise<BlogCategory[]> => listCategoriesFn(),
 		initialData: options?.initialData,
 		staleTime: 60_000,
 	});
@@ -114,17 +110,18 @@ export function useDeletePost() {
 			const previous = queryClient.getQueriesData({
 				queryKey: queryKeys.adminPosts(),
 			});
-			queryClient.setQueriesData(
-				{ queryKey: queryKeys.adminPosts() },
-				(old: ListPage | undefined) => {
+			// Update every cached admin-posts list (all filters/pages), not
+			// just the exact empty-filter key.
+			for (const [key] of previous) {
+				queryClient.setQueryData(key, (old: ListPage | undefined) => {
 					if (!old) return old;
 					return {
 						...old,
 						items: old.items.filter((item) => item.id !== id),
-						total: old.total - 1,
+						total: Math.max(0, old.total - 1),
 					};
-				},
-			);
+				});
+			}
 			return { previous };
 		},
 		onError: (_err, _id, context) => {
@@ -157,9 +154,8 @@ export function useSetPostStatus() {
 				archive: "archived",
 			};
 			const newStatus = statusMap[input.action];
-			queryClient.setQueriesData(
-				{ queryKey: queryKeys.adminPosts() },
-				(old: ListPage | undefined) => {
+			for (const [key] of previous) {
+				queryClient.setQueryData(key, (old: ListPage | undefined) => {
 					if (!old) return old;
 					return {
 						...old,
@@ -167,8 +163,8 @@ export function useSetPostStatus() {
 							item.id === input.id ? { ...item, status: newStatus } : item,
 						),
 					};
-				},
-			);
+				});
+			}
 			return { previous };
 		},
 		onError: (_err, _input, context) => {

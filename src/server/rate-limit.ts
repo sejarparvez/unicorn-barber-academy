@@ -167,6 +167,8 @@ export function isSameOrigin(request: Request): boolean {
 	const appUrl = process.env.BETTER_AUTH_URL;
 	if (!appUrl) return false;
 	try {
+		// Canonical origin helper lives in lib/env (APP_ORIGIN); compare by
+		// host here to avoid importing client-context modules server-side.
 		return originHost === new URL(appUrl).host;
 	} catch {
 		return false;

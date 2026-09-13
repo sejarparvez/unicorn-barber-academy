@@ -1,4 +1,4 @@
-// src/server/program-db.ts
+// src/server/program/program-db.ts
 // Server-only data access for the program catalog table. Marketing copy
 // stays in src/data/programs.ts; this table owns what admin controls:
 // which programs are live (isPublished), the fee (feePoisha), and the

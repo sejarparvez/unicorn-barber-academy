@@ -56,12 +56,29 @@ export const Route = createRootRoute({
 				title:
 					"Unicorn Barber Training Academy | Barbering & Beauty Courses in Dhaka",
 			},
+			{
+				name: "description",
+				content:
+					"Hands-on barbering and beauty training in Banasree, Dhaka — taught by working barbers and stylists. Full kit included, job placement support.",
+			},
 			{ property: "og:site_name", content: "Unicorn Barber Training Academy" },
 			{ property: "og:locale", content: "en_US" },
-			// Default social-card image; individual routes override og:* as needed
-			{ property: "og:image", content: `${SITE_URL}/banner.png` },
-			{ property: "og:image:width", content: "4001" },
-			{ property: "og:image:height", content: "2001" },
+			{ property: "og:type", content: "website" },
+			{ property: "og:url", content: SITE_URL },
+			{
+				property: "og:title",
+				content:
+					"Unicorn Barber Training Academy | Barbering & Beauty Courses in Dhaka",
+			},
+			{
+				property: "og:description",
+				content:
+					"Hands-on barbering and beauty training in Banasree, Dhaka — taught by working barbers and stylists. Full kit included, job placement support.",
+			},
+			// Default social-card image (1200×630); individual routes override og:* as needed
+			{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
+			{ property: "og:image:width", content: "1200" },
+			{ property: "og:image:height", content: "630" },
 			{
 				property: "og:image:alt",
 				content: "Unicorn Barber Training Academy banner",
@@ -78,7 +95,11 @@ export const Route = createRootRoute({
 				content:
 					"Hands-on barbering and beauty training in Banasree, Dhaka � taught by working barbers and stylists. Enroll today.",
 			},
-			{ name: "twitter:image", content: `${SITE_URL}/banner.png` },
+			{ name: "twitter:image", content: `${SITE_URL}/og-image.jpg` },
+			{
+				name: "twitter:image:alt",
+				content: "Unicorn Barber Training Academy banner",
+			},
 		],
 		links: [
 			// Preload the only webfont left (Inter latin): breaks the

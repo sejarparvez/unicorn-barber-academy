@@ -34,6 +34,11 @@ export const queryKeys = {
 	}) => ["users", filters ?? {}] as const,
 	siteSettings: () => ["site-settings"] as const,
 	content: () => ["content"] as const,
+	instructorsList: () => ["content", "instructors"] as const,
+	galleryList: () => ["content", "gallery"] as const,
+	testimonialsList: () => ["content", "testimonials"] as const,
+	faqsList: (placement?: string) =>
+		["content", "faqs", placement ?? "all"] as const,
 	homeInstructors: () => ["content", "home", "instructors"] as const,
 	homeTestimonials: () => ["content", "home", "testimonials"] as const,
 	homeFaqs: () => ["content", "home", "faqs"] as const,

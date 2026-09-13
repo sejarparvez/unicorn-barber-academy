@@ -27,8 +27,11 @@ import {
 	getSlugRedirectTarget,
 	listAllPosts,
 	listCategories,
+	listCategoriesWithCounts,
 	listPublishedByCategory,
+	listPublishedForLlms,
 	listPublishedPosts,
+	listRecentPublished,
 	listRelatedPosts,
 	recordPostView,
 } from "@/server/blog/blog-db";
@@ -257,3 +260,51 @@ export const getCategoryArchiveFn = createServerFn({ method: "GET" })
 export const listCategoriesFn = createServerFn({ method: "GET" }).handler(
 	async (): Promise<BlogCategory[]> => runSafe(() => listCategories()),
 );
+
+// Public feed helpers for sitemap.xml / feed.xml / llms.txt / md mirrors.
+// Read-only, no auth; wrapped in runSafe so route handlers never touch db.ts.
+export const listSitemapDataFn = createServerFn({ method: "GET" })
+	.validator((input?: { limit?: number }) => input)
+	.handler(async ({ data }) => {
+		const limit = Math.min(Math.max(data?.limit ?? 100, 1), 200);
+		return runSafe(async () => {
+			const [posts, categories] = await Promise.all([
+				listRecentPublished(limit),
+				listCategoriesWithCounts(3),
+			]);
+			return { posts, categories };
+		});
+	});
+
+export const listFeedPostsFn = createServerFn({ method: "GET" })
+	.validator((input?: { limit?: number }) => input)
+	.handler(async ({ data }) =>
+		runSafe(() =>
+			listPublishedPosts({
+				page: 1,
+				perPage: Math.min(Math.max(data?.limit ?? 20, 1), 50),
+				excludeNoindex: true,
+			}),
+		),
+	);
+
+export const listLlmsPostsFn = createServerFn({ method: "GET" })
+	.validator((input?: { limit?: number }) => input)
+	.handler(async ({ data }) =>
+		runSafe(() =>
+			listPublishedForLlms(Math.min(Math.max(data?.limit ?? 50, 1), 100)),
+		),
+	);
+
+export const getPublishedMarkdownFn = createServerFn({ method: "GET" })
+	.validator((input: { slug: string }) => input)
+	.handler(async ({ data }) =>
+		runSafe(async () => {
+			const slug = clampSearchTerm(data.slug, 220);
+			const post = await getPublishedBySlug(slug);
+			if (post) return { kind: "post" as const, post };
+			const toSlug = await getSlugRedirectTarget(slug);
+			if (toSlug) return { kind: "redirect" as const, toSlug };
+			return { kind: "missing" as const };
+		}),
+	);

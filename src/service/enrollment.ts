@@ -10,7 +10,12 @@ import {
 } from "@tanstack/react-query";
 import {
 	bulkSetStatus,
+	createIntake,
+	deleteIntake,
+	recordFeePayment,
 	setApplicationStatus,
+	updateIntake,
+	voidFeePayment,
 } from "@/lib/api/enrollment-admin";
 import type {
 	ApplicationDetail,
@@ -21,6 +26,15 @@ import type {
 	ProgramAdmin,
 	ProgramOption,
 } from "@/lib/enrollment";
+import {
+	getApplicationAdminFn,
+	listApplicationStatusLogFn,
+	listApplicationsAdminFn,
+	listIntakesAdminFn,
+	listProgramOptionsFn,
+	listProgramsAdminFn,
+	updateProgramFn,
+} from "@/server/enrollment/enrollment-fns";
 import { queryKeys } from "./query-keys";
 
 /* -------------------------------- reads --------------------------------- */
@@ -49,13 +63,8 @@ export function useApplicationsList(
 ) {
 	return useQuery({
 		queryKey: queryKeys.applications(filters),
-		queryFn: async (): Promise<ListPage> => {
-			const { listApplicationsAdminFn } = await import(
-				"@/server/enrollment/enrollment-fns"
-			);
-			const result = await listApplicationsAdminFn({ data: filters });
-			return result;
-		},
+		queryFn: (): Promise<ListPage> =>
+			listApplicationsAdminFn({ data: filters }),
 		initialData: options?.initialData,
 		staleTime: 30_000,
 		placeholderData: keepPreviousData,
@@ -68,14 +77,10 @@ export function useApplicationDetail(
 ) {
 	return useQuery({
 		queryKey: queryKeys.application(id),
-		queryFn: async (): Promise<{ application: ApplicationDetail }> => {
-			const { getApplicationAdminFn } = await import(
-				"@/server/enrollment/enrollment-fns"
-			);
-			return (await getApplicationAdminFn({ data: { id } })) as {
+		queryFn: (): Promise<{ application: ApplicationDetail }> =>
+			getApplicationAdminFn({ data: { id } }) as Promise<{
 				application: ApplicationDetail;
-			};
-		},
+			}>,
 		initialData: options?.initialData,
 		staleTime: 60_000,
 	});
@@ -84,12 +89,7 @@ export function useApplicationDetail(
 export function useIntakesAdmin(options?: { initialData?: IntakeAdmin[] }) {
 	return useQuery({
 		queryKey: queryKeys.intakes(),
-		queryFn: async (): Promise<IntakeAdmin[]> => {
-			const { listIntakesAdminFn } = await import(
-				"@/server/enrollment/enrollment-fns"
-			);
-			return listIntakesAdminFn();
-		},
+		queryFn: (): Promise<IntakeAdmin[]> => listIntakesAdminFn(),
 		initialData: options?.initialData,
 		staleTime: 30_000,
 	});
@@ -98,12 +98,7 @@ export function useIntakesAdmin(options?: { initialData?: IntakeAdmin[] }) {
 export function useProgramOptions() {
 	return useQuery({
 		queryKey: queryKeys.programOptions(),
-		queryFn: async (): Promise<ProgramOption[]> => {
-			const { listProgramOptionsFn } = await import(
-				"@/server/enrollment/enrollment-fns"
-			);
-			return listProgramOptionsFn();
-		},
+		queryFn: (): Promise<ProgramOption[]> => listProgramOptionsFn(),
 		staleTime: 60_000,
 	});
 }
@@ -111,12 +106,7 @@ export function useProgramOptions() {
 export function useProgramsAdmin() {
 	return useQuery({
 		queryKey: queryKeys.programs(),
-		queryFn: async (): Promise<ProgramAdmin[]> => {
-			const { listProgramsAdminFn } = await import(
-				"@/server/enrollment/enrollment-fns"
-			);
-			return listProgramsAdminFn();
-		},
+		queryFn: (): Promise<ProgramAdmin[]> => listProgramsAdminFn(),
 		staleTime: 30_000,
 	});
 }
@@ -134,9 +124,6 @@ export function useUpdateProgram() {
 				isPublished?: boolean;
 			};
 		}) => {
-			const { updateProgramFn } = await import(
-				"@/server/enrollment/enrollment-fns"
-			);
 			await updateProgramFn({ data: input });
 		},
 		onSuccess: () => {
@@ -199,7 +186,6 @@ export function useRecordFeePayment(id: number) {
 			method: string;
 			receipt?: string | null;
 		}) => {
-			const { recordFeePayment } = await import("@/lib/api/enrollment-admin");
 			await recordFeePayment(id, input);
 		},
 		onSuccess: () => invalidateApplication(id),
@@ -210,7 +196,6 @@ export function useVoidFeePayment(id: number) {
 	const { invalidateApplication } = useInvalidateEnrollment();
 	return useMutation({
 		mutationFn: async (paymentId: number) => {
-			const { voidFeePayment } = await import("@/lib/api/enrollment-admin");
 			await voidFeePayment(id, paymentId);
 		},
 		onSuccess: () => invalidateApplication(id),
@@ -226,7 +211,6 @@ export function useCreateIntake() {
 			startsOn: string;
 			seatsTotal: number;
 		}) => {
-			const { createIntake } = await import("@/lib/api/enrollment-admin");
 			await createIntake(input);
 		},
 		onSuccess: () => {
@@ -243,7 +227,6 @@ export function useUpdateIntake() {
 			id: number;
 			patch: { startsOn?: string; seatsTotal?: number; isOpen?: boolean };
 		}) => {
-			const { updateIntake } = await import("@/lib/api/enrollment-admin");
 			await updateIntake(input.id, input.patch);
 		},
 		onSuccess: () => {
@@ -257,7 +240,6 @@ export function useDeleteIntake() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (id: number) => {
-			const { deleteIntake } = await import("@/lib/api/enrollment-admin");
 			await deleteIntake(id);
 		},
 		onSuccess: () => {
@@ -283,9 +265,6 @@ export function useApplicationStatusLog(applicationId: number) {
 	return useQuery({
 		queryKey: queryKeys.applicationLog(applicationId),
 		queryFn: async () => {
-			const { listApplicationStatusLogFn } = await import(
-				"@/server/enrollment/enrollment-fns"
-			);
 			return listApplicationStatusLogFn({ data: { applicationId } });
 		},
 	});

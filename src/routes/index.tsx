@@ -165,6 +165,7 @@ function VisitUs() {
 							<IconMapPin
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
+								aria-hidden="true"
 							/>
 							<span>{contact.addressDisplay}</span>
 						</p>
@@ -172,6 +173,7 @@ function VisitUs() {
 							<IconPhone
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
+								aria-hidden="true"
 							/>
 							<a href={contact.phoneHref} className="hover:text-primary">
 								{contact.phoneDisplay}
@@ -181,6 +183,7 @@ function VisitUs() {
 							<IconClockHour4
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
+								aria-hidden="true"
 							/>
 							<span>{contact.hoursSummary}</span>
 						</p>
@@ -188,6 +191,7 @@ function VisitUs() {
 							<IconMapPin
 								className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 								stroke={1.75}
+								aria-hidden="true"
 							/>
 							<span>
 								Convenient for students from{" "}
@@ -199,6 +203,7 @@ function VisitUs() {
 						href={contact.mapsUrl}
 						target="_blank"
 						rel="noreferrer"
+						aria-label="Get directions to Unicorn Barber Training Academy on Google Maps"
 						className={cn(
 							buttonVariants({ variant: "outline" }),
 							"mt-9 w-fit rounded-none border-primary bg-transparent px-6 py-5 text-[12px] font-semibold tracking-[0.16em] text-primary hover:bg-primary hover:text-primary-foreground",

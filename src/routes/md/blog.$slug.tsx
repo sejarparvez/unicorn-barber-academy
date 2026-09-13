@@ -6,31 +6,29 @@
 // text/markdown) and from llms.txt. Published posts only.
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/data/site";
-import { getPublishedBySlug } from "@/server/blog/blog-db";
+import { getPublishedMarkdownFn } from "@/server/blog/blog-fns";
 
 export const Route = createFileRoute("/md/blog/$slug")({
 	server: {
 		handlers: {
 			GET: async ({ params }) => {
-				const post = await getPublishedBySlug(params.slug);
+				const result = await getPublishedMarkdownFn({
+					data: { slug: params.slug },
+				});
 
 				// Renamed? Permanent redirect preserves the indexed URL.
-				if (!post) {
-					const { getSlugRedirectTarget } = await import(
-						"../../server/blog/blog-db"
-					);
-					const toSlug = await getSlugRedirectTarget(params.slug);
-					if (toSlug) {
-						return new Response(null, {
-							status: 301,
-							headers: {
-								location: `${SITE_URL}/md/blog/${toSlug}`,
-								"x-robots-tag": "noindex",
-							},
-						});
-					}
-					return new Response("Not found", { status: 404 });
+				if (result.kind === "redirect") {
+					return new Response(null, {
+						status: 301,
+						headers: {
+							location: `${SITE_URL}/md/blog/${result.toSlug}`,
+							"x-robots-tag": "noindex",
+						},
+					});
 				}
+				if (result.kind === "missing")
+					return new Response("Not found", { status: 404 });
+				const post = result.post;
 
 				const front = [
 					`# ${post.title}`,

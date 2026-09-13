@@ -27,7 +27,7 @@ export const Route = createFileRoute("/media")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/media` },
-			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
 			{
 				name: "twitter:title",
 				content: "Press & Media | Unicorn Barber Training Academy",

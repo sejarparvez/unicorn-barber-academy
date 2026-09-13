@@ -18,8 +18,20 @@ import { resetPasswordEmail, sendMail, verificationEmail } from "@/server/mail";
 
 const appOrigin = APP_ORIGIN;
 
-// Fail fast rather than booting with an ephemeral/missing signing key.
-if (!process.env.BETTER_AUTH_SECRET && process.env.NODE_ENV === "production") {
+// Fail fast rather than booting with an ephemeral/missing signing key —
+// in production AND any non-localhost deployment (staging/preview).
+const appOriginUrl = (() => {
+	try {
+		return new URL(APP_ORIGIN);
+	} catch {
+		return null;
+	}
+})();
+const isLocalOrigin =
+	!appOriginUrl ||
+	appOriginUrl.hostname === "localhost" ||
+	appOriginUrl.hostname === "127.0.0.1";
+if (!process.env.BETTER_AUTH_SECRET && !isLocalOrigin) {
 	throw new Error(
 		"BETTER_AUTH_SECRET is not set. Generate one with: openssl rand -base64 32",
 	);
@@ -104,6 +116,12 @@ export const auth = betterAuth({
 			"/request-password-reset": { window: 60, max: 3 },
 			"/send-verification-email": { window: 60, max: 3 },
 			"/sign-in/social": { window: 60, max: 20 },
+			"/admin/ban-user": { window: 60, max: 10 },
+			"/admin/unban-user": { window: 60, max: 10 },
+			"/admin/set-role": { window: 60, max: 10 },
+			"/admin/remove-user": { window: 60, max: 5 },
+			"/admin/impersonate": { window: 60, max: 5 },
+			"/admin/stop-impersonating": { window: 60, max: 20 },
 		},
 	},
 	trustedOrigins: [appOrigin],

@@ -18,7 +18,7 @@ export const Route = createFileRoute("/privacy")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/privacy` },
-			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
 			{
 				property: "og:description",
 				content:

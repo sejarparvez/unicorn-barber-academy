@@ -37,7 +37,7 @@ export const Route = createFileRoute("/enroll")({
 			},
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: `${SITE_URL}/enroll` },
-			{ property: "og:image", content: `${SITE_URL}/banner.png` },
+			{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
 			{ name: "robots", content: "noindex" },
 		],
 		links: [{ rel: "canonical", href: `${SITE_URL}/enroll` }],

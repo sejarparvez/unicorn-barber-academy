@@ -13,6 +13,7 @@ import {
 	getCertificateForUser,
 	listCertificatesForUser,
 } from "@/server/certificate/certificate-db";
+import { parseVerifyUrl } from "@/server/certificate/certificate-validate";
 import { clampId, runSafe } from "@/server/fn-utils";
 import { requireAdminSession } from "@/server/guards";
 import { clientIp, overRateLimit } from "@/server/rate-limit";
@@ -25,13 +26,25 @@ import { getSession } from "@/server/session";
 export const generateCertificateQrFn = createServerFn({ method: "GET" })
 	.validator((input: { url: string }) => input)
 	.handler(async ({ data }): Promise<{ dataUrl: string }> => {
-		const { default: QRCode } = await import("qrcode");
-		const dataUrl = await QRCode.toDataURL(data.url, {
-			margin: 1,
-			width: 240,
-			color: { dark: "#1c1c1a", light: "#ffffff" },
+		const req = getRequest();
+		const parsed = parseVerifyUrl(
+			data?.url,
+			process.env.BETTER_AUTH_URL ?? "",
+			new URL(req.url).host,
+		);
+		if (!parsed.ok) throw new Error(parsed.message);
+		const ip = clientIp(req);
+		if (overRateLimit(`qr:${ip}`, 30, 60_000))
+			throw new Error("Too many requests");
+		return runSafe(async () => {
+			const { default: QRCode } = await import("qrcode");
+			const dataUrl = await QRCode.toDataURL(parsed.url, {
+				margin: 1,
+				width: 240,
+				color: { dark: "#1c1c1a", light: "#ffffff" },
+			});
+			return { dataUrl };
 		});
-		return { dataUrl };
 	});
 
 export const listMyCertificatesFn = createServerFn({

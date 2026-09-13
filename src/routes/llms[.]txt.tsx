@@ -7,36 +7,39 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ALL_PROGRAMS } from "@/data/programs";
 import { SITE_URL } from "@/data/site";
-import { listPublishedForLlms } from "@/server/blog/blog-db";
-import { getSiteSettings } from "@/server/settings/settings-db";
+import { listLlmsPostsFn } from "@/server/blog/blog-fns";
+import { getSiteSettingsFn } from "@/server/settings/settings-fns";
 
 export const Route = createFileRoute("/llms.txt")({
 	server: {
 		handlers: {
 			GET: async () => {
-				const posts = await listPublishedForLlms(50);
-				const { contact } = await getSiteSettings();
+				try {
+					const [posts, settings] = await Promise.all([
+						listLlmsPostsFn({ data: { limit: 50 } }),
+						getSiteSettingsFn(),
+					]);
+					const { contact } = settings;
+					const blogSection =
+						posts.length > 0
+							? posts
+									.map((post) => {
+										const date = post.publishedAt
+											? new Date(post.publishedAt).toISOString().slice(0, 10)
+											: null;
+										const takeaways =
+											post.takeaways.length > 0
+												? ` Key points: ${post.takeaways.join(" ")}`
+												: "";
+										return `- [${post.title}](${SITE_URL}/blog/${post.slug}): ${post.excerpt ?? ""}${takeaways}${date ? ` (${date})` : ""} Raw markdown: ${SITE_URL}/md/blog/${post.slug}`;
+									})
+									.join("\n")
+							: "- Articles on barbering technique and career paths are published regularly.";
 
-				const blogSection =
-					posts.length > 0
-						? posts
-								.map((post) => {
-									const date = post.publishedAt
-										? new Date(post.publishedAt).toISOString().slice(0, 10)
-										: null;
-									const takeaways =
-										post.takeaways.length > 0
-											? ` Key points: ${post.takeaways.join(" ")}`
-											: "";
-									return `- [${post.title}](${SITE_URL}/blog/${post.slug}): ${post.excerpt ?? ""}${takeaways}${date ? ` (${date})` : ""} Raw markdown: ${SITE_URL}/md/blog/${post.slug}`;
-								})
-								.join("\n")
-						: "- Articles on barbering technique and career paths are published regularly.";
+					const programLine = (p: (typeof ALL_PROGRAMS)[number]) =>
+						`- [${p.title}](${SITE_URL}${p.to}): ${p.description} ${p.duration}, ${p.level.toLowerCase()} level. Tuition ${p.tuition}.`;
 
-				const programLine = (p: (typeof ALL_PROGRAMS)[number]) =>
-					`- [${p.title}](${SITE_URL}${p.to}): ${p.description} ${p.duration}, ${p.level.toLowerCase()} level. Tuition ${p.tuition}.`;
-
-				const llmsTxt = `# Unicorn Barber Training Academy
+					const llmsTxt = `# Unicorn Barber Training Academy
 
 > A barbering and beauty & cosmetology training academy in Banasree, Rampura, Dhaka, Bangladesh. Hands-on programs taught by working industry professionals, professional kit included with every program, small cohorts, and job placement support. Nationally registered training provider with NTVQF-certified curriculum.
 
@@ -88,13 +91,16 @@ ${ALL_PROGRAMS.filter((p) => p.track === "beauty")
 - Blog articles carry BlogPosting, BreadcrumbList and FAQPage structured data.
 `;
 
-				return new Response(llmsTxt, {
-					status: 200,
-					headers: {
-						"content-type": "text/plain; charset=utf-8",
-						"cache-control": "public, max-age=3600",
-					},
-				});
+					return new Response(llmsTxt, {
+						status: 200,
+						headers: {
+							"content-type": "text/plain; charset=utf-8",
+							"cache-control": "public, max-age=3600",
+						},
+					});
+				} catch {
+					return new Response("Service unavailable", { status: 503 });
+				}
 			},
 		},
 	},

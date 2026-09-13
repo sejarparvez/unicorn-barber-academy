@@ -81,7 +81,7 @@ function localBusinessJsonLd(site: ResolvedSettings) {
 		name: "Unicorn Barber Training Academy",
 		url: SITE_URL,
 		logo: `${SITE_URL}/logo.png`,
-		image: `${SITE_URL}/banner.png`,
+		image: `${SITE_URL}/og-image.jpg`,
 		telephone: contact.phoneE164,
 		email: contact.email,
 		priceRange: "$$",
