@@ -29,6 +29,27 @@ export async function getSiteSettings(): Promise<ResolvedSettings> {
 	return resolveSettings(await getBaseValues());
 }
 
+const SETTINGS_TTL_MS = 5 * 60_000;
+let settingsCache: { value: ResolvedSettings; at: number } | null = null;
+
+/**
+ * In-memory 5-min cache for the root loader (runs on every document load).
+ * Lives here — NOT in settings-fns.ts — because any plain (non-server-fn)
+ * export from a *-fns.ts module forces its whole import chain (pg, dotenv)
+ * into the browser bundle. Admin writes invalidate via updateSiteSettings.
+ */
+export async function getCachedSiteSettings(): Promise<ResolvedSettings> {
+	if (settingsCache && Date.now() - settingsCache.at < SETTINGS_TTL_MS)
+		return settingsCache.value;
+	const value = await getSiteSettings();
+	settingsCache = { value, at: Date.now() };
+	return value;
+}
+
+export function invalidateSettingsCache(): void {
+	settingsCache = null;
+}
+
 export type SettingsMutationResult =
 	| { ok: true }
 	| { ok: false; reason: "unknown-key" };
@@ -48,5 +69,6 @@ export async function updateSiteSettings(
 			[key, value],
 		);
 	}
+	invalidateSettingsCache();
 	return { ok: true };
 }

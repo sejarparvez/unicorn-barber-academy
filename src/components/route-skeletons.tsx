@@ -93,6 +93,149 @@ export function CardGridSkeleton({ count = 6 }: { count?: number }) {
 	);
 }
 
+/* ------------------------- home section skeletons ------------------------ */
+/* Shape-matched Suspense fallbacks for the DB-backed home sections. Same
+   outer spacing as the real sections so swapping content in causes no
+   layout shift. */
+
+function SectionHeaderSkeleton({ linkWidth = "w-40" }: { linkWidth?: string }) {
+	return (
+		<div className="flex flex-wrap items-end justify-between gap-6">
+			<div className="flex items-center gap-4">
+				<span aria-hidden="true" className="h-6 w-px bg-border" />
+				<Skeleton className="h-8 w-56" />
+			</div>
+			<Skeleton className={`h-4 ${linkWidth}`} />
+		</div>
+	);
+}
+
+export function HomeGallerySkeleton() {
+	return (
+		<section
+			aria-busy="true"
+			aria-label="Loading gallery"
+			className="border-t border-primary/15 px-4 py-24 lg:px-10"
+		>
+			<div className="mx-auto max-w-7xl">
+				<SectionHeaderSkeleton linkWidth="w-36" />
+				<div className="mt-14 grid grid-cols-2 gap-3 lg:grid-cols-6">
+					{[0, 1, 2, 3, 4, 5].map((i) => (
+						<Skeleton
+							key={`gallery-${i}`}
+							className={
+								i === 0 || i === 3
+									? "col-span-2 row-span-2 min-h-72 lg:min-h-96"
+									: "min-h-36 lg:min-h-44"
+							}
+						/>
+					))}
+				</div>
+			</div>
+		</section>
+	);
+}
+
+export function HomeInstructorsSkeleton() {
+	return (
+		<section
+			aria-busy="true"
+			aria-label="Loading instructors"
+			className="section-light border-t border-border bg-background px-4 py-24 lg:px-10"
+		>
+			<div className="mx-auto max-w-7xl">
+				<SectionHeaderSkeleton linkWidth="w-44" />
+				<div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+					{[0, 1, 2].map((i) => (
+						<div
+							key={`instructor-${i}`}
+							className="overflow-hidden border border-border"
+						>
+							<Skeleton className="h-80 w-full rounded-none" />
+							<div className="space-y-2 p-5">
+								<Skeleton className="h-5 w-2/3" />
+								<Skeleton className="h-4 w-1/2" />
+								<Skeleton className="h-3 w-1/3" />
+								<div className="flex gap-1.5 pt-1">
+									<Skeleton className="h-5 w-16 rounded-none" />
+									<Skeleton className="h-5 w-20 rounded-none" />
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+	);
+}
+
+export function HomeTestimonialsSkeleton() {
+	return (
+		<section
+			aria-busy="true"
+			aria-label="Loading testimonials"
+			className="border-t border-primary/15 px-4 py-24 lg:px-10"
+		>
+			<div className="mx-auto max-w-7xl">
+				<div className="flex items-center gap-4">
+					<span aria-hidden="true" className="h-6 w-px bg-border" />
+					<Skeleton className="h-8 w-64" />
+				</div>
+				<div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{[0, 1, 2].map((i) => (
+						<div
+							key={`testimonial-${i}`}
+							className="space-y-4 border border-primary/15 bg-secondary p-8"
+						>
+							<Skeleton className="h-6 w-6" />
+							<div className="space-y-2">
+								<Skeleton className="h-4 w-full" />
+								<Skeleton className="h-4 w-full" />
+								<Skeleton className="h-4 w-2/3" />
+							</div>
+							<div className="flex items-center gap-3 pt-2">
+								<Skeleton className="h-10 w-10 rounded-full" />
+								<div className="space-y-2">
+									<Skeleton className="h-4 w-28" />
+									<Skeleton className="h-3 w-36" />
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+	);
+}
+
+export function HomeFaqSkeleton() {
+	return (
+		<section
+			aria-busy="true"
+			aria-label="Loading FAQs"
+			className="section-light border-t border-border bg-background px-4 py-24 lg:px-10"
+		>
+			<div className="mx-auto max-w-3xl">
+				<div className="flex items-center gap-4">
+					<span aria-hidden="true" className="h-6 w-px bg-border" />
+					<Skeleton className="h-8 w-52" />
+				</div>
+				<div className="mt-10 space-y-1">
+					{[0, 1, 2, 3, 4].map((i) => (
+						<div
+							key={`faq-${i}`}
+							className="flex items-center justify-between border-b border-border py-4"
+						>
+							<Skeleton className="h-5 w-3/4" />
+							<Skeleton className="h-5 w-5" />
+						</div>
+					))}
+				</div>
+			</div>
+		</section>
+	);
+}
+
 export function FormSkeleton() {
 	return (
 		<main

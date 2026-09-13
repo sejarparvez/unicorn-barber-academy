@@ -2,22 +2,29 @@
 // TanStack Query hooks for certificates. Reads wrap session-scoped server
 // functions; admin mutations invalidate the affected application detail,
 // the lists, and the console stats.
+//
+// NOTE: server functions MUST stay behind dynamic `await import()` here.
+// Static imports pull `pg`/`dotenv` (via *-db.ts) into the browser bundle
+// and crash every page that uses these hooks.
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	issueCertificate,
 	setCertificateRevoked,
 } from "@/lib/api/certificate-admin";
 import type { CertificateRecord } from "@/lib/certificates";
-import { getCertificateForApplicationFn } from "@/server/certificate/certificate-fns";
 import { queryKeys } from "./query-keys";
 
 export function useApplicationCertificate(applicationId: number) {
 	return useQuery({
 		queryKey: queryKeys.applicationCertificate(applicationId),
-		queryFn: (): Promise<CertificateRecord | null> =>
-			getCertificateForApplicationFn({
+		queryFn: async (): Promise<CertificateRecord | null> => {
+			const { getCertificateForApplicationFn } = await import(
+				"@/server/certificate/certificate-fns"
+			);
+			return getCertificateForApplicationFn({
 				data: { applicationId },
-			}),
+			});
+		},
 		staleTime: 60_000,
 	});
 }

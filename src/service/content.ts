@@ -4,6 +4,10 @@
 // home route can render its static hero (and LCP image) immediately and let
 // the DB-backed sections stream in behind Suspense boundaries instead of
 // blocking the whole route loader.
+//
+// NOTE: server functions MUST stay behind dynamic `await import()` here.
+// Static imports pull `pg`/`dotenv` (via *-db.ts) into the browser bundle
+// and crash every page that uses these hooks.
 import {
 	useMutation,
 	useQuery,
@@ -20,16 +24,6 @@ import type {
 	TestimonialAdmin,
 	TestimonialView,
 } from "@/lib/content";
-import {
-	listFaqsAdminFn,
-	listFaqsFn,
-	listFeaturedGalleryFn,
-	listGalleryAdminFn,
-	listInstructorsAdminFn,
-	listInstructorsFn,
-	listTestimonialsAdminFn,
-	listTestimonialsFn,
-} from "@/server/content/content-fns";
 import { queryKeys } from "./query-keys";
 
 const HOME_STALE_TIME = 60_000;
@@ -37,7 +31,12 @@ const HOME_STALE_TIME = 60_000;
 export function useHomeInstructors() {
 	return useSuspenseQuery({
 		queryKey: queryKeys.homeInstructors(),
-		queryFn: (): Promise<InstructorView[]> => listInstructorsFn(),
+		queryFn: async (): Promise<InstructorView[]> => {
+			const { listInstructorsFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listInstructorsFn();
+		},
 		staleTime: HOME_STALE_TIME,
 	});
 }
@@ -45,7 +44,12 @@ export function useHomeInstructors() {
 export function useHomeTestimonials() {
 	return useSuspenseQuery({
 		queryKey: queryKeys.homeTestimonials(),
-		queryFn: (): Promise<TestimonialView[]> => listTestimonialsFn(),
+		queryFn: async (): Promise<TestimonialView[]> => {
+			const { listTestimonialsFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listTestimonialsFn();
+		},
 		staleTime: HOME_STALE_TIME,
 	});
 }
@@ -53,8 +57,10 @@ export function useHomeTestimonials() {
 export function useHomeFaqs() {
 	return useSuspenseQuery({
 		queryKey: queryKeys.homeFaqs(),
-		queryFn: (): Promise<FaqView[]> =>
-			listFaqsFn({ data: { placement: "home" } }),
+		queryFn: async (): Promise<FaqView[]> => {
+			const { listFaqsFn } = await import("@/server/content/content-fns");
+			return listFaqsFn({ data: { placement: "home" } });
+		},
 		staleTime: HOME_STALE_TIME,
 	});
 }
@@ -62,7 +68,12 @@ export function useHomeFaqs() {
 export function useFeaturedGallery() {
 	return useSuspenseQuery({
 		queryKey: queryKeys.featuredGallery(),
-		queryFn: (): Promise<GalleryView[]> => listFeaturedGalleryFn(),
+		queryFn: async (): Promise<GalleryView[]> => {
+			const { listFeaturedGalleryFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listFeaturedGalleryFn();
+		},
 		staleTime: HOME_STALE_TIME,
 	});
 }
@@ -70,7 +81,12 @@ export function useFeaturedGallery() {
 export function useInstructorsAdmin() {
 	return useQuery({
 		queryKey: queryKeys.instructorsList(),
-		queryFn: (): Promise<InstructorAdmin[]> => listInstructorsAdminFn(),
+		queryFn: async (): Promise<InstructorAdmin[]> => {
+			const { listInstructorsAdminFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listInstructorsAdminFn();
+		},
 		staleTime: 30_000,
 	});
 }
@@ -78,7 +94,12 @@ export function useInstructorsAdmin() {
 export function useGalleryAdmin() {
 	return useQuery({
 		queryKey: queryKeys.galleryList(),
-		queryFn: (): Promise<GalleryAdmin[]> => listGalleryAdminFn(),
+		queryFn: async (): Promise<GalleryAdmin[]> => {
+			const { listGalleryAdminFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listGalleryAdminFn();
+		},
 		staleTime: 30_000,
 	});
 }
@@ -86,7 +107,12 @@ export function useGalleryAdmin() {
 export function useTestimonialsAdmin() {
 	return useQuery({
 		queryKey: queryKeys.testimonialsList(),
-		queryFn: (): Promise<TestimonialAdmin[]> => listTestimonialsAdminFn(),
+		queryFn: async (): Promise<TestimonialAdmin[]> => {
+			const { listTestimonialsAdminFn } = await import(
+				"@/server/content/content-fns"
+			);
+			return listTestimonialsAdminFn();
+		},
 		staleTime: 30_000,
 	});
 }
@@ -94,8 +120,10 @@ export function useTestimonialsAdmin() {
 export function useFaqsAdmin(placement?: "home" | "contact") {
 	return useQuery({
 		queryKey: queryKeys.faqsList(placement),
-		queryFn: (): Promise<FaqAdmin[]> =>
-			listFaqsAdminFn({ data: placement ? { placement } : {} }),
+		queryFn: async (): Promise<FaqAdmin[]> => {
+			const { listFaqsAdminFn } = await import("@/server/content/content-fns");
+			return listFaqsAdminFn({ data: placement ? { placement } : {} });
+		},
 		staleTime: 30_000,
 	});
 }

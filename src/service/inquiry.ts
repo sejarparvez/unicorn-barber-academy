@@ -1,5 +1,9 @@
 // src/service/inquiry.ts
 // TanStack Query hooks for the admin contact inbox (admin-only).
+//
+// NOTE: server functions MUST stay behind dynamic `await import()` here.
+// Static imports pull `pg`/`dotenv` (via *-db.ts) into the browser bundle
+// and crash every page that uses these hooks.
 import {
 	keepPreviousData,
 	useMutation,
@@ -7,18 +11,15 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import type { InquiryListResult } from "@/lib/inquiry";
-import {
-	deleteInquiryFn,
-	listInquiriesFn,
-	markInquiryFn,
-} from "@/server/inquiry/inquiry-fns";
 import { queryKeys } from "./query-keys";
 
 export function useInquiries(unreadOnly: boolean, page: number) {
 	return useQuery({
 		queryKey: queryKeys.inquiries({ unreadOnly, page }),
-		queryFn: (): Promise<InquiryListResult> =>
-			listInquiriesFn({ data: { unreadOnly, page } }),
+		queryFn: async (): Promise<InquiryListResult> => {
+			const { listInquiriesFn } = await import("@/server/inquiry/inquiry-fns");
+			return listInquiriesFn({ data: { unreadOnly, page } });
+		},
 		placeholderData: keepPreviousData,
 		staleTime: 15_000,
 	});
@@ -34,10 +35,13 @@ function useInvalidateInbox() {
 export function useMarkInquiry() {
 	const invalidate = useInvalidateInbox();
 	return useMutation({
-		mutationFn: (input: {
+		mutationFn: async (input: {
 			id: number;
 			patch: { isRead?: boolean; isReplied?: boolean };
-		}) => markInquiryFn({ data: input }),
+		}) => {
+			const { markInquiryFn } = await import("@/server/inquiry/inquiry-fns");
+			await markInquiryFn({ data: input });
+		},
 		onSuccess: () => invalidate(),
 	});
 }
@@ -45,7 +49,10 @@ export function useMarkInquiry() {
 export function useDeleteInquiry() {
 	const invalidate = useInvalidateInbox();
 	return useMutation({
-		mutationFn: (id: number) => deleteInquiryFn({ data: { id } }),
+		mutationFn: async (id: number) => {
+			const { deleteInquiryFn } = await import("@/server/inquiry/inquiry-fns");
+			await deleteInquiryFn({ data: { id } });
+		},
 		onSuccess: () => invalidate(),
 	});
 }

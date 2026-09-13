@@ -2,6 +2,10 @@
 // TanStack Query hooks for the enrollment system. Reads wrap the server
 // functions (they run over HTTP automatically during client navigation);
 // mutations invalidate precisely instead of re-running every loader.
+//
+// NOTE: server functions MUST stay behind dynamic `await import()` here.
+// Static imports pull `pg`/`dotenv` (via *-db.ts) into the browser bundle
+// and crash every page that uses these hooks.
 import {
 	keepPreviousData,
 	useMutation,
@@ -26,15 +30,6 @@ import type {
 	ProgramAdmin,
 	ProgramOption,
 } from "@/lib/enrollment";
-import {
-	getApplicationAdminFn,
-	listApplicationStatusLogFn,
-	listApplicationsAdminFn,
-	listIntakesAdminFn,
-	listProgramOptionsFn,
-	listProgramsAdminFn,
-	updateProgramFn,
-} from "@/server/enrollment/enrollment-fns";
 import { queryKeys } from "./query-keys";
 
 /* -------------------------------- reads --------------------------------- */
@@ -63,8 +58,12 @@ export function useApplicationsList(
 ) {
 	return useQuery({
 		queryKey: queryKeys.applications(filters),
-		queryFn: (): Promise<ListPage> =>
-			listApplicationsAdminFn({ data: filters }),
+		queryFn: async (): Promise<ListPage> => {
+			const { listApplicationsAdminFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
+			return listApplicationsAdminFn({ data: filters });
+		},
 		initialData: options?.initialData,
 		staleTime: 30_000,
 		placeholderData: keepPreviousData,
@@ -77,10 +76,14 @@ export function useApplicationDetail(
 ) {
 	return useQuery({
 		queryKey: queryKeys.application(id),
-		queryFn: (): Promise<{ application: ApplicationDetail }> =>
-			getApplicationAdminFn({ data: { id } }) as Promise<{
+		queryFn: async (): Promise<{ application: ApplicationDetail }> => {
+			const { getApplicationAdminFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
+			return (await getApplicationAdminFn({ data: { id } })) as {
 				application: ApplicationDetail;
-			}>,
+			};
+		},
 		initialData: options?.initialData,
 		staleTime: 60_000,
 	});
@@ -89,7 +92,12 @@ export function useApplicationDetail(
 export function useIntakesAdmin(options?: { initialData?: IntakeAdmin[] }) {
 	return useQuery({
 		queryKey: queryKeys.intakes(),
-		queryFn: (): Promise<IntakeAdmin[]> => listIntakesAdminFn(),
+		queryFn: async (): Promise<IntakeAdmin[]> => {
+			const { listIntakesAdminFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
+			return listIntakesAdminFn();
+		},
 		initialData: options?.initialData,
 		staleTime: 30_000,
 	});
@@ -98,7 +106,12 @@ export function useIntakesAdmin(options?: { initialData?: IntakeAdmin[] }) {
 export function useProgramOptions() {
 	return useQuery({
 		queryKey: queryKeys.programOptions(),
-		queryFn: (): Promise<ProgramOption[]> => listProgramOptionsFn(),
+		queryFn: async (): Promise<ProgramOption[]> => {
+			const { listProgramOptionsFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
+			return listProgramOptionsFn();
+		},
 		staleTime: 60_000,
 	});
 }
@@ -106,7 +119,12 @@ export function useProgramOptions() {
 export function useProgramsAdmin() {
 	return useQuery({
 		queryKey: queryKeys.programs(),
-		queryFn: (): Promise<ProgramAdmin[]> => listProgramsAdminFn(),
+		queryFn: async (): Promise<ProgramAdmin[]> => {
+			const { listProgramsAdminFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
+			return listProgramsAdminFn();
+		},
 		staleTime: 30_000,
 	});
 }
@@ -124,6 +142,9 @@ export function useUpdateProgram() {
 				isPublished?: boolean;
 			};
 		}) => {
+			const { updateProgramFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
 			await updateProgramFn({ data: input });
 		},
 		onSuccess: () => {
@@ -265,6 +286,9 @@ export function useApplicationStatusLog(applicationId: number) {
 	return useQuery({
 		queryKey: queryKeys.applicationLog(applicationId),
 		queryFn: async () => {
+			const { listApplicationStatusLogFn } = await import(
+				"@/server/enrollment/enrollment-fns"
+			);
 			return listApplicationStatusLogFn({ data: { applicationId } });
 		},
 	});

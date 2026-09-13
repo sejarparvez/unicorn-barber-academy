@@ -1,17 +1,22 @@
 // src/service/settings.ts
 // TanStack Query hooks for admin site settings (admin-only).
+//
+// NOTE: server functions MUST stay behind dynamic `await import()` here.
+// Static imports pull `pg`/`dotenv` (via *-db.ts) into the browser bundle
+// and crash every page that uses these hooks.
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { SettingKey } from "@/lib/settings";
-import {
-	getSettingsBaseFn,
-	updateSettingsFn,
-} from "@/server/settings/settings-fns";
 import { queryKeys } from "./query-keys";
 
 export function useSettingsBase() {
 	return useQuery({
 		queryKey: queryKeys.siteSettings(),
-		queryFn: (): Promise<Record<SettingKey, string>> => getSettingsBaseFn(),
+		queryFn: async (): Promise<Record<SettingKey, string>> => {
+			const { getSettingsBaseFn } = await import(
+				"@/server/settings/settings-fns"
+			);
+			return getSettingsBaseFn();
+		},
 		staleTime: 60_000,
 	});
 }
@@ -19,8 +24,12 @@ export function useSettingsBase() {
 export function useUpdateSettings() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (patch: Partial<Record<SettingKey, string>>) =>
-			updateSettingsFn({ data: patch }),
+		mutationFn: async (patch: Partial<Record<SettingKey, string>>) => {
+			const { updateSettingsFn } = await import(
+				"@/server/settings/settings-fns"
+			);
+			await updateSettingsFn({ data: patch });
+		},
 		onSuccess: () => {
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.siteSettings(),

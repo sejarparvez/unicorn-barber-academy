@@ -1,5 +1,9 @@
 // src/service/users.ts
 // TanStack Query hooks for admin user management (admin-only).
+//
+// NOTE: server functions MUST stay behind dynamic `await import()` here.
+// Static imports pull `pg`/`dotenv` (via *-db.ts) into the browser bundle
+// and crash every page that uses these hooks.
 import {
 	keepPreviousData,
 	useMutation,
@@ -8,11 +12,6 @@ import {
 } from "@tanstack/react-query";
 import type { Role } from "@/lib/roles";
 import type { ListUsersResult } from "@/lib/users";
-import {
-	listUsersAdminFn,
-	setUserBanFn,
-	setUserRoleFn,
-} from "@/server/users/users-fns";
 import { queryKeys } from "./query-keys";
 
 export type UserFilters = {
@@ -25,8 +24,10 @@ export type UserFilters = {
 export function useUsersList(filters: UserFilters) {
 	return useQuery({
 		queryKey: queryKeys.users(filters),
-		queryFn: (): Promise<ListUsersResult> =>
-			listUsersAdminFn({ data: filters }),
+		queryFn: async (): Promise<ListUsersResult> => {
+			const { listUsersAdminFn } = await import("@/server/users/users-fns");
+			return listUsersAdminFn({ data: filters });
+		},
 		placeholderData: keepPreviousData,
 		staleTime: 30_000,
 	});
@@ -35,8 +36,10 @@ export function useUsersList(filters: UserFilters) {
 export function useSetUserRole() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (input: { targetId: number; role: Role }) =>
-			setUserRoleFn({ data: input }),
+		mutationFn: async (input: { targetId: number; role: Role }) => {
+			const { setUserRoleFn } = await import("@/server/users/users-fns");
+			await setUserRoleFn({ data: input });
+		},
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: queryKeys.users() });
 		},
@@ -46,12 +49,15 @@ export function useSetUserRole() {
 export function useSetUserBan() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (input: {
+		mutationFn: async (input: {
 			targetId: number;
 			banned: boolean;
 			banReason?: string | null;
 			banExpiresDays?: number | null;
-		}) => setUserBanFn({ data: input }),
+		}) => {
+			const { setUserBanFn } = await import("@/server/users/users-fns");
+			await setUserBanFn({ data: input });
+		},
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: queryKeys.users() });
 		},

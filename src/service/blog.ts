@@ -2,6 +2,10 @@
 // TanStack Query hooks for the blog admin surfaces. Same contract as
 // service/enrollment.ts — reads wrap server functions, mutations invalidate
 // precisely (post detail + affected lists).
+//
+// NOTE: server functions MUST stay behind dynamic `await import()` here.
+// Static imports pull `pg`/`dotenv` (via *-db.ts) into the browser bundle
+// and crash every page that uses these hooks.
 import {
 	keepPreviousData,
 	useMutation,
@@ -21,7 +25,6 @@ import {
 	updatePost,
 } from "@/lib/api/blog-admin";
 import type { BlogCategory, BlogPostSummary, BlogStatus } from "@/lib/blog";
-import { listAdminPostsFn, listCategoriesFn } from "@/server/blog/blog-fns";
 import { queryKeys } from "./query-keys";
 
 /* -------------------------------- reads --------------------------------- */
@@ -46,8 +49,9 @@ export function useAdminPosts(
 ) {
 	return useQuery({
 		queryKey: queryKeys.adminPosts(filters),
-		queryFn: (): Promise<ListPage> =>
-			listAdminPostsFn({
+		queryFn: async (): Promise<ListPage> => {
+			const { listAdminPostsFn } = await import("@/server/blog/blog-fns");
+			return listAdminPostsFn({
 				data: {
 					status: filters.status,
 					search: filters.search,
@@ -55,7 +59,8 @@ export function useAdminPosts(
 					page: filters.page ?? 1,
 					sortByViews: filters.sortByViews ?? false,
 				},
-			}),
+			});
+		},
 		initialData: options?.initialData,
 		staleTime: 30_000,
 		placeholderData: keepPreviousData,
@@ -65,7 +70,10 @@ export function useAdminPosts(
 export function useBlogCategories(options?: { initialData?: BlogCategory[] }) {
 	return useQuery({
 		queryKey: queryKeys.blogCategories(),
-		queryFn: (): Promise<BlogCategory[]> => listCategoriesFn(),
+		queryFn: async (): Promise<BlogCategory[]> => {
+			const { listCategoriesFn } = await import("@/server/blog/blog-fns");
+			return listCategoriesFn();
+		},
 		initialData: options?.initialData,
 		staleTime: 60_000,
 	});

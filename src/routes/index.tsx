@@ -6,7 +6,12 @@ import banner640 from "@/assets/logo/banner-640.webp";
 import banner768 from "@/assets/logo/banner-768.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
 import { FinalCta, SectionEyebrow } from "@/components/effects";
-import { CardGridSkeleton } from "@/components/route-skeletons";
+import {
+	HomeFaqSkeleton,
+	HomeGallerySkeleton,
+	HomeInstructorsSkeleton,
+	HomeTestimonialsSkeleton,
+} from "@/components/route-skeletons";
 import { buttonVariants } from "@/components/ui/button";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
@@ -126,16 +131,16 @@ function Home() {
 			<Brand />
 			<Stats />
 			<Programs />
-			<Suspense fallback={<CardGridSkeleton count={4} />}>
+			<Suspense fallback={<HomeGallerySkeleton />}>
 				<StudentLifeSection />
 			</Suspense>
-			<Suspense fallback={<CardGridSkeleton count={4} />}>
+			<Suspense fallback={<HomeInstructorsSkeleton />}>
 				<InstructorsSection />
 			</Suspense>
-			<Suspense fallback={<CardGridSkeleton count={3} />}>
+			<Suspense fallback={<HomeTestimonialsSkeleton />}>
 				<TestimonialsSection />
 			</Suspense>
-			<Suspense fallback={<CardGridSkeleton count={4} />}>
+			<Suspense fallback={<HomeFaqSkeleton />}>
 				<FaqSection />
 			</Suspense>
 			<VisitUs />

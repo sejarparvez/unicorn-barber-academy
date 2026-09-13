@@ -7,7 +7,8 @@ import { runSafe } from "@/server/fn-utils";
 import { requireAdminSession } from "@/server/guards";
 import {
 	getBaseValues,
-	getSiteSettings,
+	getCachedSiteSettings,
+	invalidateSettingsCache,
 	updateSiteSettings,
 } from "@/server/settings/settings-db";
 import { parseSettingsPatch } from "@/server/settings/settings-validate";
@@ -15,23 +16,6 @@ import { parseSettingsPatch } from "@/server/settings/settings-validate";
 export const getSiteSettingsFn = createServerFn({ method: "GET" }).handler(
 	async (): Promise<ResolvedSettings> => runSafe(() => getCachedSiteSettings()),
 );
-
-const SETTINGS_TTL_MS = 5 * 60_000;
-let settingsCache: { value: ResolvedSettings; at: number } | null = null;
-
-/** In-memory 5-min cache: settings change only via admin writes, which
-    invalidate through updateSettingsFn below. */
-export async function getCachedSiteSettings(): Promise<ResolvedSettings> {
-	if (settingsCache && Date.now() - settingsCache.at < SETTINGS_TTL_MS)
-		return settingsCache.value;
-	const value = await getSiteSettings();
-	settingsCache = { value, at: Date.now() };
-	return value;
-}
-
-export function invalidateSettingsCache(): void {
-	settingsCache = null;
-}
 
 export const getSettingsBaseFn = createServerFn({ method: "GET" }).handler(
 	async (): Promise<Record<SettingKey, string>> => {
