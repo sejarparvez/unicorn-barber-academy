@@ -205,8 +205,7 @@ export default function Hero() {
 						className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-100 mt-5 text-[clamp(2.75rem,12vw,4.5rem)] leading-[1.0] tracking-tight sm:text-6xl lg:text-[4.25rem] lg:tracking-normal"
 						style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
 					>
-						Master the fade.
-						<br />
+						Master the fade, <br className="hidden md:block" />
 						<span
 							className={cn(
 								gradientText,
