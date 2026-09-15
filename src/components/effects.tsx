@@ -1,13 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import {
-	m,
-	useReducedMotion,
-	useScroll,
-	useSpring,
-	type Variants,
-} from "motion/react";
+import { m, useReducedMotion, type Variants } from "motion/react";
 import type { PropsWithChildren } from "react";
-import { useEffect, useState } from "react";
 import banner640 from "@/assets/logo/banner-640.webp";
 import banner896 from "@/assets/logo/banner-896.webp";
 import { buttonVariants } from "@/components/ui/button";
@@ -25,57 +18,6 @@ const revealVariants: Variants = {
 		transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
 	},
 };
-
-/** Thin gold reading-progress bar pinned to the top of the viewport. */
-export function ScrollProgress() {
-	const [scrolled, setScrolled] = useState(false);
-	useEffect(() => {
-		// Subscribe lazily on first scroll, and defer even the registration
-		// until the browser is idle: at page load the bar is invisible
-		// (progress 0) and `useScroll` would only add layout-measurement
-		// work to the critical path.
-		let idleId: number | undefined;
-		let removeScroll: (() => void) | undefined;
-		const subscribe = () => {
-			if (removeScroll) return;
-			const onScroll = () => setScrolled(true);
-			window.addEventListener("scroll", onScroll, {
-				passive: true,
-				once: true,
-			});
-			removeScroll = () => window.removeEventListener("scroll", onScroll);
-		};
-		const fallbackId = window.setTimeout(subscribe, 3000);
-		if (typeof window.requestIdleCallback === "function") {
-			idleId = window.requestIdleCallback(subscribe, { timeout: 2500 });
-		}
-		return () => {
-			if (idleId !== undefined) window.cancelIdleCallback(idleId);
-			window.clearTimeout(fallbackId);
-			removeScroll?.();
-		};
-	}, []);
-	if (!scrolled) return null;
-	return <ScrollProgressInner />;
-}
-
-function ScrollProgressInner() {
-	const shouldReduceMotion = useReducedMotion();
-	const { scrollYProgress } = useScroll();
-	const scaleX = useSpring(scrollYProgress, {
-		stiffness: 120,
-		damping: 28,
-		restDelta: 0.001,
-	});
-	if (shouldReduceMotion) return null;
-	return (
-		<m.div
-			aria-hidden="true"
-			className="fixed inset-x-0 top-0 z-[60] h-0.5 origin-left bg-linear-to-r from-chart-1 via-primary to-chart-4"
-			style={{ scaleX }}
-		/>
-	);
-}
 
 export function Reveal({
 	children,
@@ -237,66 +179,6 @@ export function SectionEyebrow({
 				</Title>
 			</div>
 		</div>
-	);
-}
-
-const CREDENTIALS = [
-	"Nationally Registered Training Provider",
-	"NTVQF Certified Curriculum",
-	"Member, Bangladesh Barbers & Beauticians Guild",
-];
-
-export function TrustBar() {
-	const shouldReduceMotion = useReducedMotion();
-
-	if (shouldReduceMotion) {
-		return (
-			<section
-				className="border-b border-border bg-background px-6 py-6"
-				aria-label="Accreditation"
-			>
-				<div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-3">
-					{CREDENTIALS.map((c) => (
-						<span
-							key={c}
-							className="text-[11px] font-medium tracking-[0.14em] text-muted-foreground"
-						>
-							{c.toUpperCase()}
-						</span>
-					))}
-				</div>
-			</section>
-		);
-	}
-
-	const loop = [...CREDENTIALS, ...CREDENTIALS];
-
-	return (
-		<section
-			className="overflow-hidden border-b border-border bg-background py-6"
-			aria-label="Accreditation"
-		>
-			<span className="sr-only">{CREDENTIALS.join(" — ")}</span>
-			<m.div
-				aria-hidden="true"
-				className="flex w-max items-center gap-14"
-				animate={{ x: ["0%", "-50%"] }}
-				transition={{ duration: 30, ease: "linear", repeat: Infinity }}
-			>
-				{loop.map((c, i) => (
-					<span
-						key={`${c}-${
-							// biome-ignore lint/suspicious/noArrayIndexKey: this is fine
-							i
-						}`}
-						className="flex items-center gap-14 text-[11px] font-medium tracking-[0.14em] text-muted-foreground"
-					>
-						{c.toUpperCase()}
-						<span className="h-1 w-1 shrink-0 rounded-full bg-primary/50" />
-					</span>
-				))}
-			</m.div>
-		</section>
 	);
 }
 

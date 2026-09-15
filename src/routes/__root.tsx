@@ -10,7 +10,6 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { ScrollProgress } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
 import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import Footer from "@/components/layout/footer";
@@ -19,7 +18,6 @@ import { Analytics } from "@/components/providers/analytics";
 import { LazyToaster } from "@/components/providers/lazy-toaster";
 import { MotionProvider } from "@/components/providers/motion-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
-import { RouteProgress } from "@/components/route-progress";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
 import type { ResolvedSettings } from "@/lib/settings";
@@ -193,11 +191,6 @@ function RootError({ error }: { error: Error }) {
 function RootDocument() {
 	const { session } = Route.useLoaderData();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const isMarketing =
-		!pathname.startsWith("/dashboard") &&
-		!pathname.startsWith("/auth") &&
-		!pathname.startsWith("/verify") &&
-		!pathname.includes("/print");
 	// Dashboard routes run their own app shell (sidebar + breadcrumb bar),
 	// so the marketing header, announcement banner, and footer stay off —
 	// no double navigation, no competing sticky bars. Auth pages keep the
@@ -221,7 +214,6 @@ function RootDocument() {
 			</head>
 			<body>
 				<MotionProvider>
-					<RouteProgress />
 					{/* Skip link � keyboard users jump straight past the header. */}
 					<a
 						href="#main-content"
@@ -229,7 +221,6 @@ function RootDocument() {
 					>
 						Skip to content
 					</a>
-					{isMarketing ? <ScrollProgress /> : null}
 					{/* Site chrome never prints � certificate pages rely on this.
 				    Dashboard routes hide it entirely — they own the viewport. */}
 					{!isDashboard ? (

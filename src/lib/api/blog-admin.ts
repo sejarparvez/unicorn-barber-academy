@@ -2,7 +2,7 @@
 // Browser-side client for the /api/admin/* blog endpoints. Mirrors
 // lib/api/contact.ts. Server responses are runtime-shaped by the API layer;
 // types here describe the happy path.
-import type { BlogCategory, BlogPostFull, BlogPostSummary } from "@/lib/blog";
+import type { BlogCategory, BlogPostFull } from "@/lib/blog";
 import { formatMediumDate } from "@/lib/date";
 import { extractErrorMessage, http } from "./http";
 
@@ -154,5 +154,3 @@ export function formatPostDate(iso: string | null): string {
 	if (!iso) return "—";
 	return formatMediumDate(iso);
 }
-
-export type { BlogPostSummary };

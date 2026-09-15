@@ -96,17 +96,6 @@ export async function bulkSetStatus(
 	}
 }
 
-export type StatusLogEntry = {
-	id: number;
-	applicationId: number;
-	adminUserId: number;
-	adminName: string | null;
-	fromStatus: string | null;
-	toStatus: string;
-	note: string | null;
-	createdAt: string;
-};
-
 /** Client-side CSV export of the currently visible applications. */
 export function downloadApplicationsCsv(
 	rows: Array<Record<string, string | number>>,

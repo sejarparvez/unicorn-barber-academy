@@ -1,0 +1,16 @@
+{
+	"$schema": "https://unpkg.com/knip@6/schema.json",
+	"entry": [
+		"src/routes/**/*.{ts,tsx}",
+		"scripts/**/*.ts",
+		"src/**/*.test.ts",
+		"server/middleware/**/*.ts"
+	],
+	"project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts", "server/**/*.ts", "src/**/*.css"],
+	"ignoreExportsUsedInFile": true,
+	"ignoreDependencies": ["sharp"],
+	"nitro": true,
+	"ignoreIssues": {
+		"src/components/ui/**": ["exports", "types"]
+	}
+}

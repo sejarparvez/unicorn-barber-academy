@@ -243,13 +243,6 @@ export async function listRecentPublished(
 	}));
 }
 
-export async function countPublished(): Promise<number> {
-	const res = await q<{ count: string }>(
-		"SELECT count(*)::text AS count FROM blog_post WHERE status = 'published'",
-	);
-	return Number.parseInt(res.rows[0]?.count ?? "0", 10);
-}
-
 /** llms.txt entries: summaries + takeaways for AI answer engines. */
 export async function listPublishedForLlms(limit = 50): Promise<
 	Array<{
@@ -813,8 +806,6 @@ export async function getPostCountsByStatus(): Promise<BlogStats> {
 }
 
 /* ----------------------------- bulk admin ------------------------------ */
-
-export type BulkPostResult = { updated: number } | { deleted: number };
 
 export async function bulkUpdatePostStatus(
 	ids: number[],

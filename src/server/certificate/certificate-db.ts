@@ -214,13 +214,6 @@ export async function getCertificateByApplicationId(
 	return res.rows[0] ? rowToRecord(res.rows[0]) : null;
 }
 
-export async function countCertificates(): Promise<number> {
-	const res = await db().query<{ n: number }>(
-		"SELECT count(*)::int AS n FROM certificate",
-	);
-	return res.rows[0]?.n ?? 0;
-}
-
 export async function countActiveCertificates(): Promise<number> {
 	const res = await db().query<{ n: number }>(
 		"SELECT count(*)::int AS n FROM certificate WHERE revoked_at IS NULL",

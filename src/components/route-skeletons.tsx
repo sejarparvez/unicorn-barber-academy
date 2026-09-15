@@ -1,32 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function HomeHeroSkeleton() {
-	return (
-		<main aria-busy="true" aria-label="Loading">
-			<div className="relative mx-auto grid max-w-350 grid-cols-1 lg:grid-cols-[1fr_auto_1fr]">
-				<div className="flex flex-col justify-center px-5 pt-10 pb-20 sm:px-10 lg:min-h-[88vh] lg:px-14 lg:py-0">
-					<Skeleton className="h-3 w-44" />
-					<Skeleton className="mt-5 h-14 w-3/4" />
-					<Skeleton className="mt-2 h-14 w-1/2" />
-					<Skeleton className="mt-5 h-5 w-full max-w-md" />
-					<Skeleton className="mt-2 h-5 w-2/3 max-w-md" />
-					<div className="mt-8 flex gap-4">
-						<Skeleton className="h-12 w-36" />
-						<Skeleton className="h-12 w-48" />
-					</div>
-				</div>
-				<div aria-hidden="true" className="hidden w-14 lg:block" />
-				<Skeleton className="hidden h-[88vh] w-full rounded-none lg:block" />
-			</div>
-			<div className="mx-auto grid max-w-7xl gap-4 px-5 py-12 sm:grid-cols-2 lg:grid-cols-3">
-				{[0, 1, 2].map((i) => (
-					<Skeleton key={i} className="h-56 rounded-xl" />
-				))}
-			</div>
-		</main>
-	);
-}
-
 export function ArticleSkeleton() {
 	return (
 		<main aria-busy="true" aria-label="Loading article">

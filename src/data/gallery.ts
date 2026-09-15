@@ -1,7 +1,6 @@
 ﻿// src/data/gallery.ts
-// Studio gallery items and before/after transformations. Each `seed` maps
-// to a replaceable file in src/assets/images/ via pic() from data/images.ts.
-import { pic } from "@/data/images";
+// Studio gallery items. Each `seed` maps to a replaceable file in
+// src/assets/images/ via pic() from data/images.ts.
 export type GalleryCategory = "barbering" | "beauty" | "studio" | "graduation";
 
 export type GalleryItem = {
@@ -141,41 +140,5 @@ export const GALLERY_ITEMS: GalleryItem[] = [
 		category: "graduation",
 		w: 700,
 		h: 900,
-	},
-];
-
-export type Transformation = {
-	id: string;
-	title: string;
-	program: string;
-	to: string;
-	before: string;
-	after: string;
-};
-
-export const TRANSFORMATIONS: Transformation[] = [
-	{
-		id: "t1",
-		title: "Skin Fade & Line-Up",
-		program: "Fades & Tapers",
-		to: "/programs/fades-and-tapers",
-		before: pic("unicorn-before-fade", 800, 1000),
-		after: pic("unicorn-after-fade", 800, 1000),
-	},
-	{
-		id: "t2",
-		title: "Beard Shape & Hot Towel",
-		program: "Beard Sculpting",
-		to: "/programs/beard-sculpting",
-		before: pic("unicorn-before-beard", 800, 1000),
-		after: pic("unicorn-after-beard", 800, 1000),
-	},
-	{
-		id: "t3",
-		title: "Bridal Editorial Look",
-		program: "Bridal & Editorial Makeup",
-		to: "/programs/bridal-and-editorial-makeup",
-		before: pic("unicorn-before-bridal", 800, 1000),
-		after: pic("unicorn-after-bridal", 800, 1000),
 	},
 ];
