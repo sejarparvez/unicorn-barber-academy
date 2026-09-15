@@ -6,7 +6,7 @@
 // pic("unicorn-program-classic", 800, 900) looks for a file named
 // `unicorn-program-classic.jpg|jpeg|png|webp` in `src/assets/images/`.
 // If it exists, that file is served (hashed/bundled by Vite). If not,
-// the shared `_placeholder.jpg` fallback is served instead.
+// the shared `_placeholder.webp` fallback is served instead.
 //
 // HOW TO REPLACE WITH REAL PHOTOS
 // -------------------------------
@@ -38,7 +38,7 @@ function fallback(): string {
 	)?.[1];
 	if (!url) {
 		throw new Error(
-			"src/assets/images/_placeholder.jpg is missing — restore the shared placeholder image.",
+			"src/assets/images/_placeholder.webp is missing — restore the shared placeholder image.",
 		);
 	}
 	return url;

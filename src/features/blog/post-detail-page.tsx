@@ -754,15 +754,24 @@ function TocRail({ entries }: { entries: TocEntry[] }) {
 		const container = listRef.current;
 		const item = itemRefs.current.get(activeId);
 		if (!container || !item) return;
-		const top = item.offsetTop;
-		const bottom = top + item.offsetHeight;
-		if (top < container.scrollTop + 4) {
-			container.scrollTop = top - 8;
-		} else if (bottom > container.scrollTop + container.clientHeight - 4) {
-			container.scrollTop = bottom - container.clientHeight + 8;
+		// Batch all geometry reads before the single write, and derive the
+		// edge flags from the same numbers — no reads after invalidating
+		// layout (the forced-reflow pattern Lighthouse flags).
+		const scrollTop = container.scrollTop;
+		const clientHeight = container.clientHeight;
+		const scrollHeight = container.scrollHeight;
+		const itemTop = item.offsetTop;
+		const itemBottom = itemTop + item.offsetHeight;
+		let nextTop = scrollTop;
+		if (itemTop < scrollTop + 4) {
+			nextTop = itemTop - 8;
+		} else if (itemBottom > scrollTop + clientHeight - 4) {
+			nextTop = itemBottom - clientHeight + 8;
 		}
-		updateEdges();
-	}, [activeId, updateEdges]);
+		if (nextTop !== scrollTop) container.scrollTop = nextTop;
+		setCanUp(nextTop > 4);
+		setCanDown(nextTop + clientHeight < scrollHeight - 4);
+	}, [activeId]);
 
 	return (
 		<nav

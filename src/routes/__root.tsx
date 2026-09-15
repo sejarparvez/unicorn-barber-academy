@@ -102,6 +102,11 @@ export const Route = createRootRoute({
 			},
 		],
 		links: [
+			// Cloudinary serves admin-uploaded content (blog covers,
+			// instructor photos, gallery) — preconnect saves ~100ms of
+			// TLS/connection setup per document load.
+			{ rel: "preconnect", href: "https://res.cloudinary.com" },
+			{ rel: "dns-prefetch", href: "https://res.cloudinary.com" },
 			// Preload the only webfont left (Inter latin): breaks the
 			// CSS -> font discovery chain so text paints at FCP.
 			{

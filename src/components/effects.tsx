@@ -30,15 +30,30 @@ const revealVariants: Variants = {
 export function ScrollProgress() {
 	const [scrolled, setScrolled] = useState(false);
 	useEffect(() => {
-		// Mount the scroll subscription lazily on first scroll: at page load
-		// the bar is invisible (progress 0) and `useScroll` would only add
-		// layout-measurement work to the critical path.
-		const onScroll = () => setScrolled(true);
-		window.addEventListener("scroll", onScroll, {
-			passive: true,
-			once: true,
-		});
-		return () => window.removeEventListener("scroll", onScroll);
+		// Subscribe lazily on first scroll, and defer even the registration
+		// until the browser is idle: at page load the bar is invisible
+		// (progress 0) and `useScroll` would only add layout-measurement
+		// work to the critical path.
+		let idleId: number | undefined;
+		let removeScroll: (() => void) | undefined;
+		const subscribe = () => {
+			if (removeScroll) return;
+			const onScroll = () => setScrolled(true);
+			window.addEventListener("scroll", onScroll, {
+				passive: true,
+				once: true,
+			});
+			removeScroll = () => window.removeEventListener("scroll", onScroll);
+		};
+		const fallbackId = window.setTimeout(subscribe, 3000);
+		if (typeof window.requestIdleCallback === "function") {
+			idleId = window.requestIdleCallback(subscribe, { timeout: 2500 });
+		}
+		return () => {
+			if (idleId !== undefined) window.cancelIdleCallback(idleId);
+			window.clearTimeout(fallbackId);
+			removeScroll?.();
+		};
 	}, []);
 	if (!scrolled) return null;
 	return <ScrollProgressInner />;
