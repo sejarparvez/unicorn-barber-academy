@@ -4,6 +4,7 @@
 // page needs a single loader call instead of one per subsystem.
 import { createServerFn } from "@tanstack/react-start";
 import type { ApplicationSummary } from "@/lib/enrollment";
+import { requireAdminSession } from "@/server/admin-guard.server";
 import type { BlogStats } from "@/server/blog/blog-db";
 import { getPostCountsByStatus } from "@/server/blog/blog-db";
 import { countActiveCertificates } from "@/server/certificate/certificate-db";
@@ -13,7 +14,6 @@ import {
 	listApplicationsAdmin,
 } from "@/server/enrollment/enrollment-db";
 import { runSafe } from "@/server/fn-utils";
-import { requireAdminSession } from "@/server/guards";
 
 export type ConsoleOverview = {
 	admissions: AdmissionsStats;

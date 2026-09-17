@@ -21,6 +21,7 @@ import {
 	parseCohort,
 	parseFeeStatus,
 } from "@/lib/enrollment";
+import { requireAdminSession } from "@/server/admin-guard.server";
 import { logAdminAction } from "@/server/audit/audit-log";
 import {
 	getApplicationDetail,
@@ -37,7 +38,6 @@ import {
 	clampSearchTerm,
 	runSafe,
 } from "@/server/fn-utils";
-import { requireAdminSession } from "@/server/guards";
 import {
 	listProgramOptions,
 	listProgramsAdmin,

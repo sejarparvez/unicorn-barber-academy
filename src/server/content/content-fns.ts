@@ -12,6 +12,7 @@ import type {
 	TestimonialView,
 } from "@/lib/content";
 import { parseGalleryCategory } from "@/lib/content";
+import { requireAdminSession } from "@/server/admin-guard.server";
 import { logAdminAction } from "@/server/audit/audit-log";
 import {
 	createFaq,
@@ -43,7 +44,6 @@ import {
 	parseTestimonialPayload,
 } from "@/server/content/content-validate";
 import { clampId, runSafe } from "@/server/fn-utils";
-import { requireAdminSession } from "@/server/guards";
 
 /* --------------------------------- public -------------------------------- */
 

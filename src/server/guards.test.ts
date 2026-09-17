@@ -5,17 +5,18 @@ import type { Role } from "@/lib/roles";
 import type { SessionPayload } from "@/lib/types";
 import { AdminAccessError } from "./admin-access-error";
 
-// Mock session module before importing guards
+// Mock session module before importing guards.
 const getSession = mock(
 	(): Promise<SessionPayload | null> => Promise.resolve(null),
 );
 const resolveSession = mock(
 	(): Promise<SessionPayload | null> => Promise.resolve(null),
 );
-mock.module("./session", () => ({ getSession, resolveSession }));
+mock.module("./session", () => ({ getSession }));
+mock.module("./session-core.server", () => ({ resolveSession }));
 
-const { requireRoles, requireAdminSession, requireRoleFromContext } =
-	await import("./guards");
+const { requireRoles, requireRoleFromContext } = await import("./guards");
+const { requireAdminSession } = await import("./admin-guard.server");
 
 function makeSession(role: Role = "admin"): SessionPayload {
 	return {

@@ -2,7 +2,7 @@
 // Shared hardening helpers for *-fns.ts server functions. Server fns are
 // public RPC endpoints: every handler must (1) clamp untrusted inputs to
 // safe shapes, and (2) never let raw driver errors cross the wire.
-// Role enforcement lives in guards.ts (requireAdminSession).
+// Role enforcement lives in admin-guard.server (requireAdminSession).
 import { AdminAccessError } from "./admin-access-error";
 
 /** Coerce an untrusted page param to a sane 1..10000 integer. */

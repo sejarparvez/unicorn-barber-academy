@@ -2,8 +2,8 @@
 // Admin-only reads + triage mutations for the contact inbox.
 import { createServerFn } from "@tanstack/react-start";
 import type { InquiryListResult } from "@/lib/inquiry";
+import { requireAdminSession } from "@/server/admin-guard.server";
 import { clampId, clampPage, runSafe } from "@/server/fn-utils";
-import { requireAdminSession } from "@/server/guards";
 import {
 	deleteInquiry,
 	listInquiriesAdmin,

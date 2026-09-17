@@ -2,9 +2,9 @@
 // Public read (cached client-side) + admin-only write for site settings.
 import { createServerFn } from "@tanstack/react-start";
 import type { ResolvedSettings, SettingKey } from "@/lib/settings";
+import { requireAdminSession } from "@/server/admin-guard.server";
 import { logAdminAction } from "@/server/audit/audit-log";
 import { runSafe } from "@/server/fn-utils";
-import { requireAdminSession } from "@/server/guards";
 import {
 	getBaseValues,
 	getCachedSiteSettings,

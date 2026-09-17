@@ -1,7 +1,12 @@
 // src/server/guards.ts
 // Route-guard helper for TanStack Router beforeLoad. Resolves the session
-// server-side, bounces anonymous visitors to sign-in (preserving their
-// destination), and enforces a role allow-list for privileged areas.
+// (via the client-safe getSession server function), bounces anonymous
+// visitors to sign-in (preserving their destination), and enforces a role
+// allow-list for privileged areas.
+//
+// This module IS imported by client route code, so it stays free of
+// server-only imports. The in-handler endpoint guard lives in
+// ./admin-guard.server (requireAdminSession).
 //
 // Usage in a route:
 //   beforeLoad: async ({ location }) => ({
@@ -14,8 +19,7 @@
 import { redirect } from "@tanstack/react-router";
 import { parseRole, type Role } from "@/lib/roles";
 import type { SessionPayload } from "@/lib/types";
-import { AdminAccessError } from "./admin-access-error";
-import { getSession, resolveSession } from "./session";
+import { getSession } from "./session";
 
 export async function requireRoles(options: {
 	pathname: string;
@@ -81,26 +85,5 @@ export function requireRoleFromContext(
 		throw redirect({ to: "/dashboard" });
 	}
 
-	return session;
-}
-
-/**
- * In-handler guard for createServerFn endpoints. Route beforeLoad guards do
- * NOT protect server functions — each compiled server fn is its own public
- * RPC endpoint — so any privileged fn must call this inside its handler.
- *
- * Pass `authoritative: true` from mutation handlers so the role/ban read
- * bypasses the cookie-cache and hits the database — a demoted or banned admin
- * must not keep write access until the cache cookie expires.
- */
-export async function requireAdminSession(options?: {
-	authoritative?: boolean;
-}): Promise<SessionPayload> {
-	const session = options?.authoritative
-		? await resolveSession({ authoritative: true })
-		: await getSession();
-	if (!session || parseRole(session.user.role) !== "admin") {
-		throw new AdminAccessError();
-	}
 	return session;
 }

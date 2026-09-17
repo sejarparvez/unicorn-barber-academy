@@ -18,6 +18,7 @@ import type {
 import { parseBlogStatus } from "@/lib/blog";
 import { renderMarkdown } from "@/lib/markdown";
 import { parseRole } from "@/lib/roles";
+import { requireAdminSession } from "@/server/admin-guard.server";
 import {
 	getAdjacentPosts,
 	getAnyBySlug,
@@ -41,7 +42,6 @@ import {
 	clampSearchTerm,
 	runSafe,
 } from "@/server/fn-utils";
-import { requireAdminSession } from "@/server/guards";
 import { getSession } from "@/server/session";
 
 export const listPublishedPostsFn = createServerFn({ method: "GET" })

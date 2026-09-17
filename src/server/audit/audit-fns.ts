@@ -3,9 +3,9 @@
 // inside the mutation handlers themselves — never through a public fn).
 import { createServerFn } from "@tanstack/react-start";
 import type { AuditListResult } from "@/lib/audit";
+import { requireAdminSession } from "@/server/admin-guard.server";
 import { listAuditLog } from "@/server/audit/audit-log";
 import { clampId, clampPage, runSafe } from "@/server/fn-utils";
-import { requireAdminSession } from "@/server/guards";
 
 export const listAuditLogFn = createServerFn({ method: "GET" })
 	.validator(

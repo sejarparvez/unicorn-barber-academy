@@ -7,6 +7,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import type { CertificateRecord, VerifyResult } from "@/lib/certificates";
+import { requireAdminSession } from "@/server/admin-guard.server";
 import {
 	getCertificateByApplicationId,
 	getCertificateByCode,
@@ -15,7 +16,6 @@ import {
 } from "@/server/certificate/certificate-db";
 import { parseVerifyUrl } from "@/server/certificate/certificate-validate";
 import { clampId, runSafe } from "@/server/fn-utils";
-import { requireAdminSession } from "@/server/guards";
 import { clientIp, overRateLimit } from "@/server/rate-limit";
 import { getSession } from "@/server/session";
 
