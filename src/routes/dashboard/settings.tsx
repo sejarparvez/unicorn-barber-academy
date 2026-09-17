@@ -6,6 +6,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { PasswordCard } from "@/features/dashboard/settings/password-card";
 import { ProfileCard } from "@/features/dashboard/settings/profile-card";
 import { SessionsCard } from "@/features/dashboard/settings/sessions-card";
+import { clearCachedSession } from "@/lib/session-cache";
 
 export const Route = createFileRoute("/dashboard/settings")({
 	head: () => ({
@@ -22,6 +23,10 @@ function SettingsPage() {
 	const router = useRouter();
 
 	async function refreshSession() {
+		// The session cache would otherwise serve the pre-update identity for
+		// the whole TTL window (e.g. a fresh display name or avatar after
+		// these account operations). Drop it so the re-run beforeLoad refetches.
+		clearCachedSession();
 		await router.invalidate();
 	}
 

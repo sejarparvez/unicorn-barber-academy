@@ -16,6 +16,7 @@ import { GoogleIcon } from "@/features/auth/components/google-icon";
 import { authClient } from "@/lib/auth-client";
 import { friendlyAuthError } from "@/lib/auth-errors";
 import { safeRedirect } from "@/lib/redirect";
+import { clearCachedSession } from "@/lib/session-cache";
 import { getSession } from "@/server/session";
 
 type SignInSearch = {
@@ -83,7 +84,10 @@ function RouteComponent() {
 				setError(res.error.message ?? "Unable to sign in. Please try again.");
 				return;
 			}
-			// Refresh loaders so the SSR-fetched header session updates too.
+			// Drop any cached session (signed out state) so the re-run
+			// beforeLoad picks up the new identity, then refresh loaders so
+			// the SSR-fetched header session updates too.
+			clearCachedSession();
 			router.invalidate();
 			router.history.push(search.redirect ?? "/");
 		} catch (_err) {

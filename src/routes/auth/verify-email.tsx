@@ -7,6 +7,7 @@ import { AuthAlert } from "@/features/auth/components/auth-alert";
 import { AuthCard } from "@/features/auth/components/auth-card";
 import { authClient } from "@/lib/auth-client";
 import { safeRedirect } from "@/lib/redirect";
+import { clearCachedSession } from "@/lib/session-cache";
 
 type VerifySearch = {
 	email?: string;
@@ -111,6 +112,7 @@ function RouteComponent() {
 						size="lg"
 						className="w-full"
 						onClick={() => {
+							clearCachedSession();
 							router.invalidate();
 							router.history.push(destination);
 						}}

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
+import { clearCachedSession } from "@/lib/session-cache";
 
 export function SignOut() {
 	const router = useRouter();
@@ -29,6 +30,7 @@ export function SignOut() {
 				fetchOptions: {
 					onSuccess: () => {
 						setOpen(false);
+						clearCachedSession();
 						router.navigate({ to: "/" });
 						// Re-run loaders so session-dependent UI (header, /dashboard
 						// guard) reflects the now-signed-out state.

@@ -10,6 +10,7 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { useEffect } from "react";
 import { JsonLdScript } from "@/components/jsonld-script";
 import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import Footer from "@/components/layout/footer";
@@ -20,26 +21,30 @@ import { MotionProvider } from "@/components/providers/motion-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE_URL } from "@/data/site";
+import { getCachedSession, setCachedSession } from "@/lib/session-cache";
 import type { ResolvedSettings } from "@/lib/settings";
-import type { SessionPayload } from "@/lib/types";
 import { getSession } from "@/server/session";
 import { getSiteSettingsFn } from "@/server/settings/settings-fns";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
-	// Fetched on every document load so <Header/> renders the correct
-	// signed-in/out state during SSR � no hydration flicker. Site settings
-	// ride along so contact info + announcement stay admin-editable with a
-	// single shared object (visible UI and JSON-LD never drift apart).
-	loader: async (): Promise<{
-		session: SessionPayload | null;
-		site: ResolvedSettings;
-	}> => {
-		const [session, site] = await Promise.all([
-			getSession(),
-			getSiteSettingsFn(),
-		]);
-		return { session, site };
+	// Runs parent-first on every navigation (and hover preload). Resolves the
+	// session for the whole matched tree so descendant guards — including the
+	// /dashboard layout — can check context.session synchronously instead of
+	// blocking on a server round-trip per click. On the client, a short-TTL
+	// cache serves repeat navigations from memory; SSR always fetches so the
+	// HTML and Header render the correct signed-in/out state. Site settings
+	// stay in the loader so contact info + announcement remain admin-editable
+	// from a single shared object.
+	beforeLoad: async () => {
+		const cached = getCachedSession();
+		const session = cached !== undefined ? cached : await getSession();
+		setCachedSession(session);
+		return { session };
+	},
+	loader: async (): Promise<{ site: ResolvedSettings }> => {
+		const site = await getSiteSettingsFn();
+		return { site };
 	},
 	head: () => ({
 		meta: [
@@ -189,8 +194,14 @@ function RootError({ error }: { error: Error }) {
 }
 
 function RootDocument() {
-	const { session } = Route.useLoaderData();
+	const { session } = Route.useRouteContext();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	// Seed the client-side session cache with the session resolved during SSR
+	// (or the latest from a re-render) so the first navigation's beforeLoad is
+	// served from memory instead of an RPC round-trip.
+	useEffect(() => {
+		setCachedSession(session);
+	}, [session]);
 	// Dashboard routes run their own app shell (sidebar + breadcrumb bar),
 	// so the marketing header, announcement banner, and footer stay off —
 	// no double navigation, no competing sticky bars. Auth pages keep the

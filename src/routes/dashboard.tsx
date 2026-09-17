@@ -61,17 +61,14 @@ import {
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
 import { parseRole } from "@/lib/roles";
+import { clearCachedSession } from "@/lib/session-cache";
 import type { SessionPayload } from "@/lib/types";
-import { requireRoles } from "@/server/guards";
+import { requireRoleFromContext } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard")({
-	beforeLoad: async ({ location }) => {
-		const session = await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-		});
-		return { session };
-	},
+	beforeLoad: ({ context, location }) => ({
+		session: requireRoleFromContext(context, ["admin"], location),
+	}),
 	errorComponent: DashboardError,
 	component: DashboardLayout,
 });
@@ -388,6 +385,7 @@ function UserMenu({
 		await authClient.signOut({
 			fetchOptions: {
 				onSuccess: () => {
+					clearCachedSession();
 					void navigate({ to: "/" });
 					void router.invalidate();
 				},
