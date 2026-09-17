@@ -6,16 +6,8 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { PasswordCard } from "@/features/dashboard/settings/password-card";
 import { ProfileCard } from "@/features/dashboard/settings/profile-card";
 import { SessionsCard } from "@/features/dashboard/settings/sessions-card";
-import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/settings")({
-	beforeLoad: async ({ location }) => {
-		const session = await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-		});
-		return { session };
-	},
 	head: () => ({
 		meta: [
 			{ title: "Settings | Dashboard" },

@@ -7,7 +7,7 @@ import {
 	parseCohort,
 	parseFeeStatus,
 } from "@/lib/enrollment";
-import { requireRoles } from "@/server/guards";
+import { requireRoleFromContext } from "@/server/guards";
 
 type EnrollmentsSearch = {
 	status?: ReturnType<typeof parseApplicationStatus>;
@@ -41,13 +41,9 @@ export const Route = createFileRoute("/dashboard/enrollments/")({
 			...(Number.isInteger(page) && page > 1 ? { page } : {}),
 		};
 	},
-	beforeLoad: async ({ location }) => {
-		await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-			allowed: ["admin"],
-		});
-	},
+	beforeLoad: ({ context, location }) => ({
+		session: requireRoleFromContext(context, ["admin"], location),
+	}),
 	// Reads flow through useApplicationsList (src/service/enrollment.ts) so
 	// mutations invalidate precisely — no loader to double-fetch.
 	head: () => ({

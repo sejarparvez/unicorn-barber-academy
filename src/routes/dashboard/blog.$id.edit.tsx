@@ -4,16 +4,12 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { FormSkeleton } from "@/components/route-skeletons";
 import { PostEditorPage } from "@/features/blog-admin/post-editor-page";
 import { getAdminPostFn, listCategoriesFn } from "@/server/blog/blog-fns";
-import { requireRoles } from "@/server/guards";
+import { requireRoleFromContext } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/blog/$id/edit")({
-	beforeLoad: async ({ location }) => {
-		await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-			allowed: ["admin"],
-		});
-	},
+	beforeLoad: ({ context, location }) => ({
+		session: requireRoleFromContext(context, ["admin"], location),
+	}),
 	loader: async ({ params }) => {
 		// Garbage ids must 404, not reach the DB with NaN.
 		const id = Number.parseInt(params.id, 10);

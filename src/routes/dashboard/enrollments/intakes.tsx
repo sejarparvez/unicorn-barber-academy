@@ -2,16 +2,12 @@
 // Intake manager. Admin-only. Reads via useIntakesAdmin (service layer).
 import { createFileRoute } from "@tanstack/react-router";
 import { IntakesPage } from "@/features/enrollment-admin/intakes-page";
-import { requireRoles } from "@/server/guards";
+import { requireRoleFromContext } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/enrollments/intakes")({
-	beforeLoad: async ({ location }) => {
-		await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-			allowed: ["admin"],
-		});
-	},
+	beforeLoad: ({ context, location }) => ({
+		session: requireRoleFromContext(context, ["admin"], location),
+	}),
 	head: () => ({
 		meta: [
 			{ title: "Program intakes | Dashboard" },

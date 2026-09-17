@@ -96,7 +96,7 @@ export const listInstructorsAdminFn = createServerFn({ method: "GET" }).handler(
 export const createInstructorFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ id: number }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const parsed = parseInstructorPayload(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => createInstructor(parsed.value));
@@ -115,7 +115,7 @@ export const createInstructorFn = createServerFn({ method: "POST" })
 export const updateInstructorFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const b = data.patch;
@@ -202,7 +202,7 @@ export const updateInstructorFn = createServerFn({ method: "POST" })
 export const deleteInstructorFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const deleted = await runSafe(() => deleteInstructor(id));
@@ -228,7 +228,7 @@ export const listGalleryAdminFn = createServerFn({ method: "GET" }).handler(
 export const createGalleryItemFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ id: number }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const parsed = parseGalleryPayload(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => createGalleryItem(parsed.value));
@@ -247,7 +247,7 @@ export const createGalleryItemFn = createServerFn({ method: "POST" })
 export const updateGalleryItemFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const b = data.patch;
@@ -293,7 +293,7 @@ export const updateGalleryItemFn = createServerFn({ method: "POST" })
 export const deleteGalleryItemFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const deleted = await runSafe(() => deleteGalleryItem(id));
@@ -330,7 +330,7 @@ export const listFaqsAdminFn = createServerFn({ method: "GET" })
 export const createFaqFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ id: number }> => {
-		await requireAdminSession();
+		await requireAdminSession({ authoritative: true });
 		const parsed = parseFaqPayload(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => createFaq(parsed.value));
@@ -341,7 +341,7 @@ export const createFaqFn = createServerFn({ method: "POST" })
 export const updateFaqFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const b = data.patch;
@@ -377,7 +377,7 @@ export const updateFaqFn = createServerFn({ method: "POST" })
 export const deleteFaqFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const deleted = await runSafe(() => deleteFaq(id));
@@ -388,7 +388,7 @@ export const deleteFaqFn = createServerFn({ method: "POST" })
 export const createTestimonialFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ id: number }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const parsed = parseTestimonialPayload(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => createTestimonial(parsed.value));
@@ -407,7 +407,7 @@ export const createTestimonialFn = createServerFn({ method: "POST" })
 export const updateTestimonialFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const b = data.patch as Record<string, unknown>;
@@ -451,7 +451,7 @@ export const updateTestimonialFn = createServerFn({ method: "POST" })
 export const deleteTestimonialFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const deleted = await runSafe(() => deleteTestimonial(id));

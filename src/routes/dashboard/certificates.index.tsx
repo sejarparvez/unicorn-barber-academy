@@ -21,15 +21,8 @@ import { COHORT_LABELS } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
 import { cn } from "@/lib/utils";
 import { listMyCertificatesFn } from "@/server/certificate/certificate-fns";
-import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/certificates/")({
-	beforeLoad: async ({ location }) => {
-		await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-		});
-	},
 	loader: () => listMyCertificatesFn(),
 	pendingComponent: () => <CardGridSkeleton count={4} />,
 	head: () => ({

@@ -26,7 +26,13 @@ export async function requireAdminApi(
 
 	let session: Awaited<ReturnType<typeof auth.api.getSession>>;
 	try {
-		session = await auth.api.getSession({ headers: request.headers });
+		session = await auth.api.getSession({
+			headers: request.headers,
+			// Admin API endpoints are all writes (or write-precondition reads):
+			// always hit the database so role/ban changes apply immediately,
+			// never a cached session cookie.
+			query: { disableCookieCache: true },
+		});
 	} catch {
 		return { ok: false, status: 401, message: "Unauthorized" };
 	}

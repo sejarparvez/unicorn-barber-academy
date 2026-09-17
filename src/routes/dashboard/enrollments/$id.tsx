@@ -4,16 +4,12 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { DetailPageSkeleton } from "@/components/route-skeletons";
 import { ApplicationDetailPage } from "@/features/enrollment-admin/application-detail-page";
 import { getApplicationAdminFn } from "@/server/enrollment/enrollment-fns";
-import { requireRoles } from "@/server/guards";
+import { requireRoleFromContext } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/enrollments/$id")({
-	beforeLoad: async ({ location }) => {
-		await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-			allowed: ["admin"],
-		});
-	},
+	beforeLoad: ({ context, location }) => ({
+		session: requireRoleFromContext(context, ["admin"], location),
+	}),
 	loader: async ({ params }) => {
 		const id = Number.parseInt(params.id, 10);
 		if (!Number.isInteger(id) || id < 1) throw notFound();

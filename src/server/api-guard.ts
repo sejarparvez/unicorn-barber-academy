@@ -61,7 +61,12 @@ export async function guardAuthenticatedEndpoint(
 
 	let session: Awaited<ReturnType<typeof auth.api.getSession>>;
 	try {
-		session = await auth.api.getSession({ headers: request.headers });
+		session = await auth.api.getSession({
+			headers: request.headers,
+			// These endpoints gate on role and current user state, so always
+			// read the database — never a cached session cookie.
+			query: { disableCookieCache: true },
+		});
 	} catch {
 		return {
 			ok: false,

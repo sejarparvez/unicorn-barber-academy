@@ -36,7 +36,7 @@ export const listUsersAdminFn = createServerFn({ method: "GET" })
 export const setUserRoleFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const parsed = parseRoleChange(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const callerId = Number(session.user.id);
@@ -58,7 +58,7 @@ export const setUserRoleFn = createServerFn({ method: "POST" })
 export const setUserBanFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const parsed = parseBanChange(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const callerId = Number(session.user.id);

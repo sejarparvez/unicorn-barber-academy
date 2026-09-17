@@ -27,7 +27,7 @@ export const getSettingsBaseFn = createServerFn({ method: "GET" }).handler(
 export const updateSettingsFn = createServerFn({ method: "POST" })
 	.validator((input: Record<string, unknown>) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const parsed = parseSettingsPatch(data);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => updateSiteSettings(parsed.value));

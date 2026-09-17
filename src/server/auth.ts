@@ -12,6 +12,7 @@
 import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { Pool } from "pg";
 import { APP_ORIGIN } from "@/lib/env";
 import { resetPasswordEmail, sendMail, verificationEmail } from "@/server/mail";
@@ -98,6 +99,24 @@ export const auth = betterAuth({
 		autoSignInAfterVerification: true,
 		expiresIn: 48 * 60 * 60,
 	},
+	session: {
+		// Cookie cache: validate sessions from a short-lived signed cookie
+		// instead of hitting Postgres on every getSession()/requireRoles()
+		// call. Admin navigation previously ran 3–4 serialized DB session
+		// lookups per page; with this enabled those become ~0ms HMAC verifies.
+		//
+		// Security note: a revoked/demoted session can stay valid for up to
+		// `maxAge` on cached *reads*. Write surfaces (/api/admin/*, mutation
+		// server fns) force an authoritative DB read via `disableCookieCache`
+		// so role/bans gate writes immediately. Lower `maxAge` (e.g. 60) to
+		// tighten the read-side revocation window at the cost of more DB reads.
+		cookieCache: {
+			enabled: true,
+			maxAge: 5 * 60,
+			strategy: "compact",
+			refreshCache: true,
+		},
+	},
 	rateLimit: {
 		enabled: true,
 		window: 60,
@@ -142,6 +161,9 @@ export const auth = betterAuth({
 			defaultRole: "user",
 			adminRoles: ["admin"],
 		}),
+		// MUST stay last: writes session cookies onto TanStack Start responses.
+		// Anything registered after it can clobber the cookie writes.
+		tanstackStartCookies(),
 	],
 	advanced: {
 		// Behind a load balancer/CDN, X-Forwarded-For holds a comma chain and

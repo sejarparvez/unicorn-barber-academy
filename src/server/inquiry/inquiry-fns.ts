@@ -28,7 +28,7 @@ export const markInquiryFn = createServerFn({ method: "POST" })
 			input,
 	)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const updated = await runSafe(() =>
@@ -48,7 +48,7 @@ export const markInquiryFn = createServerFn({ method: "POST" })
 export const deleteInquiryFn = createServerFn({ method: "POST" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		await requireAdminSession();
+		await requireAdminSession({ authoritative: true });
 		const id = clampId(data.id);
 		if (!id) throw new Error("Invalid id");
 		const deleted = await runSafe(() => deleteInquiry(id));

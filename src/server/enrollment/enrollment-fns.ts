@@ -135,7 +135,7 @@ export const listProgramsAdminFn = createServerFn({ method: "GET" }).handler(
 export const updateProgramFn = createServerFn({ method: "POST" })
 	.validator((input: { slug: string; patch: Record<string, unknown> }) => input)
 	.handler(async ({ data }): Promise<{ ok: true }> => {
-		const session = await requireAdminSession();
+		const session = await requireAdminSession({ authoritative: true });
 		const parsed = parseProgramPatch(data.patch);
 		if (!parsed.ok) throw new Error(parsed.message);
 		const result = await runSafe(() => updateProgram(data.slug, parsed.value));

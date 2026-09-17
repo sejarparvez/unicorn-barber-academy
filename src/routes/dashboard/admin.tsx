@@ -29,16 +29,12 @@ import {
 import { cn } from "@/lib/utils";
 import type { ConsoleOverview } from "@/server/console-fns";
 import { getConsoleOverviewFn } from "@/server/console-fns";
-import { requireRoles } from "@/server/guards";
+import { requireRoleFromContext } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/admin")({
-	beforeLoad: async ({ location }) => {
-		await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-			allowed: ["admin"],
-		});
-	},
+	beforeLoad: ({ context, location }) => ({
+		session: requireRoleFromContext(context, ["admin"], location),
+	}),
 	loader: () => getConsoleOverviewFn(),
 	head: () => ({
 		meta: [

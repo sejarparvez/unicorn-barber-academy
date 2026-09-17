@@ -9,9 +9,13 @@ import { AdminAccessError } from "./admin-access-error";
 const getSession = mock(
 	(): Promise<SessionPayload | null> => Promise.resolve(null),
 );
-mock.module("./session", () => ({ getSession }));
+const resolveSession = mock(
+	(): Promise<SessionPayload | null> => Promise.resolve(null),
+);
+mock.module("./session", () => ({ getSession, resolveSession }));
 
-const { requireRoles, requireAdminSession } = await import("./guards");
+const { requireRoles, requireAdminSession, requireRoleFromContext } =
+	await import("./guards");
 
 function makeSession(role: Role = "admin"): SessionPayload {
 	return {
@@ -32,6 +36,7 @@ function makeSession(role: Role = "admin"): SessionPayload {
 
 afterEach(() => {
 	getSession.mockClear();
+	resolveSession.mockClear();
 });
 
 describe("requireRoles", () => {
@@ -161,5 +166,90 @@ describe("requireAdminSession", () => {
 		} catch (err) {
 			expect(err).toBeInstanceOf(AdminAccessError);
 		}
+	});
+
+	test("authoritative mode performs a database read", async () => {
+		const session = makeSession("admin");
+		resolveSession.mockReturnValue(Promise.resolve(session));
+		const result = await requireAdminSession({ authoritative: true });
+		expect(result).toBe(session);
+		expect(getSession).not.toHaveBeenCalled();
+		expect(resolveSession).toHaveBeenCalledWith({ authoritative: true });
+	});
+});
+
+describe("requireRoleFromContext", () => {
+	test("returns the parent session when role is allowed", () => {
+		const session = makeSession("admin");
+		const result = requireRoleFromContext({ session }, ["admin"], {
+			pathname: "/dashboard/users",
+		});
+		expect(result).toBe(session);
+	});
+
+	test("throws redirect to sign-in when context has no session", () => {
+		try {
+			requireRoleFromContext({ session: null }, ["admin"], {
+				pathname: "/dashboard/blog",
+			});
+			expect(true).toBe(false);
+		} catch (err: unknown) {
+			const e = err as {
+				options: { to: string; search: { redirect: string } };
+			};
+			expect(e.options.to).toBe("/auth/signin");
+			expect(e.options.search.redirect).toBe("/dashboard/blog");
+		}
+	});
+
+	test("preserves query string in redirect", () => {
+		try {
+			requireRoleFromContext({ session: null }, ["admin"], {
+				pathname: "/dashboard/enrollments",
+				search: { status: "pending", page: "2" },
+			});
+			expect(true).toBe(false);
+		} catch (err: unknown) {
+			const e = err as { options: { search: { redirect: string } } };
+			expect(e.options.search.redirect).toBe(
+				"/dashboard/enrollments?status=pending&page=2",
+			);
+		}
+	});
+
+	test("throws redirect to dashboard when role not allowed", () => {
+		const session = makeSession("student");
+		try {
+			requireRoleFromContext({ session }, ["admin"], {
+				pathname: "/dashboard/blog",
+			});
+			expect(true).toBe(false);
+		} catch (err: unknown) {
+			const e = err as { options: { to: string } };
+			expect(e.options.to).toBe("/dashboard");
+		}
+	});
+
+	test("throws redirect for user role when only admin allowed", () => {
+		const session = makeSession("user");
+		try {
+			requireRoleFromContext({ session }, ["admin"], {
+				pathname: "/dashboard/enrollments",
+			});
+			expect(true).toBe(false);
+		} catch (err: unknown) {
+			const e = err as { options: { to: string } };
+			expect(e.options.to).toBe("/dashboard");
+		}
+	});
+
+	test("allows instructor role when in allowed list", () => {
+		const session = makeSession("instructor");
+		const result = requireRoleFromContext(
+			{ session },
+			["admin", "instructor"],
+			{ pathname: "/dashboard" },
+		);
+		expect(result).toBe(session);
 	});
 });

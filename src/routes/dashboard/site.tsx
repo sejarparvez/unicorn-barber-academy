@@ -2,15 +2,11 @@
 // Academy-global site settings. Admin-only.
 import { createFileRoute } from "@tanstack/react-router";
 import { SitePage } from "@/features/admin/site-page";
-import { requireRoles } from "@/server/guards";
+import { requireRoleFromContext } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard/site")({
-	beforeLoad: async ({ location }) => ({
-		session: await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-			allowed: ["admin"],
-		}),
+	beforeLoad: ({ context, location }) => ({
+		session: requireRoleFromContext(context, ["admin"], location),
 	}),
 	head: () => ({
 		meta: [

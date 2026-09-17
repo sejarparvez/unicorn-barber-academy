@@ -4,7 +4,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PostListPage } from "@/features/blog-admin/post-list-page";
 import { parseBlogStatus } from "@/lib/blog";
-import { requireRoles } from "@/server/guards";
+import { requireRoleFromContext } from "@/server/guards";
 
 type BlogSearch = {
 	status?: ReturnType<typeof parseBlogStatus>;
@@ -31,13 +31,9 @@ export const Route = createFileRoute("/dashboard/blog/")({
 			...(search.sort === "views" ? { sort: "views" as const } : {}),
 		};
 	},
-	beforeLoad: async ({ location }) => {
-		await requireRoles({
-			pathname: location.pathname,
-			search: location.search as Record<string, string>,
-			allowed: ["admin"],
-		});
-	},
+	beforeLoad: ({ context, location }) => ({
+		session: requireRoleFromContext(context, ["admin"], location),
+	}),
 	// Reads flow through useAdminPosts (src/service/blog.ts) so post
 	// mutations invalidate precisely — no loader to double-fetch.
 	head: () => ({

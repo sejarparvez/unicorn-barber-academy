@@ -15,7 +15,7 @@ import { redirect } from "@tanstack/react-router";
 import { parseRole, type Role } from "@/lib/roles";
 import type { SessionPayload } from "@/lib/types";
 import { AdminAccessError } from "./admin-access-error";
-import { getSession } from "./session";
+import { getSession, resolveSession } from "./session";
 
 export async function requireRoles(options: {
 	pathname: string;
@@ -48,12 +48,57 @@ export async function requireRoles(options: {
 }
 
 /**
+ * Zero-cost role gate for routes nested under a parent that already resolved
+ * the session (e.g. /dashboard children). beforeLoad runs serially parent →
+ * child, so the parent's returned `session` is present in the child context.
+ * This reads it in memory — no server call, no database read.
+ *
+ * Usage in a child route:
+ *   beforeLoad: ({ context, location }) => ({
+ *     session: requireRoleFromContext(context, ["admin"], location),
+ *   }),
+ */
+export function requireRoleFromContext(
+	context: { session?: SessionPayload | null },
+	allowed: Role[],
+	location: { pathname: string; search?: Record<string, string> | unknown },
+): SessionPayload {
+	const session = context.session ?? null;
+
+	if (!session) {
+		const search = location.search as Record<string, string> | undefined;
+		const qs = new URLSearchParams(search ?? {}).toString();
+		throw redirect({
+			to: "/auth/signin",
+			search: {
+				redirect: qs ? `${location.pathname}?${qs}` : location.pathname,
+			},
+		});
+	}
+
+	const role = parseRole(session.user.role);
+	if (!role || !allowed.includes(role)) {
+		throw redirect({ to: "/dashboard" });
+	}
+
+	return session;
+}
+
+/**
  * In-handler guard for createServerFn endpoints. Route beforeLoad guards do
  * NOT protect server functions — each compiled server fn is its own public
  * RPC endpoint — so any privileged fn must call this inside its handler.
+ *
+ * Pass `authoritative: true` from mutation handlers so the role/ban read
+ * bypasses the cookie-cache and hits the database — a demoted or banned admin
+ * must not keep write access until the cache cookie expires.
  */
-export async function requireAdminSession(): Promise<SessionPayload> {
-	const session = await getSession();
+export async function requireAdminSession(options?: {
+	authoritative?: boolean;
+}): Promise<SessionPayload> {
+	const session = options?.authoritative
+		? await resolveSession({ authoritative: true })
+		: await getSession();
 	if (!session || parseRole(session.user.role) !== "admin") {
 		throw new AdminAccessError();
 	}
