@@ -36,10 +36,11 @@ const config = defineConfig(({ mode }) => ({
 		...(mode === "development" ? [devtools()] : []),
 		nitro({
 			rollupConfig: { external: [/^@sentry\//] },
+			// Never SWR-cache full documents here: the SSR HTML embeds the
+			// visitor's session (Header + window.$_TSR) and Nitro's URL-only
+			// cache key ignores cookies, so a hard refresh can serve another
+			// visitor's signed-in/out state. Only static assets are cacheable.
 			routeRules: {
-				"/": { swr: 300 },
-				"/programs/**": { swr: 3600 },
-				"/blog/**": { swr: 600 },
 				"/assets/**": {
 					headers: { "cache-control": "public, max-age=31536000, immutable" },
 				},

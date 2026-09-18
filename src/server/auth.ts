@@ -40,6 +40,10 @@ if (!process.env.BETTER_AUTH_SECRET && !isLocalOrigin) {
 
 export const auth = betterAuth({
 	secret: process.env.BETTER_AUTH_SECRET,
+	// Pin the canonical origin so cookie names/attributes derive from it
+	// (e.g. the `__Secure-` prefix) instead of per-request protocol detection,
+	// which can flip behind TLS-terminating proxies and break cached reads.
+	baseURL: appOrigin,
 	database: new Pool({
 		connectionString: process.env.DATABASE_URL,
 		// Verified working with Neon's chain via system CAs. Override only if a

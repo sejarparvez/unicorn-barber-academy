@@ -18,6 +18,10 @@
 import type { SessionPayload } from "@/lib/types";
 
 const TTL_MS = 60_000;
+// A signed-out result is only worth caching briefly: a stale `null` served
+// from the cache would lock the Header into "Sign in" for the full TTL after
+// the user actually logs in (e.g. following a bad SSR response).
+const NULL_TTL_MS = 10_000;
 
 let cached: { session: SessionPayload | null; at: number } | null = null;
 
@@ -25,7 +29,8 @@ const isClient = () => typeof window !== "undefined";
 
 export function getCachedSession(): SessionPayload | null | undefined {
 	if (!isClient() || !cached) return undefined;
-	if (Date.now() - cached.at > TTL_MS) return undefined;
+	const ttl = cached.session ? TTL_MS : NULL_TTL_MS;
+	if (Date.now() - cached.at > ttl) return undefined;
 	return cached.session;
 }
 
