@@ -8,6 +8,13 @@
 // single-sourced in code; intakes only reference slugs.
 
 import { ALL_PROGRAMS } from "@/data/programs";
+import type {
+	AdmissionsStats,
+	ApplicationDeltas,
+	FeeRevenuePoint,
+	ProgramApplications,
+	TimelinePoint,
+} from "@/lib/console";
 import { toDateOnly } from "@/lib/date";
 import type {
 	ApplicationStatus,
@@ -873,13 +880,6 @@ export async function deleteIntake(id: number): Promise<IntakeMutationResult> {
 
 /* ------------------------------ admin: stats ----------------------------- */
 
-export type AdmissionsStats = {
-	byStatus: Record<ApplicationStatus, number>;
-	total: number;
-	/** Open intakes that have not started yet, soonest first. */
-	upcomingOpenIntakes: IntakeAdmin[];
-};
-
 export async function getAdmissionsStats(): Promise<AdmissionsStats> {
 	const res = await db().query<{ status: string; n: number }>(
 		"SELECT status, count(*)::int AS n FROM enrollment_application GROUP BY status",
@@ -911,4 +911,106 @@ export async function getAdmissionsStats(): Promise<AdmissionsStats> {
 		.slice(0, 6);
 
 	return { byStatus, total, upcomingOpenIntakes };
+}
+
+/* ------------------------------ console: charts ---------------------------- */
+
+/** Monthly application submissions for the admin chart. Zero-filled so the
+    axis stays continuous even for months without any submissions. */
+export async function getApplicationsTimeline(
+	months = 12,
+): Promise<TimelinePoint[]> {
+	const res = await db().query<{ month: string; count: number }>(
+		`SELECT to_char(m, 'YYYY-MM') AS month, COALESCE(c.n, 0)::int AS count
+		 FROM generate_series(
+		   date_trunc('month', now()) - ($1::int - 1) * interval '1 month',
+		   date_trunc('month', now()),
+		   interval '1 month'
+		 ) AS m
+		 LEFT JOIN (
+		   SELECT date_trunc('month', created_at) AS created_month,
+		          count(*)::int AS n
+		   FROM enrollment_application
+		   WHERE created_at >= date_trunc('month', now()) - ($1::int - 1) * interval '1 month'
+		   GROUP BY 1
+		 ) c ON c.created_month = m
+		 ORDER BY m`,
+		[months],
+	);
+	return res.rows.map((r) => ({ month: r.month, count: r.count }));
+}
+
+/** Application counts per program (slug mapped to title), most-popular first. */
+export async function getApplicationsByProgram(): Promise<
+	ProgramApplications[]
+> {
+	const res = await db().query<{ program_slug: string; n: number }>(
+		`SELECT i.program_slug, count(*)::int AS n
+		 FROM enrollment_application a
+		 JOIN program_intake i ON i.id = a.intake_id
+		 GROUP BY i.program_slug
+		 ORDER BY n DESC
+		 LIMIT 8`,
+	);
+	const out: ProgramApplications[] = [];
+	for (const row of res.rows) {
+		const title = programTitle(row.program_slug);
+		if (!title) continue;
+		out.push({ programTitle: title, count: row.n });
+	}
+	return out;
+}
+
+/** Monthly fee revenue actually collected (fee_payment), zero-filled. */
+export async function getFeeRevenueByMonth(
+	months = 12,
+): Promise<FeeRevenuePoint[]> {
+	const res = await db().query<{
+		month: string;
+		amount_poisha: number | string;
+	}>(
+		`SELECT to_char(m, 'YYYY-MM') AS month, COALESCE(r.amount_poisha, 0)::bigint AS amount_poisha
+		 FROM generate_series(
+		   date_trunc('month', now()) - ($1::int - 1) * interval '1 month',
+		   date_trunc('month', now()),
+		   interval '1 month'
+		 ) AS m
+		 LEFT JOIN (
+		   SELECT date_trunc('month', paid_at) AS paid_month,
+		          sum(amount_poisha)::bigint AS amount_poisha
+		   FROM fee_payment
+		   WHERE paid_at >= date_trunc('month', now()) - ($1::int - 1) * interval '1 month'
+		   GROUP BY 1
+		 ) r ON r.paid_month = m
+		 ORDER BY m`,
+		[months],
+	);
+	return res.rows.map((r) => ({
+		month: r.month,
+		amountPoisha: Number(r.amount_poisha),
+	}));
+}
+
+/** Submission totals for the trailing window — trend chips on the KPI cards. */
+export async function getApplicationsSince(
+	days = 7,
+): Promise<ApplicationDeltas> {
+	const res = await db().query<{
+		total: number;
+		needs_review: number;
+		approved: number;
+	}>(
+		`SELECT count(*)::int AS total,
+		        count(*) FILTER (WHERE status IN ('pending','reviewing'))::int AS needs_review,
+		        count(*) FILTER (WHERE status = 'approved')::int AS approved
+		 FROM enrollment_application
+		 WHERE created_at >= now() - $1::int * interval '1 day'`,
+		[days],
+	);
+	const row = res.rows[0];
+	return {
+		total: row?.total ?? 0,
+		needsReview: row?.needs_review ?? 0,
+		approved: row?.approved ?? 0,
+	};
 }

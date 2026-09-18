@@ -4,6 +4,7 @@
 	IconClipboardList,
 	IconClockHour4,
 	IconGauge,
+	IconHistory,
 	IconHome,
 	IconLayoutDashboard,
 	IconLogout,
@@ -183,6 +184,12 @@ const NAV_GROUPS: NavGroup[] = [
 				label: "Users",
 				to: "/dashboard/users",
 				icon: IconUser,
+				visibleFor: "admin",
+			},
+			{
+				label: "Activity",
+				to: "/dashboard/activity",
+				icon: IconHistory,
 				visibleFor: "admin",
 			},
 			{

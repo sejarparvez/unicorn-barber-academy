@@ -15,6 +15,7 @@ import type {
 	Paginated,
 } from "@/lib/blog";
 import { estimateReadingMinutes, parseBlogStatus } from "@/lib/blog";
+import type { BlogStats } from "@/lib/console";
 import { q, withTransaction } from "../db";
 import { escapeLike } from "../fn-utils";
 import { PG_UNIQUE_VIOLATION } from "../pg-codes";
@@ -790,8 +791,6 @@ export async function deleteCategory(id: number): Promise<boolean> {
 }
 
 /* --------------------------------- stats --------------------------------- */
-
-export type BlogStats = { draft: number; published: number; archived: number };
 
 export async function getPostCountsByStatus(): Promise<BlogStats> {
 	const res = await q<{ status: string; n: number }>(
