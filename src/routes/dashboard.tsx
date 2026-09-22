@@ -64,12 +64,22 @@ import { authClient } from "@/lib/auth-client";
 import { parseRole } from "@/lib/roles";
 import { clearCachedSession } from "@/lib/session-cache";
 import type { SessionPayload } from "@/lib/types";
-import { requireRoleFromContext } from "@/server/guards";
+import { requireRoles } from "@/server/guards";
 
 export const Route = createFileRoute("/dashboard")({
-	beforeLoad: ({ context, location }) => ({
-		session: requireRoleFromContext(context, ["admin"], location),
-	}),
+	// This is the shared layout for EVERY signed-in role (user, student,
+	// instructor, admin) — do not restrict `allowed` here. Admin-only pages
+	// (e.g. /dashboard/users) enforce their own role check further down via
+	// requireRoleFromContext. Restricting this parent route to ["admin"]
+	// previously sent every non-admin role into a redirect loop back to
+	// /dashboard, which the router surfaced as the DashboardError screen.
+	beforeLoad: async ({ location }) => {
+		const session = await requireRoles({
+			pathname: location.pathname,
+			search: location.search as Record<string, string>,
+		});
+		return { session };
+	},
 	errorComponent: DashboardError,
 	component: DashboardLayout,
 });
