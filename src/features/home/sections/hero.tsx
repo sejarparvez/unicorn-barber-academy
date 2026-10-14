@@ -1,14 +1,12 @@
 // components/Hero.tsx
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
+import { Image } from "@unpic/react";
 import { m, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import banner480 from "@/assets/logo/banner-480.webp";
-import banner640 from "@/assets/logo/banner-640.webp";
+import heroimage from "@/assets/images/hero-image.webp";
 import banner768 from "@/assets/logo/banner-768.webp";
-import banner896 from "@/assets/logo/banner-896.webp";
 import { buttonVariants } from "@/components/ui/button";
-import { pic } from "@/data/images";
 import { cn } from "@/lib/utils";
 
 /* ----------------------------- Hero ----------------------------- */
@@ -20,47 +18,20 @@ import { cn } from "@/lib/utils";
 const gradientText =
 	"bg-linear-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-transparent";
 
-/** Desktop-only (matches `lg:`): running `useScroll` against the hero section
- *  forces layout measurement on every scroll — pointless on mobile where the
- *  photo column is `hidden`. */
 const HERO_PHOTO_ALT =
 	"Barbering student practicing a fade haircut on a mannequin at Unicorn Barber Training Academy";
 
-/** Media-gated photo: the `<source media>` (not CSS `display`) decides what
- *  downloads, so mobile fetches zero bytes for this column while desktop
- *  gets an eager, high-priority LCP image. (CSS-hidden `eager` images still
- *  download — that cost mobile a hidden 278 KiB fetch.) */
 function HeroPhotoImg({ eager }: { eager: boolean }) {
-	const src = pic("unicorn-hero-barbering", 1400, 1700);
-	if (!eager) {
-		return (
-			<img
-				src={src}
-				alt={HERO_PHOTO_ALT}
-				width={900}
-				height={597}
-				loading="lazy"
-				decoding="async"
-				className="h-full w-full object-cover contrast-[1.05] grayscale-15"
-			/>
-		);
-	}
 	return (
-		<picture className="contents">
-			<source media="(min-width: 1024px)" srcSet={src} type="image/webp" />
-			<img
-				// Zero-byte fallback: only fetched when NO source matches
-				// (mobile) — the desktop source above is used otherwise.
-				src="data:,"
-				alt={HERO_PHOTO_ALT}
-				width={900}
-				height={597}
-				fetchPriority="high"
-				loading="eager"
-				decoding="async"
-				className="h-full w-full object-cover contrast-[1.05] grayscale-15"
-			/>
-		</picture>
+		<Image
+			src={heroimage}
+			layout="fullWidth"
+			alt={HERO_PHOTO_ALT}
+			priority={eager}
+			loading={eager ? "eager" : "lazy"}
+			decoding="async"
+			className="h-full w-full object-cover contrast-[1.05] grayscale-15"
+		/>
 	);
 }
 
@@ -167,27 +138,17 @@ export default function Hero() {
 			/>
 
 			<div className="relative mx-auto grid max-w-350 grid-cols-1 lg:grid-cols-[1fr_auto_1fr]">
-				{/* Brand banner — mobile only. The `<source media>` (not CSS)
-				    decides what downloads: desktop fetches zero bytes here. */}
+				{/* Brand banner — mobile only (using unpic Image component with banner asset) */}
 				<div className="order-1 flex items-center justify-center bg-[#0d0d0f] -ml-8 pt-6 pb-5 lg:hidden">
-					<picture>
-						<source
-							media="(max-width: 1023px)"
-							type="image/webp"
-							srcSet={`${banner480} 480w, ${banner640} 640w, ${banner768} 768w, ${banner896} 896w`}
-							sizes="100vw"
-						/>
-						<img
-							src="data:,"
-							alt="Unicorn Barber Training Academy"
-							className="h-auto w-full"
-							width={480}
-							height={240}
-							fetchPriority="high"
-							loading="eager"
-							decoding="async"
-						/>
-					</picture>
+					<Image
+						src={banner768}
+						layout="fullWidth"
+						alt="Unicorn Barber Training Academy"
+						className="h-auto w-full"
+						priority
+						loading="eager"
+						decoding="async"
+					/>
 				</div>
 
 				{/* Content column */}
@@ -254,11 +215,9 @@ export default function Hero() {
 				<div
 					aria-hidden="true"
 					className="relative hidden w-14 shrink-0 lg:flex lg:flex-col lg:items-center lg:justify-center"
-				></div>
+				/>
 
-				{/* Photo column — desktop only via CSS (`hidden lg:block` inside),
-				    so the LCP element exists in SSR HTML instead of mounting
-				    after a `matchMedia` effect. */}
+				{/* Photo column — desktop only via CSS */}
 				<HeroPhoto sectionRef={sectionRef} />
 			</div>
 			{/* Bottom fade into the marquee — mobile only, softens the exit */}
