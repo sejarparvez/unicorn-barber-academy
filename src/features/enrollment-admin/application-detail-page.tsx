@@ -16,12 +16,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { formatDateOnly } from "@/lib/date";
 import type { ApplicationDetail, ApplicationStatus } from "@/lib/enrollment";
 import {
 	APPLICATION_STATUS_LABELS,
+	calculateAge,
 	FEE_METHOD_LABELS,
 	formatFeePoisha,
 	formatStartsOn,
+	GENDER_LABELS,
 	parseApplicationStatus,
 } from "@/lib/enrollment";
 import { APP_ORIGIN } from "@/lib/env";
@@ -214,6 +217,107 @@ export function ApplicationDetailPage({
 							<Row label="Heard via" value={application.hearAbout} />
 						) : null}
 					</dl>
+
+					<h2 className="pt-2 font-heading text-lg font-semibold">
+						Student details
+					</h2>
+					<dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+						<Row label="Father's name" value={application.fatherName ?? "—"} />
+						<Row label="Mother's name" value={application.motherName ?? "—"} />
+						<Row
+							label="Date of birth"
+							value={
+								application.dateOfBirth
+									? `${formatDateOnly(application.dateOfBirth)}${
+											calculateAge(application.dateOfBirth) !== null
+												? ` · age ${calculateAge(application.dateOfBirth)}`
+												: ""
+										}`
+									: "—"
+							}
+						/>
+						<Row
+							label="Gender"
+							value={
+								application.gender ? GENDER_LABELS[application.gender] : "—"
+							}
+						/>
+						<Row label="Nationality" value={application.nationality ?? "—"} />
+						<Row
+							label="NID / birth certificate"
+							value={application.nidOrBirthCertNo ?? "—"}
+						/>
+					</dl>
+
+					<h2 className="pt-2 font-heading text-lg font-semibold">Contact</h2>
+					<dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+						<Row label="Mobile" value={application.phone} />
+						<Row label="WhatsApp / email" value={application.whatsapp ?? "—"} />
+						<Row
+							label="Present address"
+							value={application.presentAddress ?? "—"}
+						/>
+						<Row
+							label="Permanent address"
+							value={application.permanentAddress ?? "—"}
+						/>
+					</dl>
+
+					<h2 className="pt-2 font-heading text-lg font-semibold">
+						Emergency contact
+					</h2>
+					<dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+						<Row label="Name" value={application.emergencyName ?? "—"} />
+						<Row
+							label="Relation"
+							value={application.emergencyRelation ?? "—"}
+						/>
+						<Row label="Mobile" value={application.emergencyMobile ?? "—"} />
+						<Row label="Address" value={application.emergencyAddress ?? "—"} />
+					</dl>
+
+					<h2 className="pt-2 font-heading text-lg font-semibold">
+						Education & experience
+					</h2>
+					<dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+						<Row label="Education" value={application.education ?? "—"} />
+						<Row
+							label="Barbering experience"
+							value={
+								application.hasBarberExperience === null
+									? "—"
+									: application.hasBarberExperience
+										? `Yes${
+												application.barberExperiencePeriod
+													? ` · ${application.barberExperiencePeriod}`
+													: ""
+											}`
+										: "No"
+							}
+						/>
+						<Row
+							label="Prior training"
+							value={
+								application.hasPriorTraining === null
+									? "—"
+									: application.hasPriorTraining
+										? `Yes${
+												application.priorTrainingInstitute
+													? ` · ${application.priorTrainingInstitute}`
+													: ""
+											}`
+										: "No"
+							}
+						/>
+					</dl>
+					{application.courseGoal ? (
+						<div className="text-sm">
+							<p className="text-xs text-muted-foreground">Course goal</p>
+							<p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed">
+								{application.courseGoal}
+							</p>
+						</div>
+					) : null}
 
 					<h2 className="pt-2 font-heading text-lg font-semibold">Program</h2>
 					<dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">

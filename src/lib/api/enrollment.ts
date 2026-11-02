@@ -4,8 +4,28 @@ import { http } from "./http";
 
 type SubmitApplicationPayload = {
 	intakeId: number;
+	fullName: string;
 	phone: string;
-	experienceNote?: string | null;
+	fatherName: string;
+	motherName: string;
+	dateOfBirth: string;
+	nationality: string;
+	gender: "male" | "female" | "other";
+	nidOrBirthCertNo: string | null;
+	whatsapp: string | null;
+	presentAddress: string;
+	permanentAddress: string;
+	emergencyName: string;
+	emergencyRelation: string;
+	emergencyMobile: string;
+	emergencyAddress: string;
+	education: string;
+	hasBarberExperience: boolean;
+	barberExperiencePeriod: string | null;
+	hasPriorTraining: boolean;
+	priorTrainingInstitute: string | null;
+	courseGoal: string;
+	declarationAccepted: boolean;
 	hearAbout?: string | null;
 };
 

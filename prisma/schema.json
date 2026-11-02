@@ -1297,10 +1297,31 @@
           },
           "EnrollmentApplication": {
             "fields": {
+              "barberExperiencePeriod": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "courseGoal": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz@1",
+                  "kind": "scalar"
+                }
+              },
+              "dateOfBirth": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/date@1",
                   "kind": "scalar"
                 }
               },
@@ -1325,6 +1346,13 @@
                   "kind": "scalar"
                 }
               },
+              "education": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "email": {
                 "nullable": false,
                 "type": {
@@ -1335,7 +1363,42 @@
                   }
                 }
               },
+              "emergencyAddress": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "emergencyMobile": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "emergencyName": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "emergencyRelation": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "experienceNote": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "fatherName": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -1369,6 +1432,27 @@
                   }
                 }
               },
+              "gender": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "hasBarberExperience": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "hasPriorTraining": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "hearAbout": {
                 "nullable": true,
                 "type": {
@@ -1393,6 +1477,34 @@
                   "kind": "scalar"
                 }
               },
+              "motherName": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "nationality": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "nidOrBirthCertNo": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "permanentAddress": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "phone": {
                 "nullable": false,
                 "type": {
@@ -1401,6 +1513,20 @@
                   "typeParams": {
                     "length": 40
                   }
+                }
+              },
+              "presentAddress": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "priorTrainingInstitute": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "reference": {
@@ -1434,6 +1560,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "whatsapp": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               }
@@ -1532,8 +1665,17 @@
             },
             "storage": {
               "fields": {
+                "barberExperiencePeriod": {
+                  "column": "barber_experience_period"
+                },
+                "courseGoal": {
+                  "column": "course_goal"
+                },
                 "createdAt": {
                   "column": "created_at"
+                },
+                "dateOfBirth": {
+                  "column": "date_of_birth"
                 },
                 "decidedAt": {
                   "column": "decided_at"
@@ -1544,11 +1686,29 @@
                 "decisionNote": {
                   "column": "decision_note"
                 },
+                "education": {
+                  "column": "education"
+                },
                 "email": {
                   "column": "email"
                 },
+                "emergencyAddress": {
+                  "column": "emergency_address"
+                },
+                "emergencyMobile": {
+                  "column": "emergency_mobile"
+                },
+                "emergencyName": {
+                  "column": "emergency_name"
+                },
+                "emergencyRelation": {
+                  "column": "emergency_relation"
+                },
                 "experienceNote": {
                   "column": "experience_note"
+                },
+                "fatherName": {
+                  "column": "father_name"
                 },
                 "feePaidAt": {
                   "column": "fee_paid_at"
@@ -1559,6 +1719,15 @@
                 "fullName": {
                   "column": "full_name"
                 },
+                "gender": {
+                  "column": "gender"
+                },
+                "hasBarberExperience": {
+                  "column": "has_barber_experience"
+                },
+                "hasPriorTraining": {
+                  "column": "has_prior_training"
+                },
                 "hearAbout": {
                   "column": "hear_about"
                 },
@@ -1568,8 +1737,26 @@
                 "intakeId": {
                   "column": "intake_id"
                 },
+                "motherName": {
+                  "column": "mother_name"
+                },
+                "nationality": {
+                  "column": "nationality"
+                },
+                "nidOrBirthCertNo": {
+                  "column": "nid_or_birth_cert_no"
+                },
+                "permanentAddress": {
+                  "column": "permanent_address"
+                },
                 "phone": {
                   "column": "phone"
+                },
+                "presentAddress": {
+                  "column": "present_address"
+                },
+                "priorTrainingInstitute": {
+                  "column": "prior_training_institute"
                 },
                 "reference": {
                   "column": "reference"
@@ -1582,6 +1769,9 @@
                 },
                 "userId": {
                   "column": "user_id"
+                },
+                "whatsapp": {
+                  "column": "whatsapp"
                 }
               },
               "namespaceId": "public",
@@ -4132,6 +4322,16 @@
             },
             "enrollment_application": {
               "columns": {
+                "barber_experience_period": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "course_goal": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "created_at": {
                   "codecId": "pg/timestamptz@1",
                   "default": {
@@ -4140,6 +4340,11 @@
                   },
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "date_of_birth": {
+                  "codecId": "pg/date@1",
+                  "nativeType": "date",
+                  "nullable": true
                 },
                 "decided_at": {
                   "codecId": "pg/timestamptz@1",
@@ -4156,6 +4361,11 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "education": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "email": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
@@ -4164,7 +4374,32 @@
                     "length": 200
                   }
                 },
+                "emergency_address": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "emergency_mobile": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "emergency_name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "emergency_relation": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "experience_note": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "father_name": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -4194,6 +4429,21 @@
                     "length": 160
                   }
                 },
+                "gender": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "has_barber_experience": {
+                  "codecId": "pg/bool@1",
+                  "nativeType": "bool",
+                  "nullable": true
+                },
+                "has_prior_training": {
+                  "codecId": "pg/bool@1",
+                  "nativeType": "bool",
+                  "nullable": true
+                },
                 "hear_about": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
@@ -4216,6 +4466,26 @@
                   "nativeType": "int4",
                   "nullable": false
                 },
+                "mother_name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "nationality": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "nid_or_birth_cert_no": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "permanent_address": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "phone": {
                   "codecId": "sql/varchar@1",
                   "nativeType": "character varying",
@@ -4223,6 +4493,16 @@
                   "typeParams": {
                     "length": 40
                   }
+                },
+                "present_address": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "prior_training_institute": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "reference": {
                   "codecId": "sql/varchar@1",
@@ -4257,6 +4537,11 @@
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": false
+                },
+                "whatsapp": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -5478,7 +5763,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "3b9918c056a398a190bfe78b581b3a0cc54ae2db8e15624ef7ce9a0aa43ce5ad"
+    "storageHash": "e385681fdc4e138e8565feb43798fca318b4e7952e99a7a8ed9016985f023358"
   },
   "capabilities": {
     "postgres": {

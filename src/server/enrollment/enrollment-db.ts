@@ -31,6 +31,7 @@ import {
 	parseCohort,
 	parseFeeMethod,
 	parseFeeStatus,
+	parseGender,
 } from "@/lib/enrollment";
 import { db, withTransaction } from "../db";
 import { escapeLike } from "../fn-utils";
@@ -118,7 +119,25 @@ export async function submitApplication(input: {
 	fullName: string;
 	email: string;
 	phone: string;
-	experienceNote: string | null;
+	fatherName: string;
+	motherName: string;
+	dateOfBirth: string;
+	nationality: string;
+	gender: string;
+	nidOrBirthCertNo: string | null;
+	whatsapp: string | null;
+	presentAddress: string;
+	permanentAddress: string;
+	emergencyName: string;
+	emergencyRelation: string;
+	emergencyMobile: string;
+	emergencyAddress: string;
+	education: string;
+	hasBarberExperience: boolean;
+	barberExperiencePeriod: string | null;
+	hasPriorTraining: boolean;
+	priorTrainingInstitute: string | null;
+	courseGoal: string;
 	hearAbout: string | null;
 }): Promise<SubmitResult> {
 	return withTransaction<SubmitResult>(async (tx) => {
@@ -162,8 +181,14 @@ export async function submitApplication(input: {
 				await tx.query(
 					`INSERT INTO enrollment_application
 						(reference, user_id, intake_id, status, full_name, email, phone,
-						 experience_note, hear_about)
-					 VALUES ($1,$2,$3,'pending',$4,$5,$6,$7,$8)`,
+						 father_name, mother_name, date_of_birth, nationality, gender,
+						 nid_or_birth_cert_no, whatsapp, present_address, permanent_address,
+						 emergency_name, emergency_relation, emergency_mobile,
+						 emergency_address, education, has_barber_experience,
+						 barber_experience_period, has_prior_training,
+						 prior_training_institute, course_goal, hear_about)
+					 VALUES ($1,$2,$3,'pending',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,
+						 $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)`,
 					[
 						reference,
 						input.userId,
@@ -171,7 +196,25 @@ export async function submitApplication(input: {
 						input.fullName,
 						input.email,
 						input.phone,
-						input.experienceNote,
+						input.fatherName,
+						input.motherName,
+						input.dateOfBirth,
+						input.nationality,
+						input.gender,
+						input.nidOrBirthCertNo,
+						input.whatsapp,
+						input.presentAddress,
+						input.permanentAddress,
+						input.emergencyName,
+						input.emergencyRelation,
+						input.emergencyMobile,
+						input.emergencyAddress,
+						input.education,
+						input.hasBarberExperience,
+						input.barberExperiencePeriod,
+						input.hasPriorTraining,
+						input.priorTrainingInstitute,
+						input.courseGoal,
 						input.hearAbout,
 					],
 				);
@@ -353,6 +396,25 @@ export async function getApplicationDetail(id: number) {
 		full_name: string;
 		email: string;
 		phone: string;
+		father_name: string | null;
+		mother_name: string | null;
+		date_of_birth: Date | null;
+		nationality: string | null;
+		gender: string | null;
+		nid_or_birth_cert_no: string | null;
+		whatsapp: string | null;
+		present_address: string | null;
+		permanent_address: string | null;
+		emergency_name: string | null;
+		emergency_relation: string | null;
+		emergency_mobile: string | null;
+		emergency_address: string | null;
+		education: string | null;
+		has_barber_experience: boolean | null;
+		barber_experience_period: string | null;
+		has_prior_training: boolean | null;
+		prior_training_institute: string | null;
+		course_goal: string | null;
 		experience_note: string | null;
 		hear_about: string | null;
 		decided_at: Date | null;
@@ -372,7 +434,13 @@ export async function getApplicationDetail(id: number) {
 		fee_paid: number;
 	}>(
 		`SELECT a.id, a.reference, a.status, a.fee_status, a.full_name, a.email,
-			a.phone, a.experience_note, a.hear_about, a.decided_at, a.decision_note,
+			a.phone, a.father_name, a.mother_name, a.date_of_birth, a.nationality,
+			a.gender, a.nid_or_birth_cert_no, a.whatsapp, a.present_address,
+			a.permanent_address, a.emergency_name, a.emergency_relation,
+			a.emergency_mobile, a.emergency_address, a.education,
+			a.has_barber_experience, a.barber_experience_period,
+			a.has_prior_training, a.prior_training_institute, a.course_goal,
+			a.experience_note, a.hear_about, a.decided_at, a.decision_note,
 			a.user_id, u.role AS user_role, a.created_at, a.updated_at,
 			i.id AS intake_id, i.program_slug, i.cohort, i.starts_on,
 			i.is_open AS intake_open, i.seats_total,
@@ -409,6 +477,25 @@ export async function getApplicationDetail(id: number) {
 			userId: row.user_id,
 			userRole: row.user_role,
 			submittedAt: new Date(row.created_at).toISOString(),
+			fatherName: row.father_name,
+			motherName: row.mother_name,
+			dateOfBirth: row.date_of_birth ? toDateOnly(row.date_of_birth) : null,
+			nationality: row.nationality,
+			gender: parseGender(row.gender) ?? null,
+			nidOrBirthCertNo: row.nid_or_birth_cert_no,
+			whatsapp: row.whatsapp,
+			presentAddress: row.present_address,
+			permanentAddress: row.permanent_address,
+			emergencyName: row.emergency_name,
+			emergencyRelation: row.emergency_relation,
+			emergencyMobile: row.emergency_mobile,
+			emergencyAddress: row.emergency_address,
+			education: row.education,
+			hasBarberExperience: row.has_barber_experience,
+			barberExperiencePeriod: row.barber_experience_period,
+			hasPriorTraining: row.has_prior_training,
+			priorTrainingInstitute: row.prior_training_institute,
+			courseGoal: row.course_goal,
 			experienceNote: row.experience_note,
 			hearAbout: row.hear_about,
 			decidedAt: row.decided_at ? new Date(row.decided_at).toISOString() : null,

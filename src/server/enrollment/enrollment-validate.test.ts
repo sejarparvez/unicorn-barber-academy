@@ -13,27 +13,53 @@ function futureDate(daysAhead = 30): string {
 }
 
 describe("validateApplicationPayload", () => {
+	const basePayload = {
+		intakeId: "12",
+		fullName: "  Rahim Uddin  ",
+		phone: " 01337229944 ",
+		fatherName: "Karim Uddin",
+		motherName: "Fatema Begum",
+		dateOfBirth: "2000-01-01",
+		nationality: "Bangladeshi",
+		gender: "male",
+		presentAddress: "12 Mirpur Road, Dhaka",
+		permanentAddress: "12 Mirpur Road, Dhaka",
+		emergencyName: "Karim Uddin",
+		emergencyRelation: "Father",
+		emergencyMobile: "01700000000",
+		emergencyAddress: "12 Mirpur Road, Dhaka",
+		education: "HSC",
+		hasBarberExperience: false,
+		hasPriorTraining: false,
+		courseGoal: "Open my own barbershop",
+		declarationAccepted: true,
+	};
+
 	test("accepts a clean payload and normalizes", () => {
 		const result = validateApplicationPayload({
-			intakeId: "12",
-			phone: " 01337229944 ",
-			experienceNote: "  two years at a salon  ",
+			...basePayload,
+			nidOrBirthCertNo: " 1990123456789 ",
+			whatsapp: " rahim@example.com ",
 			hearAbout: "instagram",
 		});
 		expect(result.ok).toBe(true);
 		if (result.ok) {
 			expect(result.value.intakeId).toBe(12);
+			expect(result.value.fullName).toBe("Rahim Uddin");
 			expect(result.value.phone).toBe("01337229944");
-			expect(result.value.experienceNote).toBe("two years at a salon");
+			expect(result.value.gender).toBe("male");
+			expect(result.value.nidOrBirthCertNo).toBe("1990123456789");
+			expect(result.value.whatsapp).toBe("rahim@example.com");
 			expect(result.value.hearAbout).toBe("instagram");
+			expect(result.value.hasBarberExperience).toBe(false);
 		}
 	});
 
 	test("rejects missing/garbage intakeId", () => {
 		for (const intakeId of [undefined, "abc", "0", -3]) {
 			const result = validateApplicationPayload({
+				...basePayload,
 				intakeId,
-				phone: "01337229944",
 			});
 			expect(result.ok).toBe(false);
 		}
@@ -41,29 +67,93 @@ describe("validateApplicationPayload", () => {
 
 	test("rejects bad phones", () => {
 		for (const phone of ["", "abcd", `+880${"1".repeat(40)}`, "12"]) {
-			const result = validateApplicationPayload({ intakeId: 1, phone });
+			const result = validateApplicationPayload({ ...basePayload, phone });
 			expect(result.ok).toBe(false);
 		}
 	});
 
+	test("rejects missing required student fields", () => {
+		for (const field of [
+			"fullName",
+			"fatherName",
+			"motherName",
+			"dateOfBirth",
+			"nationality",
+			"gender",
+			"presentAddress",
+			"permanentAddress",
+			"emergencyName",
+			"emergencyRelation",
+			"emergencyMobile",
+			"emergencyAddress",
+			"education",
+			"courseGoal",
+		] as const) {
+			const result = validateApplicationPayload({
+				...basePayload,
+				[field]: "",
+			});
+			expect(result.ok).toBe(false);
+		}
+	});
+
+	test("rejects a future date of birth", () => {
+		const result = validateApplicationPayload({
+			...basePayload,
+			dateOfBirth: "2099-01-01",
+		});
+		expect(result.ok).toBe(false);
+	});
+
+	test("requires details when experience/training is yes", () => {
+		expect(
+			validateApplicationPayload({
+				...basePayload,
+				hasBarberExperience: true,
+			}).ok,
+		).toBe(false);
+		expect(
+			validateApplicationPayload({
+				...basePayload,
+				hasPriorTraining: true,
+			}).ok,
+		).toBe(false);
+		expect(
+			validateApplicationPayload({
+				...basePayload,
+				hasBarberExperience: "yes",
+				barberExperiencePeriod: "2 years",
+				hasPriorTraining: "yes",
+				priorTrainingInstitute: "Dhaka Barber School",
+			}).ok,
+		).toBe(true);
+	});
+
+	test("requires the declaration", () => {
+		expect(
+			validateApplicationPayload({
+				...basePayload,
+				declarationAccepted: false,
+			}).ok,
+		).toBe(false);
+	});
+
 	test("unknown hearAbout becomes null instead of storing junk", () => {
 		const result = validateApplicationPayload({
-			intakeId: 1,
-			phone: "01337229944",
+			...basePayload,
 			hearAbout: "<script>alert(1)</script>",
 		});
 		expect(result.ok).toBe(true);
 		if (result.ok) expect(result.value.hearAbout).toBeNull();
 	});
 
-	test("experience note is capped at 2000 chars", () => {
+	test("course goal is capped at 2000 chars", () => {
 		const result = validateApplicationPayload({
-			intakeId: 1,
-			phone: "01337229944",
-			experienceNote: "x".repeat(5000),
+			...basePayload,
+			courseGoal: "x".repeat(5000),
 		});
 		expect(result.ok).toBe(true);
-		if (result.ok) expect(result.value.experienceNote?.length).toBe(2000);
+		if (result.ok) expect(result.value.courseGoal.length).toBe(2000);
 	});
 
 	test("non-object bodies are rejected", () => {
@@ -72,23 +162,24 @@ describe("validateApplicationPayload", () => {
 		expect(validateApplicationPayload(42).ok).toBe(false);
 	});
 
-	test("accepts empty experienceNote and hearAbout", () => {
+	test("accepts empty optional fields", () => {
 		const result = validateApplicationPayload({
-			intakeId: 1,
-			phone: "01337229944",
-			experienceNote: "",
+			...basePayload,
+			nidOrBirthCertNo: "",
+			whatsapp: "",
 			hearAbout: "",
 		});
 		expect(result.ok).toBe(true);
 		if (result.ok) {
-			expect(result.value.experienceNote).toBeNull();
+			expect(result.value.nidOrBirthCertNo).toBeNull();
+			expect(result.value.whatsapp).toBeNull();
 			expect(result.value.hearAbout).toBeNull();
 		}
 	});
 
 	test("phone with special characters is accepted", () => {
 		const result = validateApplicationPayload({
-			intakeId: 1,
+			...basePayload,
 			phone: "+880 (133) 722-9944",
 		});
 		expect(result.ok).toBe(true);
@@ -96,8 +187,8 @@ describe("validateApplicationPayload", () => {
 
 	test("intakeId as string number is coerced", () => {
 		const result = validateApplicationPayload({
+			...basePayload,
 			intakeId: "42",
-			phone: "01337229944",
 		});
 		expect(result.ok).toBe(true);
 		if (result.ok) expect(result.value.intakeId).toBe(42);

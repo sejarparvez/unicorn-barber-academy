@@ -133,21 +133,62 @@ export type ApplicationSummary = {
 	submittedAt: string;
 };
 
-/** Full detail for the admin decision page. */
-export type ApplicationDetail = ApplicationSummary & {
-	experienceNote: string | null;
-	hearAbout: string | null;
-	decidedAt: string | null;
-	decisionNote: string | null;
-	intakeId: number;
-	intakeOpen: boolean;
-	seatsTotal: number;
-	seatsOccupied: number;
-	updatedAt: string;
-	programFeePoisha: number;
-	feePaidPoisha: number;
-	payments: FeePaymentRow[];
+export type Gender = "male" | "female" | "other";
+export const GENDERS = ["male", "female", "other"] as const;
+
+export function parseGender(value: unknown): Gender | undefined {
+	return typeof value === "string" &&
+		(GENDERS as readonly string[]).includes(value)
+		? (value as Gender)
+		: undefined;
+}
+
+export const GENDER_LABELS: Record<Gender, string> = {
+	male: "Male",
+	female: "Female",
+	other: "Other",
 };
+
+/** Applicant-supplied admission-form fields (all optional for rows created
+    before the full form existed). */
+export type AdmissionFormData = {
+	fatherName: string | null;
+	motherName: string | null;
+	dateOfBirth: string | null; // yyyy-mm-dd
+	nationality: string | null;
+	gender: Gender | null;
+	nidOrBirthCertNo: string | null;
+	whatsapp: string | null;
+	presentAddress: string | null;
+	permanentAddress: string | null;
+	emergencyName: string | null;
+	emergencyRelation: string | null;
+	emergencyMobile: string | null;
+	emergencyAddress: string | null;
+	education: string | null;
+	hasBarberExperience: boolean | null;
+	barberExperiencePeriod: string | null;
+	hasPriorTraining: boolean | null;
+	priorTrainingInstitute: string | null;
+	courseGoal: string | null;
+};
+
+/** Full detail for the admin decision page. */
+export type ApplicationDetail = ApplicationSummary &
+	AdmissionFormData & {
+		experienceNote: string | null;
+		hearAbout: string | null;
+		decidedAt: string | null;
+		decisionNote: string | null;
+		intakeId: number;
+		intakeOpen: boolean;
+		seatsTotal: number;
+		seatsOccupied: number;
+		updatedAt: string;
+		programFeePoisha: number;
+		feePaidPoisha: number;
+		payments: FeePaymentRow[];
+	};
 
 export type IntakeAdmin = {
 	id: number;
@@ -192,6 +233,31 @@ export type ProgramAdmin = {
 export function formatFeePoisha(poisha: number): string {
 	const bdt = Math.floor(poisha / 100);
 	return `৳${bdt.toLocaleString("en-US")}`;
+}
+
+/** Age in whole years from a yyyy-mm-dd date of birth. */
+export function calculateAge(
+	dateOfBirth: string,
+	today = new Date(),
+): number | null {
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) return null;
+	const [y, m, d] = dateOfBirth
+		.split("-")
+		.map((part) => Number.parseInt(part, 10));
+	const dob = new Date(Date.UTC(y, m - 1, d));
+	if (
+		dob.getUTCFullYear() !== y ||
+		dob.getUTCMonth() !== m - 1 ||
+		dob.getUTCDate() !== d
+	) {
+		return null;
+	}
+	let age = today.getFullYear() - y;
+	const hadBirthday =
+		today.getMonth() + 1 > m ||
+		(today.getMonth() + 1 === m && today.getDate() >= d);
+	if (!hadBirthday) age -= 1;
+	return age >= 0 ? age : null;
 }
 
 /* ------------------------------ helpers -------------------------------- */

@@ -2,9 +2,11 @@ import { describe, expect, test } from "bun:test";
 import {
 	APPLICATION_STATUS_LABELS,
 	APPLICATION_STATUSES,
+	calculateAge,
 	formatStartsOn,
 	generateReference,
 	parseApplicationStatus,
+	parseGender,
 	SEAT_HOLDING_STATUSES,
 } from "@/lib/enrollment";
 
@@ -67,5 +69,31 @@ describe("formatStartsOn", () => {
 
 	test("returns input unchanged for garbage", () => {
 		expect(formatStartsOn("not-a-date")).toBe("not-a-date");
+	});
+});
+
+describe("calculateAge", () => {
+	test("counts whole years after the birthday has passed", () => {
+		expect(calculateAge("2000-01-15", new Date(2026, 0, 15))).toBe(26);
+	});
+
+	test("does not count the current year before the birthday", () => {
+		expect(calculateAge("2000-12-31", new Date(2026, 0, 15))).toBe(25);
+	});
+
+	test("returns null for an invalid or future-looking date", () => {
+		expect(calculateAge("")).toBeNull();
+		expect(calculateAge("2026-02-30")).toBeNull();
+		expect(calculateAge("2099-01-01", new Date(2026, 0, 15))).toBeNull();
+	});
+});
+
+describe("parseGender", () => {
+	test("accepts known genders and rejects junk", () => {
+		expect(parseGender("male")).toBe("male");
+		expect(parseGender("female")).toBe("female");
+		expect(parseGender("other")).toBe("other");
+		expect(parseGender("MALE")).toBeUndefined();
+		expect(parseGender(null)).toBeUndefined();
 	});
 });

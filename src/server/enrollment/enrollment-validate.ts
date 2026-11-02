@@ -1,20 +1,64 @@
 // src/server/enrollment-validate.ts
 // Manual payload validation for enrollment endpoints — house style (no schema
 // library), mirrors blog-validate.ts. Returns normalized values.
-import { type Cohort, parseFeeMethod } from "@/lib/enrollment";
+import { type Cohort, parseFeeMethod, parseGender } from "@/lib/enrollment";
 import { isProgramLive } from "@/server/program/program-db";
 import type { ValidationResult } from "../validate-utils";
-import { str } from "../validate-utils";
+import { nullableStr, str } from "../validate-utils";
 
 const HTTP_PHONE = /^[+]?[\d\s\-()]{7,20}$/;
 
 export type { ValidationResult } from "../validate-utils";
 
+function parseBool(value: unknown): boolean | null {
+	if (value === true || value === "true" || value === "yes" || value === "1") {
+		return true;
+	}
+	if (value === false || value === "false" || value === "no" || value === "0") {
+		return false;
+	}
+	return null;
+}
+
+/** yyyy-mm-dd, a real calendar date, and not in the future. */
+function isPastOrTodayDate(value: string): boolean {
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+	const [y, m, d] = value.split("-").map((part) => Number.parseInt(part, 10));
+	const date = new Date(Date.UTC(y, m - 1, d));
+	const today = new Date();
+	today.setUTCHours(0, 0, 0, 0);
+	return (
+		date.getUTCFullYear() === y &&
+		date.getUTCMonth() === m - 1 &&
+		date.getUTCDate() === d &&
+		date <= today
+	);
+}
+
 export function validateApplicationPayload(body: unknown): ValidationResult<{
 	intakeId: number;
+	fullName: string;
 	phone: string;
-	experienceNote: string | null;
 	hearAbout: string | null;
+	fatherName: string;
+	motherName: string;
+	dateOfBirth: string;
+	nationality: string;
+	gender: import("@/lib/enrollment").Gender;
+	nidOrBirthCertNo: string | null;
+	whatsapp: string | null;
+	presentAddress: string;
+	permanentAddress: string;
+	emergencyName: string;
+	emergencyRelation: string;
+	emergencyMobile: string;
+	emergencyAddress: string;
+	education: string;
+	hasBarberExperience: boolean;
+	barberExperiencePeriod: string | null;
+	hasPriorTraining: boolean;
+	priorTrainingInstitute: string | null;
+	courseGoal: string;
 }> {
 	if (typeof body !== "object" || body === null) {
 		return { ok: false, message: "Invalid request body" };
@@ -26,12 +70,93 @@ export function validateApplicationPayload(body: unknown): ValidationResult<{
 		return { ok: false, message: "Please choose a cohort" };
 	}
 
+	const fullName = str(b.fullName);
+	if (fullName.length < 1 || fullName.length > 160) {
+		return { ok: false, message: "Full name is required" };
+	}
+
 	const phone = str(b.phone);
 	if (!HTTP_PHONE.test(phone)) {
 		return {
 			ok: false,
 			message: "Enter a valid phone number (e.g. +880 1XXX-XXXXXX)",
 		};
+	}
+
+	const fatherName = str(b.fatherName);
+	if (!fatherName) return { ok: false, message: "Father's name is required" };
+	const motherName = str(b.motherName);
+	if (!motherName) return { ok: false, message: "Mother's name is required" };
+
+	const dateOfBirth = str(b.dateOfBirth);
+	if (!isPastOrTodayDate(dateOfBirth)) {
+		return { ok: false, message: "Enter a valid date of birth" };
+	}
+
+	const nationality = str(b.nationality);
+	if (!nationality) return { ok: false, message: "Nationality is required" };
+
+	const gender = parseGender(str(b.gender));
+	if (!gender) return { ok: false, message: "Please select a gender" };
+
+	const presentAddress = str(b.presentAddress);
+	if (!presentAddress) {
+		return { ok: false, message: "Present address is required" };
+	}
+	const permanentAddress = str(b.permanentAddress);
+	if (!permanentAddress) {
+		return { ok: false, message: "Permanent address is required" };
+	}
+
+	const emergencyName = str(b.emergencyName);
+	if (!emergencyName) {
+		return { ok: false, message: "Emergency contact name is required" };
+	}
+	const emergencyRelation = str(b.emergencyRelation);
+	if (!emergencyRelation) {
+		return { ok: false, message: "Emergency contact relation is required" };
+	}
+	const emergencyMobile = str(b.emergencyMobile);
+	if (!HTTP_PHONE.test(emergencyMobile)) {
+		return { ok: false, message: "Enter a valid emergency mobile number" };
+	}
+	const emergencyAddress = str(b.emergencyAddress);
+	if (!emergencyAddress) {
+		return { ok: false, message: "Emergency contact address is required" };
+	}
+
+	const education = str(b.education);
+	if (!education) return { ok: false, message: "Education is required" };
+
+	const hasBarberExperience = parseBool(b.hasBarberExperience);
+	if (hasBarberExperience === null) {
+		return {
+			ok: false,
+			message: "Please tell us whether you have barbering experience",
+		};
+	}
+	const barberExperiencePeriod = nullableStr(b.barberExperiencePeriod, 100);
+	if (hasBarberExperience && !barberExperiencePeriod) {
+		return { ok: false, message: "Please enter your barbering experience" };
+	}
+
+	const hasPriorTraining = parseBool(b.hasPriorTraining);
+	if (hasPriorTraining === null) {
+		return {
+			ok: false,
+			message: "Please tell us whether you have prior training",
+		};
+	}
+	const priorTrainingInstitute = nullableStr(b.priorTrainingInstitute, 200);
+	if (hasPriorTraining && !priorTrainingInstitute) {
+		return { ok: false, message: "Please enter the institution name" };
+	}
+
+	const courseGoal = str(b.courseGoal);
+	if (!courseGoal) return { ok: false, message: "Course goal is required" };
+
+	if (b.declarationAccepted !== true) {
+		return { ok: false, message: "Please accept the student declaration" };
 	}
 
 	const hearAboutAllowed = [
@@ -51,9 +176,30 @@ export function validateApplicationPayload(body: unknown): ValidationResult<{
 		ok: true,
 		value: {
 			intakeId,
+			fullName: fullName.slice(0, 160),
 			phone,
-			experienceNote: str(b.experienceNote).slice(0, 2000) || null,
 			hearAbout,
+			fatherName: fatherName.slice(0, 160),
+			motherName: motherName.slice(0, 160),
+			dateOfBirth,
+			nationality: nationality.slice(0, 60),
+			gender,
+			nidOrBirthCertNo: nullableStr(b.nidOrBirthCertNo, 60),
+			whatsapp: nullableStr(b.whatsapp, 40),
+			presentAddress: presentAddress.slice(0, 500),
+			permanentAddress: permanentAddress.slice(0, 500),
+			emergencyName: emergencyName.slice(0, 160),
+			emergencyRelation: emergencyRelation.slice(0, 80),
+			emergencyMobile: emergencyMobile.slice(0, 40),
+			emergencyAddress: emergencyAddress.slice(0, 500),
+			education: education.slice(0, 200),
+			hasBarberExperience,
+			barberExperiencePeriod: hasBarberExperience
+				? barberExperiencePeriod
+				: null,
+			hasPriorTraining,
+			priorTrainingInstitute: hasPriorTraining ? priorTrainingInstitute : null,
+			courseGoal: courseGoal.slice(0, 2000),
 		},
 	};
 }

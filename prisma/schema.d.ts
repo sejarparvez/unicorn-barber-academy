@@ -30,7 +30,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'3b9918c056a398a190bfe78b581b3a0cc54ae2db8e15624ef7ce9a0aa43ce5ad'>;
+  StorageHashBase<'e385681fdc4e138e8565feb43798fca318b4e7952e99a7a8ed9016985f023358'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -254,6 +254,25 @@ export type FieldOutputTypes = {
       readonly fullName: Varchar<160>;
       readonly email: Varchar<200>;
       readonly phone: Varchar<40>;
+      readonly fatherName: CodecTypes['pg/text@1']['output'] | null;
+      readonly motherName: CodecTypes['pg/text@1']['output'] | null;
+      readonly dateOfBirth: CodecTypes['pg/date@1']['output'] | null;
+      readonly nationality: CodecTypes['pg/text@1']['output'] | null;
+      readonly gender: CodecTypes['pg/text@1']['output'] | null;
+      readonly nidOrBirthCertNo: CodecTypes['pg/text@1']['output'] | null;
+      readonly whatsapp: CodecTypes['pg/text@1']['output'] | null;
+      readonly presentAddress: CodecTypes['pg/text@1']['output'] | null;
+      readonly permanentAddress: CodecTypes['pg/text@1']['output'] | null;
+      readonly emergencyName: CodecTypes['pg/text@1']['output'] | null;
+      readonly emergencyRelation: CodecTypes['pg/text@1']['output'] | null;
+      readonly emergencyMobile: CodecTypes['pg/text@1']['output'] | null;
+      readonly emergencyAddress: CodecTypes['pg/text@1']['output'] | null;
+      readonly education: CodecTypes['pg/text@1']['output'] | null;
+      readonly hasBarberExperience: CodecTypes['pg/bool@1']['output'] | null;
+      readonly barberExperiencePeriod: CodecTypes['pg/text@1']['output'] | null;
+      readonly hasPriorTraining: CodecTypes['pg/bool@1']['output'] | null;
+      readonly priorTrainingInstitute: CodecTypes['pg/text@1']['output'] | null;
+      readonly courseGoal: CodecTypes['pg/text@1']['output'] | null;
       readonly experienceNote: CodecTypes['pg/text@1']['output'] | null;
       readonly hearAbout: Varchar<80> | null;
       readonly decidedAt: CodecTypes['pg/timestamptz@1']['output'] | null;
@@ -503,6 +522,25 @@ export type FieldInputTypes = {
       readonly fullName: CodecTypes['sql/varchar@1']['input'];
       readonly email: CodecTypes['sql/varchar@1']['input'];
       readonly phone: CodecTypes['sql/varchar@1']['input'];
+      readonly fatherName: CodecTypes['pg/text@1']['input'] | null;
+      readonly motherName: CodecTypes['pg/text@1']['input'] | null;
+      readonly dateOfBirth: CodecTypes['pg/date@1']['input'] | null;
+      readonly nationality: CodecTypes['pg/text@1']['input'] | null;
+      readonly gender: CodecTypes['pg/text@1']['input'] | null;
+      readonly nidOrBirthCertNo: CodecTypes['pg/text@1']['input'] | null;
+      readonly whatsapp: CodecTypes['pg/text@1']['input'] | null;
+      readonly presentAddress: CodecTypes['pg/text@1']['input'] | null;
+      readonly permanentAddress: CodecTypes['pg/text@1']['input'] | null;
+      readonly emergencyName: CodecTypes['pg/text@1']['input'] | null;
+      readonly emergencyRelation: CodecTypes['pg/text@1']['input'] | null;
+      readonly emergencyMobile: CodecTypes['pg/text@1']['input'] | null;
+      readonly emergencyAddress: CodecTypes['pg/text@1']['input'] | null;
+      readonly education: CodecTypes['pg/text@1']['input'] | null;
+      readonly hasBarberExperience: CodecTypes['pg/bool@1']['input'] | null;
+      readonly barberExperiencePeriod: CodecTypes['pg/text@1']['input'] | null;
+      readonly hasPriorTraining: CodecTypes['pg/bool@1']['input'] | null;
+      readonly priorTrainingInstitute: CodecTypes['pg/text@1']['input'] | null;
+      readonly courseGoal: CodecTypes['pg/text@1']['input'] | null;
       readonly experienceNote: CodecTypes['pg/text@1']['input'] | null;
       readonly hearAbout: CodecTypes['sql/varchar@1']['input'] | null;
       readonly decidedAt: CodecTypes['pg/timestamptz@1']['input'] | null;
@@ -744,23 +782,42 @@ export type StorageColumnTypes = {
       readonly subject: Varchar<24>;
     };
     readonly enrollment_application: {
+      readonly barber_experience_period: CodecTypes['pg/text@1']['output'] | null;
+      readonly course_goal: CodecTypes['pg/text@1']['output'] | null;
       readonly created_at: CodecTypes['pg/timestamptz@1']['output'];
+      readonly date_of_birth: CodecTypes['pg/date@1']['output'] | null;
       readonly decided_at: CodecTypes['pg/timestamptz@1']['output'] | null;
       readonly decided_by: CodecTypes['pg/int4@1']['output'] | null;
       readonly decision_note: CodecTypes['pg/text@1']['output'] | null;
+      readonly education: CodecTypes['pg/text@1']['output'] | null;
       readonly email: Varchar<200>;
+      readonly emergency_address: CodecTypes['pg/text@1']['output'] | null;
+      readonly emergency_mobile: CodecTypes['pg/text@1']['output'] | null;
+      readonly emergency_name: CodecTypes['pg/text@1']['output'] | null;
+      readonly emergency_relation: CodecTypes['pg/text@1']['output'] | null;
       readonly experience_note: CodecTypes['pg/text@1']['output'] | null;
+      readonly father_name: CodecTypes['pg/text@1']['output'] | null;
       readonly fee_paid_at: CodecTypes['pg/timestamptz@1']['output'] | null;
       readonly fee_status: Varchar<16>;
       readonly full_name: Varchar<160>;
+      readonly gender: CodecTypes['pg/text@1']['output'] | null;
+      readonly has_barber_experience: CodecTypes['pg/bool@1']['output'] | null;
+      readonly has_prior_training: CodecTypes['pg/bool@1']['output'] | null;
       readonly hear_about: Varchar<80> | null;
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly intake_id: CodecTypes['pg/int4@1']['output'];
+      readonly mother_name: CodecTypes['pg/text@1']['output'] | null;
+      readonly nationality: CodecTypes['pg/text@1']['output'] | null;
+      readonly nid_or_birth_cert_no: CodecTypes['pg/text@1']['output'] | null;
+      readonly permanent_address: CodecTypes['pg/text@1']['output'] | null;
       readonly phone: Varchar<40>;
+      readonly present_address: CodecTypes['pg/text@1']['output'] | null;
+      readonly prior_training_institute: CodecTypes['pg/text@1']['output'] | null;
       readonly reference: Varchar<20>;
       readonly status: Varchar<16>;
       readonly updated_at: CodecTypes['pg/timestamptz@1']['output'];
       readonly user_id: CodecTypes['pg/int4@1']['output'];
+      readonly whatsapp: CodecTypes['pg/text@1']['output'] | null;
     };
     readonly faq_item: {
       readonly answer: CodecTypes['pg/text@1']['output'];
@@ -993,23 +1050,42 @@ export type StorageColumnInputTypes = {
       readonly subject: CodecTypes['sql/varchar@1']['input'];
     };
     readonly enrollment_application: {
+      readonly barber_experience_period: CodecTypes['pg/text@1']['input'] | null;
+      readonly course_goal: CodecTypes['pg/text@1']['input'] | null;
       readonly created_at: CodecTypes['pg/timestamptz@1']['input'];
+      readonly date_of_birth: CodecTypes['pg/date@1']['input'] | null;
       readonly decided_at: CodecTypes['pg/timestamptz@1']['input'] | null;
       readonly decided_by: CodecTypes['pg/int4@1']['input'] | null;
       readonly decision_note: CodecTypes['pg/text@1']['input'] | null;
+      readonly education: CodecTypes['pg/text@1']['input'] | null;
       readonly email: CodecTypes['sql/varchar@1']['input'];
+      readonly emergency_address: CodecTypes['pg/text@1']['input'] | null;
+      readonly emergency_mobile: CodecTypes['pg/text@1']['input'] | null;
+      readonly emergency_name: CodecTypes['pg/text@1']['input'] | null;
+      readonly emergency_relation: CodecTypes['pg/text@1']['input'] | null;
       readonly experience_note: CodecTypes['pg/text@1']['input'] | null;
+      readonly father_name: CodecTypes['pg/text@1']['input'] | null;
       readonly fee_paid_at: CodecTypes['pg/timestamptz@1']['input'] | null;
       readonly fee_status: CodecTypes['sql/varchar@1']['input'];
       readonly full_name: CodecTypes['sql/varchar@1']['input'];
+      readonly gender: CodecTypes['pg/text@1']['input'] | null;
+      readonly has_barber_experience: CodecTypes['pg/bool@1']['input'] | null;
+      readonly has_prior_training: CodecTypes['pg/bool@1']['input'] | null;
       readonly hear_about: CodecTypes['sql/varchar@1']['input'] | null;
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly intake_id: CodecTypes['pg/int4@1']['input'];
+      readonly mother_name: CodecTypes['pg/text@1']['input'] | null;
+      readonly nationality: CodecTypes['pg/text@1']['input'] | null;
+      readonly nid_or_birth_cert_no: CodecTypes['pg/text@1']['input'] | null;
+      readonly permanent_address: CodecTypes['pg/text@1']['input'] | null;
       readonly phone: CodecTypes['sql/varchar@1']['input'];
+      readonly present_address: CodecTypes['pg/text@1']['input'] | null;
+      readonly prior_training_institute: CodecTypes['pg/text@1']['input'] | null;
       readonly reference: CodecTypes['sql/varchar@1']['input'];
       readonly status: CodecTypes['sql/varchar@1']['input'];
       readonly updated_at: CodecTypes['pg/timestamptz@1']['input'];
       readonly user_id: CodecTypes['pg/int4@1']['input'];
+      readonly whatsapp: CodecTypes['pg/text@1']['input'] | null;
     };
     readonly faq_item: {
       readonly answer: CodecTypes['pg/text@1']['input'];
@@ -2065,6 +2141,101 @@ type ContractBase = Omit<
                   readonly codecId: 'sql/varchar@1';
                   readonly nullable: false;
                   readonly typeParams: { readonly length: 40 };
+                };
+                readonly father_name: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly mother_name: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly date_of_birth: {
+                  readonly nativeType: 'date';
+                  readonly codecId: 'pg/date@1';
+                  readonly nullable: true;
+                };
+                readonly nationality: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly gender: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly nid_or_birth_cert_no: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly whatsapp: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly present_address: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly permanent_address: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly emergency_name: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly emergency_relation: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly emergency_mobile: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly emergency_address: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly education: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly has_barber_experience: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: true;
+                };
+                readonly barber_experience_period: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly has_prior_training: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: true;
+                };
+                readonly prior_training_institute: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly course_goal: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
                 };
                 readonly experience_note: {
                   readonly nativeType: 'text';
@@ -3971,6 +4142,82 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly length: 40 };
                 };
               };
+              readonly fatherName: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly motherName: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly dateOfBirth: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/date@1' };
+              };
+              readonly nationality: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly gender: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly nidOrBirthCertNo: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly whatsapp: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly presentAddress: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly permanentAddress: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly emergencyName: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly emergencyRelation: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly emergencyMobile: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly emergencyAddress: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly education: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly hasBarberExperience: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly barberExperiencePeriod: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly hasPriorTraining: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly priorTrainingInstitute: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly courseGoal: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly experienceNote: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -4090,6 +4337,25 @@ type ContractBase = Omit<
                 readonly fullName: { readonly column: 'full_name' };
                 readonly email: { readonly column: 'email' };
                 readonly phone: { readonly column: 'phone' };
+                readonly fatherName: { readonly column: 'father_name' };
+                readonly motherName: { readonly column: 'mother_name' };
+                readonly dateOfBirth: { readonly column: 'date_of_birth' };
+                readonly nationality: { readonly column: 'nationality' };
+                readonly gender: { readonly column: 'gender' };
+                readonly nidOrBirthCertNo: { readonly column: 'nid_or_birth_cert_no' };
+                readonly whatsapp: { readonly column: 'whatsapp' };
+                readonly presentAddress: { readonly column: 'present_address' };
+                readonly permanentAddress: { readonly column: 'permanent_address' };
+                readonly emergencyName: { readonly column: 'emergency_name' };
+                readonly emergencyRelation: { readonly column: 'emergency_relation' };
+                readonly emergencyMobile: { readonly column: 'emergency_mobile' };
+                readonly emergencyAddress: { readonly column: 'emergency_address' };
+                readonly education: { readonly column: 'education' };
+                readonly hasBarberExperience: { readonly column: 'has_barber_experience' };
+                readonly barberExperiencePeriod: { readonly column: 'barber_experience_period' };
+                readonly hasPriorTraining: { readonly column: 'has_prior_training' };
+                readonly priorTrainingInstitute: { readonly column: 'prior_training_institute' };
+                readonly courseGoal: { readonly column: 'course_goal' };
                 readonly experienceNote: { readonly column: 'experience_note' };
                 readonly hearAbout: { readonly column: 'hear_about' };
                 readonly decidedAt: { readonly column: 'decided_at' };
