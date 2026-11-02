@@ -185,6 +185,7 @@ model Certificate {
   code          VarChar(24)            @unique(map: "certificate_code_key")
   userId        Int                    @map("user_id")
   applicationId Int?                   @unique @map("application_id")
+  holderName    String?                @map("holder_name")
   programSlug   VarChar(120)           @map("program_slug")
   cohort        VarChar(16)
   issuedOn      Date                   @default(dbgenerated("CURRENT_DATE")) @map("issued_on")

@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	APPLICATION_STATUS_LABELS,
 	APPLICATION_STATUSES,
+	APPLICATION_TRANSITIONS,
 	calculateAge,
 	formatStartsOn,
 	generateReference,
@@ -31,6 +32,24 @@ describe("APPLICATION_STATUS_LABELS", () => {
 			expect(typeof APPLICATION_STATUS_LABELS[status]).toBe("string");
 			expect(APPLICATION_STATUS_LABELS[status].length).toBeGreaterThan(0);
 		}
+	});
+});
+
+describe("APPLICATION_TRANSITIONS", () => {
+	test("only targets known statuses and never self-transitions", () => {
+		for (const status of APPLICATION_STATUSES) {
+			for (const target of APPLICATION_TRANSITIONS[status]) {
+				expect(APPLICATION_STATUSES).toContain(target);
+				expect(target).not.toBe(status);
+			}
+		}
+	});
+
+	test("graduates only from approved, and terminal states are final", () => {
+		expect(APPLICATION_TRANSITIONS.approved).toContain("completed");
+		expect(APPLICATION_TRANSITIONS.pending).not.toContain("completed");
+		expect(APPLICATION_TRANSITIONS.rejected).toEqual([]);
+		expect(APPLICATION_TRANSITIONS.completed).toEqual([]);
 	});
 });
 

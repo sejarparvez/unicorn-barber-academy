@@ -31,6 +31,23 @@ export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
 	completed: "Completed",
 };
 
+/**
+ * Allowed status transitions. A key maps from the current status to the set
+ * of statuses it can move to. Shared by the server (enforcement) and the
+ * admin UI (so it only offers legal actions).
+ */
+export const APPLICATION_TRANSITIONS: Record<
+	ApplicationStatus,
+	readonly ApplicationStatus[]
+> = {
+	pending: ["reviewing", "approved", "waitlisted", "rejected"],
+	reviewing: ["approved", "waitlisted", "rejected"],
+	approved: ["completed", "rejected"],
+	waitlisted: ["approved", "rejected"],
+	rejected: [],
+	completed: [],
+};
+
 /** Statuses that hold one of the intake's seats. */
 export const SEAT_HOLDING_STATUSES: readonly ApplicationStatus[] = [
 	"pending",

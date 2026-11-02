@@ -6,15 +6,24 @@
 // reaches the client bundle.
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import type { CertificateRecord, VerifyResult } from "@/lib/certificates";
+import type {
+	AdminCertificateList,
+	CertificateListFilters,
+	CertificateRecord,
+	VerifyResult,
+} from "@/lib/certificates";
 import { requireAdminSession } from "@/server/admin-guard.server";
 import {
 	getCertificateByApplicationId,
 	getCertificateByCode,
 	getCertificateForUser,
+	listCertificatesAdmin,
 	listCertificatesForUser,
 } from "@/server/certificate/certificate-db";
-import { parseVerifyUrl } from "@/server/certificate/certificate-validate";
+import {
+	parseCertificateListFilters,
+	parseVerifyUrl,
+} from "@/server/certificate/certificate-validate";
 import { clampId, runSafe } from "@/server/fn-utils";
 import { clientIp, overRateLimit } from "@/server/rate-limit";
 import { getSession } from "@/server/session";
@@ -101,3 +110,14 @@ export const verifyCertificateFn = createServerFn({ method: "GET" })
 				};
 			}),
 	);
+
+export const listCertificatesAdminFn = createServerFn({
+	method: "GET",
+})
+	.validator((input: CertificateListFilters) =>
+		parseCertificateListFilters(input),
+	)
+	.handler(async ({ data }): Promise<AdminCertificateList> => {
+		await requireAdminSession();
+		return runSafe(() => listCertificatesAdmin(data));
+	});

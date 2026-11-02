@@ -7,6 +7,7 @@ import { parseApplicationStatus } from "@/lib/enrollment";
 import { requireAdminApi } from "@/server/admin-api";
 import { logAdminAction } from "@/server/audit/audit-log";
 import { bulkUpdateApplicationStatus } from "@/server/enrollment/enrollment-db";
+import { sendApplicationDecisionEmail } from "@/server/enrollment/enrollment-mail";
 
 export const Route = createFileRoute("/api/admin/enrollments/bulk")({
 	server: {
@@ -50,6 +51,18 @@ export const Route = createFileRoute("/api/admin/enrollments/bulk")({
 					adminUserId: guard.userId,
 					note,
 				});
+
+				// Bulk decisions send the same emails as single decisions —
+				// otherwise applicants silently change state.
+				if (
+					status === "approved" ||
+					status === "waitlisted" ||
+					status === "rejected"
+				) {
+					for (const id of result.appliedIds) {
+						await sendApplicationDecisionEmail(id, status);
+					}
+				}
 
 				await logAdminAction({
 					actorId: guard.userId,

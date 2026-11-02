@@ -52,6 +52,11 @@ export const queryKeys = {
 
 	/* ----------------------------- certificates ----------------------------- */
 	certificates: () => ["certificates"] as const,
+	adminCertificates: (filters?: {
+		search?: string;
+		status?: string;
+		page?: number;
+	}) => ["certificates", "admin", filters ?? {}] as const,
 	certificate: (id: number) => ["certificates", "detail", id] as const,
 	applicationCertificate: (applicationId: number) =>
 		["certificates", "application", applicationId] as const,

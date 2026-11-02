@@ -3,6 +3,7 @@
 // Eligibility and one-per-application rules live in certificate-db.
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
+import { APP_ORIGIN } from "@/lib/env";
 import { requireAdminApi } from "@/server/admin-api";
 import { logAdminAction } from "@/server/audit/audit-log";
 import { issueCertificateForApplication } from "@/server/certificate/certificate-db";
@@ -13,7 +14,7 @@ const REASON_MESSAGES = {
 	"not-found": "Application not found",
 	"not-completed":
 		"Candidates must be marked completed before a certificate can be issued.",
-	"fee-unpaid": "The registration fee must be recorded as paid before issuing.",
+	"fee-unpaid": "The full course fee must be recorded as paid before issuing.",
 	"already-issued": "This application already has a certificate.",
 } as const;
 
@@ -66,7 +67,7 @@ export const Route = createFileRoute("/api/admin/certificates")({
 									cohortLabel:
 										app.cohort === "day" ? "Day cohort" : "Evening cohort",
 									certificateCode: result.code,
-									dashboardUrl: `/dashboard`,
+									dashboardUrl: `${APP_ORIGIN}/dashboard/certificates`,
 								}),
 							});
 						}

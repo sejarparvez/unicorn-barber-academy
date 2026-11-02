@@ -133,6 +133,12 @@ const NAV_GROUPS: NavGroup[] = [
 				icon: IconCertificate,
 				visibleFor: "all",
 			},
+			{
+				label: "Certificate registry",
+				to: "/dashboard/certificates/admin",
+				icon: IconCertificate,
+				visibleFor: "admin",
+			},
 		],
 	},
 	{

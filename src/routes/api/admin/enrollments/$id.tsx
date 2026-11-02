@@ -6,7 +6,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
 import { parseApplicationStatus, parseFeeMethod } from "@/lib/enrollment";
-import { APP_ORIGIN } from "@/lib/env";
 import { requireAdminApi } from "@/server/admin-api";
 import { logAdminAction } from "@/server/audit/audit-log";
 import {
@@ -15,13 +14,8 @@ import {
 	recordFeePayment,
 	updateApplicationStatus,
 } from "@/server/enrollment/enrollment-db";
-import {
-	applicationApprovedEmail,
-	applicationRejectedEmail,
-	applicationWaitlistedEmail,
-	feePaymentConfirmedEmail,
-	sendMail,
-} from "@/server/mail";
+import { sendApplicationDecisionEmail } from "@/server/enrollment/enrollment-mail";
+import { feePaymentConfirmedEmail, sendMail } from "@/server/mail";
 
 type Params = { id: string };
 
@@ -186,41 +180,7 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 
 					// Decision emails — non-fatal; admission state already committed.
 					if (result.emailKind) {
-						try {
-							const detail = await getApplicationDetail(id);
-							if (detail) {
-								const app = detail.application;
-								const data = {
-									reference: app.reference,
-									fullName: app.fullName,
-									programTitle: app.programTitle,
-									cohortLabel:
-										app.cohort === "day" ? "Day cohort" : "Evening cohort",
-									startsOnDisplay: new Date(app.startsOn).toLocaleDateString(
-										"en-US",
-										{ year: "numeric", month: "long", day: "numeric" },
-									),
-								};
-								const html =
-									result.emailKind === "approved"
-										? applicationApprovedEmail(data, `${APP_ORIGIN}/dashboard`)
-										: result.emailKind === "waitlisted"
-											? applicationWaitlistedEmail(data)
-											: applicationRejectedEmail(data);
-								await sendMail({
-									to: app.email,
-									subject:
-										result.emailKind === "approved"
-											? `Approved (${app.reference}) | Unicorn Barber Training Academy`
-											: result.emailKind === "waitlisted"
-												? `Waitlisted (${app.reference}) | Unicorn Barber Training Academy`
-												: `Update on your application (${app.reference})`,
-									html,
-								});
-							}
-						} catch (error) {
-							console.error("[enrollments] decision email failed:", error);
-						}
+						await sendApplicationDecisionEmail(id, result.emailKind);
 					}
 
 					await logAdminAction({

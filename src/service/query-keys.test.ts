@@ -60,6 +60,13 @@ describe("queryKeys", () => {
 			const key = queryKeys.applicationCertificate(99);
 			expect(key).toEqual(["certificates", "application", 99]);
 		});
+
+		test("adminCertificates() nests under certificates scope", () => {
+			const key = queryKeys.adminCertificates({ status: "active" });
+			expect(key[0]).toBe("certificates");
+			expect(key[1]).toBe("admin");
+			expect(key[2]).toEqual({ status: "active" });
+		});
 	});
 
 	describe("console", () => {

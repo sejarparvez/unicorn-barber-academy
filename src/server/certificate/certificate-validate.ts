@@ -1,7 +1,40 @@
 // src/server/certificate/certificate-validate.ts
 // Input validation for certificate server functions.
 
+import type {
+	CertificateListFilters,
+	CertificateListStatus,
+} from "@/lib/certificates";
+
 const VERIFY_PATH = /^\/verify\/[A-Z0-9-]{4,64}$/;
+
+const LIST_STATUSES: readonly CertificateListStatus[] = [
+	"all",
+	"active",
+	"revoked",
+];
+
+/** Normalise the admin registry query string. */
+export function parseCertificateListFilters(
+	raw: unknown,
+): Required<CertificateListFilters> {
+	const input =
+		raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+	const search =
+		typeof input.search === "string" ? input.search.trim().slice(0, 120) : "";
+	const status = LIST_STATUSES.includes(input.status as CertificateListStatus)
+		? (input.status as CertificateListStatus)
+		: "all";
+	const pageInput =
+		typeof input.page === "number"
+			? input.page
+			: Number.parseInt(String(input.page ?? ""), 10);
+	const page =
+		Number.isInteger(pageInput) && pageInput > 0
+			? Math.min(pageInput, 10_000)
+			: 1;
+	return { search, status, page };
+}
 
 export function parseVerifyUrl(
 	raw: unknown,

@@ -26,6 +26,7 @@ import type {
 	MyApplication,
 } from "@/lib/enrollment";
 import {
+	APPLICATION_TRANSITIONS,
 	generateReference,
 	parseApplicationStatus,
 	parseCohort,
@@ -37,19 +38,6 @@ import { db, withTransaction } from "../db";
 import { escapeLike } from "../fn-utils";
 import { PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION } from "../pg-codes";
 import { programTitle } from "../program-utils";
-
-/** Allowed status transitions. A key maps from the current status to the set of statuses it can move to. */
-const VALID_TRANSITIONS: Record<
-	ApplicationStatus,
-	readonly ApplicationStatus[]
-> = {
-	pending: ["reviewing", "approved", "waitlisted", "rejected"],
-	reviewing: ["approved", "waitlisted", "rejected"],
-	approved: ["completed", "rejected"],
-	waitlisted: ["approved", "rejected"],
-	rejected: [],
-	completed: [],
-};
 
 /* ------------------------------- public --------------------------------- */
 
@@ -605,7 +593,7 @@ export async function updateApplicationStatus(options: {
 		const currentStatus = parseApplicationStatus(current.status);
 		if (!currentStatus)
 			return { ok: false as const, reason: "invalid-transition" as const };
-		const allowed = VALID_TRANSITIONS[currentStatus];
+		const allowed = APPLICATION_TRANSITIONS[currentStatus];
 		if (!allowed || !allowed.includes(options.status)) {
 			return {
 				ok: false as const,
@@ -793,6 +781,7 @@ export async function bulkUpdateApplicationStatus(options: {
 	note: string | null;
 }): Promise<{
 	applied: number;
+	appliedIds: number[];
 	failed: Array<{ id: number; reason: string }>;
 }> {
 	const ids = options.ids.slice(0, 50);
@@ -813,7 +802,7 @@ export async function bulkUpdateApplicationStatus(options: {
 		}
 	}
 
-	return { applied: applied.length, failed };
+	return { applied: applied.length, appliedIds: applied, failed };
 }
 
 /* ---------------------------- admin: intakes ----------------------------- */

@@ -31,3 +31,25 @@ export type VerifyResult =
 			issuedOn: string;
 	  }
 	| { kind: "unknown" | "rate-limited" };
+
+/** Admin registry row: credential plus the application/user it came from. */
+export type AdminCertificateListItem = CertificateRecord & {
+	holderEmail: string;
+	applicationId: number | null;
+	applicationReference: string | null;
+};
+
+export type AdminCertificateList = {
+	items: AdminCertificateListItem[];
+	total: number;
+	page: number;
+	pageSize: number;
+};
+
+export type CertificateListStatus = "all" | "active" | "revoked";
+
+export type CertificateListFilters = {
+	search?: string;
+	status?: CertificateListStatus;
+	page?: number;
+};

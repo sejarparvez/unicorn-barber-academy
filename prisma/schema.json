@@ -1004,6 +1004,13 @@
                   "kind": "scalar"
                 }
               },
+              "holderName": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -1139,6 +1146,9 @@
                 },
                 "createdAt": {
                   "column": "created_at"
+                },
+                "holderName": {
+                  "column": "holder_name"
                 },
                 "id": {
                   "column": "id"
@@ -4047,6 +4057,11 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "holder_name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "id": {
                   "codecId": "pg/int4@1",
                   "default": {
@@ -5763,7 +5778,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "e385681fdc4e138e8565feb43798fca318b4e7952e99a7a8ed9016985f023358"
+    "storageHash": "436c2ce88003eb669d635861df9acac6a58d70f84e7b5a66e2ebeb1bd4bf65e0"
   },
   "capabilities": {
     "postgres": {

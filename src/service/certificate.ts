@@ -6,13 +6,37 @@
 // NOTE: server functions MUST stay behind dynamic `await import()` here.
 // Static imports pull `pg`/`dotenv` (via *-db.ts) into the browser bundle
 // and crash every page that uses these hooks.
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	keepPreviousData,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import {
 	issueCertificate,
 	setCertificateRevoked,
 } from "@/lib/api/certificate-admin";
-import type { CertificateRecord } from "@/lib/certificates";
+import type {
+	AdminCertificateList,
+	CertificateListFilters,
+	CertificateRecord,
+} from "@/lib/certificates";
 import { queryKeys } from "./query-keys";
+
+/** Admin registry: every issued credential, searchable and paginated. */
+export function useAdminCertificates(filters: CertificateListFilters) {
+	return useQuery({
+		queryKey: queryKeys.adminCertificates(filters),
+		queryFn: async (): Promise<AdminCertificateList> => {
+			const { listCertificatesAdminFn } = await import(
+				"@/server/certificate/certificate-fns"
+			);
+			return listCertificatesAdminFn({ data: filters });
+		},
+		placeholderData: keepPreviousData,
+		staleTime: 15_000,
+	});
+}
 
 export function useApplicationCertificate(applicationId: number) {
 	return useQuery({

@@ -17,9 +17,14 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateOnly } from "@/lib/date";
-import type { ApplicationDetail, ApplicationStatus } from "@/lib/enrollment";
+import type {
+	ApplicationDetail,
+	ApplicationStatus,
+	FeeStatus,
+} from "@/lib/enrollment";
 import {
 	APPLICATION_STATUS_LABELS,
+	APPLICATION_TRANSITIONS,
 	calculateAge,
 	FEE_METHOD_LABELS,
 	formatFeePoisha,
@@ -386,25 +391,29 @@ export function ApplicationDetailPage({
 							Terminal decisions email the applicant automatically.
 						</p>
 						<div className="grid grid-cols-1 gap-2">
-							{STATUS_FLOW.filter((s) => s.status !== application.status).map(
-								(step) => (
-									<Button
-										key={step.status}
-										disabled={busy}
-										onClick={() => transition(step.status)}
-										className={step.tone}
-									>
-										{busy ? "Working…" : step.label}
-									</Button>
-								),
-							)}
+							{STATUS_FLOW.filter((s) =>
+								APPLICATION_TRANSITIONS[application.status].includes(s.status),
+							).map((step) => (
+								<Button
+									key={step.status}
+									disabled={busy}
+									onClick={() => transition(step.status)}
+									className={step.tone}
+								>
+									{busy ? "Working…" : step.label}
+								</Button>
+							))}
+							{APPLICATION_TRANSITIONS[application.status].length === 0 ? (
+								<p className="text-xs text-muted-foreground">
+									This application is in a terminal state — no further status
+									changes.
+								</p>
+							) : null}
 						</div>
 					</section>
 
 					<section className="space-y-3 rounded-xl border border-border bg-card p-5">
-						<h2 className="font-heading text-sm font-semibold">
-							Registration fee
-						</h2>
+						<h2 className="font-heading text-sm font-semibold">Course fee</h2>
 						<Label>Offline tracking — bKash / cash / bank at the academy</Label>
 						<p className="text-sm">
 							<span className="font-semibold tabular-nums">
@@ -491,7 +500,11 @@ export function ApplicationDetailPage({
 						</form>
 					</section>
 
-					<CertificatePanel applicationId={application.id} />
+					<CertificatePanel
+						applicationId={application.id}
+						status={application.status}
+						feeStatus={application.feeStatus}
+					/>
 				</aside>
 			</div>
 		</div>
@@ -508,13 +521,28 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 /** Issue / manage the certificate minted from this application. */
-function CertificatePanel({ applicationId }: { applicationId: number }) {
+function CertificatePanel({
+	applicationId,
+	status,
+	feeStatus,
+}: {
+	applicationId: number;
+	status: ApplicationStatus;
+	feeStatus: FeeStatus;
+}) {
 	const { data: certificate } = useApplicationCertificate(applicationId);
 	const issue = useIssueCertificate();
 	const revoke = useSetCertificateRevocation();
 	const [confirmRevoked, setConfirmRevoked] = useState(false);
 
 	const canIssue = !certificate;
+	const blockedReason =
+		status !== "completed"
+			? "Mark the application completed first."
+			: feeStatus !== "paid"
+				? "The full course fee must be paid before issuing."
+				: null;
+	const eligible = blockedReason === null;
 
 	async function onIssue() {
 		try {
@@ -594,14 +622,19 @@ function CertificatePanel({ applicationId }: { applicationId: number }) {
 				<div className="space-y-2">
 					<p className="text-[11px] leading-relaxed text-muted-foreground">
 						Issuing requires the application to be <strong>completed</strong>{" "}
-						and the registration fee <strong>paid</strong>. The graduate finds
+						and the full course fee <strong>paid</strong>. The graduate finds
 						the certificate in their dashboard.
 					</p>
+					{blockedReason ? (
+						<p className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+							{blockedReason}
+						</p>
+					) : null}
 					<Button
 						variant="outline"
 						size="sm"
 						className="w-full"
-						disabled={!canIssue || issue.isPending}
+						disabled={!canIssue || !eligible || issue.isPending}
 						onClick={onIssue}
 					>
 						{issue.isPending ? "Issuing…" : "Issue certificate"}

@@ -105,7 +105,7 @@ export function AdminConsolePage({ overview }: { overview: ConsoleOverview }) {
 					label="Active certificates"
 					value={String(overview.activeCertificates)}
 					hint="Revoked certificates excluded"
-					to="/dashboard/certificates"
+					to="/dashboard/certificates/admin"
 				/>
 				<StatCard
 					icon={IconArticle}

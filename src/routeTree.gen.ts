@@ -46,6 +46,7 @@ import { Route as DashboardTestimonialsRouteImport } from './routes/dashboard/te
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
 import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
+import { Route as VerifyIndexRouteImport } from './routes/verify.index'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as ApiAdminBlogRouteImport } from './routes/api/admin/blog'
 import { Route as ApiAdminCertificatesRouteImport } from './routes/api/admin/certificates'
@@ -58,6 +59,7 @@ import { Route as DashboardBlogIndexRouteImport } from './routes/dashboard/blog.
 import { Route as DashboardBlogCategoriesRouteImport } from './routes/dashboard/blog.categories'
 import { Route as DashboardBlogNewRouteImport } from './routes/dashboard/blog.new'
 import { Route as DashboardCertificatesIndexRouteImport } from './routes/dashboard/certificates.index'
+import { Route as DashboardCertificatesAdminRouteImport } from './routes/dashboard/certificates.admin'
 import { Route as DashboardEnrollmentsIndexRouteImport } from './routes/dashboard/enrollments.index'
 import { Route as DashboardEnrollmentsIdRouteImport } from './routes/dashboard/enrollments/$id'
 import { Route as DashboardEnrollmentsIntakesRouteImport } from './routes/dashboard/enrollments/intakes'
@@ -258,6 +260,11 @@ const ProgramsSlugRoute = ProgramsSlugRouteImport.update({
   path: '/programs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyIndexRoute = VerifyIndexRouteImport.update({
+  id: '/verify/',
+  path: '/verify/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerifyCodeRoute = VerifyCodeRouteImport.update({
   id: '/verify/$code',
   path: '/verify/$code',
@@ -317,6 +324,12 @@ const DashboardCertificatesIndexRoute =
   DashboardCertificatesIndexRouteImport.update({
     id: '/certificates/',
     path: '/certificates/',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardCertificatesAdminRoute =
+  DashboardCertificatesAdminRouteImport.update({
+    id: '/certificates/admin',
+    path: '/certificates/admin',
     getParentRoute: () => DashboardRoute,
   } as any)
 const DashboardEnrollmentsIndexRoute =
@@ -434,6 +447,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/programs/': typeof ProgramsIndexRoute
+  '/verify/': typeof VerifyIndexRoute
   '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
   '/api/admin/certificates': typeof ApiAdminCertificatesRouteWithChildren
   '/api/admin/upload': typeof ApiAdminUploadRoute
@@ -443,6 +457,7 @@ export interface FileRoutesByFullPath {
   '/certificates/$id/print': typeof CertificatesIdPrintRoute
   '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/dashboard/certificates/admin': typeof DashboardCertificatesAdminRoute
   '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
   '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
   '/md/blog/$slug': typeof MdBlogSlugRoute
@@ -498,6 +513,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/programs': typeof ProgramsIndexRoute
+  '/verify': typeof VerifyIndexRoute
   '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
   '/api/admin/certificates': typeof ApiAdminCertificatesRouteWithChildren
   '/api/admin/upload': typeof ApiAdminUploadRoute
@@ -507,6 +523,7 @@ export interface FileRoutesByTo {
   '/certificates/$id/print': typeof CertificatesIdPrintRoute
   '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/dashboard/certificates/admin': typeof DashboardCertificatesAdminRoute
   '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
   '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
   '/md/blog/$slug': typeof MdBlogSlugRoute
@@ -564,6 +581,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/programs/': typeof ProgramsIndexRoute
+  '/verify/': typeof VerifyIndexRoute
   '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
   '/api/admin/certificates': typeof ApiAdminCertificatesRouteWithChildren
   '/api/admin/upload': typeof ApiAdminUploadRoute
@@ -573,6 +591,7 @@ export interface FileRoutesById {
   '/certificates/$id/print': typeof CertificatesIdPrintRoute
   '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
   '/dashboard/blog/new': typeof DashboardBlogNewRoute
+  '/dashboard/certificates/admin': typeof DashboardCertificatesAdminRoute
   '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
   '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
   '/md/blog/$slug': typeof MdBlogSlugRoute
@@ -631,6 +650,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/dashboard/'
     | '/programs/'
+    | '/verify/'
     | '/api/admin/blog'
     | '/api/admin/certificates'
     | '/api/admin/upload'
@@ -640,6 +660,7 @@ export interface FileRouteTypes {
     | '/certificates/$id/print'
     | '/dashboard/blog/categories'
     | '/dashboard/blog/new'
+    | '/dashboard/certificates/admin'
     | '/dashboard/enrollments/$id'
     | '/dashboard/enrollments/intakes'
     | '/md/blog/$slug'
@@ -695,6 +716,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/dashboard'
     | '/programs'
+    | '/verify'
     | '/api/admin/blog'
     | '/api/admin/certificates'
     | '/api/admin/upload'
@@ -704,6 +726,7 @@ export interface FileRouteTypes {
     | '/certificates/$id/print'
     | '/dashboard/blog/categories'
     | '/dashboard/blog/new'
+    | '/dashboard/certificates/admin'
     | '/dashboard/enrollments/$id'
     | '/dashboard/enrollments/intakes'
     | '/md/blog/$slug'
@@ -760,6 +783,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/dashboard/'
     | '/programs/'
+    | '/verify/'
     | '/api/admin/blog'
     | '/api/admin/certificates'
     | '/api/admin/upload'
@@ -769,6 +793,7 @@ export interface FileRouteTypes {
     | '/certificates/$id/print'
     | '/dashboard/blog/categories'
     | '/dashboard/blog/new'
+    | '/dashboard/certificates/admin'
     | '/dashboard/enrollments/$id'
     | '/dashboard/enrollments/intakes'
     | '/md/blog/$slug'
@@ -815,6 +840,7 @@ export interface RootRouteChildren {
   VerifyCodeRoute: typeof VerifyCodeRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ProgramsIndexRoute: typeof ProgramsIndexRoute
+  VerifyIndexRoute: typeof VerifyIndexRoute
   ApiAdminBlogRoute: typeof ApiAdminBlogRouteWithChildren
   ApiAdminCertificatesRoute: typeof ApiAdminCertificatesRouteWithChildren
   ApiAdminUploadRoute: typeof ApiAdminUploadRoute
@@ -1089,6 +1115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgramsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify/': {
+      id: '/verify/'
+      path: '/verify'
+      fullPath: '/verify/'
+      preLoaderRoute: typeof VerifyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verify/$code': {
       id: '/verify/$code'
       path: '/verify/$code'
@@ -1171,6 +1204,13 @@ declare module '@tanstack/react-router' {
       path: '/certificates'
       fullPath: '/dashboard/certificates/'
       preLoaderRoute: typeof DashboardCertificatesIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/certificates/admin': {
+      id: '/dashboard/certificates/admin'
+      path: '/certificates/admin'
+      fullPath: '/dashboard/certificates/admin'
+      preLoaderRoute: typeof DashboardCertificatesAdminRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/enrollments/': {
@@ -1288,6 +1328,7 @@ interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardBlogCategoriesRoute: typeof DashboardBlogCategoriesRoute
   DashboardBlogNewRoute: typeof DashboardBlogNewRoute
+  DashboardCertificatesAdminRoute: typeof DashboardCertificatesAdminRoute
   DashboardEnrollmentsIdRoute: typeof DashboardEnrollmentsIdRoute
   DashboardEnrollmentsIntakesRoute: typeof DashboardEnrollmentsIntakesRoute
   DashboardBlogIndexRoute: typeof DashboardBlogIndexRoute
@@ -1310,6 +1351,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardBlogCategoriesRoute: DashboardBlogCategoriesRoute,
   DashboardBlogNewRoute: DashboardBlogNewRoute,
+  DashboardCertificatesAdminRoute: DashboardCertificatesAdminRoute,
   DashboardEnrollmentsIdRoute: DashboardEnrollmentsIdRoute,
   DashboardEnrollmentsIntakesRoute: DashboardEnrollmentsIntakesRoute,
   DashboardBlogIndexRoute: DashboardBlogIndexRoute,
@@ -1405,6 +1447,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyCodeRoute: VerifyCodeRoute,
   BlogIndexRoute: BlogIndexRoute,
   ProgramsIndexRoute: ProgramsIndexRoute,
+  VerifyIndexRoute: VerifyIndexRoute,
   ApiAdminBlogRoute: ApiAdminBlogRouteWithChildren,
   ApiAdminCertificatesRoute: ApiAdminCertificatesRouteWithChildren,
   ApiAdminUploadRoute: ApiAdminUploadRoute,

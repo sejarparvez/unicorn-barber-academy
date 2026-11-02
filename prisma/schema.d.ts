@@ -30,7 +30,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'e385681fdc4e138e8565feb43798fca318b4e7952e99a7a8ed9016985f023358'>;
+  StorageHashBase<'436c2ce88003eb669d635861df9acac6a58d70f84e7b5a66e2ebeb1bd4bf65e0'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -224,6 +224,7 @@ export type FieldOutputTypes = {
       readonly code: Varchar<24>;
       readonly userId: CodecTypes['pg/int4@1']['output'];
       readonly applicationId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly holderName: CodecTypes['pg/text@1']['output'] | null;
       readonly programSlug: Varchar<120>;
       readonly cohort: Varchar<16>;
       readonly issuedOn: CodecTypes['pg/date@1']['output'];
@@ -492,6 +493,7 @@ export type FieldInputTypes = {
       readonly code: CodecTypes['sql/varchar@1']['input'];
       readonly userId: CodecTypes['pg/int4@1']['input'];
       readonly applicationId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly holderName: CodecTypes['pg/text@1']['input'] | null;
       readonly programSlug: CodecTypes['sql/varchar@1']['input'];
       readonly cohort: CodecTypes['sql/varchar@1']['input'];
       readonly issuedOn: CodecTypes['pg/date@1']['input'];
@@ -760,6 +762,7 @@ export type StorageColumnTypes = {
       readonly code: Varchar<24>;
       readonly cohort: Varchar<16>;
       readonly created_at: CodecTypes['pg/timestamptz@1']['output'];
+      readonly holder_name: CodecTypes['pg/text@1']['output'] | null;
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly issued_by: CodecTypes['pg/int4@1']['output'] | null;
       readonly issued_on: CodecTypes['pg/date@1']['output'];
@@ -1028,6 +1031,7 @@ export type StorageColumnInputTypes = {
       readonly code: CodecTypes['sql/varchar@1']['input'];
       readonly cohort: CodecTypes['sql/varchar@1']['input'];
       readonly created_at: CodecTypes['pg/timestamptz@1']['input'];
+      readonly holder_name: CodecTypes['pg/text@1']['input'] | null;
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly issued_by: CodecTypes['pg/int4@1']['input'] | null;
       readonly issued_on: CodecTypes['pg/date@1']['input'];
@@ -1874,6 +1878,11 @@ type ContractBase = Omit<
                 readonly application_id: {
                   readonly nativeType: 'int4';
                   readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly holder_name: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
                   readonly nullable: true;
                 };
                 readonly program_slug: {
@@ -3910,6 +3919,10 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
+              readonly holderName: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly programSlug: {
                 readonly nullable: false;
                 readonly type: {
@@ -3996,6 +4009,7 @@ type ContractBase = Omit<
                 readonly code: { readonly column: 'code' };
                 readonly userId: { readonly column: 'user_id' };
                 readonly applicationId: { readonly column: 'application_id' };
+                readonly holderName: { readonly column: 'holder_name' };
                 readonly programSlug: { readonly column: 'program_slug' };
                 readonly cohort: { readonly column: 'cohort' };
                 readonly issuedOn: { readonly column: 'issued_on' };

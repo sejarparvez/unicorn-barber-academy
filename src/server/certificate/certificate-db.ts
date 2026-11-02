@@ -5,9 +5,15 @@
 // employer verification checks, so uniqueness is enforced with retries
 // against the DB constraint rather than trusting count-based sequences.
 
-import type { CertificateRecord } from "@/lib/certificates";
+import type {
+	AdminCertificateList,
+	AdminCertificateListItem,
+	CertificateListStatus,
+	CertificateRecord,
+} from "@/lib/certificates";
 import { parseCohort } from "@/lib/enrollment";
 import { db, withTransaction } from "../db";
+import { escapeLike } from "../fn-utils";
 import { PG_UNIQUE_VIOLATION } from "../pg-codes";
 import { programTitle } from "../program-utils";
 
@@ -42,8 +48,12 @@ function rowToRecord(row: CertificateRow): CertificateRecord {
 	};
 }
 
-const SELECT_COLUMNS = `c.id, c.code, c.user_id, u.name AS holder_name,
+const SELECT_COLUMNS = `c.id, c.code, c.user_id,
+	coalesce(c.holder_name, a.full_name, u.name, 'Graduate') AS holder_name,
 	c.program_slug, c.cohort, c.issued_on, c.issued_by, c.revoked_at, c.revoked_by, c.revoked_reason`;
+
+const SELECT_JOINS = `LEFT JOIN enrollment_application a ON a.id = c.application_id
+	JOIN "user" u ON u.id = c.user_id`;
 
 /* ------------------------------- issuance -------------------------------- */
 
@@ -72,8 +82,9 @@ export async function issueCertificateForApplication(
 			fee_status: string;
 			program_slug: string;
 			cohort: string;
+			full_name: string;
 		}>(
-			`SELECT a.id, a.user_id, a.status, a.fee_status, i.program_slug, i.cohort
+			`SELECT a.id, a.user_id, a.status, a.fee_status, a.full_name, i.program_slug, i.cohort
 			 FROM enrollment_application a
 			 JOIN program_intake i ON i.id = a.intake_id
 			 WHERE a.id = $1
@@ -111,13 +122,14 @@ export async function issueCertificateForApplication(
 			const code = `UBT-${year}-${String(serial).padStart(4, "0")}`;
 			try {
 				const insertRes = await tx.query<{ code: string }>(
-					`INSERT INTO certificate (code, user_id, application_id, program_slug, cohort, issued_by)
-					 VALUES ($1, $2, $3, $4, $5, $6)
+					`INSERT INTO certificate (code, user_id, application_id, holder_name, program_slug, cohort, issued_by)
+					 VALUES ($1, $2, $3, $4, $5, $6, $7)
 					 RETURNING code`,
 					[
 						code,
 						app.user_id,
 						applicationId,
+						app.full_name?.trim() || null,
 						app.program_slug,
 						app.cohort,
 						adminUserId,
@@ -167,7 +179,7 @@ export async function getCertificateByCode(
 ): Promise<CertificateRecord | null> {
 	const res = await db().query<CertificateRow>(
 		`SELECT ${SELECT_COLUMNS}
-		 FROM certificate c JOIN "user" u ON u.id = c.user_id
+		 FROM certificate c ${SELECT_JOINS}
 		 WHERE c.code = $1 LIMIT 1`,
 		[code],
 	);
@@ -179,7 +191,7 @@ export async function listCertificatesForUser(
 ): Promise<CertificateRecord[]> {
 	const res = await db().query<CertificateRow>(
 		`SELECT ${SELECT_COLUMNS}
-		 FROM certificate c JOIN "user" u ON u.id = c.user_id
+		 FROM certificate c ${SELECT_JOINS}
 		 WHERE c.user_id = $1
 		 ORDER BY c.issued_on DESC, c.id DESC`,
 		[userId],
@@ -194,7 +206,7 @@ export async function getCertificateForUser(
 ): Promise<CertificateRecord | null> {
 	const res = await db().query<CertificateRow>(
 		`SELECT ${SELECT_COLUMNS}
-		 FROM certificate c JOIN "user" u ON u.id = c.user_id
+		 FROM certificate c ${SELECT_JOINS}
 		 WHERE c.id = $1 AND c.user_id = $2 LIMIT 1`,
 		[id, userId],
 	);
@@ -207,7 +219,7 @@ export async function getCertificateByApplicationId(
 ): Promise<CertificateRecord | null> {
 	const res = await db().query<CertificateRow>(
 		`SELECT ${SELECT_COLUMNS}
-		 FROM certificate c JOIN "user" u ON u.id = c.user_id
+		 FROM certificate c ${SELECT_JOINS}
 		 WHERE c.application_id = $1 LIMIT 1`,
 		[applicationId],
 	);
@@ -219,4 +231,70 @@ export async function countActiveCertificates(): Promise<number> {
 		"SELECT count(*)::int AS n FROM certificate WHERE revoked_at IS NULL",
 	);
 	return res.rows[0]?.n ?? 0;
+}
+
+/* ----------------------------- admin registry ---------------------------- */
+
+type AdminCertificateRow = CertificateRow & {
+	holder_email: string;
+	application_id: number | null;
+	application_reference: string | null;
+};
+
+/** Paginated certificate registry for the admin console. */
+export async function listCertificatesAdmin(options: {
+	search: string;
+	status: CertificateListStatus;
+	page: number;
+}): Promise<AdminCertificateList> {
+	const pageSize = 25;
+	const page = Math.max(1, options.page);
+	const params: unknown[] = [];
+	const conditions: string[] = [];
+
+	if (options.search) {
+		params.push(`%${escapeLike(options.search)}%`);
+		const term = `$${params.length}`;
+		conditions.push(
+			`(c.code ILIKE ${term}
+			 OR coalesce(c.holder_name, a.full_name, u.name) ILIKE ${term}
+			 OR u.email ILIKE ${term}
+			 OR coalesce(a.reference, '') ILIKE ${term})`,
+		);
+	}
+	if (options.status === "active") conditions.push("c.revoked_at IS NULL");
+	if (options.status === "revoked") conditions.push("c.revoked_at IS NOT NULL");
+
+	const where =
+		conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+	const countRes = await db().query<{ n: number }>(
+		`SELECT count(*)::int AS n
+		 FROM certificate c ${SELECT_JOINS} ${where}`,
+		params,
+	);
+
+	params.push(pageSize, (page - 1) * pageSize);
+	const res = await db().query<AdminCertificateRow>(
+		`SELECT ${SELECT_COLUMNS}, u.email AS holder_email, c.application_id,
+			a.reference AS application_reference
+		 FROM certificate c ${SELECT_JOINS} ${where}
+		 ORDER BY c.issued_on DESC, c.id DESC
+		 LIMIT $${params.length - 1} OFFSET $${params.length}`,
+		params,
+	);
+
+	const items: AdminCertificateListItem[] = res.rows.map((row) => ({
+		...rowToRecord(row),
+		holderEmail: row.holder_email,
+		applicationId: row.application_id,
+		applicationReference: row.application_reference,
+	}));
+
+	return {
+		items,
+		total: countRes.rows[0]?.n ?? 0,
+		page,
+		pageSize,
+	};
 }
