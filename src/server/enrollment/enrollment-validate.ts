@@ -283,7 +283,8 @@ export function parseFeePaymentPayload(body: unknown): ValidationResult<{
 	const method = parseFeeMethod(str(b.method));
 	if (!method)
 		return { ok: false, message: "Method must be bKash, cash, or bank" };
-	const receiptRef = str(b.receiptRef).slice(0, 120) || null;
+	const receiptRef =
+		(str(b.receiptRef) || str(b.receipt)).slice(0, 120) || null;
 	let paidAt: string | null = null;
 	const rawDate = str(b.paidAt);
 	if (rawDate) {

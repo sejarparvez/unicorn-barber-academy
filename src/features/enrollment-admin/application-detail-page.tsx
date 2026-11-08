@@ -6,7 +6,7 @@
 // Data comes from useApplicationDetail (service layer), primed with the
 // route loader's snapshot; status/fee/certificate mutations invalidate
 // precisely.
-import { IconArrowLeft } from "@tabler/icons-react";
+import { IconArrowLeft, IconPrinter } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -111,7 +111,9 @@ export function ApplicationDetailPage({
 			setNotice(
 				result.userRoleUpgraded
 					? `Status updated to "${APPLICATION_STATUS_LABELS[status]}". Applicant's account was upgraded to Student and notified by email.`
-					: `Status updated to "${APPLICATION_STATUS_LABELS[status]}".`,
+					: result.userRoleDowngraded
+						? `Status updated to "${APPLICATION_STATUS_LABELS[status]}". Applicant's account was returned to User.`
+						: `Status updated to "${APPLICATION_STATUS_LABELS[status]}".`,
 			);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Action failed");
@@ -593,6 +595,18 @@ function CertificatePanel({
 					<p className="font-mono text-sm font-semibold tracking-wider">
 						{certificate.code}
 					</p>
+					<Link
+						to="/certificates/$id/print"
+						params={{ id: String(certificate.id) }}
+						target="_blank"
+						className={cn(
+							buttonVariants({ variant: "outline", size: "sm" }),
+							"w-full gap-2",
+						)}
+					>
+						<IconPrinter className="h-4 w-4" stroke={1.75} />
+						Print certificate
+					</Link>
 					<a
 						href={`${APP_ORIGIN}/verify/${certificate.code}`}
 						target="_blank"

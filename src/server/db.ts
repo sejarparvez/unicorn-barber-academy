@@ -39,7 +39,7 @@ export function q<T extends Record<string, unknown>>(
 	return db().query(text, params);
 }
 
-type TxClient = {
+export type TxClient = {
 	query: <R extends Record<string, unknown>>(
 		text: string,
 		params?: unknown[],

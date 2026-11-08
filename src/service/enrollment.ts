@@ -167,6 +167,13 @@ function useInvalidateEnrollment() {
 				queryKey: queryKeys.applications(),
 			});
 			void queryClient.invalidateQueries({ queryKey: queryKeys.intakes() });
+			void queryClient.invalidateQueries({ queryKey: queryKeys.programs() });
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.myApplications(),
+			});
+			void queryClient.invalidateQueries({
+				queryKey: queryKeys.consoleOverview(),
+			});
 		},
 		invalidateApplication: (id: number) => {
 			void queryClient.invalidateQueries({
@@ -176,6 +183,7 @@ function useInvalidateEnrollment() {
 				queryKey: queryKeys.applications(),
 			});
 			void queryClient.invalidateQueries({ queryKey: queryKeys.intakes() });
+			void queryClient.invalidateQueries({ queryKey: queryKeys.programs() });
 			// Approval flips role to student → their dashboard list may change.
 			void queryClient.invalidateQueries({
 				queryKey: queryKeys.myApplications(),
@@ -237,6 +245,7 @@ export function useCreateIntake() {
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: queryKeys.intakes() });
 			void queryClient.invalidateQueries({ queryKey: queryKeys.openIntakes() });
+			void queryClient.invalidateQueries({ queryKey: queryKeys.programs() });
 		},
 	});
 }
@@ -253,6 +262,7 @@ export function useUpdateIntake() {
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: queryKeys.intakes() });
 			void queryClient.invalidateQueries({ queryKey: queryKeys.openIntakes() });
+			void queryClient.invalidateQueries({ queryKey: queryKeys.programs() });
 		},
 	});
 }
@@ -266,6 +276,7 @@ export function useDeleteIntake() {
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: queryKeys.intakes() });
 			void queryClient.invalidateQueries({ queryKey: queryKeys.openIntakes() });
+			void queryClient.invalidateQueries({ queryKey: queryKeys.programs() });
 		},
 	});
 }

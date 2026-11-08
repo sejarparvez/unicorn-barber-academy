@@ -280,6 +280,16 @@ describe("parseFeePaymentPayload", () => {
 		if (result.ok) expect(result.value.amountPoisha).toBe(1500000);
 	});
 
+	test("accepts the legacy `receipt` field used by the admin route", () => {
+		const result = parseFeePaymentPayload({
+			amountTaka: 5000,
+			method: "cash",
+			receipt: "  RCPT-9  ",
+		});
+		expect(result.ok).toBe(true);
+		if (result.ok) expect(result.value.receiptRef).toBe("RCPT-9");
+	});
+
 	test("rejects bad amounts, methods, future dates", () => {
 		expect(parseFeePaymentPayload({ amountTaka: 0, method: "cash" }).ok).toBe(
 			false,

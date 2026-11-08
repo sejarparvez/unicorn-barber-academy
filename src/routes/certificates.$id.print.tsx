@@ -1,7 +1,8 @@
 // routes/certificates.$id.print.tsx
 // Printable certificate (browser Print → PDF). Lives outside /dashboard so
 // the dashboard chrome never prints; the site header/footer opt out via
-// print:hidden. Ownership is enforced by getMyCertificateFn.
+// print:hidden. getCertificateForPrintFn allows the owner or an admin
+// (office reprints) and rejects everyone else.
 import { IconPrinter } from "@tabler/icons-react";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import logo from "@/assets/logo/logo.png";
@@ -11,7 +12,7 @@ import { APP_ORIGIN } from "@/lib/env";
 import { useSite } from "@/lib/site-context";
 import {
 	generateCertificateQrFn,
-	getMyCertificateFn,
+	getCertificateForPrintFn,
 } from "@/server/certificate/certificate-fns";
 import { requireRoles } from "@/server/guards";
 
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/certificates/$id/print")({
 	loader: async ({ params }) => {
 		const id = Number.parseInt(params.id, 10);
 		const certificate = Number.isInteger(id)
-			? await getMyCertificateFn({ data: { id } })
+			? await getCertificateForPrintFn({ data: { id } })
 			: null;
 		if (!certificate) throw notFound();
 

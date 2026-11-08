@@ -14,7 +14,6 @@ import type {
 import { parseCohort } from "@/lib/enrollment";
 import { db, withTransaction } from "../db";
 import { escapeLike } from "../fn-utils";
-import { PG_UNIQUE_VIOLATION } from "../pg-codes";
 import { programTitle } from "../program-utils";
 
 type CertificateRow = {
@@ -120,28 +119,27 @@ export async function issueCertificateForApplication(
 		for (let attempt = 0; attempt < 5; attempt++) {
 			const serial = (seqRes.rows[0]?.n ?? 0) + 1 + attempt;
 			const code = `UBT-${year}-${String(serial).padStart(4, "0")}`;
-			try {
-				const insertRes = await tx.query<{ code: string }>(
-					`INSERT INTO certificate (code, user_id, application_id, holder_name, program_slug, cohort, issued_by)
-					 VALUES ($1, $2, $3, $4, $5, $6, $7)
-					 RETURNING code`,
-					[
-						code,
-						app.user_id,
-						applicationId,
-						app.full_name?.trim() || null,
-						app.program_slug,
-						app.cohort,
-						adminUserId,
-					],
-				);
+			// ON CONFLICT avoids aborting the transaction on a code collision,
+			// which would make the retry fail with 25P02.
+			const insertRes = await tx.query<{ code: string }>(
+				`INSERT INTO certificate (code, user_id, application_id, holder_name, program_slug, cohort, issued_by)
+				 VALUES ($1, $2, $3, $4, $5, $6, $7)
+				 ON CONFLICT (code) DO NOTHING
+				 RETURNING code`,
+				[
+					code,
+					app.user_id,
+					applicationId,
+					app.full_name?.trim() || null,
+					app.program_slug,
+					app.cohort,
+					adminUserId,
+				],
+			);
+			if (insertRes.rows[0]) {
 				return { ok: true, code: insertRes.rows[0].code };
-			} catch (error) {
-				if ((error as { code?: string }).code !== PG_UNIQUE_VIOLATION) {
-					throw error;
-				}
-				// Serial raced with a concurrent issuance — try the next one.
 			}
+			// Serial raced with a concurrent issuance — try the next one.
 		}
 		throw new Error(
 			`certificate code generation failed after retries (admin ${adminUserId}, application ${applicationId})`,
@@ -222,6 +220,19 @@ export async function getCertificateByApplicationId(
 		 FROM certificate c ${SELECT_JOINS}
 		 WHERE c.application_id = $1 LIMIT 1`,
 		[applicationId],
+	);
+	return res.rows[0] ? rowToRecord(res.rows[0]) : null;
+}
+
+/** Admin print/reprint lookup — not ownership scoped. */
+export async function getCertificateById(
+	id: number,
+): Promise<CertificateRecord | null> {
+	const res = await db().query<CertificateRow>(
+		`SELECT ${SELECT_COLUMNS}
+		 FROM certificate c ${SELECT_JOINS}
+		 WHERE c.id = $1 LIMIT 1`,
+		[id],
 	);
 	return res.rows[0] ? rowToRecord(res.rows[0]) : null;
 }

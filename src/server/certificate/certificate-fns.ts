@@ -12,10 +12,12 @@ import type {
 	CertificateRecord,
 	VerifyResult,
 } from "@/lib/certificates";
+import { parseRole } from "@/lib/roles";
 import { requireAdminSession } from "@/server/admin-guard.server";
 import {
 	getCertificateByApplicationId,
 	getCertificateByCode,
+	getCertificateById,
 	getCertificateForUser,
 	listCertificatesAdmin,
 	listCertificatesForUser,
@@ -64,11 +66,15 @@ export const listMyCertificatesFn = createServerFn({
 	return runSafe(() => listCertificatesForUser(Number(session.user.id)));
 });
 
-export const getMyCertificateFn = createServerFn({ method: "GET" })
+export const getCertificateForPrintFn = createServerFn({ method: "GET" })
 	.validator((input: { id: number }) => input)
 	.handler(async ({ data }): Promise<CertificateRecord | null> => {
 		const session = await getSession();
 		if (!session) return null;
+		if (parseRole(session.user.role) === "admin") {
+			// Admins can reprint any graduate's certificate from the registry.
+			return runSafe(() => getCertificateById(clampId(data.id)));
+		}
 		return runSafe(() =>
 			getCertificateForUser(clampId(data.id), Number(session.user.id)),
 		);

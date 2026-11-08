@@ -5,6 +5,7 @@
 import {
 	IconCertificate,
 	IconExternalLink,
+	IconPrinter,
 	IconSearch,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -275,6 +276,21 @@ export function CertificateRegistryPage({
 														/>
 													</Link>
 												) : null}
+												<Link
+													to="/certificates/$id/print"
+													params={{ id: String(item.id) }}
+													target="_blank"
+													aria-label={`Print ${item.code}`}
+													className={cn(
+														buttonVariants({
+															variant: "ghost",
+															size: "icon-sm",
+														}),
+														"text-muted-foreground",
+													)}
+												>
+													<IconPrinter className="h-4 w-4" stroke={1.75} />
+												</Link>
 												<a
 													href={`${APP_ORIGIN}/verify/${item.code}`}
 													target="_blank"

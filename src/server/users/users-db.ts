@@ -48,7 +48,7 @@ export async function listUsersAdmin(options: {
 	if (options.search) {
 		params.push(`%${escapeLike(options.search)}%`);
 		conditions.push(
-			`(u.email ILIKE $${params.length} ESCAPE '' OR u.name ILIKE $${params.length} ESCAPE ''')`,
+			`(u.email ILIKE $${params.length} ESCAPE '\\' OR u.name ILIKE $${params.length} ESCAPE '\\')`,
 		);
 	}
 	if (options.role) {

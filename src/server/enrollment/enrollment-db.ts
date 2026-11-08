@@ -33,7 +33,9 @@ import {
 	parseFeeMethod,
 	parseFeeStatus,
 	parseGender,
+	SEAT_HOLDING_STATUSES,
 } from "@/lib/enrollment";
+import type { TxClient } from "../db";
 import { db, withTransaction } from "../db";
 import { escapeLike } from "../fn-utils";
 import { PG_FOREIGN_KEY_VIOLATION, PG_UNIQUE_VIOLATION } from "../pg-codes";
@@ -135,19 +137,30 @@ export async function submitApplication(input: {
 			seats_total: number;
 			starts_on: Date;
 			seats_left: number;
+			is_published: boolean | null;
+			track: string | null;
 		}>(
-			`SELECT id, is_open, seats_total, starts_on,
-				seats_total - (
+			`SELECT i.id, i.is_open, i.seats_total, i.starts_on,
+				p.is_published, p.track,
+				i.seats_total - (
 					SELECT count(*) FROM enrollment_application a
 					WHERE a.intake_id = i.id
 					  AND a.status IN ('pending','reviewing','approved')
 				)::int AS seats_left
-			 FROM program_intake i WHERE i.id = $1 FOR UPDATE`,
+			 FROM program_intake i
+			 LEFT JOIN program p ON p.slug = i.program_slug
+			 WHERE i.id = $1
+			 FOR UPDATE OF i`,
 			[input.intakeId],
 		);
 		const intake = intakeRes.rows[0];
 		if (!intake) return { ok: false, reason: "closed" };
 		if (!intake.is_open) return { ok: false, reason: "closed" };
+		// Hidden programs and non-barbering tracks never accept applications,
+		// even if the intake itself is still open.
+		if (intake.is_published !== true || intake.track !== "barbering") {
+			return { ok: false, reason: "closed" };
+		}
 		if (new Date(intake.starts_on) < startOfToday()) {
 			return { ok: false, reason: "past" };
 		}
@@ -162,55 +175,55 @@ export async function submitApplication(input: {
 
 		if (intake.seats_left <= 0) return { ok: false, reason: "full" };
 
-		// Collision-checked reference (alphabet omits I/L/O/0/1).
+		// Collision-checked reference (alphabet omits I/L/O/0/1). ON CONFLICT
+		// keeps the transaction usable after a collision — a raised unique
+		// violation would abort it and make the retry fail with 25P02.
 		for (let attempt = 0; attempt < 5; attempt++) {
-			try {
-				const reference = generateReference();
-				await tx.query(
-					`INSERT INTO enrollment_application
-						(reference, user_id, intake_id, status, full_name, email, phone,
-						 father_name, mother_name, date_of_birth, nationality, gender,
-						 nid_or_birth_cert_no, whatsapp, present_address, permanent_address,
-						 emergency_name, emergency_relation, emergency_mobile,
-						 emergency_address, education, has_barber_experience,
-						 barber_experience_period, has_prior_training,
-						 prior_training_institute, course_goal, hear_about)
-					 VALUES ($1,$2,$3,'pending',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,
-						 $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)`,
-					[
-						reference,
-						input.userId,
-						input.intakeId,
-						input.fullName,
-						input.email,
-						input.phone,
-						input.fatherName,
-						input.motherName,
-						input.dateOfBirth,
-						input.nationality,
-						input.gender,
-						input.nidOrBirthCertNo,
-						input.whatsapp,
-						input.presentAddress,
-						input.permanentAddress,
-						input.emergencyName,
-						input.emergencyRelation,
-						input.emergencyMobile,
-						input.emergencyAddress,
-						input.education,
-						input.hasBarberExperience,
-						input.barberExperiencePeriod,
-						input.hasPriorTraining,
-						input.priorTrainingInstitute,
-						input.courseGoal,
-						input.hearAbout,
-					],
-				);
-				return { ok: true, reference };
-			} catch (error) {
-				if ((error as { code?: string }).code !== PG_UNIQUE_VIOLATION) {
-					throw error;
-				}
+			const reference = generateReference();
+			const insertRes = await tx.query<{ reference: string }>(
+				`INSERT INTO enrollment_application
+					(reference, user_id, intake_id, status, full_name, email, phone,
+					 father_name, mother_name, date_of_birth, nationality, gender,
+					 nid_or_birth_cert_no, whatsapp, present_address, permanent_address,
+					 emergency_name, emergency_relation, emergency_mobile,
+					 emergency_address, education, has_barber_experience,
+					 barber_experience_period, has_prior_training,
+					 prior_training_institute, course_goal, hear_about)
+				 VALUES ($1,$2,$3,'pending',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,
+					 $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)
+				 ON CONFLICT (reference) DO NOTHING
+				 RETURNING reference`,
+				[
+					reference,
+					input.userId,
+					input.intakeId,
+					input.fullName,
+					input.email,
+					input.phone,
+					input.fatherName,
+					input.motherName,
+					input.dateOfBirth,
+					input.nationality,
+					input.gender,
+					input.nidOrBirthCertNo,
+					input.whatsapp,
+					input.presentAddress,
+					input.permanentAddress,
+					input.emergencyName,
+					input.emergencyRelation,
+					input.emergencyMobile,
+					input.emergencyAddress,
+					input.education,
+					input.hasBarberExperience,
+					input.barberExperiencePeriod,
+					input.hasPriorTraining,
+					input.priorTrainingInstitute,
+					input.courseGoal,
+					input.hearAbout,
+				],
+			);
+			if (insertRes.rows[0]) {
+				return { ok: true, reference: insertRes.rows[0].reference };
 			}
 		}
 		return { ok: false, reason: "closed" }; // unreachable in practice
@@ -244,23 +257,19 @@ export async function listMyApplications(
 		 ORDER BY a.created_at DESC`,
 		[userId],
 	);
-	return res.rows.flatMap((row) => {
-		const title = programTitle(row.program_slug);
-		if (!title) return [];
-		return [
-			{
-				id: row.id,
-				reference: row.reference,
-				status: parseApplicationStatus(row.status) ?? "pending",
-				feeStatus: parseFeeStatus(row.fee_status) ?? "unpaid",
-				programTitle: title,
-				programSlug: row.program_slug,
-				cohort: parseCohort(row.cohort) ?? "day",
-				startsOn: toDateOnly(row.starts_on),
-				submittedAt: new Date(row.created_at).toISOString(),
-			},
-		];
-	});
+	return res.rows.map((row) => ({
+		id: row.id,
+		reference: row.reference,
+		status: parseApplicationStatus(row.status) ?? "pending",
+		feeStatus: parseFeeStatus(row.fee_status) ?? "unpaid",
+		// A stale slug (program removed from the catalog) must not make the
+		// application disappear from the applicant's dashboard.
+		programTitle: programTitle(row.program_slug) ?? row.program_slug,
+		programSlug: row.program_slug,
+		cohort: parseCohort(row.cohort) ?? "day",
+		startsOn: toDateOnly(row.starts_on),
+		submittedAt: new Date(row.created_at).toISOString(),
+	}));
 }
 
 /* -------------------------------- admin --------------------------------- */
@@ -293,7 +302,7 @@ export async function listApplicationsAdmin(options: {
 		countParams.push(`%${escapeLike(options.search.trim())}%`);
 		const n = countParams.length;
 		conditions.push(
-			`(a.reference ILIKE $${n} ESCAPE '' OR a.full_name ILIKE $${n} ESCAPE '' OR a.email ILIKE $${n} ESCAPE '' OR a.phone ILIKE $${n} ESCAPE ''')`,
+			`(a.reference ILIKE $${n} ESCAPE '\\' OR a.full_name ILIKE $${n} ESCAPE '\\' OR a.email ILIKE $${n} ESCAPE '\\' OR a.phone ILIKE $${n} ESCAPE '\\')`,
 		);
 	}
 	if (options.programSlug) {
@@ -311,8 +320,13 @@ export async function listApplicationsAdmin(options: {
 	const where =
 		conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
+	// The WHERE clause can reference intake columns (program_slug/cohort), so
+	// the count query must join program_intake exactly like the row query.
 	const totalRes = await db().query<{ count: string }>(
-		`SELECT count(*)::text AS count FROM enrollment_application a ${where}`,
+		`SELECT count(*)::text AS count
+		 FROM enrollment_application a
+		 JOIN program_intake i ON i.id = a.intake_id
+		 ${where}`,
 		countParams,
 	);
 	const total = Number.parseInt(totalRes.rows[0]?.count ?? "0", 10);
@@ -346,28 +360,24 @@ export async function listApplicationsAdmin(options: {
 	);
 
 	return {
-		items: res.rows.flatMap((row) => {
-			const title = programTitle(row.program_slug);
-			if (!title) return [];
-			return [
-				{
-					id: row.id,
-					reference: row.reference,
-					status: parseApplicationStatus(row.status) ?? "pending",
-					feeStatus: parseFeeStatus(row.fee_status) ?? "unpaid",
-					fullName: row.full_name,
-					email: row.email,
-					phone: row.phone,
-					programTitle: title,
-					programSlug: row.program_slug,
-					cohort: parseCohort(row.cohort) ?? "day",
-					startsOn: toDateOnly(row.starts_on),
-					userId: row.user_id,
-					userRole: row.user_role,
-					submittedAt: new Date(row.created_at).toISOString(),
-				},
-			];
-		}),
+		items: res.rows.map((row) => ({
+			id: row.id,
+			reference: row.reference,
+			status: parseApplicationStatus(row.status) ?? "pending",
+			feeStatus: parseFeeStatus(row.fee_status) ?? "unpaid",
+			fullName: row.full_name,
+			email: row.email,
+			phone: row.phone,
+			// Never drop a row just because the program was removed from the
+			// catalog — that made totals disagree with the rendered list.
+			programTitle: programTitle(row.program_slug) ?? row.program_slug,
+			programSlug: row.program_slug,
+			cohort: parseCohort(row.cohort) ?? "day",
+			startsOn: toDateOnly(row.starts_on),
+			userId: row.user_id,
+			userRole: row.user_role,
+			submittedAt: new Date(row.created_at).toISOString(),
+		})),
 		total,
 		page,
 		perPage,
@@ -445,8 +455,8 @@ export async function getApplicationDetail(id: number) {
 	);
 	const row = res.rows[0];
 	if (!row) return null;
-	const title = programTitle(row.program_slug);
-	if (!title) return null;
+	// Fall back to the raw slug so records for removed programs stay manageable.
+	const title = programTitle(row.program_slug) ?? row.program_slug;
 	const payments = await listFeePayments(row.id);
 
 	return {
@@ -505,8 +515,12 @@ export type StatusUpdateResult =
 			ok: true;
 			emailKind: "approved" | "waitlisted" | "rejected" | null;
 			userRoleUpgraded: boolean;
+			userRoleDowngraded: boolean;
 	  }
-	| { ok: false; reason: "not-found" | "invalid-transition" };
+	| {
+			ok: false;
+			reason: "not-found" | "invalid-transition" | "intake-full";
+	  };
 
 export type StatusLogEntry = {
 	id: number;
@@ -555,7 +569,8 @@ export async function listApplicationStatusLog(
 
 /**
  * Status transition with side effects, all in one transaction:
- *   * stamps decided_at/by on first terminal decision,
+ *   * stamps decided_at/by on every terminal decision (so a later rejection
+ *     replaces the original approval timestamp),
  *   * upgrades the applicant's academy role 'user' → 'student' on approval
  *     (never touches instructor/admin roles).
  */
@@ -578,8 +593,9 @@ export async function updateApplicationStatus(options: {
 			status: string;
 			role: string | null;
 			decided_at: Date | null;
+			intake_id: number;
 		}>(
-			`SELECT a.user_id, a.status, u.role, a.decided_at
+			`SELECT a.user_id, a.status, u.role, a.decided_at, a.intake_id
 			 FROM enrollment_application a
 			 JOIN "user" u ON u.id = a.user_id
 			 WHERE a.id = $1
@@ -601,15 +617,41 @@ export async function updateApplicationStatus(options: {
 			};
 		}
 
-		const firstDecision =
-			TERMINAL.includes(options.status) && !current.decided_at;
+		// Moving into a seat-holding status (waitlisted → approved) must respect
+		// capacity. Pending/reviewing already hold a seat, so no extra check.
+		const targetHoldsSeat = SEAT_HOLDING_STATUSES.includes(options.status);
+		const currentHoldsSeat = SEAT_HOLDING_STATUSES.includes(currentStatus);
+		if (targetHoldsSeat && !currentHoldsSeat) {
+			const intakeRes = await tx.query<{
+				seats_total: number;
+				occupied: number;
+			}>(
+				`SELECT i.seats_total,
+					(SELECT count(*) FROM enrollment_application x
+					 WHERE x.intake_id = i.id
+					   AND x.status IN ('pending','reviewing','approved'))::int AS occupied
+				 FROM program_intake i
+				 WHERE i.id = $1
+				 FOR UPDATE`,
+				[current.intake_id],
+			);
+			const intake = intakeRes.rows[0];
+			if (!intake) {
+				return { ok: false as const, reason: "invalid-transition" as const };
+			}
+			if (intake.occupied >= intake.seats_total) {
+				return { ok: false as const, reason: "intake-full" as const };
+			}
+		}
+
+		const isTerminal = TERMINAL.includes(options.status);
 
 		await tx.query(
 			`UPDATE enrollment_application SET
 				status = $2,
 				decided_at = CASE WHEN $5 THEN now() ELSE decided_at END,
 				decided_by = CASE WHEN $5 THEN $3 ELSE decided_by END,
-				decision_note = COALESCE($4, decision_note),
+				decision_note = CASE WHEN $5 THEN $4 ELSE decision_note END,
 				updated_at = now()
 			 WHERE id = $1`,
 			[
@@ -617,7 +659,7 @@ export async function updateApplicationStatus(options: {
 				options.status,
 				options.adminUserId,
 				options.note,
-				firstDecision,
+				isTerminal,
 			],
 		);
 
@@ -644,6 +686,27 @@ export async function updateApplicationStatus(options: {
 			userRoleUpgraded = true;
 		}
 
+		// Rejecting the last active enrollment should not leave the applicant
+		// with student-level access. Only demote when no other approved or
+		// completed application remains.
+		let userRoleDowngraded = false;
+		if (options.status === "rejected" && current.role === "student") {
+			const otherActive = await tx.query<{ one: number }>(
+				`SELECT 1 AS one FROM enrollment_application
+				 WHERE user_id = $1 AND id <> $2
+				   AND status IN ('approved','completed')
+				 LIMIT 1`,
+				[current.user_id, options.id],
+			);
+			if (otherActive.rows.length === 0) {
+				await tx.query(
+					`UPDATE "user" SET role = 'user', "updatedAt" = now() WHERE id = $1 AND role = 'student'`,
+					[current.user_id],
+				);
+				userRoleDowngraded = true;
+			}
+		}
+
 		// 'completed' is terminal but silent — the graduation itself is
 		// communicated by issuing a certificate, not a form email.
 		const emailKind =
@@ -653,23 +716,36 @@ export async function updateApplicationStatus(options: {
 				? options.status
 				: null;
 
-		return { ok: true as const, emailKind, userRoleUpgraded };
+		return {
+			ok: true as const,
+			emailKind,
+			userRoleUpgraded,
+			userRoleDowngraded,
+		};
 	});
 }
 
 /* ------------------------------ fee ledger ------------------------------ */
 
 export type FeeRecordResult =
-	| { ok: true; id?: number }
+	| {
+			ok: true;
+			id?: number;
+			previousFeeStatus: FeeStatus;
+			feeStatus: FeeStatus;
+	  }
 	| { ok: false; reason: "not-found" | "invalid" };
 
 /**
  * Recompute fee_status from the ledger: paid in full when Σ payments ≥ the
- * intake program's fee. Called after every ledger write so the flag (and
- * everything downstream — certificate gate, badges) stays truthful.
+ * intake program's fee. Runs inside the caller's transaction so the ledger
+ * row and the flag can never diverge.
  */
-async function recomputeFeeStatus(applicationId: number): Promise<void> {
-	await db().query(
+async function recomputeFeeStatus(
+	client: TxClient,
+	applicationId: number,
+): Promise<void> {
+	await client.query(
 		`UPDATE enrollment_application a SET
 			fee_status = CASE
 				WHEN coalesce((
@@ -706,40 +782,55 @@ export async function recordFeePayment(input: {
 	if (!Number.isInteger(input.amountPoisha) || input.amountPoisha <= 0) {
 		return { ok: false, reason: "invalid" };
 	}
-	const app = await db().query<{ one: number }>(
-		"SELECT 1 AS one FROM enrollment_application WHERE id = $1",
-		[input.applicationId],
-	);
-	if (app.rows.length === 0) return { ok: false, reason: "not-found" };
-	const res = await db().query<{ id: number }>(
-		`INSERT INTO fee_payment
-			(application_id, amount_poisha, method, receipt_ref, received_by, paid_at)
-		 VALUES ($1,$2,$3,$4,$5,coalesce($6::timestamptz, now()))
-		 RETURNING id`,
-		[
-			input.applicationId,
-			input.amountPoisha,
-			input.method,
-			input.receiptRef,
-			input.receivedBy,
-			input.paidAt,
-		],
-	);
-	await recomputeFeeStatus(input.applicationId);
-	return { ok: true, id: res.rows[0]?.id };
+	return withTransaction<FeeRecordResult>(async (tx) => {
+		const app = await tx.query<{ fee_status: string }>(
+			"SELECT fee_status FROM enrollment_application WHERE id = $1 FOR UPDATE",
+			[input.applicationId],
+		);
+		const current = app.rows[0];
+		if (!current) return { ok: false, reason: "not-found" };
+
+		const res = await tx.query<{ id: number }>(
+			`INSERT INTO fee_payment
+				(application_id, amount_poisha, method, receipt_ref, received_by, paid_at)
+			 VALUES ($1,$2,$3,$4,$5,coalesce($6::timestamptz, now()))
+			 RETURNING id`,
+			[
+				input.applicationId,
+				input.amountPoisha,
+				input.method,
+				input.receiptRef,
+				input.receivedBy,
+				input.paidAt,
+			],
+		);
+		await recomputeFeeStatus(tx, input.applicationId);
+		const next = await tx.query<{ fee_status: string }>(
+			"SELECT fee_status FROM enrollment_application WHERE id = $1",
+			[input.applicationId],
+		);
+		return {
+			ok: true,
+			id: res.rows[0]?.id,
+			previousFeeStatus: parseFeeStatus(current.fee_status) ?? "unpaid",
+			feeStatus: parseFeeStatus(next.rows[0]?.fee_status) ?? "unpaid",
+		};
+	});
 }
 
 export async function deleteFeePayment(
 	applicationId: number,
 	paymentId: number,
 ): Promise<boolean> {
-	const res = await db().query(
-		"DELETE FROM fee_payment WHERE id = $1 AND application_id = $2",
-		[paymentId, applicationId],
-	);
-	if ((res.rowCount ?? 0) === 0) return false;
-	await recomputeFeeStatus(applicationId);
-	return true;
+	return withTransaction(async (tx) => {
+		const res = await tx.query(
+			"DELETE FROM fee_payment WHERE id = $1 AND application_id = $2",
+			[paymentId, applicationId],
+		);
+		if ((res.rowCount ?? 0) === 0) return false;
+		await recomputeFeeStatus(tx, applicationId);
+		return true;
+	});
 }
 
 export async function listFeePayments(
@@ -828,8 +919,8 @@ export async function listIntakesAdmin(): Promise<IntakeAdmin[]> {
 	);
 	const out: IntakeAdmin[] = [];
 	for (const row of res.rows) {
-		const title = programTitle(row.program_slug);
-		if (!title) continue;
+		// Keep stale intakes visible so admins can still close/delete them.
+		const title = programTitle(row.program_slug) ?? row.program_slug;
 		out.push({
 			id: row.id,
 			programSlug: row.program_slug,
@@ -1030,9 +1121,10 @@ export async function getApplicationsByProgram(): Promise<
 	);
 	const out: ProgramApplications[] = [];
 	for (const row of res.rows) {
-		const title = programTitle(row.program_slug);
-		if (!title) continue;
-		out.push({ programTitle: title, count: row.n });
+		out.push({
+			programTitle: programTitle(row.program_slug) ?? row.program_slug,
+			count: row.n,
+		});
 	}
 	return out;
 }

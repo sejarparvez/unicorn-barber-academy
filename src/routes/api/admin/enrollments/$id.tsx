@@ -5,7 +5,7 @@
 // (non-fatal on failure) — see updateApplicationStatus for DB side effects.
 import { createFileRoute } from "@tanstack/react-router";
 import { json } from "@tanstack/react-start";
-import { parseApplicationStatus, parseFeeMethod } from "@/lib/enrollment";
+import { parseApplicationStatus } from "@/lib/enrollment";
 import { requireAdminApi } from "@/server/admin-api";
 import { logAdminAction } from "@/server/audit/audit-log";
 import {
@@ -15,6 +15,7 @@ import {
 	updateApplicationStatus,
 } from "@/server/enrollment/enrollment-db";
 import { sendApplicationDecisionEmail } from "@/server/enrollment/enrollment-mail";
+import { parseFeePaymentPayload } from "@/server/enrollment/enrollment-validate";
 import { feePaymentConfirmedEmail, sendMail } from "@/server/mail";
 
 type Params = { id: string };
@@ -48,33 +49,14 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 				}
 
 				if (action === "record-payment") {
-					const taka = Number.parseInt(String(body.amountTaka ?? ""), 10);
-					const method = parseFeeMethod(
-						typeof body.method === "string" ? body.method : "",
-					);
-					if (!Number.isInteger(taka) || taka < 1 || taka > 1_000_000) {
-						return json(
-							{ message: "Amount must be ৳1–৳1,000,000" },
-							{ status: 400 },
-						);
+					const parsed = parseFeePaymentPayload(body);
+					if (!parsed.ok) {
+						return json({ message: parsed.message }, { status: 400 });
 					}
-					if (!method) {
-						return json(
-							{ message: "Method must be bKash, cash, or bank" },
-							{ status: 400 },
-						);
-					}
-					const receipt =
-						typeof body.receipt === "string" && body.receipt.trim()
-							? body.receipt.trim().slice(0, 120)
-							: null;
 					const result = await recordFeePayment({
 						applicationId: id,
-						amountPoisha: taka * 100,
-						method,
-						receiptRef: receipt,
+						...parsed.value,
 						receivedBy: guard.userId,
-						paidAt: null,
 					});
 					if (!result.ok) {
 						return json(
@@ -92,13 +74,21 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 						action: "application.fee",
 						targetType: "application",
 						targetId: id,
-						summary: `Recorded ৳${taka.toLocaleString("en-US")} (${method}) for application #${id}`,
-						metadata: { amountPoisha: taka * 100, method },
+						summary: `Recorded ৳${(parsed.value.amountPoisha / 100).toLocaleString("en-US")} (${parsed.value.method}) for application #${id}`,
+						metadata: {
+							amountPoisha: parsed.value.amountPoisha,
+							method: parsed.value.method,
+						},
 					});
-					// Payment confirmation email when the ledger flips paid in full.
+					// Payment confirmation email only when the ledger transitions
+					// unpaid → paid, not on every additional payment.
 					try {
 						const detail = await getApplicationDetail(id);
-						if (detail && detail.application.feeStatus === "paid") {
+						if (
+							detail &&
+							result.previousFeeStatus !== "paid" &&
+							result.feeStatus === "paid"
+						) {
 							const app = detail.application;
 							await sendMail({
 								to: app.email,
@@ -172,6 +162,15 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 								{ status: 404 },
 							);
 						}
+						if (result.reason === "intake-full") {
+							return json(
+								{
+									message:
+										"This intake is already full — reject or waitlist another applicant first",
+								},
+								{ status: 409 },
+							);
+						}
 						return json(
 							{ message: "This status transition is not allowed" },
 							{ status: 409 },
@@ -183,17 +182,27 @@ export const Route = createFileRoute("/api/admin/enrollments/$id")({
 						await sendApplicationDecisionEmail(id, result.emailKind);
 					}
 
+					const roleNote = result.userRoleUpgraded
+						? " (role upgraded to student)"
+						: result.userRoleDowngraded
+							? " (role downgraded to user)"
+							: "";
 					await logAdminAction({
 						actorId: guard.userId,
 						action: "application.status",
 						targetType: "application",
 						targetId: id,
-						summary: `Set application #${id} status to ${status}${result.userRoleUpgraded ? " (role upgraded to student)" : ""}`,
-						metadata: { status, userRoleUpgraded: result.userRoleUpgraded },
+						summary: `Set application #${id} status to ${status}${roleNote}`,
+						metadata: {
+							status,
+							userRoleUpgraded: result.userRoleUpgraded,
+							userRoleDowngraded: result.userRoleDowngraded,
+						},
 					});
 					return json({
 						ok: true,
 						userRoleUpgraded: result.userRoleUpgraded,
+						userRoleDowngraded: result.userRoleDowngraded,
 					});
 				}
 

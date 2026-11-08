@@ -8,13 +8,16 @@ export async function setApplicationStatus(
 	id: number,
 	status: ApplicationStatus,
 	note?: string | null,
-): Promise<{ userRoleUpgraded: boolean }> {
+): Promise<{ userRoleUpgraded: boolean; userRoleDowngraded: boolean }> {
 	try {
-		const res = await http.patch<{ userRoleUpgraded: boolean }>(
-			`/api/admin/enrollments/${id}`,
-			{ action: "status", status, note },
-		);
-		return { userRoleUpgraded: Boolean(res.data.userRoleUpgraded) };
+		const res = await http.patch<{
+			userRoleUpgraded: boolean;
+			userRoleDowngraded: boolean;
+		}>(`/api/admin/enrollments/${id}`, { action: "status", status, note });
+		return {
+			userRoleUpgraded: Boolean(res.data.userRoleUpgraded),
+			userRoleDowngraded: Boolean(res.data.userRoleDowngraded),
+		};
 	} catch (error) {
 		throw new Error(await extractErrorMessage(error));
 	}

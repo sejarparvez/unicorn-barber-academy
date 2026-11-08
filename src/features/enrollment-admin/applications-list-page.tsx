@@ -13,7 +13,18 @@ import {
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { ListPagination } from "@/components/list-pagination";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -104,6 +115,11 @@ export function ApplicationsListPage({
 	const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 	const [bulkStatus, setBulkStatus] = useState<ApplicationStatus>("pending");
 	const [confirmBulk, setConfirmBulk] = useState(false);
+	const [quickAction, setQuickAction] = useState<{
+		id: number;
+		reference: string;
+		status: ApplicationStatus;
+	} | null>(null);
 
 	const allVisibleIds = useMemo(
 		() => data?.items.map((a) => a.id) ?? [],
@@ -133,16 +149,62 @@ export function ApplicationsListPage({
 		});
 	}, []);
 
-	function handleBulkApply() {
-		bulkMutation.mutate(
-			{ ids: Array.from(selectedIds), status: bulkStatus },
-			{
-				onSuccess: () => {
-					setSelectedIds(new Set());
-					setConfirmBulk(false);
-				},
-			},
-		);
+	async function handleBulkApply() {
+		try {
+			const result = await bulkMutation.mutateAsync({
+				ids: Array.from(selectedIds),
+				status: bulkStatus,
+			});
+			setSelectedIds(new Set());
+			setConfirmBulk(false);
+			if (result.failed.length === 0) {
+				toast.success(
+					`${result.applied} application${result.applied === 1 ? "" : "s"} updated.`,
+				);
+				return;
+			}
+			const firstReason = result.failed[0]?.reason;
+			const reasonText =
+				firstReason === "intake-full"
+					? "the intake is full"
+					: "some transitions are not allowed";
+			if (result.applied === 0) {
+				toast.error(`No applications updated — ${reasonText}.`);
+			} else {
+				toast.warning(
+					`${result.applied} updated, ${result.failed.length} skipped — ${reasonText}.`,
+				);
+			}
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : "Bulk update failed");
+		}
+	}
+
+	async function applyQuickAction() {
+		if (!quickAction) return;
+		const { id, reference, status } = quickAction;
+		try {
+			const result = await bulkMutation.mutateAsync({
+				ids: [id],
+				status,
+			});
+			if (result.applied > 0) {
+				toast.success(
+					`${reference} set to ${APPLICATION_STATUS_LABELS[status]}.`,
+				);
+			} else {
+				const reason = result.failed[0]?.reason;
+				toast.error(
+					reason === "intake-full"
+						? "That intake is already full — free a seat before approving."
+						: "That status transition is not allowed.",
+				);
+			}
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : "Action failed");
+		} finally {
+			setQuickAction(null);
+		}
 	}
 
 	function navigateWith(next: {
@@ -544,8 +606,9 @@ export function ApplicationsListPage({
 										<DropdownMenuSeparator />
 										<DropdownMenuItem
 											onClick={() =>
-												bulkMutation.mutate({
-													ids: [application.id],
+												setQuickAction({
+													id: application.id,
+													reference: application.reference,
 													status: "approved",
 												})
 											}
@@ -556,8 +619,9 @@ export function ApplicationsListPage({
 										<DropdownMenuItem
 											variant="destructive"
 											onClick={() =>
-												bulkMutation.mutate({
-													ids: [application.id],
+												setQuickAction({
+													id: application.id,
+													reference: application.reference,
 													status: "rejected",
 												})
 											}
@@ -589,6 +653,38 @@ export function ApplicationsListPage({
 					})
 				}
 			/>
+
+			<AlertDialog
+				open={Boolean(quickAction)}
+				onOpenChange={(open) => {
+					if (!open) setQuickAction(null);
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{quickAction?.status === "approved" ? "Approve" : "Reject"}{" "}
+							{quickAction?.reference}?
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							This will set the application to{" "}
+							{quickAction
+								? APPLICATION_STATUS_LABELS[quickAction.status].toLowerCase()
+								: ""}
+							. The applicant is emailed about the decision.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							disabled={bulkMutation.isPending}
+							onClick={() => void applyQuickAction()}
+						>
+							Confirm
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }
