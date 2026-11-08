@@ -15,24 +15,25 @@ not cover.
 
 ## Findings at a glance
 
-| # | Severity | Area | Finding |
-|---|---|---|---|
-| C1 | Critical | Admin list | Program/Cohort filters crash the query and render a false empty state |
-| H1 | High | Missing feature | No application delete or applicant withdrawal |
-| H2 | High | Missing feature | No certificate edit/delete; revoked certificates can never be reissued |
-| H3 | High | Seats | Waitlisted → approved skips capacity checks and can overbook |
-| H4 | High | Concurrency | Retry-after-unique-violation inside a transaction always fails |
-| H5 | High | Roles | Approved → rejected leaves the applicant with the `student` role |
-| H6 | High | Public API | Crafted `/api/enroll` requests can target hidden or non-barbering intakes |
-| M1 | Medium | Fees | Ledger writes are not transactional; void is a hard delete |
-| M2 | Medium | Email | Payment confirmation resends on every extra payment |
-| M3 | Medium | UX/state | Quick approve/reject ignores failures; bulk invalidation is incomplete |
-| M4 | Medium | Cache | Intake and application mutations do not refresh program stats |
-| M5 | Medium | Search | Enrollment search escaping is broken for `%`, `_`, `\` |
-| M6 | Medium | Data access | Removed program slugs make applications invisible; list totals disagree |
-| S1 | Security | Certificates | Sequential codes + public verify expose graduate PII |
-| S2 | Security | Rate limits | Limits are in-process memory only |
-| L1–L6 | Low | Misc | Stale `decided_at`, irreversible `completed`, no DOB age bounds, no admin print, unused validator, test gaps |
+| #     | Severity | Area            | Finding                                                                                                      |
+| ----- | -------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
+| C1    | Critical | Admin list      | Program/Cohort filters crash the query and render a false empty state                                        |
+| H1    | High     | Missing feature | No application delete or applicant withdrawal                                                                |
+| H2    | High     | Missing feature | No certificate edit/delete; revoked certificates can never be reissued                                       |
+| H3    | High     | Seats           | Waitlisted → approved skips capacity checks and can overbook                                                 |
+| H4    | High     | Concurrency     | Retry-after-unique-violation inside a transaction always fails                                               |
+| H5    | High     | Roles           | Approved → rejected leaves the applicant with the `student` role                                             |
+| H6    | High     | Public API      | Crafted `/api/enroll` requests can target hidden or non-barbering intakes                                    |
+| M1    | Medium   | Fees            | Ledger writes are not transactional; void is a hard delete                                                   |
+| M2    | Medium   | Email           | Payment confirmation resends on every extra payment                                                          |
+| M3    | Medium   | UX/state        | Quick approve/reject ignores failures; bulk invalidation is incomplete                                       |
+| M4    | Medium   | Cache           | Intake and application mutations do not refresh program stats                                                |
+| M5    | Medium   | UX              | Certificate search does not reset pagination                                                                 |
+| M6    | Medium   | Search          | Enrollment search escaping is broken for `%`, `_`, `\`                                                       |
+| M7    | Medium   | Data access     | Removed program slugs make applications invisible; list totals disagree                                      |
+| S1    | Security | Certificates    | Sequential codes + public verify expose graduate PII                                                         |
+| S2    | Security | Rate limits     | Limits are in-process memory only                                                                            |
+| L1–L6 | Low      | Misc            | Stale `decided_at`, irreversible `completed`, no DOB age bounds, no admin print, unused validator, test gaps |
 
 ---
 
@@ -244,7 +245,18 @@ refetch.
 **Fix:** invalidate `queryKeys.programs()` on all intake and application
 mutations.
 
-### M5. Enrollment search escaping is broken
+### M5. Certificate registry search does not reset pagination
+
+**Where:** `src/features/admin/certificate-registry-page.tsx:61-76` and
+`:149-156`
+
+Submitting a search calls `navigateWith` without `page`, so the current page is
+preserved. Searching from page 5 can show “no results” even when matches exist on
+page 1. Status-tab changes have the same issue.
+
+**Fix:** reset `page` to 1 on search/status changes.
+
+### M6. Enrollment search escaping is broken
 
 **Where:** `enrollment-db.ts:292-297` builds `%${escapeLike(term)}%`, but uses
 `ESCAPE ''`. `escapeLike` inserts backslashes (`src/server/fn-utils.ts:29-31`), and
@@ -258,7 +270,7 @@ The blog list does this correctly with `ESCAPE '\\'`
 **Fix:** use the same `ESCAPE '\\'` pattern as the blog query, or switch to a
 non-backslash escape character and update `escapeLike` consistently.
 
-### M6. Removed program slugs make records invisible and break counts
+### M7. Removed program slugs make records invisible and break counts
 
 **Where:** `getApplicationDetail` returns `null` when
 `programTitle(row.program_slug)` is falsy (`enrollment-db.ts:448-449`); the list
@@ -332,42 +344,18 @@ platform/WAF layer.
 
 ---
 
-## Remediation progress
-
-Updated 2026-11-08 while addressing the audit:
-
-| Finding | Status | Notes |
-|---|---|---|
-| C1 | Fixed | Count query now joins `program_intake`; read-only filter regression test added |
-| H3 | Fixed | Waitlist → approved locks the intake and checks seat capacity |
-| H4 | Fixed | Reference/certificate inserts use `ON CONFLICT … DO NOTHING` retries instead of aborting the transaction |
-| H5 | Fixed | Rejection demotes `student` → `user` only when no other approved/completed application remains |
-| H6 | Fixed | Submission requires a published barbering program |
-| M1 | Partial | Ledger writes and fee-status recompute are now in one transaction; soft-void still pending |
-| M2 | Fixed | Confirmation email sends only on an `unpaid → paid` transition |
-| M3 | Fixed | Quick actions confirm and report failures; bulk mutation invalidates derived queries |
-| M4 | Fixed | Intake/application mutations now invalidate program stats |
-| M5 | Fixed | Enrollment (and users) search use the correct `ESCAPE` clause |
-| M6 | Fixed | Stale program slugs fall back to the slug; list totals match rendered rows |
-| L1 | Fixed | `decided_at`, `decided_by`, and the decision note update on every terminal transition |
-| L4 | Fixed | Admins can reprint any certificate from the registry or application detail; print lookup allows owner or admin |
-| L5 | Fixed | Payment route now uses `parseFeePaymentPayload` |
-| L6 | Partial | Added a read-only DB regression test for list filters; broader integration coverage still pending |
-
-Still open: H1, H2, S1, S2, L2, L3.
-
 ## Suggested fix order
 
-1. **C1, M5, H4** — small changes with disproportionate impact: restore filters,
+1. **C1, M6, H4** — small changes with disproportionate impact: restore filters,
    correct escaping, fix retry/transaction handling.
 2. **H3, H5, H6** — enforce capacity on approval, define the role-downgrade policy,
    and validate publication/track server-side.
 3. **H1, H2** — add application delete/withdraw and certificate
    correction/reissue, with audit trails and explicit handling of
    payments/certificates.
-4. **M1, M2, M3, M4** — transactional fee ledger, transition-based email,
+4. **M1, M2, M3, M4, M5** — transactional fee ledger, transition-based email,
    result-aware bulk actions, and complete cache invalidation.
-5. **S1, S2, M6** — randomize certificate codes, move rate limiting to a shared
-   store, and stop dropping applications with unknown program slugs.
+5. **S1, S2** — randomize certificate codes and move rate limiting to a shared
+   store.
 6. Add DB-backed tests for the filter query, seat approval, fee transitions, and
    certificate issuance.

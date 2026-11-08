@@ -585,6 +585,7 @@ export async function updateApplicationStatus(options: {
 		"waitlisted",
 		"rejected",
 		"completed",
+		"withdrawn",
 	];
 
 	return withTransaction(async (tx) => {
@@ -686,11 +687,14 @@ export async function updateApplicationStatus(options: {
 			userRoleUpgraded = true;
 		}
 
-		// Rejecting the last active enrollment should not leave the applicant
-		// with student-level access. Only demote when no other approved or
-		// completed application remains.
+		// Rejecting or withdrawing the last active enrollment should not leave
+		// the applicant with student-level access. Only demote when no other
+		// approved or completed application remains.
 		let userRoleDowngraded = false;
-		if (options.status === "rejected" && current.role === "student") {
+		if (
+			(options.status === "rejected" || options.status === "withdrawn") &&
+			current.role === "student"
+		) {
 			const otherActive = await tx.query<{ one: number }>(
 				`SELECT 1 AS one FROM enrollment_application
 				 WHERE user_id = $1 AND id <> $2
@@ -1058,6 +1062,7 @@ export async function getAdmissionsStats(): Promise<AdmissionsStats> {
 		waitlisted: 0,
 		rejected: 0,
 		completed: 0,
+		withdrawn: 0,
 	};
 	let total = 0;
 	for (const row of res.rows) {

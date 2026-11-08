@@ -1,9 +1,9 @@
 // src/server/certificate-db.ts
 // Certificate data access: issuance from completed+paid applications,
 // public code lookup for /verify, student listings, revocation.
-// Codes are public-facing (UBT-YYYY-NNNN) — they appear in QR codes and
-// employer verification checks, so uniqueness is enforced with retries
-// against the DB constraint rather than trusting count-based sequences.
+// Codes are public-facing (UBT-YYYY-XXXXXXXX) — they appear in QR codes and
+// employer verification checks, so they carry high-entropy random suffixes:
+// sequential codes let anyone enumerate graduates via /verify.
 
 import type {
 	AdminCertificateList,
@@ -14,7 +14,9 @@ import type {
 import { parseCohort } from "@/lib/enrollment";
 import { db, withTransaction } from "../db";
 import { escapeLike } from "../fn-utils";
+import { PG_UNIQUE_VIOLATION } from "../pg-codes";
 import { programTitle } from "../program-utils";
+import { generateCertificateCode } from "./certificate-code";
 
 type CertificateRow = {
 	id: number;
@@ -66,8 +68,11 @@ export type IssueResult =
 /**
  * Mint a certificate for an application. Eligibility is enforced here —
  * not in the route — so every caller (API, future bulk tool) inherits it:
- * the application must be 'completed' with the registration fee paid, and
- * must not already have a certificate.
+ * the application must be 'completed' with the registration fee paid.
+ *
+ * A revoked certificate is not a permanent dead end: we keep the original
+ * record and reissue it with a fresh code so audit history and certificate ids
+ * remain stable while the credential is made valid again.
  */
 export async function issueCertificateForApplication(
 	applicationId: number,
@@ -97,30 +102,67 @@ export async function issueCertificateForApplication(
 		}
 		if (app.fee_status !== "paid") return { ok: false, reason: "fee-unpaid" };
 
-		const existing = await tx.query<{ code: string }>(
-			"SELECT code FROM certificate WHERE application_id = $1",
+		const existing = await tx.query<{
+			id: number;
+			revoked_at: Date | null;
+		}>(
+			`SELECT id, revoked_at FROM certificate WHERE application_id = $1 FOR UPDATE`,
 			[applicationId],
 		);
-		if (existing.rows[0]) {
+		const existingCert = existing.rows[0];
+		if (existingCert && existingCert.revoked_at === null) {
 			return { ok: false, reason: "already-issued" };
 		}
 
-		// Per-year sequence: UBT-YYYY-NNNN, padded to four digits. Derived
-		// from max(serial), not count(*): deletions must not create gaps that
-		// collide with live codes.
-		const year = new Date().getFullYear();
-		const seqRes = await tx.query<{ n: number }>(
-			`SELECT COALESCE(max(split_part(code, '-', 3)::int), 0) AS n
-			 FROM certificate
-			 WHERE code LIKE $1`,
-			[`UBT-${year}-%`],
-		);
+		if (existingCert?.revoked_at) {
+			for (let attempt = 0; attempt < 5; attempt++) {
+				const code = generateCertificateCode();
+				try {
+					await tx.query("SAVEPOINT certificate_reissue");
+					const updateRes = await tx.query<{ code: string }>(
+						`UPDATE certificate SET
+							code = $1,
+							holder_name = $2,
+							program_slug = $3,
+							cohort = $4,
+							issued_on = CURRENT_DATE,
+							issued_by = $5,
+							revoked_at = NULL,
+							revoked_by = NULL,
+							revoked_reason = NULL
+						 WHERE id = $6
+						 RETURNING code`,
+						[
+							code,
+							app.full_name?.trim() || null,
+							app.program_slug,
+							app.cohort,
+							adminUserId,
+							existingCert.id,
+						],
+					);
+					await tx.query("RELEASE SAVEPOINT certificate_reissue");
+					if (updateRes.rows[0]) {
+						return { ok: true, code: updateRes.rows[0].code };
+					}
+					break;
+				} catch (error) {
+					await tx.query("ROLLBACK TO SAVEPOINT certificate_reissue");
+					if ((error as { code?: string }).code !== PG_UNIQUE_VIOLATION) {
+						throw error;
+					}
+				}
+			}
+			throw new Error(
+				`certificate reissue failed after retries (admin ${adminUserId}, application ${applicationId})`,
+			);
+		}
 
+		// High-entropy code with an ON CONFLICT retry. There is no sequence to
+		// race on; a collision means the random suffix repeated (practically
+		// impossible) so just draw another.
 		for (let attempt = 0; attempt < 5; attempt++) {
-			const serial = (seqRes.rows[0]?.n ?? 0) + 1 + attempt;
-			const code = `UBT-${year}-${String(serial).padStart(4, "0")}`;
-			// ON CONFLICT avoids aborting the transaction on a code collision,
-			// which would make the retry fail with 25P02.
+			const code = generateCertificateCode();
 			const insertRes = await tx.query<{ code: string }>(
 				`INSERT INTO certificate (code, user_id, application_id, holder_name, program_slug, cohort, issued_by)
 				 VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -139,7 +181,6 @@ export async function issueCertificateForApplication(
 			if (insertRes.rows[0]) {
 				return { ok: true, code: insertRes.rows[0].code };
 			}
-			// Serial raced with a concurrent issuance — try the next one.
 		}
 		throw new Error(
 			`certificate code generation failed after retries (admin ${adminUserId}, application ${applicationId})`,

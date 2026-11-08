@@ -69,6 +69,7 @@ const STATUS_FLOW: Array<{
 		label: "Mark completed (graduated)",
 		tone: "bg-primary hover:bg-primary/90",
 	},
+	{ status: "withdrawn", label: "Withdraw application", tone: "" },
 ];
 
 export function ApplicationDetailPage({
@@ -390,7 +391,8 @@ export function ApplicationDetailPage({
 							placeholder="Recorded with the decision; included in the admin trail only."
 						/>
 						<p className="text-[11px] text-muted-foreground">
-							Terminal decisions email the applicant automatically.
+							Terminal decisions email the applicant automatically. Withdrawals
+							are silent (no email).
 						</p>
 						<div className="grid grid-cols-1 gap-2">
 							{STATUS_FLOW.filter((s) =>
@@ -537,7 +539,7 @@ function CertificatePanel({
 	const revoke = useSetCertificateRevocation();
 	const [confirmRevoked, setConfirmRevoked] = useState(false);
 
-	const canIssue = !certificate;
+	const canIssue = !certificate || Boolean(certificate?.revokedAt);
 	const blockedReason =
 		status !== "completed"
 			? "Mark the application completed first."
@@ -607,6 +609,24 @@ function CertificatePanel({
 						<IconPrinter className="h-4 w-4" stroke={1.75} />
 						Print certificate
 					</Link>
+					{certificate.revokedAt ? (
+						<>
+							<p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
+								This certificate was revoked. Reissuing creates a fresh code for
+								the same application while keeping the original record
+								auditable.
+							</p>
+							<Button
+								variant="outline"
+								size="sm"
+								className="w-full"
+								disabled={issue.isPending || revoke.isPending}
+								onClick={() => void onIssue()}
+							>
+								{issue.isPending ? "Reissuing…" : "Reissue certificate"}
+							</Button>
+						</>
+					) : null}
 					<a
 						href={`${APP_ORIGIN}/verify/${certificate.code}`}
 						target="_blank"
@@ -649,7 +669,7 @@ function CertificatePanel({
 						size="sm"
 						className="w-full"
 						disabled={!canIssue || !eligible || issue.isPending}
-						onClick={onIssue}
+						onClick={() => onIssue()}
 					>
 						{issue.isPending ? "Issuing…" : "Issue certificate"}
 					</Button>

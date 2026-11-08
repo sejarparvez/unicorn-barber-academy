@@ -75,6 +75,7 @@ const PIPELINE_COLORS: Record<ApplicationStatus, string> = {
 	waitlisted: "var(--chart-2)",
 	rejected: "var(--chart-5)",
 	completed: "var(--primary)",
+	withdrawn: "var(--muted-foreground)",
 };
 
 const RAMP = [
@@ -201,6 +202,7 @@ const pipelineConfig = {
 	waitlisted: { label: APPLICATION_STATUS_LABELS.waitlisted },
 	rejected: { label: APPLICATION_STATUS_LABELS.rejected },
 	completed: { label: APPLICATION_STATUS_LABELS.completed },
+	withdrawn: { label: APPLICATION_STATUS_LABELS.withdrawn },
 } satisfies ChartConfig;
 
 export function PipelineChart({ admissions }: { admissions: AdmissionsStats }) {
@@ -213,7 +215,7 @@ export function PipelineChart({ admissions }: { admissions: AdmissionsStats }) {
 	return (
 		<ConsoleChartCard
 			title="Pipeline"
-			description={`${admissions.total} applications across the six statuses`}
+			description={`${admissions.total} applications across the seven statuses`}
 		>
 			{admissions.total === 0 ? (
 				<ChartEmpty>

@@ -80,6 +80,7 @@ const TABS: Array<{ label: string; status?: ApplicationStatus }> = [
 	{ label: "Completed", status: "completed" },
 	{ label: "Waitlisted", status: "waitlisted" },
 	{ label: "Rejected", status: "rejected" },
+	{ label: "Withdrawn", status: "withdrawn" },
 ];
 
 export function ApplicationsListPage({

@@ -10,6 +10,7 @@ export const APPLICATION_STATUSES = [
 	"waitlisted",
 	"rejected",
 	"completed",
+	"withdrawn",
 ] as const;
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 
@@ -29,6 +30,7 @@ export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
 	waitlisted: "Waitlisted",
 	rejected: "Not accepted",
 	completed: "Completed",
+	withdrawn: "Withdrawn",
 };
 
 /**
@@ -40,12 +42,13 @@ export const APPLICATION_TRANSITIONS: Record<
 	ApplicationStatus,
 	readonly ApplicationStatus[]
 > = {
-	pending: ["reviewing", "approved", "waitlisted", "rejected"],
-	reviewing: ["approved", "waitlisted", "rejected"],
-	approved: ["completed", "rejected"],
-	waitlisted: ["approved", "rejected"],
+	pending: ["reviewing", "approved", "waitlisted", "rejected", "withdrawn"],
+	reviewing: ["approved", "waitlisted", "rejected", "withdrawn"],
+	approved: ["completed", "rejected", "withdrawn"],
+	waitlisted: ["approved", "rejected", "withdrawn"],
 	rejected: [],
 	completed: [],
+	withdrawn: [],
 };
 
 /** Statuses that hold one of the intake's seats. */
