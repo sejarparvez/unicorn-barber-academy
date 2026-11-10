@@ -1,5 +1,3 @@
-/* ------------------------------- FAQ ------------------------------- */
-
 import { Reveal, SectionEyebrow } from "@/components/effects";
 import { JsonLdScript } from "@/components/jsonld-script";
 import {

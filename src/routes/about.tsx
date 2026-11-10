@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import AboutPage from "@/components/pages/about/about-page";
 import { CardGridSkeleton } from "@/components/route-skeletons";
 import { pic } from "@/data/images";
 import { SITE_URL } from "@/data/site";
-import { AboutPage } from "@/features/about/about-page";
 import { listInstructorsFn } from "@/server/content/content-fns";
 
 export const Route = createFileRoute("/about")({

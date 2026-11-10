@@ -1,6 +1,4 @@
-﻿/* --------------------------- Student Life --------------------------- */
-
-import { IconArrowRight } from "@tabler/icons-react";
+﻿import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Reveal } from "@/components/effects";
 import type { GalleryView } from "@/lib/content";

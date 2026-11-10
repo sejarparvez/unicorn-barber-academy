@@ -52,7 +52,7 @@ function CertificatePrintPage() {
 
 	return (
 		<main className="min-h-[calc(100svh-4rem)] bg-muted/25 px-4 py-10 print:block print:min-h-0 print:bg-white print:p-0">
-			<div className="mx-auto mb-6 flex max-w-[820px] items-center justify-between print:hidden">
+			<div className="mx-auto mb-6 flex max-w-205 items-center justify-between print:hidden">
 				<p className="text-sm text-muted-foreground">
 					Use your browser&rsquo;s print dialog and choose{" "}
 					<strong>Save as PDF</strong> (A4, portrait, margins: default).
@@ -69,7 +69,7 @@ function CertificatePrintPage() {
 
 			<article
 				aria-label={`Certificate ${certificate.code}`}
-				className="relative mx-auto max-w-[820px] border-[3px] border-[#c9a227] bg-white p-10 text-center text-[#1c1c1a] shadow-lg print:max-w-none print:border-2 print:shadow-none sm:p-14"
+				className="relative mx-auto max-w-205 border-[3px] border-[#c9a227] bg-white p-10 text-center text-[#1c1c1a] shadow-lg print:max-w-none print:border-2 print:shadow-none sm:p-14"
 			>
 				{/* Inner hairline frame */}
 				<div
@@ -101,7 +101,7 @@ function CertificatePrintPage() {
 					This certifies that
 				</p>
 
-				<p className="mt-3 font-serif text-4xl font-semibold break-words text-balance">
+				<p className="mt-3 font-serif text-4xl font-semibold wrap-break-word text-balance">
 					{certificate.holderName}
 				</p>
 

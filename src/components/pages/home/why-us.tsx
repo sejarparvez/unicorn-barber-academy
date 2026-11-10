@@ -1,5 +1,3 @@
-/* --------------------------- Why Unicorn --------------------------- */
-
 import {
 	IconBriefcase,
 	IconClockHour4,

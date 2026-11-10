@@ -1,5 +1,3 @@
-/* ----------------------------- Programs ----------------------------- */
-
 import {
 	IconArrowRight,
 	IconScissors,

@@ -1,7 +1,3 @@
-// src/features/home/sections/craft-marquee.tsx
-// Bold display-type marquee of craft words between hero and stats —
-// barbershop energy, deliberately louder than the quiet accreditation
-// band in effects.tsx (TrustBar). Pure CSS loop; pauses on hover.
 const CRAFT_WORDS = [
 	"FADES",
 	"TAPERS",
@@ -21,7 +17,7 @@ export default function CraftMarquee() {
 			className="overflow-hidden border-y border-primary/20 bg-secondary py-5"
 		>
 			<span className="sr-only">{CRAFT_WORDS.join(", ")}</span>
-			<div className="group/marquee flex w-max animate-marquee items-center gap-10 group-hover/marquee:[animation-play-state:paused] motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center">
+			<div className="group/marquee flex w-max animate-marquee items-center gap-10 group-hover/marquee:paused motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center">
 				{loop.map((word, i) => (
 					<span
 						key={`${word}-${

@@ -1,4 +1,3 @@
-// components/Hero.tsx
 import { IconArrowRight } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { Image } from "@unpic/react";
@@ -8,12 +7,6 @@ import heroimage from "@/assets/images/hero-image.webp";
 import banner768 from "@/assets/logo/banner-768.webp";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-/* ----------------------------- Hero ----------------------------- */
-/* Signature device: a clipper-guard gauge — a vertical ruler of real
-   guard lengths (#0 skin to #4) running down the seam between copy
-   and photo, the same reference a barber checks mid-fade. The photo
-   column parallaxes gently on scroll; the gradient headline shimmers. */
 
 const gradientText =
 	"bg-linear-to-r from-[#F4C430] via-primary to-[#8B6914] bg-clip-text text-transparent";
@@ -152,7 +145,7 @@ export default function Hero() {
 				</div>
 
 				{/* Content column */}
-				<div className="order-2 flex flex-col justify-center px-5 pt-10 pb-20 sm:px-10 lg:order-none lg:min-h-[88vh] lg:px-14 lg:py-0">
+				<div className="order-2 flex flex-col justify-center px-5 pt-10 pb-20 sm:px-10 lg:order-0 lg:min-h-[88vh] lg:px-14 lg:py-0">
 					<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 flex items-center gap-3 font-mono text-xs tracking-[0.28em] text-primary">
 						<span
 							aria-hidden="true"
@@ -163,7 +156,7 @@ export default function Hero() {
 
 					<h1
 						id="hero-heading"
-						className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-100 mt-5 text-[clamp(2.75rem,12vw,4.5rem)] leading-[1.0] tracking-tight sm:text-6xl lg:text-[4.25rem] lg:tracking-normal"
+						className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-100 mt-5 text-[clamp(2.75rem,12vw,4.5rem)] leading-none tracking-tight sm:text-6xl lg:text-[4.25rem] lg:tracking-normal"
 						style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}
 					>
 						Master the fade, <br className="hidden md:block" />
