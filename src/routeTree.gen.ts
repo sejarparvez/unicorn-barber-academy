@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicSplatRouteImport } from './routes/_public/$'
+import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
+import { Route as PublicTermsRouteImport } from './routes/_public/terms'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as EnrollIndexRouteImport } from './routes/enroll/index'
@@ -29,6 +32,21 @@ const DashboardRouteRoute = DashboardRouteRouteImport.update({
 const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicSplatRoute = PublicSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicTermsRoute = PublicTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const AuthSigninRoute = AuthSigninRouteImport.update({
@@ -55,12 +73,18 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/$': typeof PublicSplatRoute
+  '/privacy': typeof PublicPrivacyRoute
+  '/terms': typeof PublicTermsRoute
   '/auth/signin': typeof AuthSigninRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/enroll/': typeof EnrollIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
+  '/$': typeof PublicSplatRoute
+  '/privacy': typeof PublicPrivacyRoute
+  '/terms': typeof PublicTermsRoute
   '/auth/signin': typeof AuthSigninRoute
   '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -71,6 +95,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/_public/$': typeof PublicSplatRoute
+  '/_public/privacy': typeof PublicPrivacyRoute
+  '/_public/terms': typeof PublicTermsRoute
   '/auth/signin': typeof AuthSigninRoute
   '/_public/': typeof PublicIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -82,16 +109,30 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/$'
+    | '/privacy'
+    | '/terms'
     | '/auth/signin'
     | '/dashboard/'
     | '/enroll/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/signin' | '/' | '/dashboard' | '/enroll' | '/api/auth/$'
+  to:
+    | '/$'
+    | '/privacy'
+    | '/terms'
+    | '/auth/signin'
+    | '/'
+    | '/dashboard'
+    | '/enroll'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/_public'
     | '/dashboard'
+    | '/_public/$'
+    | '/_public/privacy'
+    | '/_public/terms'
     | '/auth/signin'
     | '/_public/'
     | '/dashboard/'
@@ -130,6 +171,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicIndexRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_public/$': {
+      id: '/_public/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof PublicSplatRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/privacy': {
+      id: '/_public/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PublicPrivacyRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/terms': {
+      id: '/_public/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof PublicTermsRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/auth/signin': {
       id: '/auth/signin'
       path: '/auth/signin'
@@ -162,10 +224,16 @@ declare module '@tanstack/react-router' {
 }
 
 interface PublicRouteRouteChildren {
+  PublicSplatRoute: typeof PublicSplatRoute
+  PublicPrivacyRoute: typeof PublicPrivacyRoute
+  PublicTermsRoute: typeof PublicTermsRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicSplatRoute: PublicSplatRoute,
+  PublicPrivacyRoute: PublicPrivacyRoute,
+  PublicTermsRoute: PublicTermsRoute,
   PublicIndexRoute: PublicIndexRoute,
 }
 
