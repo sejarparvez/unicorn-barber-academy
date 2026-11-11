@@ -1,126 +1,208 @@
-# Unicorn Barber Training Academy
+Welcome to your new TanStack Start app!
 
-Marketing and enrollment website for **Unicorn Barber Training Academy** in Dhaka — public pages (programs, instructors, gallery, blog), a student enrollment flow, and an authenticated dashboard for application management and a blog CMS.
+# Getting Started
 
-## Tech Stack
-
-| Concern | Choice |
-|---------|--------|
-| Framework | TanStack Start (React 19, SSR) + TanStack Router |
-| Build | Vite 8 + Nitro 3 |
-| Styling | Tailwind CSS v4, shadcn-style UI primitives |
-| Database | PostgreSQL 17+ via raw SQL (pg driver) |
-| Auth | Better Auth (Google OAuth, email verification via Resend) |
-| Client state | TanStack Query |
-| Runtime / PM | Bun |
-| Lint / format | Biome 2.x |
-
-## Prerequisites
-
-- [Bun](https://bun.sh/) runtime and package manager
-- PostgreSQL 17+ (or a Neon serverless Postgres URL)
-- A [Resend](https://resend.com/) API key for transactional email
-- A [Cloudinary](https://cloudinary.com/) account for image uploads (optional for local dev)
-
-## Quick Start
+To run this application:
 
 ```bash
-git clone <repo-url>
-cd unicorn-barber-training-academy
-cp .env.example .env    # fill in your values
 bun install
-bun run dev             # http://localhost:3000
+bun --bun run dev
 ```
 
-## Environment Variables
+# Building For Production
 
-Copy `.env.example` to `.env` and configure:
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string (Neon pooler URL) |
-| `BETTER_AUTH_SECRET` | Yes | Random 32-byte secret for session signing |
-| `BETTER_AUTH_URL` | Yes | App origin (e.g. `http://localhost:3000`) |
-| `RESEND_API_KEY` | No | Email sending; without it, emails print to console |
-| `CLOUDINARY_*` | No | Image uploads; without them, uploads show a clear error |
-| `TRUSTED_PROXIES` | No | Proxy CIDRs for correct IP resolution behind a load balancer |
-| `AUTH_IP_HEADERS` | No | Platform-set headers for IP detection (e.g. `x-real-ip`) |
-| `VITE_PLAUSIBLE_DOMAIN` | No | Enables Plausible analytics script |
-
-## Commands
+To build this application for production:
 
 ```bash
-bun install              # install dependencies
-bun run dev              # dev server at http://localhost:3000
-bun run build            # production build -> dist/
-bun run preview          # preview production build
-bun run test             # tests via `bun test`
-bun run check            # biome check --write (format + lint + safe fixes)
-bun run generate-routes  # regenerate route tree after adding/removing routes
+bun --bun run build
 ```
 
-## Project Structure
+## Styling
 
-```
-src/routes/       file-based routes — thin: guards, loaders, composing features
-src/features/     domain components (about, auth, blog, enrollment, ...)
-src/components/   shared UI: layout/, providers/, ui/ (shadcn-style primitives)
-src/service/      client-side TanStack Query services + query-keys
-src/lib/          isomorphic shared code: types, env parsing, roles, api clients
-src/server/<domain>/  SERVER-ONLY per domain: db.ts, validate.ts, fns.ts
-src/data/         seed sources + truly static content (program copy, image seeds)
-docs/             admin manual, architecture, workflows, decision records
-scripts/          set-role.ts (live tool) + seeds/ (one-time, re-runnable)
-```
+This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 
-## Architecture
+### Removing Tailwind CSS
 
-Code flows in one direction:
+If you prefer not to use Tailwind CSS:
 
-```
-src/routes/  →  src/features/  →  src/service/  →  src/server/<domain>/
-     ↓                                              ↓
-  loaders                                      createServerFn
-     ↓                                              ↓
-  src/server/<domain>/fns.ts              src/server/<domain>/db.ts
-```
+1. Remove the demo pages in `src/routes/demo/`
+2. Replace the Tailwind import in `src/styles.css` with your own styles
+3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
+4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
 
-- Route loaders must not import `db.ts` directly — wrap calls in `fns.ts`
-- `src/features/**` and `src/components/**` cannot import `@/server/**`
-- Every query key lives in `src/service/query-keys.ts`
-- Auth roles: `"user" | "student" | "instructor" | "admin"` (plain text, not Postgres enum)
-- Docs for humans: `docs/admin-manual.md` (dashboard how-tos), `docs/architecture.md`, `docs/workflows.md`, `docs/decisions/`
+## Linting & Formatting
 
-## Testing
+This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
 
-Tests colocate with source as `*.test.ts` and run with `bun test`:
 
 ```bash
-bun test             # run all tests
-bun test src/lib     # run tests in a specific directory
+bun --bun run lint
+bun --bun run format
+bun --bun run check
 ```
 
-## Database
 
-Prisma contract (`prisma/schema.prisma`) owns all DDL — never hand-write schema SQL. Runtime queries stay raw SQL via the `pg` driver; do not use the Prisma client for writes.
+## Deploy with Nitro
+
+This project uses Nitro as a generic server adapter, so it can run on any Node-compatible host.
 
 ```bash
-bun run db:emit     # regenerate schema.json/schema.d.ts after schema edits
-bun run db:migrate  # apply contract to Neon (use direct URL, not pooler)
-bun run db:status   # verify DB matches contract
+npm run build
+node .output/server/index.mjs
 ```
 
-## Deployment
+The build output is a self-contained Node server. To deploy, push the `.output/` directory to your host (Render, Fly.io, your own VPS, etc.) and run the server command above.
 
-Builds with Nitro as the server adapter — deploy to any Node/Bun-compatible host:
+For host-specific presets (Vercel, Netlify, Cloudflare, AWS Lambda, etc.) and tuning, see https://v3.nitro.build/deploy.
 
-```bash
-bun run build
-bun run preview       # test production build locally
+
+
+## Routing
+
+This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
+
+### Adding A Route
+
+To add a new route to your application just add a new file in the `./src/routes` directory.
+
+TanStack will automatically generate the content of the route file for you.
+
+Now that you have two routes you can use a `Link` component to navigate between them.
+
+### Adding Links
+
+To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
+
+```tsx
+import { Link } from "@tanstack/react-router";
 ```
 
-See [Nitro deployment docs](https://nitro.build/deploy) for platform-specific guides.
+Then anywhere in your JSX you can use it like so:
 
-## License
+```tsx
+<Link to="/about">About</Link>
+```
 
-Private — Unicorn Barber Training Academy.
+This will create a link that will navigate to the `/about` route.
+
+More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
+
+### Using A Layout
+
+In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
+
+Here is an example layout that includes a header:
+
+```tsx
+import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+
+export const Route = createRootRoute({
+  head: () => ({
+    meta: [
+      { charSet: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { title: 'My App' },
+    ],
+  }),
+  shellComponent: ({ children }) => (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <header>
+          <nav>
+            <Link to="/">Home</Link>
+            <Link to="/about">About</Link>
+          </nav>
+        </header>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  ),
+})
+```
+
+More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
+
+## Server Functions
+
+TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
+
+```tsx
+import { createServerFn } from '@tanstack/react-start'
+
+const getServerTime = createServerFn({
+  method: 'GET',
+}).handler(async () => {
+  return new Date().toISOString()
+})
+
+// Use in a component
+function MyComponent() {
+  const [time, setTime] = useState('')
+  
+  useEffect(() => {
+    getServerTime().then(setTime)
+  }, [])
+  
+  return <div>Server time: {time}</div>
+}
+```
+
+## API Routes
+
+You can create API routes by using the `server` property in your route definitions:
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+import { json } from '@tanstack/react-start'
+
+export const Route = createFileRoute('/api/hello')({
+  server: {
+    handlers: {
+      GET: () => json({ message: 'Hello, World!' }),
+    },
+  },
+})
+```
+
+## Data Fetching
+
+There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
+
+For example:
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/people')({
+  loader: async () => {
+    const response = await fetch('https://swapi.dev/api/people')
+    return response.json()
+  },
+  component: PeopleComponent,
+})
+
+function PeopleComponent() {
+  const data = Route.useLoaderData()
+  return (
+    <ul>
+      {data.results.map((person) => (
+        <li key={person.name}>{person.name}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
+
+
+
+# Learn More
+
+You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+
+For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).

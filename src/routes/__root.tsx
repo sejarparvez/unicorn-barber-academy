@@ -1,273 +1,52 @@
-import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
-import { IconArrowRight } from "@tabler/icons-react";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-import {
-	createRootRoute,
-	HeadContent,
-	Link,
-	Outlet,
-	Scripts,
-	useRouterState,
-} from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { useEffect } from "react";
-import { JsonLdScript } from "@/components/jsonld-script";
-import { AnnouncementBanner } from "@/components/layout/announcement-banner";
-import Footer from "@/components/layout/footer";
-import Header from "@/components/layout/header";
-import { Analytics } from "@/components/providers/analytics";
-import { LazyToaster } from "@/components/providers/lazy-toaster";
-import { MotionProvider } from "@/components/providers/motion-provider";
-import { QueryProvider } from "@/components/providers/query-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { SITE_URL } from "@/data/site";
-import { getCachedSession, setCachedSession } from "@/lib/session-cache";
-import type { ResolvedSettings } from "@/lib/settings";
-import { getSession } from "@/server/session";
-import { getSiteSettingsFn } from "@/server/settings/settings-fns";
-import appCss from "../styles.css?url";
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+
+import appCss from '../styles.css?url';
 
 export const Route = createRootRoute({
-	// Runs parent-first on every navigation (and hover preload). Resolves the
-	// session for the whole matched tree so descendant guards — including the
-	// /dashboard layout — can check context.session synchronously instead of
-	// blocking on a server round-trip per click. On the client, a short-TTL
-	// cache serves repeat navigations from memory; SSR always fetches so the
-	// HTML and Header render the correct signed-in/out state. Site settings
-	// stay in the loader so contact info + announcement remain admin-editable
-	// from a single shared object.
-	beforeLoad: async () => {
-		const cached = getCachedSession();
-		const session = cached !== undefined ? cached : await getSession();
-		setCachedSession(session);
-		return { session };
-	},
-	loader: async (): Promise<{ site: ResolvedSettings }> => {
-		const site = await getSiteSettingsFn();
-		return { site };
-	},
 	head: () => ({
 		meta: [
 			{
-				charSet: "utf-8",
+				charSet: 'utf-8',
 			},
 			{
-				name: "viewport",
-				content: "width=device-width, initial-scale=1",
+				name: 'viewport',
+				content: 'width=device-width, initial-scale=1',
 			},
 			{
-				title:
-					"Unicorn Barber Training Academy | Barbering & Beauty Courses in Dhaka",
-			},
-			{
-				name: "description",
-				content:
-					"Hands-on barbering and beauty training in Banasree, Dhaka — taught by working barbers and stylists. Full kit included, job placement support.",
-			},
-			{ property: "og:site_name", content: "Unicorn Barber Training Academy" },
-			{ property: "og:locale", content: "en_US" },
-			{ property: "og:type", content: "website" },
-			{ property: "og:url", content: SITE_URL },
-			{
-				property: "og:title",
-				content:
-					"Unicorn Barber Training Academy | Barbering & Beauty Courses in Dhaka",
-			},
-			{
-				property: "og:description",
-				content:
-					"Hands-on barbering and beauty training in Banasree, Dhaka — taught by working barbers and stylists. Full kit included, job placement support.",
-			},
-			// Default social-card image (1200×630); individual routes override og:* as needed
-			{ property: "og:image", content: `${SITE_URL}/og-image.jpg` },
-			{ property: "og:image:width", content: "1200" },
-			{ property: "og:image:height", content: "630" },
-			{
-				property: "og:image:alt",
-				content: "Unicorn Barber Training Academy banner",
-			},
-			{ name: "twitter:card", content: "summary_large_image" },
-			{ name: "twitter:site", content: "@UnicornBTAcademy" },
-			{
-				name: "twitter:title",
-				content:
-					"Unicorn Barber Training Academy | Barbering & Beauty Courses in Dhaka",
-			},
-			{
-				name: "twitter:description",
-				content:
-					"Hands-on barbering and beauty training in Banasree, Dhaka � taught by working barbers and stylists. Enroll today.",
-			},
-			{ name: "twitter:image", content: `${SITE_URL}/og-image.jpg` },
-			{
-				name: "twitter:image:alt",
-				content: "Unicorn Barber Training Academy banner",
+				title: 'TanStack Start Starter',
 			},
 		],
 		links: [
-			// The homepage never requests Cloudinary (all bundled assets), so a
-			// preconnect here would be flagged unused. Keep only the cheap DNS
-			// hint — it still helps on blog/gallery pages that serve
-			// admin-uploaded Cloudinary images.
-			{ rel: "dns-prefetch", href: "https://res.cloudinary.com" },
-			// Preload the only webfont left (Inter latin): breaks the
-			// CSS -> font discovery chain so text paints at FCP.
 			{
-				rel: "preload",
-				href: interLatin,
-				as: "font",
-				type: "font/woff2",
-				crossOrigin: "anonymous",
-			},
-			// Preload the stylesheet: moves its download off the CSS parse of
-			// the HTML so render-blocking waits on transfer, not discovery.
-			{
-				rel: "preload",
+				rel: 'stylesheet',
 				href: appCss,
-				as: "style",
-			},
-			{
-				rel: "stylesheet",
-				href: appCss,
-			},
-			{ rel: "icon", type: "image/png", href: "/favicon.png" },
-			{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-			// RSS autodiscovery � /feed.xml exists but was undiscoverable.
-			{
-				rel: "alternate",
-				type: "application/rss+xml",
-				title: "Unicorn Barber Training Academy Blog",
-				href: "/feed.xml",
 			},
 		],
 	}),
-	component: RootDocument,
-	notFoundComponent: RootNotFound,
-	errorComponent: RootError,
+	shellComponent: RootDocument,
 });
 
-function RootNotFound() {
-	return (
-		<main className="mx-auto max-w-xl px-6 py-32 text-center">
-			<h1 className="font-heading text-3xl font-medium text-foreground">
-				Page not found
-			</h1>
-			<p className="mt-3 text-sm text-muted-foreground">
-				The page you&rsquo;re looking for doesn&rsquo;t exist or may have moved.
-			</p>
-			<Link
-				to="/"
-				className="mt-8 inline-flex items-center gap-2 border border-primary px-6 py-3 text-[12px] font-semibold tracking-[0.16em] text-primary hover:bg-primary hover:text-primary-foreground"
-			>
-				BACK TO HOME
-				<IconArrowRight className="h-3.5 w-3.5" stroke={1.75} />
-			</Link>
-		</main>
-	);
-}
-
-function RootError({ error }: { error: Error }) {
-	return (
-		<main className="mx-auto max-w-xl px-6 py-32 text-center">
-			<h1 className="font-heading text-3xl font-medium text-foreground">
-				Something went wrong
-			</h1>
-			<p className="mt-3 text-sm text-muted-foreground">
-				An unexpected error occurred while loading this page. Please try again �
-				if the problem persists, contact us.
-			</p>
-			{import.meta.env.DEV && error ? (
-				<pre className="mt-6 max-h-48 overflow-auto rounded-md border border-border bg-muted/40 p-4 text-left text-xs whitespace-pre-wrap text-muted-foreground">
-					{error.message}
-				</pre>
-			) : null}
-			<button
-				type="button"
-				onClick={() => window.location.reload()}
-				className="mt-8 inline-flex cursor-pointer items-center gap-2 border border-primary px-6 py-3 text-[12px] font-semibold tracking-[0.16em] text-primary hover:bg-primary hover:text-primary-foreground"
-			>
-				RELOAD PAGE
-				<IconArrowRight className="h-3.5 w-3.5" stroke={1.75} />
-			</button>
-		</main>
-	);
-}
-
-function RootDocument() {
-	const { session } = Route.useRouteContext();
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	// Seed the client-side session cache with the session resolved during SSR
-	// (or the latest from a re-render) so the first navigation's beforeLoad is
-	// served from memory instead of an RPC round-trip.
-	useEffect(() => {
-		setCachedSession(session);
-	}, [session]);
-	// Dashboard routes run their own app shell (sidebar + breadcrumb bar),
-	// so the marketing header, announcement banner, and footer stay off —
-	// no double navigation, no competing sticky bars. Auth pages keep the
-	// public chrome; they are visitor-facing.
-	const isDashboard = pathname.startsWith("/dashboard");
+function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
 			<head>
-				<JsonLdScript
-					data={{
-						"@context": "https://schema.org",
-						"@type": "WebSite",
-						name: "Unicorn Barber Training Academy",
-						url: SITE_URL,
-						publisher: {
-							"@id": `${SITE_URL}/#academy`,
-						},
-					}}
-				/>
 				<HeadContent />
 			</head>
 			<body>
-				<MotionProvider>
-					{/* Skip link � keyboard users jump straight past the header. */}
-					<a
-						href="#main-content"
-						className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-					>
-						Skip to content
-					</a>
-					{/* Site chrome never prints � certificate pages rely on this.
-				    Dashboard routes hide it entirely — they own the viewport. */}
-					{!isDashboard ? (
-						<div className="print:hidden">
-							<AnnouncementBanner />
-							<Header session={session} />
-						</div>
-					) : null}
-					<div id="main-content" className=" min-h-screen">
-						<TooltipProvider>
-							<QueryProvider>
-								<Outlet />
-							</QueryProvider>
-						</TooltipProvider>
-					</div>
-					{!isDashboard ? (
-						<div className="print:hidden">
-							<Footer />
-						</div>
-					) : null}
-					<Analytics />
-					<LazyToaster />
-				</MotionProvider>
-				{import.meta.env.DEV && (
-					<TanStackDevtools
-						config={{
-							position: "bottom-right",
-						}}
-						plugins={[
-							{
-								name: "Tanstack Router",
-								render: <TanStackRouterDevtoolsPanel />,
-							},
-						]}
-					/>
-				)}
+				{children}
+				<TanStackDevtools
+					config={{
+						position: 'bottom-right',
+					}}
+					plugins={[
+						{
+							name: 'Tanstack Router',
+							render: <TanStackRouterDevtoolsPanel />,
+						},
+					]}
+				/>
 				<Scripts />
 			</body>
 		</html>

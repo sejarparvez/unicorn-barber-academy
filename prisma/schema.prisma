@@ -1,450 +1,70 @@
-// use prisma-next
-// Prisma contract — SINGLE SOURCE OF TRUTH for all tables. Prisma owns DDL
-// (`db:emit` / `db:migrate`); never hand-write DDL SQL. Runtime queries stay
-// raw pg (src/server/db.ts + *-db.ts); better-auth owns its tables via its
-// own pool (src/server/auth.ts).
-//
-// IDs are integer autoincrement paired with better-auth's
-// `advanced.database.generateId: "serial"`. better-auth returns numeric ids
-// as strings in its API responses — handle both.
-// Roles: "user" | "student" | "instructor" | "admin" (src/lib/roles.ts) kept
-// as plain text — do NOT convert to a Postgres enum.
+// Prisma schema — single source of truth for the database.
+// Runtime client: src/lib/db.ts (Neon serverless adapter, pooled DATABASE_URL).
+// CLI config: prisma.config.ts (migrations use the direct DIRECT_URL).
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Better Auth (better-auth/adapters/prisma) ───────────────────────────────
+// Field names must match what the adapter maps to its lowercase model keys:
+// prisma.user / prisma.session / prisma.account / prisma.verification.
+// Ids are text: better-auth generates them on create.
 
 model User {
-  id                                          Int                     @id(map: "user_pkey") @default(autoincrement())
-  createdAt                                   Timestamptz             @default(now())
-  email                                       String                  @unique(map: "user_email_key")
-  emailVerified                               Boolean                 @default(false)
-  image                                       String?
-  name                                        String?
-  updatedAt                                   Timestamptz
-  username                                    String?
-  banExpires                                  Timestamptz?
-  banReason                                   String?
-  banned                                      Boolean                 @default(false)
-  role                                        String                  @default("user")
-  accounts                                    Account[]
-  blogPosts                                   BlogPost[]
-  sessions                                    Session[]
-  certificates                                Certificate[]           @relation(name: "certificate_issued_by_fkey")
-  certificatesCertificate                     Certificate[]           @relation(name: "certificate_revoked_by_fkey")
-  certificates2                               Certificate[]           @relation(name: "certificate_user_id_fkey")
-  enrollmentApplications                      EnrollmentApplication[] @relation(name: "enrollment_application_decided_by_fkey")
-  enrollmentApplicationsEnrollmentApplication EnrollmentApplication[] @relation(name: "enrollment_application_user_id_fkey")
-  statusLogActions                              ApplicationStatusLog[]
-  auditLogs                                     AdminAuditLog[]
-  receivedPayments                              FeePayment[] @relation(name: "fee_payment_received_by_fkey")
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  @@map("user")
-}
-
-model Account {
-  id                    Int          @id(map: "account_pkey") @default(autoincrement())
-  accessToken           String?
-  accessTokenExpiresAt  Timestamptz?
-  accountId             String
-  createdAt             Timestamptz  @default(now())
-  idToken               String?
-  password              String?
-  providerId            String
-  refreshToken          String?
-  refreshTokenExpiresAt Timestamptz?
-  scope                 String?
-  updatedAt             Timestamptz
-  userId                Int
-  user                  User         @relation(fields: [userId], references: [id], onDelete: Cascade, map: "account_userId_fkey")
-
-  @@index([userId], name: "account_userId_idx")
-  @@map("account")
-}
-
-model BlogCategory {
-  id        Int          @id(map: "blog_category_pkey") @default(autoincrement())
-  name      VarChar(80)
-  slug      VarChar(120) @unique(map: "blog_category_slug_key")
-  createdAt Timestamptz  @default(now()) @map("created_at")
-  blogPosts BlogPost[]
-
-  @@map("blog_category")
-}
-
-model BlogPost {
-  id                  Int                @id(map: "blog_post_pkey") @default(autoincrement())
-  slug                VarChar(220)       @unique(map: "blog_post_slug_key")
-  title               VarChar(200)
-  excerpt             VarChar(400)?
-  contentMd           String             @default("") @map("content_md")
-  coverImageUrl       String?            @map("cover_image_url")
-  coverImageAlt       VarChar(300)?      @map("cover_image_alt")
-  metaTitle           VarChar(200)?      @map("meta_title")
-  metaDescription     VarChar(400)?      @map("meta_description")
-  focusKeyword        VarChar(120)?      @map("focus_keyword")
-  seoKeywords         String[]           @default([]) @map("seo_keywords")
-  canonicalUrl        String?            @map("canonical_url")
-  ogImageUrl          String?            @map("og_image_url")
-  noindex             Boolean            @default(false)
-  keyTakeaways        String[]           @default([]) @map("key_takeaways")
-  faq                 Jsonb              @default(dbgenerated("'[]'::jsonb"))
-  relatedProgramSlugs String[]           @default([]) @map("related_program_slugs")
-  tags                String[]           @default([])
-  status              VarChar(16)        @default("draft")
-  categoryId          Int?               @map("category_id")
-  authorId            Int?               @map("author_id")
-  readingMinutes      Int                @default(1) @map("reading_minutes")
-  viewCount           Int                @default(0) @map("view_count")
-  publishedAt         Timestamptz?       @map("published_at")
-  createdAt           Timestamptz        @default(now()) @map("created_at")
-  updatedAt           Timestamptz        @default(now()) @map("updated_at")
-  blogSlugRedirects   BlogSlugRedirect[]
-  author              User?              @relation(fields: [authorId], references: [id], onDelete: SetNull, map: "blog_post_author_id_fkey", index: false)
-  category            BlogCategory?      @relation(fields: [categoryId], references: [id], onDelete: SetNull, map: "blog_post_category_id_fkey")
-
-  @@index([categoryId], map: "idx_blog_post_category")
-  @@index([status, publishedAt], map: "idx_blog_post_published")
-  @@map("blog_post")
-}
-
-model BlogSlugRedirect {
-  id        Int          @id(map: "blog_slug_redirect_pkey") @default(autoincrement())
-  oldSlug   VarChar(220) @unique(map: "blog_slug_redirect_old_slug_key") @map("old_slug")
-  postId    Int          @map("post_id")
-  createdAt Timestamptz  @default(now()) @map("created_at")
-  post      BlogPost     @relation(fields: [postId], references: [id], onDelete: Cascade, map: "blog_slug_redirect_post_id_fkey")
-
-  @@index([postId], map: "idx_blog_slug_redirect_post")
-  @@map("blog_slug_redirect")
-}
-
-model ProgramIntake {
-  id                     Int                     @id(map: "program_intake_pkey") @default(autoincrement())
-  programSlug            VarChar(120)            @map("program_slug")
-  cohort                 VarChar(16)
-  startsOn               Date                    @map("starts_on")
-  seatsTotal             Int                     @default(12) @map("seats_total")
-  isOpen                 Boolean                 @default(true) @map("is_open")
-  createdAt              Timestamptz             @default(now()) @map("created_at")
-  enrollmentApplications EnrollmentApplication[]
-
-  @@unique([programSlug, cohort, startsOn], map: "program_intake_program_slug_cohort_starts_on_key")
-  @@index([programSlug, isOpen, startsOn], map: "idx_program_intake_open")
-  @@map("program_intake")
-}
-
-model EnrollmentApplication {
-  id                     Int           @id(map: "enrollment_application_pkey") @default(autoincrement())
-  reference              VarChar(20)   @unique(map: "enrollment_application_reference_key")
-  userId                 Int           @map("user_id")
-  intakeId               Int           @map("intake_id")
-  status                 VarChar(16)   @default("pending")
-  fullName               VarChar(160)  @map("full_name")
-  email                  VarChar(200)
-  phone                  VarChar(40)
-  fatherName             String?       @map("father_name")
-  motherName             String?       @map("mother_name")
-  dateOfBirth            Date?         @map("date_of_birth")
-  nationality            String?       @map("nationality")
-  gender                 String?       @map("gender")
-  nidOrBirthCertNo       String?       @map("nid_or_birth_cert_no")
-  whatsapp               String?       @map("whatsapp")
-  presentAddress         String?       @map("present_address")
-  permanentAddress       String?       @map("permanent_address")
-  emergencyName          String?       @map("emergency_name")
-  emergencyRelation      String?       @map("emergency_relation")
-  emergencyMobile        String?       @map("emergency_mobile")
-  emergencyAddress       String?       @map("emergency_address")
-  education              String?       @map("education")
-  hasBarberExperience    Boolean?      @map("has_barber_experience")
-  barberExperiencePeriod String?       @map("barber_experience_period")
-  hasPriorTraining       Boolean?      @map("has_prior_training")
-  priorTrainingInstitute String?       @map("prior_training_institute")
-  courseGoal             String?       @map("course_goal")
-  experienceNote         String?       @map("experience_note")
-  hearAbout              VarChar(80)?  @map("hear_about")
-  decidedAt              Timestamptz?  @map("decided_at")
-  decidedBy              Int?          @map("decided_by")
-  decisionNote           String?       @map("decision_note")
-  feeStatus              VarChar(16)   @default("unpaid") @map("fee_status")
-  feePaidAt              Timestamptz?  @map("fee_paid_at")
-  createdAt              Timestamptz   @default(now()) @map("created_at")
-  updatedAt              Timestamptz   @default(now()) @map("updated_at")
-  certificate            Certificate?
-  statusLogs             ApplicationStatusLog[]
-  payments               FeePayment[]
-  user                   User?         @relation(name: "enrollment_application_decided_by_fkey", fields: [decidedBy], references: [id], onDelete: SetNull, map: "enrollment_application_decided_by_fkey", index: false)
-  intake                 ProgramIntake @relation(fields: [intakeId], references: [id], onDelete: Restrict, map: "enrollment_application_intake_id_fkey")
-  userUser               User          @relation(name: "enrollment_application_user_id_fkey", fields: [userId], references: [id], onDelete: Restrict, map: "enrollment_application_user_id_fkey")
-
-  @@index([intakeId], map: "idx_application_intake")
-  @@index([status, createdAt], map: "idx_application_status_created")
-  @@index([userId], map: "idx_application_user")
-  @@map("enrollment_application")
-}
-
-model Certificate {
-  id            Int                    @id(map: "certificate_pkey") @default(autoincrement())
-  code          VarChar(24)            @unique(map: "certificate_code_key")
-  userId        Int                    @map("user_id")
-  applicationId Int?                   @unique @map("application_id")
-  holderName    String?                @map("holder_name")
-  programSlug   VarChar(120)           @map("program_slug")
-  cohort        VarChar(16)
-  issuedOn      Date                   @default(dbgenerated("CURRENT_DATE")) @map("issued_on")
-  revokedAt     Timestamptz?           @map("revoked_at")
-  revokedReason String?                @map("revoked_reason")
-  createdAt     Timestamptz            @default(now()) @map("created_at")
-  issuedBy      Int?                   @map("issued_by")
-  revokedBy     Int?                   @map("revoked_by")
-  application   EnrollmentApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull, map: "certificate_application_id_fkey")
-  user          User?                  @relation(name: "certificate_issued_by_fkey", fields: [issuedBy], references: [id], map: "certificate_issued_by_fkey", index: false)
-  userUser      User?                  @relation(name: "certificate_revoked_by_fkey", fields: [revokedBy], references: [id], map: "certificate_revoked_by_fkey", index: false)
-  user2         User                   @relation(name: "certificate_user_id_fkey", fields: [userId], references: [id], onDelete: Cascade, map: "certificate_user_id_fkey")
-
-  @@index([applicationId], map: "idx_certificate_application", unique: true)
-  @@index([programSlug], map: "idx_certificate_program")
-  @@index([userId], map: "idx_certificate_user")
-  @@map("certificate")
+  sessions Session[]
+  accounts Account[]
 }
 
 model Session {
-  id        Int         @id(map: "session_pkey") @default(autoincrement())
-  createdAt Timestamptz @default(now())
-  expiresAt Timestamptz
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   ipAddress String?
-  token     String      @unique(map: "session_token_key")
-  updatedAt Timestamptz
   userAgent String?
-  userId    Int
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade, map: "session_userId_fkey")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  @@index([userId], name: "session_userId_idx")
-  @@map("session")
+model Account {
+  id                   String    @id
+  accountId            String
+  providerId           String
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken          String?
+  refreshToken         String?
+  idToken              String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                String?
+  password             String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
 }
 
 model Verification {
-  id         Int         @id(map: "verification_pkey") @default(autoincrement())
-  createdAt  Timestamptz @default(now())
-  expiresAt  Timestamptz
+  id         String   @id
   identifier String
-  updatedAt  Timestamptz
   value      String
-
-  @@index([identifier], name: "verification_identifier_idx")
-  @@map("verification")
-}
-
-// Audit trail for application status transitions. Every
-// updateApplicationStatus call inserts a row (src/server/enrollment-db.ts).
-model ApplicationStatusLog {
-  id            Int                   @id @default(autoincrement())
-  applicationId Int                   @map("application_id")
-  application   EnrollmentApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  adminUserId   Int                   @map("admin_user_id")
-  admin         User                  @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
-  fromStatus    VarChar(16)?          @map("from_status")
-  toStatus      VarChar(16)           @map("to_status")
-  note          String?
-  createdAt     Timestamptz           @default(now()) @map("created_at")
-
-  @@index([applicationId, createdAt], map: "idx_status_log_application")
-  @@map("application_status_log")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Site settings (key-value). Admin-editable academy globals: contact email /
-// phone, address parts, hours, areas served, announcement banner. Values are
-// plain text; derived fields (tel: links, WhatsApp, Maps URLs, display
-// formatting) are computed in code (src/server/settings-db.ts) so visible UI
-// and JSON-LD can never drift apart. Missing keys fall back to the code
-// defaults in src/data/site.ts — an empty table renders byte-identical.
-// `site_url` is deliberately NOT stored here (canonicals must not change at
-// runtime).
-// ─────────────────────────────────────────────────────────────────────────────
-
-model SiteSetting {
-  key       VarChar(80)  @id(map: "site_setting_pkey")
-  value     String
-  updatedAt Timestamptz  @default(now()) @map("updated_at")
-
-  @@map("site_setting")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Content collections (Phase 2). Admin-managed marketing content previously
-// hardcoded in src/data/*. Image strategy: image_url holds a Cloudinary URL
-// from the existing upload endpoint; when null, pages fall back to the
-// bundled pic() seeds so migration is gradual and pages never break.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Instructor {
-  id          Int       @id @default(autoincrement())
-  slug        VarChar(120) @unique(map: "instructor_slug_key")
-  name        VarChar(160)
-  title       VarChar(200)
-  track       VarChar(16)
-  memberNo    VarChar(24)  @unique(map: "instructor_member_no_key") @map("member_no")
-  years       Int          @default(0)
-  bio         String       @default("")
-  specialties String[]     @default([])
-  imageUrl    String?      @map("image_url")
-  imageAlt    String?      @map("image_alt")
-  // Legacy bridge: pic() seed from src/data/*.ts used when image_url is
-  // null, so existing bundled photos keep rendering until admin re-uploads.
-  imageSeed   VarChar(120)? @map("image_seed")
-  instagram   String? 
-  programSlug VarChar(120)?  @map("program_slug")
-  lead        Boolean      @default(false)
-  quote       String?
-  sortOrder   Int          @default(0) @map("sort_order")
-  isPublished Boolean      @default(true) @map("is_published")
-  createdAt   Timestamptz  @default(now()) @map("created_at")
-  updatedAt   Timestamptz  @default(now()) @map("updated_at")
-
-  @@index([track, isPublished, sortOrder])
-  @@map("instructor")
-}
-
-model GalleryItem {
-  id          Int       @id @default(autoincrement())
-  category    VarChar(16)
-  imageUrl    String?   @map("image_url")
-  imageAlt    String    @default("") @map("image_alt")
-  // Legacy bridge: pic() seed, same rule as Instructor.imageSeed.
-  imageSeed   VarChar(120)? @map("image_seed")
-  caption     String?
-  sortOrder   Int       @default(0) @map("sort_order")
-  isPublished Boolean   @default(true) @map("is_published")
-  isFeatured  Boolean   @default(false) @map("is_featured")
-  createdAt   Timestamptz @default(now()) @map("created_at")
-
-  @@index([category, isPublished, sortOrder])
-  @@map("gallery_item")
-}
-
-model Testimonial {
-  id          Int       @id @default(autoincrement())
-  quote       String
-  name        VarChar(160)
-  programSlug VarChar(120)? @map("program_slug")
-  programName VarChar(200) @default("") @map("program_name")
-  cohort      VarChar(24)  @default("") 
-  imageUrl    String?   @map("image_url")
-  imageAlt    String?   @map("image_alt")
-  // Legacy bridge: pic() seed, same rule as Instructor.imageSeed.
-  imageSeed   VarChar(120)? @map("image_seed")
-  rating      Int       @default(5)
-  sortOrder   Int       @default(0) @map("sort_order")
-  isPublished Boolean   @default(true) @map("is_published")
-  createdAt   Timestamptz @default(now()) @map("created_at")
-
-  @@index([isPublished, sortOrder])
-  @@map("testimonial")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Admin audit log (Phase 3). Append-only trail of privileged mutations: who
-// did what to which record, with a human summary plus old/new metadata.
-// Writes never block the underlying mutation (helper catches internally).
-// No retention pruning — volume is tiny. Viewer is admin-only.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model AdminAuditLog {
-  id         Int       @id @default(autoincrement())
-  actorId    Int       @map("actor_id")
-  actor      User      @relation(fields: [actorId], references: [id], onDelete: Restrict)
-  action     VarChar(48)
-  targetType VarChar(48) @map("target_type")
-  targetId   VarChar(80) @map("target_id")
-  summary    String
-  metadata   Jsonb     @default(dbgenerated("'{}'::jsonb"))
-  createdAt  Timestamptz @default(now()) @map("created_at")
-
-  @@index([createdAt], map: "idx_audit_log_created")
-  @@index([actorId, createdAt], map: "idx_audit_log_actor")
-  @@map("admin_audit_log")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Contact inbox. Every website inquiry is stored here IN ADDITION to the
-// notification email, so a missed email never loses a lead. Admin triages
-// read/unread + replied + spam-delete from the dashboard Inbox page.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model ContactInquiry {
-  id        Int       @id @default(autoincrement())
-  name      VarChar(160)
-  email     VarChar(200)
-  phone     VarChar(40)?
-  subject   VarChar(24)  @default("other")
-  program   VarChar(200)?
-  message   String
-  isRead    Boolean   @default(false) @map("is_read")
-  isReplied Boolean   @default(false) @map("is_replied")
-  createdAt Timestamptz @default(now()) @map("created_at")
-
-  @@index([isRead, createdAt], map: "idx_inquiry_unread")
-  @@map("contact_inquiry")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// FAQs (home + contact placements). One table feeds both FAQ sections and
-// their FAQPage JSON-LD blocks, so answers stay consistent everywhere.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model FaqItem {
-  id          Int       @id @default(autoincrement())
-  placement   VarChar(16)
-  question    String
-  answer      String
-  sortOrder   Int       @default(0) @map("sort_order")
-  isPublished Boolean   @default(true) @map("is_published")
-  createdAt   Timestamptz @default(now()) @map("created_at")
-
-  @@index([placement, isPublished, sortOrder], map: "idx_faq_placement")
-  @@map("faq_item")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Fee ledger. Every offline payment (bKash/cash/bank) is a row: amount in
-// poisha, method, optional receipt reference, receiving admin, timestamp.
-// enrollment_application.fee_status is DERIVED (see recomputeFeeStatus):
-// paid in full when Σ payments ≥ the intake program's fee. Supports
-// partials and discounts; deleting a payment re-derives the flag.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model FeePayment {
-  id            Int       @id @default(autoincrement())
-  applicationId Int       @map("application_id")
-  application   EnrollmentApplication @relation(fields: [applicationId], references: [id], onDelete: Restrict)
-  amountPoisha  Int       @map("amount_poisha")
-  method        VarChar(16)
-  receiptRef    VarChar(120)?  @map("receipt_ref")
-  receivedBy    Int?      @map("received_by")
-  receiver      User?     @relation(name: "fee_payment_received_by_fkey", fields: [receivedBy], references: [id], onDelete: SetNull)
-  paidAt        Timestamptz  @default(now()) @map("paid_at")
-  createdAt     Timestamptz @default(now()) @map("created_at")
-
-  @@index([applicationId, paidAt], map: "idx_fee_payment_application")
-  @@map("fee_payment")
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Program catalog (operational control). The full marketing copy stays in
-// src/data/programs.ts for now; this table owns what admin controls:
-// which programs are live, the fee, and the default seat count.
-// feePoisha is an integer (1 BDT = 100 poisha) so revenue math stays exact.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Program {
-  id           Int       @id @default(autoincrement())
-  slug         VarChar(120) @unique(map: "program_slug_key")
-  title        VarChar(200)
-  track        VarChar(16)
-  duration     VarChar(40)
-  feePoisha    Int       @default(0) @map("fee_poisha")
-  defaultSeats Int       @default(12) @map("default_seats")
-  isPublished  Boolean   @default(true) @map("is_published")
-  createdAt    Timestamptz @default(now()) @map("created_at")
-  updatedAt    Timestamptz @default(now()) @map("updated_at")
-
-  @@map("program")
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

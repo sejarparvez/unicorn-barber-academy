@@ -9,280 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as CareersRouteImport } from './routes/careers'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as EnrollRouteImport } from './routes/enroll'
-import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
-import { Route as GalleryRouteImport } from './routes/gallery'
-import { Route as InstructorsRouteImport } from './routes/instructors'
-import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
-import { Route as MediaRouteImport } from './routes/media'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as StudentLifeRouteImport } from './routes/student-life'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as ApiContactRouteImport } from './routes/api/contact'
-import { Route as ApiEnrollRouteImport } from './routes/api/enroll'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as PublicRouteRouteImport } from './routes/_public/route'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
+import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
-import { Route as AuthSignupRouteImport } from './routes/auth/signup'
-import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
-import { Route as DashboardActivityRouteImport } from './routes/dashboard/activity'
-import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
-import { Route as DashboardFaqsRouteImport } from './routes/dashboard/faqs'
-import { Route as DashboardGalleryRouteImport } from './routes/dashboard/gallery'
-import { Route as DashboardInboxRouteImport } from './routes/dashboard/inbox'
-import { Route as DashboardInstructorsRouteImport } from './routes/dashboard/instructors'
-import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
-import { Route as DashboardSiteRouteImport } from './routes/dashboard/site'
-import { Route as DashboardTestimonialsRouteImport } from './routes/dashboard/testimonials'
-import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
-import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
-import { Route as ProgramsSlugRouteImport } from './routes/programs.$slug'
-import { Route as VerifyIndexRouteImport } from './routes/verify.index'
-import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
-import { Route as ApiAdminBlogRouteImport } from './routes/api/admin/blog'
-import { Route as ApiAdminCertificatesRouteImport } from './routes/api/admin/certificates'
-import { Route as ApiAdminUploadRouteImport } from './routes/api/admin/upload'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as EnrollIndexRouteImport } from './routes/enroll/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
-import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
-import { Route as CertificatesIdPrintRouteImport } from './routes/certificates.$id.print'
-import { Route as DashboardBlogIndexRouteImport } from './routes/dashboard/blog.index'
-import { Route as DashboardBlogCategoriesRouteImport } from './routes/dashboard/blog.categories'
-import { Route as DashboardBlogNewRouteImport } from './routes/dashboard/blog.new'
-import { Route as DashboardCertificatesIndexRouteImport } from './routes/dashboard/certificates.index'
-import { Route as DashboardCertificatesAdminRouteImport } from './routes/dashboard/certificates.admin'
-import { Route as DashboardEnrollmentsIndexRouteImport } from './routes/dashboard/enrollments.index'
-import { Route as DashboardEnrollmentsIdRouteImport } from './routes/dashboard/enrollments/$id'
-import { Route as DashboardEnrollmentsIntakesRouteImport } from './routes/dashboard/enrollments/intakes'
-import { Route as MdBlogSlugRouteImport } from './routes/md/blog.$slug'
-import { Route as ApiAdminBlogIdRouteImport } from './routes/api/admin/blog/$id'
-import { Route as ApiAdminBlogBulkRouteImport } from './routes/api/admin/blog/bulk'
-import { Route as ApiAdminBlogCategoriesRouteImport } from './routes/api/admin/blog/categories'
-import { Route as ApiAdminCertificatesIdRouteImport } from './routes/api/admin/certificates/$id'
-import { Route as ApiAdminEnrollmentsIdRouteImport } from './routes/api/admin/enrollments/$id'
-import { Route as ApiAdminEnrollmentsBulkRouteImport } from './routes/api/admin/enrollments/bulk'
-import { Route as ApiAdminEnrollmentsIntakesRouteImport } from './routes/api/admin/enrollments/intakes'
-import { Route as DashboardBlogIdEditRouteImport } from './routes/dashboard/blog.$id.edit'
-import { Route as ApiAdminBlogCategoriesIdRouteImport } from './routes/api/admin/blog/categories/$id'
-import { Route as ApiAdminEnrollmentsIntakesIdRouteImport } from './routes/api/admin/enrollments/intakes/$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const PublicRouteRoute = PublicRouteRouteImport.update({
+  id: '/_public',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CareersRoute = CareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EnrollRoute = EnrollRouteImport.update({
-  id: '/enroll',
-  path: '/enroll',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
-  id: '/feed.xml',
-  path: '/feed.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GalleryRoute = GalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InstructorsRoute = InstructorsRouteImport.update({
-  id: '/instructors',
-  path: '/instructors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
-  id: '/llms.txt',
-  path: '/llms.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MediaRoute = MediaRouteImport.update({
-  id: '/media',
-  path: '/media',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudentLifeRoute = StudentLifeRouteImport.update({
-  id: '/student-life',
-  path: '/student-life',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiContactRoute = ApiContactRouteImport.update({
-  id: '/api/contact',
-  path: '/api/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiEnrollRoute = ApiEnrollRouteImport.update({
-  id: '/api/enroll',
-  path: '/api/enroll',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => rootRouteImport,
+const PublicIndexRoute = PublicIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 const AuthSigninRoute = AuthSigninRouteImport.update({
   id: '/auth/signin',
   path: '/auth/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/auth/signup',
-  path: '/auth/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
-  id: '/auth/verify-email',
-  path: '/auth/verify-email',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardActivityRoute = DashboardActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardAdminRoute = DashboardAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardFaqsRoute = DashboardFaqsRouteImport.update({
-  id: '/faqs',
-  path: '/faqs',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardGalleryRoute = DashboardGalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardInboxRoute = DashboardInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardInstructorsRoute = DashboardInstructorsRouteImport.update({
-  id: '/instructors',
-  path: '/instructors',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardSiteRoute = DashboardSiteRouteImport.update({
-  id: '/site',
-  path: '/site',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardTestimonialsRoute = DashboardTestimonialsRouteImport.update({
-  id: '/testimonials',
-  path: '/testimonials',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardUsersRoute = DashboardUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const ProgramsIndexRoute = ProgramsIndexRouteImport.update({
-  id: '/programs/',
-  path: '/programs/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProgramsSlugRoute = ProgramsSlugRouteImport.update({
-  id: '/programs/$slug',
-  path: '/programs/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VerifyIndexRoute = VerifyIndexRouteImport.update({
-  id: '/verify/',
-  path: '/verify/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VerifyCodeRoute = VerifyCodeRouteImport.update({
-  id: '/verify/$code',
-  path: '/verify/$code',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminBlogRoute = ApiAdminBlogRouteImport.update({
-  id: '/api/admin/blog',
-  path: '/api/admin/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminCertificatesRoute = ApiAdminCertificatesRouteImport.update({
-  id: '/api/admin/certificates',
-  path: '/api/admin/certificates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminUploadRoute = ApiAdminUploadRouteImport.update({
-  id: '/api/admin/upload',
-  path: '/api/admin/upload',
+const EnrollIndexRoute = EnrollIndexRouteImport.update({
+  id: '/enroll/',
+  path: '/enroll/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -290,704 +51,84 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiUploadAvatarRoute = ApiUploadAvatarRouteImport.update({
-  id: '/api/upload/avatar',
-  path: '/api/upload/avatar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogCategorySlugRoute = BlogCategorySlugRouteImport.update({
-  id: '/blog/category/$slug',
-  path: '/blog/category/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CertificatesIdPrintRoute = CertificatesIdPrintRouteImport.update({
-  id: '/certificates/$id/print',
-  path: '/certificates/$id/print',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardBlogIndexRoute = DashboardBlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardBlogCategoriesRoute = DashboardBlogCategoriesRouteImport.update({
-  id: '/blog/categories',
-  path: '/blog/categories',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardBlogNewRoute = DashboardBlogNewRouteImport.update({
-  id: '/blog/new',
-  path: '/blog/new',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardCertificatesIndexRoute =
-  DashboardCertificatesIndexRouteImport.update({
-    id: '/certificates/',
-    path: '/certificates/',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardCertificatesAdminRoute =
-  DashboardCertificatesAdminRouteImport.update({
-    id: '/certificates/admin',
-    path: '/certificates/admin',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardEnrollmentsIndexRoute =
-  DashboardEnrollmentsIndexRouteImport.update({
-    id: '/enrollments/',
-    path: '/enrollments/',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardEnrollmentsIdRoute = DashboardEnrollmentsIdRouteImport.update({
-  id: '/enrollments/$id',
-  path: '/enrollments/$id',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardEnrollmentsIntakesRoute =
-  DashboardEnrollmentsIntakesRouteImport.update({
-    id: '/enrollments/intakes',
-    path: '/enrollments/intakes',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const MdBlogSlugRoute = MdBlogSlugRouteImport.update({
-  id: '/md/blog/$slug',
-  path: '/md/blog/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminBlogIdRoute = ApiAdminBlogIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiAdminBlogRoute,
-} as any)
-const ApiAdminBlogBulkRoute = ApiAdminBlogBulkRouteImport.update({
-  id: '/bulk',
-  path: '/bulk',
-  getParentRoute: () => ApiAdminBlogRoute,
-} as any)
-const ApiAdminBlogCategoriesRoute = ApiAdminBlogCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => ApiAdminBlogRoute,
-} as any)
-const ApiAdminCertificatesIdRoute = ApiAdminCertificatesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiAdminCertificatesRoute,
-} as any)
-const ApiAdminEnrollmentsIdRoute = ApiAdminEnrollmentsIdRouteImport.update({
-  id: '/api/admin/enrollments/$id',
-  path: '/api/admin/enrollments/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminEnrollmentsBulkRoute = ApiAdminEnrollmentsBulkRouteImport.update({
-  id: '/api/admin/enrollments/bulk',
-  path: '/api/admin/enrollments/bulk',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminEnrollmentsIntakesRoute =
-  ApiAdminEnrollmentsIntakesRouteImport.update({
-    id: '/api/admin/enrollments/intakes',
-    path: '/api/admin/enrollments/intakes',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardBlogIdEditRoute = DashboardBlogIdEditRouteImport.update({
-  id: '/blog/$id/edit',
-  path: '/blog/$id/edit',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const ApiAdminBlogCategoriesIdRoute =
-  ApiAdminBlogCategoriesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => ApiAdminBlogCategoriesRoute,
-  } as any)
-const ApiAdminEnrollmentsIntakesIdRoute =
-  ApiAdminEnrollmentsIntakesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => ApiAdminEnrollmentsIntakesRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRouteWithChildren
-  '/enroll': typeof EnrollRoute
-  '/feed.xml': typeof FeedDotxmlRoute
-  '/gallery': typeof GalleryRoute
-  '/instructors': typeof InstructorsRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/media': typeof MediaRoute
-  '/privacy': typeof PrivacyRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/student-life': typeof StudentLifeRoute
-  '/terms': typeof TermsRoute
-  '/api/contact': typeof ApiContactRoute
-  '/api/enroll': typeof ApiEnrollRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/': typeof PublicIndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/auth/signin': typeof AuthSigninRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/auth/verify-email': typeof AuthVerifyEmailRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/activity': typeof DashboardActivityRoute
-  '/dashboard/admin': typeof DashboardAdminRoute
-  '/dashboard/faqs': typeof DashboardFaqsRoute
-  '/dashboard/gallery': typeof DashboardGalleryRoute
-  '/dashboard/inbox': typeof DashboardInboxRoute
-  '/dashboard/instructors': typeof DashboardInstructorsRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/site': typeof DashboardSiteRoute
-  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
-  '/dashboard/users': typeof DashboardUsersRoute
-  '/programs/$slug': typeof ProgramsSlugRoute
-  '/verify/$code': typeof VerifyCodeRoute
-  '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/programs/': typeof ProgramsIndexRoute
-  '/verify/': typeof VerifyIndexRoute
-  '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
-  '/api/admin/certificates': typeof ApiAdminCertificatesRouteWithChildren
-  '/api/admin/upload': typeof ApiAdminUploadRoute
+  '/enroll/': typeof EnrollIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/upload/avatar': typeof ApiUploadAvatarRoute
-  '/blog/category/$slug': typeof BlogCategorySlugRoute
-  '/certificates/$id/print': typeof CertificatesIdPrintRoute
-  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
-  '/dashboard/blog/new': typeof DashboardBlogNewRoute
-  '/dashboard/certificates/admin': typeof DashboardCertificatesAdminRoute
-  '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
-  '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
-  '/md/blog/$slug': typeof MdBlogSlugRoute
-  '/dashboard/blog/': typeof DashboardBlogIndexRoute
-  '/dashboard/certificates/': typeof DashboardCertificatesIndexRoute
-  '/dashboard/enrollments/': typeof DashboardEnrollmentsIndexRoute
-  '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
-  '/api/admin/blog/bulk': typeof ApiAdminBlogBulkRoute
-  '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
-  '/api/admin/certificates/$id': typeof ApiAdminCertificatesIdRoute
-  '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
-  '/api/admin/enrollments/bulk': typeof ApiAdminEnrollmentsBulkRoute
-  '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
-  '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
-  '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
-  '/api/admin/enrollments/intakes/$id': typeof ApiAdminEnrollmentsIntakesIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/enroll': typeof EnrollRoute
-  '/feed.xml': typeof FeedDotxmlRoute
-  '/gallery': typeof GalleryRoute
-  '/instructors': typeof InstructorsRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/media': typeof MediaRoute
-  '/privacy': typeof PrivacyRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/student-life': typeof StudentLifeRoute
-  '/terms': typeof TermsRoute
-  '/api/contact': typeof ApiContactRoute
-  '/api/enroll': typeof ApiEnrollRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/auth/verify-email': typeof AuthVerifyEmailRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/activity': typeof DashboardActivityRoute
-  '/dashboard/admin': typeof DashboardAdminRoute
-  '/dashboard/faqs': typeof DashboardFaqsRoute
-  '/dashboard/gallery': typeof DashboardGalleryRoute
-  '/dashboard/inbox': typeof DashboardInboxRoute
-  '/dashboard/instructors': typeof DashboardInstructorsRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/site': typeof DashboardSiteRoute
-  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
-  '/dashboard/users': typeof DashboardUsersRoute
-  '/programs/$slug': typeof ProgramsSlugRoute
-  '/verify/$code': typeof VerifyCodeRoute
-  '/blog': typeof BlogIndexRoute
+  '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardIndexRoute
-  '/programs': typeof ProgramsIndexRoute
-  '/verify': typeof VerifyIndexRoute
-  '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
-  '/api/admin/certificates': typeof ApiAdminCertificatesRouteWithChildren
-  '/api/admin/upload': typeof ApiAdminUploadRoute
+  '/enroll': typeof EnrollIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/upload/avatar': typeof ApiUploadAvatarRoute
-  '/blog/category/$slug': typeof BlogCategorySlugRoute
-  '/certificates/$id/print': typeof CertificatesIdPrintRoute
-  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
-  '/dashboard/blog/new': typeof DashboardBlogNewRoute
-  '/dashboard/certificates/admin': typeof DashboardCertificatesAdminRoute
-  '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
-  '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
-  '/md/blog/$slug': typeof MdBlogSlugRoute
-  '/dashboard/blog': typeof DashboardBlogIndexRoute
-  '/dashboard/certificates': typeof DashboardCertificatesIndexRoute
-  '/dashboard/enrollments': typeof DashboardEnrollmentsIndexRoute
-  '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
-  '/api/admin/blog/bulk': typeof ApiAdminBlogBulkRoute
-  '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
-  '/api/admin/certificates/$id': typeof ApiAdminCertificatesIdRoute
-  '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
-  '/api/admin/enrollments/bulk': typeof ApiAdminEnrollmentsBulkRoute
-  '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
-  '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
-  '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
-  '/api/admin/enrollments/intakes/$id': typeof ApiAdminEnrollmentsIntakesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRouteWithChildren
-  '/enroll': typeof EnrollRoute
-  '/feed.xml': typeof FeedDotxmlRoute
-  '/gallery': typeof GalleryRoute
-  '/instructors': typeof InstructorsRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/media': typeof MediaRoute
-  '/privacy': typeof PrivacyRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/student-life': typeof StudentLifeRoute
-  '/terms': typeof TermsRoute
-  '/api/contact': typeof ApiContactRoute
-  '/api/enroll': typeof ApiEnrollRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/_public': typeof PublicRouteRouteWithChildren
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/auth/signin': typeof AuthSigninRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/auth/verify-email': typeof AuthVerifyEmailRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/activity': typeof DashboardActivityRoute
-  '/dashboard/admin': typeof DashboardAdminRoute
-  '/dashboard/faqs': typeof DashboardFaqsRoute
-  '/dashboard/gallery': typeof DashboardGalleryRoute
-  '/dashboard/inbox': typeof DashboardInboxRoute
-  '/dashboard/instructors': typeof DashboardInstructorsRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/site': typeof DashboardSiteRoute
-  '/dashboard/testimonials': typeof DashboardTestimonialsRoute
-  '/dashboard/users': typeof DashboardUsersRoute
-  '/programs/$slug': typeof ProgramsSlugRoute
-  '/verify/$code': typeof VerifyCodeRoute
-  '/blog/': typeof BlogIndexRoute
+  '/_public/': typeof PublicIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/programs/': typeof ProgramsIndexRoute
-  '/verify/': typeof VerifyIndexRoute
-  '/api/admin/blog': typeof ApiAdminBlogRouteWithChildren
-  '/api/admin/certificates': typeof ApiAdminCertificatesRouteWithChildren
-  '/api/admin/upload': typeof ApiAdminUploadRoute
+  '/enroll/': typeof EnrollIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/upload/avatar': typeof ApiUploadAvatarRoute
-  '/blog/category/$slug': typeof BlogCategorySlugRoute
-  '/certificates/$id/print': typeof CertificatesIdPrintRoute
-  '/dashboard/blog/categories': typeof DashboardBlogCategoriesRoute
-  '/dashboard/blog/new': typeof DashboardBlogNewRoute
-  '/dashboard/certificates/admin': typeof DashboardCertificatesAdminRoute
-  '/dashboard/enrollments/$id': typeof DashboardEnrollmentsIdRoute
-  '/dashboard/enrollments/intakes': typeof DashboardEnrollmentsIntakesRoute
-  '/md/blog/$slug': typeof MdBlogSlugRoute
-  '/dashboard/blog/': typeof DashboardBlogIndexRoute
-  '/dashboard/certificates/': typeof DashboardCertificatesIndexRoute
-  '/dashboard/enrollments/': typeof DashboardEnrollmentsIndexRoute
-  '/api/admin/blog/$id': typeof ApiAdminBlogIdRoute
-  '/api/admin/blog/bulk': typeof ApiAdminBlogBulkRoute
-  '/api/admin/blog/categories': typeof ApiAdminBlogCategoriesRouteWithChildren
-  '/api/admin/certificates/$id': typeof ApiAdminCertificatesIdRoute
-  '/api/admin/enrollments/$id': typeof ApiAdminEnrollmentsIdRoute
-  '/api/admin/enrollments/bulk': typeof ApiAdminEnrollmentsBulkRoute
-  '/api/admin/enrollments/intakes': typeof ApiAdminEnrollmentsIntakesRouteWithChildren
-  '/dashboard/blog/$id/edit': typeof DashboardBlogIdEditRoute
-  '/api/admin/blog/categories/$id': typeof ApiAdminBlogCategoriesIdRoute
-  '/api/admin/enrollments/intakes/$id': typeof ApiAdminEnrollmentsIntakesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
-    | '/careers'
-    | '/contact'
     | '/dashboard'
-    | '/enroll'
-    | '/feed.xml'
-    | '/gallery'
-    | '/instructors'
-    | '/llms.txt'
-    | '/media'
-    | '/privacy'
-    | '/sitemap.xml'
-    | '/student-life'
-    | '/terms'
-    | '/api/contact'
-    | '/api/enroll'
-    | '/auth/forgot-password'
-    | '/auth/reset-password'
     | '/auth/signin'
-    | '/auth/signup'
-    | '/auth/verify-email'
-    | '/blog/$slug'
-    | '/dashboard/activity'
-    | '/dashboard/admin'
-    | '/dashboard/faqs'
-    | '/dashboard/gallery'
-    | '/dashboard/inbox'
-    | '/dashboard/instructors'
-    | '/dashboard/settings'
-    | '/dashboard/site'
-    | '/dashboard/testimonials'
-    | '/dashboard/users'
-    | '/programs/$slug'
-    | '/verify/$code'
-    | '/blog/'
     | '/dashboard/'
-    | '/programs/'
-    | '/verify/'
-    | '/api/admin/blog'
-    | '/api/admin/certificates'
-    | '/api/admin/upload'
+    | '/enroll/'
     | '/api/auth/$'
-    | '/api/upload/avatar'
-    | '/blog/category/$slug'
-    | '/certificates/$id/print'
-    | '/dashboard/blog/categories'
-    | '/dashboard/blog/new'
-    | '/dashboard/certificates/admin'
-    | '/dashboard/enrollments/$id'
-    | '/dashboard/enrollments/intakes'
-    | '/md/blog/$slug'
-    | '/dashboard/blog/'
-    | '/dashboard/certificates/'
-    | '/dashboard/enrollments/'
-    | '/api/admin/blog/$id'
-    | '/api/admin/blog/bulk'
-    | '/api/admin/blog/categories'
-    | '/api/admin/certificates/$id'
-    | '/api/admin/enrollments/$id'
-    | '/api/admin/enrollments/bulk'
-    | '/api/admin/enrollments/intakes'
-    | '/dashboard/blog/$id/edit'
-    | '/api/admin/blog/categories/$id'
-    | '/api/admin/enrollments/intakes/$id'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/careers'
-    | '/contact'
-    | '/enroll'
-    | '/feed.xml'
-    | '/gallery'
-    | '/instructors'
-    | '/llms.txt'
-    | '/media'
-    | '/privacy'
-    | '/sitemap.xml'
-    | '/student-life'
-    | '/terms'
-    | '/api/contact'
-    | '/api/enroll'
-    | '/auth/forgot-password'
-    | '/auth/reset-password'
-    | '/auth/signin'
-    | '/auth/signup'
-    | '/auth/verify-email'
-    | '/blog/$slug'
-    | '/dashboard/activity'
-    | '/dashboard/admin'
-    | '/dashboard/faqs'
-    | '/dashboard/gallery'
-    | '/dashboard/inbox'
-    | '/dashboard/instructors'
-    | '/dashboard/settings'
-    | '/dashboard/site'
-    | '/dashboard/testimonials'
-    | '/dashboard/users'
-    | '/programs/$slug'
-    | '/verify/$code'
-    | '/blog'
-    | '/dashboard'
-    | '/programs'
-    | '/verify'
-    | '/api/admin/blog'
-    | '/api/admin/certificates'
-    | '/api/admin/upload'
-    | '/api/auth/$'
-    | '/api/upload/avatar'
-    | '/blog/category/$slug'
-    | '/certificates/$id/print'
-    | '/dashboard/blog/categories'
-    | '/dashboard/blog/new'
-    | '/dashboard/certificates/admin'
-    | '/dashboard/enrollments/$id'
-    | '/dashboard/enrollments/intakes'
-    | '/md/blog/$slug'
-    | '/dashboard/blog'
-    | '/dashboard/certificates'
-    | '/dashboard/enrollments'
-    | '/api/admin/blog/$id'
-    | '/api/admin/blog/bulk'
-    | '/api/admin/blog/categories'
-    | '/api/admin/certificates/$id'
-    | '/api/admin/enrollments/$id'
-    | '/api/admin/enrollments/bulk'
-    | '/api/admin/enrollments/intakes'
-    | '/dashboard/blog/$id/edit'
-    | '/api/admin/blog/categories/$id'
-    | '/api/admin/enrollments/intakes/$id'
+  to: '/auth/signin' | '/' | '/dashboard' | '/enroll' | '/api/auth/$'
   id:
     | '__root__'
-    | '/'
-    | '/about'
-    | '/careers'
-    | '/contact'
+    | '/_public'
     | '/dashboard'
-    | '/enroll'
-    | '/feed.xml'
-    | '/gallery'
-    | '/instructors'
-    | '/llms.txt'
-    | '/media'
-    | '/privacy'
-    | '/sitemap.xml'
-    | '/student-life'
-    | '/terms'
-    | '/api/contact'
-    | '/api/enroll'
-    | '/auth/forgot-password'
-    | '/auth/reset-password'
     | '/auth/signin'
-    | '/auth/signup'
-    | '/auth/verify-email'
-    | '/blog/$slug'
-    | '/dashboard/activity'
-    | '/dashboard/admin'
-    | '/dashboard/faqs'
-    | '/dashboard/gallery'
-    | '/dashboard/inbox'
-    | '/dashboard/instructors'
-    | '/dashboard/settings'
-    | '/dashboard/site'
-    | '/dashboard/testimonials'
-    | '/dashboard/users'
-    | '/programs/$slug'
-    | '/verify/$code'
-    | '/blog/'
+    | '/_public/'
     | '/dashboard/'
-    | '/programs/'
-    | '/verify/'
-    | '/api/admin/blog'
-    | '/api/admin/certificates'
-    | '/api/admin/upload'
+    | '/enroll/'
     | '/api/auth/$'
-    | '/api/upload/avatar'
-    | '/blog/category/$slug'
-    | '/certificates/$id/print'
-    | '/dashboard/blog/categories'
-    | '/dashboard/blog/new'
-    | '/dashboard/certificates/admin'
-    | '/dashboard/enrollments/$id'
-    | '/dashboard/enrollments/intakes'
-    | '/md/blog/$slug'
-    | '/dashboard/blog/'
-    | '/dashboard/certificates/'
-    | '/dashboard/enrollments/'
-    | '/api/admin/blog/$id'
-    | '/api/admin/blog/bulk'
-    | '/api/admin/blog/categories'
-    | '/api/admin/certificates/$id'
-    | '/api/admin/enrollments/$id'
-    | '/api/admin/enrollments/bulk'
-    | '/api/admin/enrollments/intakes'
-    | '/dashboard/blog/$id/edit'
-    | '/api/admin/blog/categories/$id'
-    | '/api/admin/enrollments/intakes/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  CareersRoute: typeof CareersRoute
-  ContactRoute: typeof ContactRoute
-  DashboardRoute: typeof DashboardRouteWithChildren
-  EnrollRoute: typeof EnrollRoute
-  FeedDotxmlRoute: typeof FeedDotxmlRoute
-  GalleryRoute: typeof GalleryRoute
-  InstructorsRoute: typeof InstructorsRoute
-  LlmsDottxtRoute: typeof LlmsDottxtRoute
-  MediaRoute: typeof MediaRoute
-  PrivacyRoute: typeof PrivacyRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  StudentLifeRoute: typeof StudentLifeRoute
-  TermsRoute: typeof TermsRoute
-  ApiContactRoute: typeof ApiContactRoute
-  ApiEnrollRoute: typeof ApiEnrollRoute
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
-  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  PublicRouteRoute: typeof PublicRouteRouteWithChildren
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   AuthSigninRoute: typeof AuthSigninRoute
-  AuthSignupRoute: typeof AuthSignupRoute
-  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
-  BlogSlugRoute: typeof BlogSlugRoute
-  ProgramsSlugRoute: typeof ProgramsSlugRoute
-  VerifyCodeRoute: typeof VerifyCodeRoute
-  BlogIndexRoute: typeof BlogIndexRoute
-  ProgramsIndexRoute: typeof ProgramsIndexRoute
-  VerifyIndexRoute: typeof VerifyIndexRoute
-  ApiAdminBlogRoute: typeof ApiAdminBlogRouteWithChildren
-  ApiAdminCertificatesRoute: typeof ApiAdminCertificatesRouteWithChildren
-  ApiAdminUploadRoute: typeof ApiAdminUploadRoute
+  EnrollIndexRoute: typeof EnrollIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiUploadAvatarRoute: typeof ApiUploadAvatarRoute
-  BlogCategorySlugRoute: typeof BlogCategorySlugRoute
-  CertificatesIdPrintRoute: typeof CertificatesIdPrintRoute
-  MdBlogSlugRoute: typeof MdBlogSlugRoute
-  ApiAdminEnrollmentsIdRoute: typeof ApiAdminEnrollmentsIdRoute
-  ApiAdminEnrollmentsBulkRoute: typeof ApiAdminEnrollmentsBulkRoute
-  ApiAdminEnrollmentsIntakesRoute: typeof ApiAdminEnrollmentsIntakesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_public': {
+      id: '/_public'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/careers': {
-      id: '/careers'
-      path: '/careers'
-      fullPath: '/careers'
-      preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
+      preLoaderRoute: typeof PublicRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+      preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/enroll': {
-      id: '/enroll'
-      path: '/enroll'
-      fullPath: '/enroll'
-      preLoaderRoute: typeof EnrollRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feed.xml': {
-      id: '/feed.xml'
-      path: '/feed.xml'
-      fullPath: '/feed.xml'
-      preLoaderRoute: typeof FeedDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gallery': {
-      id: '/gallery'
-      path: '/gallery'
-      fullPath: '/gallery'
-      preLoaderRoute: typeof GalleryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/instructors': {
-      id: '/instructors'
-      path: '/instructors'
-      fullPath: '/instructors'
-      preLoaderRoute: typeof InstructorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/llms.txt': {
-      id: '/llms.txt'
-      path: '/llms.txt'
-      fullPath: '/llms.txt'
-      preLoaderRoute: typeof LlmsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/media': {
-      id: '/media'
-      path: '/media'
-      fullPath: '/media'
-      preLoaderRoute: typeof MediaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/student-life': {
-      id: '/student-life'
-      path: '/student-life'
-      fullPath: '/student-life'
-      preLoaderRoute: typeof StudentLifeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/contact': {
-      id: '/api/contact'
-      path: '/api/contact'
-      fullPath: '/api/contact'
-      preLoaderRoute: typeof ApiContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/enroll': {
-      id: '/api/enroll'
-      path: '/api/enroll'
-      fullPath: '/api/enroll'
-      preLoaderRoute: typeof ApiEnrollRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/auth/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/auth/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_public/': {
+      id: '/_public/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/auth/signin': {
       id: '/auth/signin'
@@ -996,158 +137,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSigninRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/signup': {
-      id: '/auth/signup'
-      path: '/auth/signup'
-      fullPath: '/auth/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/verify-email': {
-      id: '/auth/verify-email'
-      path: '/auth/verify-email'
-      fullPath: '/auth/verify-email'
-      preLoaderRoute: typeof AuthVerifyEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/activity': {
-      id: '/dashboard/activity'
-      path: '/activity'
-      fullPath: '/dashboard/activity'
-      preLoaderRoute: typeof DashboardActivityRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/admin': {
-      id: '/dashboard/admin'
-      path: '/admin'
-      fullPath: '/dashboard/admin'
-      preLoaderRoute: typeof DashboardAdminRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/faqs': {
-      id: '/dashboard/faqs'
-      path: '/faqs'
-      fullPath: '/dashboard/faqs'
-      preLoaderRoute: typeof DashboardFaqsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/gallery': {
-      id: '/dashboard/gallery'
-      path: '/gallery'
-      fullPath: '/dashboard/gallery'
-      preLoaderRoute: typeof DashboardGalleryRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/inbox': {
-      id: '/dashboard/inbox'
-      path: '/inbox'
-      fullPath: '/dashboard/inbox'
-      preLoaderRoute: typeof DashboardInboxRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/instructors': {
-      id: '/dashboard/instructors'
-      path: '/instructors'
-      fullPath: '/dashboard/instructors'
-      preLoaderRoute: typeof DashboardInstructorsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/settings': {
-      id: '/dashboard/settings'
-      path: '/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof DashboardSettingsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/site': {
-      id: '/dashboard/site'
-      path: '/site'
-      fullPath: '/dashboard/site'
-      preLoaderRoute: typeof DashboardSiteRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/testimonials': {
-      id: '/dashboard/testimonials'
-      path: '/testimonials'
-      fullPath: '/dashboard/testimonials'
-      preLoaderRoute: typeof DashboardTestimonialsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/users': {
-      id: '/dashboard/users'
-      path: '/users'
-      fullPath: '/dashboard/users'
-      preLoaderRoute: typeof DashboardUsersRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/programs/': {
-      id: '/programs/'
-      path: '/programs'
-      fullPath: '/programs/'
-      preLoaderRoute: typeof ProgramsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/programs/$slug': {
-      id: '/programs/$slug'
-      path: '/programs/$slug'
-      fullPath: '/programs/$slug'
-      preLoaderRoute: typeof ProgramsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/verify/': {
-      id: '/verify/'
-      path: '/verify'
-      fullPath: '/verify/'
-      preLoaderRoute: typeof VerifyIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/verify/$code': {
-      id: '/verify/$code'
-      path: '/verify/$code'
-      fullPath: '/verify/$code'
-      preLoaderRoute: typeof VerifyCodeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/blog': {
-      id: '/api/admin/blog'
-      path: '/api/admin/blog'
-      fullPath: '/api/admin/blog'
-      preLoaderRoute: typeof ApiAdminBlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/certificates': {
-      id: '/api/admin/certificates'
-      path: '/api/admin/certificates'
-      fullPath: '/api/admin/certificates'
-      preLoaderRoute: typeof ApiAdminCertificatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/upload': {
-      id: '/api/admin/upload'
-      path: '/api/admin/upload'
-      fullPath: '/api/admin/upload'
-      preLoaderRoute: typeof ApiAdminUploadRouteImport
+    '/enroll/': {
+      id: '/enroll/'
+      path: '/enroll'
+      fullPath: '/enroll/'
+      preLoaderRoute: typeof EnrollIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -1157,308 +158,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/upload/avatar': {
-      id: '/api/upload/avatar'
-      path: '/api/upload/avatar'
-      fullPath: '/api/upload/avatar'
-      preLoaderRoute: typeof ApiUploadAvatarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/category/$slug': {
-      id: '/blog/category/$slug'
-      path: '/blog/category/$slug'
-      fullPath: '/blog/category/$slug'
-      preLoaderRoute: typeof BlogCategorySlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/certificates/$id/print': {
-      id: '/certificates/$id/print'
-      path: '/certificates/$id/print'
-      fullPath: '/certificates/$id/print'
-      preLoaderRoute: typeof CertificatesIdPrintRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/blog/': {
-      id: '/dashboard/blog/'
-      path: '/blog'
-      fullPath: '/dashboard/blog/'
-      preLoaderRoute: typeof DashboardBlogIndexRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/blog/categories': {
-      id: '/dashboard/blog/categories'
-      path: '/blog/categories'
-      fullPath: '/dashboard/blog/categories'
-      preLoaderRoute: typeof DashboardBlogCategoriesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/blog/new': {
-      id: '/dashboard/blog/new'
-      path: '/blog/new'
-      fullPath: '/dashboard/blog/new'
-      preLoaderRoute: typeof DashboardBlogNewRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/certificates/': {
-      id: '/dashboard/certificates/'
-      path: '/certificates'
-      fullPath: '/dashboard/certificates/'
-      preLoaderRoute: typeof DashboardCertificatesIndexRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/certificates/admin': {
-      id: '/dashboard/certificates/admin'
-      path: '/certificates/admin'
-      fullPath: '/dashboard/certificates/admin'
-      preLoaderRoute: typeof DashboardCertificatesAdminRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/enrollments/': {
-      id: '/dashboard/enrollments/'
-      path: '/enrollments'
-      fullPath: '/dashboard/enrollments/'
-      preLoaderRoute: typeof DashboardEnrollmentsIndexRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/enrollments/$id': {
-      id: '/dashboard/enrollments/$id'
-      path: '/enrollments/$id'
-      fullPath: '/dashboard/enrollments/$id'
-      preLoaderRoute: typeof DashboardEnrollmentsIdRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/enrollments/intakes': {
-      id: '/dashboard/enrollments/intakes'
-      path: '/enrollments/intakes'
-      fullPath: '/dashboard/enrollments/intakes'
-      preLoaderRoute: typeof DashboardEnrollmentsIntakesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/md/blog/$slug': {
-      id: '/md/blog/$slug'
-      path: '/md/blog/$slug'
-      fullPath: '/md/blog/$slug'
-      preLoaderRoute: typeof MdBlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/blog/$id': {
-      id: '/api/admin/blog/$id'
-      path: '/$id'
-      fullPath: '/api/admin/blog/$id'
-      preLoaderRoute: typeof ApiAdminBlogIdRouteImport
-      parentRoute: typeof ApiAdminBlogRoute
-    }
-    '/api/admin/blog/bulk': {
-      id: '/api/admin/blog/bulk'
-      path: '/bulk'
-      fullPath: '/api/admin/blog/bulk'
-      preLoaderRoute: typeof ApiAdminBlogBulkRouteImport
-      parentRoute: typeof ApiAdminBlogRoute
-    }
-    '/api/admin/blog/categories': {
-      id: '/api/admin/blog/categories'
-      path: '/categories'
-      fullPath: '/api/admin/blog/categories'
-      preLoaderRoute: typeof ApiAdminBlogCategoriesRouteImport
-      parentRoute: typeof ApiAdminBlogRoute
-    }
-    '/api/admin/certificates/$id': {
-      id: '/api/admin/certificates/$id'
-      path: '/$id'
-      fullPath: '/api/admin/certificates/$id'
-      preLoaderRoute: typeof ApiAdminCertificatesIdRouteImport
-      parentRoute: typeof ApiAdminCertificatesRoute
-    }
-    '/api/admin/enrollments/$id': {
-      id: '/api/admin/enrollments/$id'
-      path: '/api/admin/enrollments/$id'
-      fullPath: '/api/admin/enrollments/$id'
-      preLoaderRoute: typeof ApiAdminEnrollmentsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/enrollments/bulk': {
-      id: '/api/admin/enrollments/bulk'
-      path: '/api/admin/enrollments/bulk'
-      fullPath: '/api/admin/enrollments/bulk'
-      preLoaderRoute: typeof ApiAdminEnrollmentsBulkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/enrollments/intakes': {
-      id: '/api/admin/enrollments/intakes'
-      path: '/api/admin/enrollments/intakes'
-      fullPath: '/api/admin/enrollments/intakes'
-      preLoaderRoute: typeof ApiAdminEnrollmentsIntakesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/blog/$id/edit': {
-      id: '/dashboard/blog/$id/edit'
-      path: '/blog/$id/edit'
-      fullPath: '/dashboard/blog/$id/edit'
-      preLoaderRoute: typeof DashboardBlogIdEditRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/api/admin/blog/categories/$id': {
-      id: '/api/admin/blog/categories/$id'
-      path: '/$id'
-      fullPath: '/api/admin/blog/categories/$id'
-      preLoaderRoute: typeof ApiAdminBlogCategoriesIdRouteImport
-      parentRoute: typeof ApiAdminBlogCategoriesRoute
-    }
-    '/api/admin/enrollments/intakes/$id': {
-      id: '/api/admin/enrollments/intakes/$id'
-      path: '/$id'
-      fullPath: '/api/admin/enrollments/intakes/$id'
-      preLoaderRoute: typeof ApiAdminEnrollmentsIntakesIdRouteImport
-      parentRoute: typeof ApiAdminEnrollmentsIntakesRoute
-    }
   }
 }
 
-interface DashboardRouteChildren {
-  DashboardActivityRoute: typeof DashboardActivityRoute
-  DashboardAdminRoute: typeof DashboardAdminRoute
-  DashboardFaqsRoute: typeof DashboardFaqsRoute
-  DashboardGalleryRoute: typeof DashboardGalleryRoute
-  DashboardInboxRoute: typeof DashboardInboxRoute
-  DashboardInstructorsRoute: typeof DashboardInstructorsRoute
-  DashboardSettingsRoute: typeof DashboardSettingsRoute
-  DashboardSiteRoute: typeof DashboardSiteRoute
-  DashboardTestimonialsRoute: typeof DashboardTestimonialsRoute
-  DashboardUsersRoute: typeof DashboardUsersRoute
+interface PublicRouteRouteChildren {
+  PublicIndexRoute: typeof PublicIndexRoute
+}
+
+const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicIndexRoute: PublicIndexRoute,
+}
+
+const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
+  PublicRouteRouteChildren,
+)
+
+interface DashboardRouteRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardBlogCategoriesRoute: typeof DashboardBlogCategoriesRoute
-  DashboardBlogNewRoute: typeof DashboardBlogNewRoute
-  DashboardCertificatesAdminRoute: typeof DashboardCertificatesAdminRoute
-  DashboardEnrollmentsIdRoute: typeof DashboardEnrollmentsIdRoute
-  DashboardEnrollmentsIntakesRoute: typeof DashboardEnrollmentsIntakesRoute
-  DashboardBlogIndexRoute: typeof DashboardBlogIndexRoute
-  DashboardCertificatesIndexRoute: typeof DashboardCertificatesIndexRoute
-  DashboardEnrollmentsIndexRoute: typeof DashboardEnrollmentsIndexRoute
-  DashboardBlogIdEditRoute: typeof DashboardBlogIdEditRoute
 }
 
-const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardActivityRoute: DashboardActivityRoute,
-  DashboardAdminRoute: DashboardAdminRoute,
-  DashboardFaqsRoute: DashboardFaqsRoute,
-  DashboardGalleryRoute: DashboardGalleryRoute,
-  DashboardInboxRoute: DashboardInboxRoute,
-  DashboardInstructorsRoute: DashboardInstructorsRoute,
-  DashboardSettingsRoute: DashboardSettingsRoute,
-  DashboardSiteRoute: DashboardSiteRoute,
-  DashboardTestimonialsRoute: DashboardTestimonialsRoute,
-  DashboardUsersRoute: DashboardUsersRoute,
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardBlogCategoriesRoute: DashboardBlogCategoriesRoute,
-  DashboardBlogNewRoute: DashboardBlogNewRoute,
-  DashboardCertificatesAdminRoute: DashboardCertificatesAdminRoute,
-  DashboardEnrollmentsIdRoute: DashboardEnrollmentsIdRoute,
-  DashboardEnrollmentsIntakesRoute: DashboardEnrollmentsIntakesRoute,
-  DashboardBlogIndexRoute: DashboardBlogIndexRoute,
-  DashboardCertificatesIndexRoute: DashboardCertificatesIndexRoute,
-  DashboardEnrollmentsIndexRoute: DashboardEnrollmentsIndexRoute,
-  DashboardBlogIdEditRoute: DashboardBlogIdEditRoute,
 }
 
-const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
-  DashboardRouteChildren,
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
 )
-
-interface ApiAdminBlogCategoriesRouteChildren {
-  ApiAdminBlogCategoriesIdRoute: typeof ApiAdminBlogCategoriesIdRoute
-}
-
-const ApiAdminBlogCategoriesRouteChildren: ApiAdminBlogCategoriesRouteChildren =
-  {
-    ApiAdminBlogCategoriesIdRoute: ApiAdminBlogCategoriesIdRoute,
-  }
-
-const ApiAdminBlogCategoriesRouteWithChildren =
-  ApiAdminBlogCategoriesRoute._addFileChildren(
-    ApiAdminBlogCategoriesRouteChildren,
-  )
-
-interface ApiAdminBlogRouteChildren {
-  ApiAdminBlogIdRoute: typeof ApiAdminBlogIdRoute
-  ApiAdminBlogBulkRoute: typeof ApiAdminBlogBulkRoute
-  ApiAdminBlogCategoriesRoute: typeof ApiAdminBlogCategoriesRouteWithChildren
-}
-
-const ApiAdminBlogRouteChildren: ApiAdminBlogRouteChildren = {
-  ApiAdminBlogIdRoute: ApiAdminBlogIdRoute,
-  ApiAdminBlogBulkRoute: ApiAdminBlogBulkRoute,
-  ApiAdminBlogCategoriesRoute: ApiAdminBlogCategoriesRouteWithChildren,
-}
-
-const ApiAdminBlogRouteWithChildren = ApiAdminBlogRoute._addFileChildren(
-  ApiAdminBlogRouteChildren,
-)
-
-interface ApiAdminCertificatesRouteChildren {
-  ApiAdminCertificatesIdRoute: typeof ApiAdminCertificatesIdRoute
-}
-
-const ApiAdminCertificatesRouteChildren: ApiAdminCertificatesRouteChildren = {
-  ApiAdminCertificatesIdRoute: ApiAdminCertificatesIdRoute,
-}
-
-const ApiAdminCertificatesRouteWithChildren =
-  ApiAdminCertificatesRoute._addFileChildren(ApiAdminCertificatesRouteChildren)
-
-interface ApiAdminEnrollmentsIntakesRouteChildren {
-  ApiAdminEnrollmentsIntakesIdRoute: typeof ApiAdminEnrollmentsIntakesIdRoute
-}
-
-const ApiAdminEnrollmentsIntakesRouteChildren: ApiAdminEnrollmentsIntakesRouteChildren =
-  {
-    ApiAdminEnrollmentsIntakesIdRoute: ApiAdminEnrollmentsIntakesIdRoute,
-  }
-
-const ApiAdminEnrollmentsIntakesRouteWithChildren =
-  ApiAdminEnrollmentsIntakesRoute._addFileChildren(
-    ApiAdminEnrollmentsIntakesRouteChildren,
-  )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  CareersRoute: CareersRoute,
-  ContactRoute: ContactRoute,
-  DashboardRoute: DashboardRouteWithChildren,
-  EnrollRoute: EnrollRoute,
-  FeedDotxmlRoute: FeedDotxmlRoute,
-  GalleryRoute: GalleryRoute,
-  InstructorsRoute: InstructorsRoute,
-  LlmsDottxtRoute: LlmsDottxtRoute,
-  MediaRoute: MediaRoute,
-  PrivacyRoute: PrivacyRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
-  StudentLifeRoute: StudentLifeRoute,
-  TermsRoute: TermsRoute,
-  ApiContactRoute: ApiContactRoute,
-  ApiEnrollRoute: ApiEnrollRoute,
-  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
-  AuthResetPasswordRoute: AuthResetPasswordRoute,
+  PublicRouteRoute: PublicRouteRouteWithChildren,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AuthSigninRoute: AuthSigninRoute,
-  AuthSignupRoute: AuthSignupRoute,
-  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
-  BlogSlugRoute: BlogSlugRoute,
-  ProgramsSlugRoute: ProgramsSlugRoute,
-  VerifyCodeRoute: VerifyCodeRoute,
-  BlogIndexRoute: BlogIndexRoute,
-  ProgramsIndexRoute: ProgramsIndexRoute,
-  VerifyIndexRoute: VerifyIndexRoute,
-  ApiAdminBlogRoute: ApiAdminBlogRouteWithChildren,
-  ApiAdminCertificatesRoute: ApiAdminCertificatesRouteWithChildren,
-  ApiAdminUploadRoute: ApiAdminUploadRoute,
+  EnrollIndexRoute: EnrollIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiUploadAvatarRoute: ApiUploadAvatarRoute,
-  BlogCategorySlugRoute: BlogCategorySlugRoute,
-  CertificatesIdPrintRoute: CertificatesIdPrintRoute,
-  MdBlogSlugRoute: MdBlogSlugRoute,
-  ApiAdminEnrollmentsIdRoute: ApiAdminEnrollmentsIdRoute,
-  ApiAdminEnrollmentsBulkRoute: ApiAdminEnrollmentsBulkRoute,
-  ApiAdminEnrollmentsIntakesRoute: ApiAdminEnrollmentsIntakesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

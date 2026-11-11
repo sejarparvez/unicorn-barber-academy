@@ -1,48 +1,38 @@
-import { IconMenu2, IconPlus } from "@tabler/icons-react";
-import { Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { IconMenu2, IconPlus } from '@tabler/icons-react';
+import { Link, useRouterState } from '@tanstack/react-router';
+import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
 	Sheet,
 	SheetContent,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
-} from "@/components/ui/sheet";
-import type { SessionPayload } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import { LogoLink } from "./logo-link";
-import UserDropDown from "./user";
+} from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
+import { LogoLink } from './logo-link';
+import UserDropDown from './user';
 
 const navItems = [
-	{ name: "Home", href: "/" },
-	{ name: "About", href: "/about" },
-	{ name: "Programs", href: "/programs" },
-	{ name: "Instructors", href: "/instructors" },
-	{ name: "Gallery", href: "/gallery" },
-	{ name: "Blog", href: "/blog" },
-	{ name: "Contact", href: "/contact" },
+	{ name: 'Home', href: '/' },
+	{ name: 'About', href: '/about' },
+	{ name: 'Programs', href: '/programs' },
+	{ name: 'Instructors', href: '/instructors' },
+	{ name: 'Gallery', href: '/gallery' },
+	{ name: 'Blog', href: '/blog' },
+	{ name: 'Contact', href: '/contact' },
 ];
 
-// Section pages stay active on child routes (/blog/<slug>, /programs/<slug>);
-// the home link matches exactly so it isn't lit for every path.
 function isActiveNav(pathname: string, href: string) {
-	return href === "/"
-		? pathname === "/"
+	return href === '/'
+		? pathname === '/'
 		: pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export default function Header({
-	session,
-}: {
-	session: SessionPayload | null;
-}) {
-	// TanStack Router equivalent of next/navigation's usePathname().
+export default function Header() {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const [isVisible, setIsVisible] = useState(true);
 	const lastScrollYRef = useRef(0);
-	// Controlled so nav links can close the drawer on tap — Base UI's Dialog
-	// does not auto-close when the route changes underneath it.
 	const [mobileOpen, setMobileOpen] = useState(false);
 
 	useEffect(() => {
@@ -61,16 +51,16 @@ export default function Header({
 			lastScrollYRef.current = currentScrollY;
 		};
 
-		window.addEventListener("scroll", controlNavbar, { passive: true });
-		return () => window.removeEventListener("scroll", controlNavbar);
+		window.addEventListener('scroll', controlNavbar, { passive: true });
+		return () => window.removeEventListener('scroll', controlNavbar);
 	}, []);
 
 	return (
 		<nav
 			aria-label="Main navigation"
 			className={cn(
-				"sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-transform duration-300",
-				isVisible ? "translate-y-0" : "-translate-y-full",
+				'sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-transform duration-300',
+				isVisible ? 'translate-y-0' : '-translate-y-full',
 			)}
 		>
 			<div className="mx-auto flex h-16 max-w-8xl items-center justify-between px-4 sm:px-6 lg:px-16">
@@ -105,10 +95,10 @@ export default function Header({
 												preload="intent"
 												onClick={() => setMobileOpen(false)}
 												className={cn(
-													"flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200",
+													'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200',
 													active
-														? "bg-primary/10 text-primary"
-														: "text-foreground/70 hover:text-primary hover:bg-primary/5",
+														? 'bg-primary/10 text-primary'
+														: 'text-foreground/70 hover:text-primary hover:bg-primary/5',
 												)}
 											>
 												{active && (
@@ -151,16 +141,16 @@ export default function Header({
 								to={item.href}
 								preload="intent"
 								className={cn(
-									"relative px-3 py-2 text-sm font-medium transition-colors duration-200 hover:text-primary group",
-									active ? "text-primary" : "text-muted-foreground",
+									'relative px-3 py-2 text-sm font-medium transition-colors duration-200 hover:text-primary group',
+									active ? 'text-primary' : 'text-muted-foreground',
 								)}
 							>
 								{item.name}
 								{/* Active underline — h-px rule from design system */}
 								<span
 									className={cn(
-										"absolute bottom-0 left-3 right-3 h-px bg-primary transition-all duration-200",
-										active ? "opacity-100" : "opacity-0 group-hover:opacity-40",
+										'absolute bottom-0 left-3 right-3 h-px bg-primary transition-all duration-200',
+										active ? 'opacity-100' : 'opacity-0 group-hover:opacity-40',
 									)}
 								/>
 							</Link>
@@ -170,7 +160,7 @@ export default function Header({
 
 				{/* ── Right: actions ── */}
 				<div className="flex items-center gap-5">
-					<UserDropDown session={session} />
+					<UserDropDown />
 					{/* Book Now — primary, drives conversion; solid gold on both mobile drawer and desktop bar */}
 					<Button
 						render={<Link to="/enroll" />}

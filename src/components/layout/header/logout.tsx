@@ -1,5 +1,5 @@
-import { useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRouter } from '@tanstack/react-router';
+import { useState } from 'react';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -9,23 +9,9 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { authClient } from "@/lib/auth-client";
-import { clearCachedSession } from "@/lib/session-cache";
+} from '@/components/ui/alert-dialog';
+import { authClient } from '@/lib/auth-client';
 
-/**
- * Sign-out confirmation.
- *
- * Must be rendered as a SIBLING of the account DropdownMenu, never inside
- * DropdownMenuContent. The menu popup lives in a Base UI portal with
- * `keepMounted: false`, so closing the menu unmounts its entire subtree.
- * Base UI's AlertDialog does not join the menu's floating tree (Dialog.Root has
- * no `tree` prop), which means any press inside the portaled dialog counts as
- * an outside press for the menu — the menu would close and destroy the dialog
- * the instant it appeared. This is the "Open a dialog" pattern from the Base UI
- * Menu docs: control the dialog from state owned outside the menu and open it
- * from the item's `onClick`.
- */
 export function SignOut({
 	open,
 	onOpenChange,
@@ -54,8 +40,7 @@ export function SignOut({
 				fetchOptions: {
 					onSuccess: () => {
 						onOpenChange(false);
-						clearCachedSession();
-						router.navigate({ to: "/" });
+						router.navigate({ to: '/' });
 						// Re-run loaders so session-dependent UI (header, /dashboard
 						// guard) reflects the now-signed-out state.
 						router.invalidate();
@@ -64,14 +49,14 @@ export function SignOut({
 						setIsSigningOut(false);
 						setError(
 							ctx.error.message ??
-								"Could not sign out. Please try again in a moment.",
+								'Could not sign out. Please try again in a moment.',
 						);
 					},
 				},
 			});
 		} catch (_error) {
 			setIsSigningOut(false);
-			setError("Network error while signing out. Please try again.");
+			setError('Network error while signing out. Please try again.');
 		}
 	};
 
@@ -97,7 +82,7 @@ export function SignOut({
 						disabled={isSigningOut}
 						className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 					>
-						{isSigningOut ? "Signing out..." : "Sign Out"}
+						{isSigningOut ? 'Signing out...' : 'Sign Out'}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
