@@ -114,6 +114,7 @@
 
     --border: oklch(0.88 0.01 85);
     --input: oklch(0.88 0.01 85);
+    --ring: oklch(0.62 0.14 80);
 
     /* bronze → soft warm gray */
     --secondary: oklch(0.94 0.008 85);

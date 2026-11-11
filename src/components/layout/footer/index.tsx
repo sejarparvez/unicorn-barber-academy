@@ -16,6 +16,7 @@ import logo from '@/assets/logo/logo.png';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { SITE } from '@/lib/site';
 
 type FooterLink = { label: string; to: string };
 
@@ -116,7 +117,7 @@ export default function Footer() {
 								onSubmit={(event) => {
 									event.preventDefault();
 									window.open(
-										'https://wa.me/01',
+										`https://wa.me/${SITE.contact.whatsapp}`,
 										'_blank',
 										'noopener,noreferrer',
 									);
@@ -141,23 +142,23 @@ export default function Footer() {
 						</div>
 
 						<div className="mt-6 flex items-center gap-4">
-							<SocialIcon href="https:instagram.com/" label="Instagram">
+							<SocialIcon href={SITE.socials.instagram} label="Instagram">
 								<IconBrandInstagram className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
 
-							<SocialIcon href="https:instagram.com/" label="Facebook">
+							<SocialIcon href={SITE.socials.facebook} label="Facebook">
 								<IconBrandFacebook className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
 
-							<SocialIcon href="https:instagram.com/" label="YouTube">
+							<SocialIcon href={SITE.socials.youtube} label="YouTube">
 								<IconBrandYoutube className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
 
-							<SocialIcon href="https:instagram.com/" label="TikTok">
+							<SocialIcon href={SITE.socials.tiktok} label="TikTok">
 								<IconBrandTiktok className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
 
-							<SocialIcon href="https:instagram.com/" label="X (Twitter)">
+							<SocialIcon href={SITE.socials.x} label="X (Twitter)">
 								<IconBrandX className="h-4 w-4" stroke={1.75} />
 							</SocialIcon>
 						</div>
@@ -198,15 +199,18 @@ export default function Footer() {
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<span>address</span>
+								<span>{SITE.contact.address}</span>
 							</p>
 							<p className="flex items-start gap-3">
 								<IconPhone
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<a href="phone" className="hover:text-primary">
-									phone
+								<a
+									href={`tel:${SITE.contact.phoneE164}`}
+									className="hover:text-primary"
+								>
+									{SITE.contact.phone}
 								</a>
 							</p>
 							<p className="flex items-start gap-3">
@@ -214,8 +218,11 @@ export default function Footer() {
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<a href="mail" className="hover:text-primary">
-									mail
+								<a
+									href={`mailto:${SITE.contact.email}`}
+									className="break-all hover:text-primary"
+								>
+									{SITE.contact.email}
 								</a>
 							</p>
 							<p className="flex items-start gap-3">
@@ -223,7 +230,11 @@ export default function Footer() {
 									className="mt-0.5 h-4 w-4 shrink-0 text-primary/80"
 									stroke={1.75}
 								/>
-								<span>hours</span>
+								<span>
+									{SITE.contact.hours.days}
+									<br />
+									{SITE.contact.hours.time}
+								</span>
 							</p>
 						</address>
 					</div>

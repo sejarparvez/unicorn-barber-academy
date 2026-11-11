@@ -17,6 +17,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { SITE } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
 // These destinations are `string`-typed on purpose, matching the header and
@@ -30,13 +31,11 @@ export type LegalSectionMeta = {
 	title: string;
 };
 
-// TODO: replace these placeholders with the academy's real contact details
-// before launch. They are intentionally centralized so every legal page (and
-// eventually the footer) can share one source of truth.
+// Legal pages and the footer share the same contact source of truth.
 export const LEGAL_CONTACT = {
-	address: 'Academy address, Dhaka, Bangladesh',
-	email: 'admissions@unicornbarberacademy.com',
-	phone: '+880 1XXX-XXXXXX',
+	address: SITE.contact.address,
+	email: SITE.contact.email,
+	phone: SITE.contact.phone,
 };
 
 export const CONTACT_LINK: Destination = {
@@ -459,7 +458,7 @@ export function LegalContactGrid() {
 				icon={<IconPhone className="size-4" stroke={1.75} />}
 				label="Call"
 				value={LEGAL_CONTACT.phone}
-				href={`tel:${LEGAL_CONTACT.phone.replace(/[^\d+]/g, '')}`}
+				href={`tel:${SITE.contact.phoneE164}`}
 			/>
 		</div>
 	);
