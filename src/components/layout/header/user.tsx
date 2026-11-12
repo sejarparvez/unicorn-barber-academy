@@ -16,7 +16,7 @@ import { cn, getInitials } from '@/lib/utils';
 import { SignOut } from './logout';
 
 export default function UserDropDown() {
-	const { session } = useRouteContext({ from: '/_public' });
+	const { session } = useRouteContext({ from: '__root__' });
 	const [signOutOpen, setSignOutOpen] = useState(false);
 	if (!session?.user) {
 		return (

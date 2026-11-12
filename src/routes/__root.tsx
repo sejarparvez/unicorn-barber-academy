@@ -2,10 +2,15 @@ import { TanStackDevtools } from '@tanstack/react-devtools';
 import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { Toaster } from '@/components/ui/sonner';
+import { getSession } from '@/lib/auth.functions';
 
 import appCss from '../styles.css?url';
 
 export const Route = createRootRoute({
+	beforeLoad: async () => {
+		const session = await getSession();
+		return { session };
+	},
 	head: () => ({
 		meta: [
 			{
@@ -37,7 +42,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				{children}
-				<Toaster />
+				<Toaster richColors />
 				<TanStackDevtools
 					config={{
 						position: 'bottom-right',
