@@ -1,13 +1,6 @@
-import {
-	IconArrowRight,
-	IconArrowUpRight,
-	IconBrush,
-	IconPalette,
-	IconRazor,
-	IconScissors,
-	IconSparkles,
-} from '@tabler/icons-react';
+import { IconArrowRight, IconArrowUpRight } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
+import { ProgramNumber } from '@/components/pages/programs/program-number';
 import { Badge } from '@/components/ui/badge';
 import {
 	Card,
@@ -18,7 +11,6 @@ import {
 import { SectionHeading } from './section-heading';
 
 type Program = {
-	icon: typeof IconScissors;
 	title: string;
 	description: string;
 	meta: string[];
@@ -29,7 +21,6 @@ type Program = {
 // incrementally, so literal paths would fail type-checking until they exist.
 const FEATURED: Program[] = [
 	{
-		icon: IconScissors,
 		title: 'Classic Barbering',
 		description:
 			'Foundations, fades, tapers and classic cuts — the full barbering toolkit from first grip to final blend.',
@@ -37,7 +28,6 @@ const FEATURED: Program[] = [
 		to: '/programs/classic-barbering',
 	},
 	{
-		icon: IconRazor,
 		title: 'Fades & Tapers',
 		description:
 			'Precision fade work, taper blending and sharp line-ups, drilled until the transitions disappear.',
@@ -45,7 +35,6 @@ const FEATURED: Program[] = [
 		to: '/programs/fades-and-tapers',
 	},
 	{
-		icon: IconSparkles,
 		title: 'Beard Sculpting',
 		description:
 			'Shape, line and finish beards with clipper work, razor detailing and hot-towel treatments.',
@@ -56,21 +45,18 @@ const FEATURED: Program[] = [
 
 const ALSO_OFFERED: Program[] = [
 	{
-		icon: IconPalette,
 		title: 'Cosmetology Fundamentals',
 		description: 'Skin, hair and beauty science for the salon floor.',
 		meta: [],
 		to: '/programs/cosmetology-fundamentals',
 	},
 	{
-		icon: IconBrush,
 		title: 'Hair Styling & Colouring',
 		description: 'Cutting, colour theory and modern styling.',
 		meta: [],
 		to: '/programs/hair-styling-and-colouring',
 	},
 	{
-		icon: IconSparkles,
 		title: 'Bridal & Editorial Makeup',
 		description: 'Client-ready looks for weddings and shoots.',
 		meta: [],
@@ -124,19 +110,13 @@ export default function Programs() {
 				</div>
 
 				<div className="mt-5 grid gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/60 md:grid-cols-3">
-					{ALSO_OFFERED.map((program) => (
+					{ALSO_OFFERED.map((program, index) => (
 						<Link
 							key={program.title}
 							to={program.to}
 							className="group flex items-start gap-4 bg-card/40 p-5 transition-colors hover:bg-primary/5"
 						>
-							<span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 text-primary">
-								<program.icon
-									className="size-4"
-									stroke={1.6}
-									aria-hidden="true"
-								/>
-							</span>
+							<ProgramNumber position={FEATURED.length + index + 1} size="sm" />
 							<span className="min-w-0">
 								<span className="flex items-center gap-1.5 font-medium text-foreground text-sm transition-colors group-hover:text-primary">
 									{program.title}
@@ -171,16 +151,7 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
 
 				<CardHeader className="pt-6">
 					<div className="flex items-start justify-between gap-4">
-						<span className="flex size-12 items-center justify-center rounded-xl border border-primary/25 bg-primary/5 text-primary transition-colors group-hover:bg-primary/10">
-							<program.icon
-								className="size-6"
-								stroke={1.5}
-								aria-hidden="true"
-							/>
-						</span>
-						<span className="font-mono text-[11px] text-muted-foreground/60 tracking-[0.2em]">
-							{String(index + 1).padStart(2, '0')}
-						</span>
+						<ProgramNumber position={index + 1} />
 					</div>
 
 					<h3 className="mt-5 font-semibold text-lg tracking-tight transition-colors group-hover:text-primary">

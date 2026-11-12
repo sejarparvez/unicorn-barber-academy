@@ -1,4 +1,10 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import {
+	createFileRoute,
+	Link,
+	Outlet,
+	redirect,
+	useRouterState,
+} from '@tanstack/react-router';
 import { AppSidebar } from '@/components/layout/dashboard/app-sidebar';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
@@ -32,6 +38,16 @@ export const Route = createFileRoute('/dashboard')({
 });
 
 function RouteComponent() {
+	const pathname = useRouterState({
+		select: (state) => state.location.pathname,
+	});
+	const pageTitle =
+		pathname === '/dashboard'
+			? 'Overview'
+			: (pathname.split('/').filter(Boolean).at(-1) ?? 'Overview')
+					.replaceAll('-', ' ')
+					.replace(/\b\w/g, (character) => character.toUpperCase());
+
 	return (
 		<SidebarProvider>
 			<AppSidebar />
@@ -47,13 +63,13 @@ function RouteComponent() {
 						<Breadcrumb>
 							<BreadcrumbList>
 								<BreadcrumbItem className="hidden md:block">
-									<BreadcrumbLink href="#">
-										Build Your Application
+									<BreadcrumbLink render={<Link to="/dashboard" />}>
+										Dashboard
 									</BreadcrumbLink>
 								</BreadcrumbItem>
 								<BreadcrumbSeparator className="hidden md:block" />
 								<BreadcrumbItem>
-									<BreadcrumbPage>Data Fetching</BreadcrumbPage>
+									<BreadcrumbPage>{pageTitle}</BreadcrumbPage>
 								</BreadcrumbItem>
 							</BreadcrumbList>
 						</Breadcrumb>

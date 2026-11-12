@@ -4,6 +4,7 @@ import {
 	IconClock,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
+import { ProgramNumber } from '@/components/pages/programs/program-number';
 import { buttonVariants } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { PROGRAM_STATS, PROGRAMS } from '@/data/programs';
@@ -121,19 +122,13 @@ export default function ProgramsHero() {
 						</div>
 
 						<ul className="mt-3 divide-y divide-border/60">
-							{PROGRAMS.map((program) => (
+							{PROGRAMS.map((program, index) => (
 								<li key={program.slug}>
 									<a
 										href={`#${program.slug}`}
 										className="group flex items-center gap-3 py-3"
 									>
-										<span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 text-primary transition-colors group-hover:bg-primary/10">
-											<program.icon
-												className="size-4"
-												stroke={1.6}
-												aria-hidden="true"
-											/>
-										</span>
+										<ProgramNumber position={index + 1} size="sm" />
 										<span className="min-w-0 flex-1">
 											<span className="block truncate font-medium text-foreground text-sm transition-colors group-hover:text-primary">
 												{program.title}

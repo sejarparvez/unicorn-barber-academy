@@ -1,13 +1,8 @@
 import {
 	IconBriefcase,
-	IconBrush,
 	IconCertificate,
-	IconPalette,
-	IconRazor,
 	IconScissors,
-	IconSparkles,
 	IconUsers,
-	IconWand,
 } from '@tabler/icons-react';
 
 export type ProgramCategory = 'Barbering' | 'Beauty & styling' | 'Makeup';
@@ -20,7 +15,6 @@ export type ProgramModule = {
 export type Program = {
 	slug: string;
 	title: string;
-	icon: typeof IconScissors;
 	category: ProgramCategory;
 	level: string;
 	duration: string;
@@ -32,6 +26,8 @@ export type Program = {
 	curriculum: ProgramModule[];
 	whoFor: string[];
 	careerPaths: string[];
+	/** Course price in BDT. Placeholder until the final figures are set. */
+	price: number;
 	featured?: boolean;
 };
 
@@ -39,7 +35,6 @@ export const PROGRAMS: Program[] = [
 	{
 		slug: 'classic-barbering',
 		title: 'Classic Barbering',
-		icon: IconScissors,
 		category: 'Barbering',
 		level: 'Beginner friendly',
 		duration: '12 weeks',
@@ -82,12 +77,12 @@ export const PROGRAMS: Program[] = [
 			'Mobile barber building their own client book',
 			'Further study in fades, beard work or colour',
 		],
+		price: 48000,
 		featured: true,
 	},
 	{
 		slug: 'fades-and-tapers',
 		title: 'Fades & Tapers',
-		icon: IconRazor,
 		category: 'Barbering',
 		level: 'Intermediate',
 		duration: '8 weeks',
@@ -130,12 +125,12 @@ export const PROGRAMS: Program[] = [
 			"Men's grooming stylist with a sharper service menu",
 			'Mobile barber offering faster, cleaner cuts',
 		],
+		price: 42000,
 		featured: true,
 	},
 	{
 		slug: 'beard-sculpting',
 		title: 'Beard Sculpting',
-		icon: IconSparkles,
 		category: 'Barbering',
 		level: 'All levels',
 		duration: '6 weeks',
@@ -178,12 +173,12 @@ export const PROGRAMS: Program[] = [
 			"Men's grooming specialist in a salon or shop",
 			'Mobile or private grooming work',
 		],
+		price: 40000,
 		featured: true,
 	},
 	{
 		slug: 'cosmetology-fundamentals',
 		title: 'Cosmetology Fundamentals',
-		icon: IconPalette,
 		category: 'Beauty & styling',
 		level: 'Beginner friendly',
 		duration: '16 weeks',
@@ -226,11 +221,11 @@ export const PROGRAMS: Program[] = [
 			'Product advisor or brand educator',
 			'Further study in styling, colour or makeup',
 		],
+		price: 46000,
 	},
 	{
 		slug: 'hair-styling-and-colouring',
 		title: 'Hair Styling & Colouring',
-		icon: IconBrush,
 		category: 'Beauty & styling',
 		level: 'All levels',
 		duration: '12 weeks',
@@ -273,11 +268,11 @@ export const PROGRAMS: Program[] = [
 			'Freelance styling for shoots and events',
 			'Salon team lead or educator',
 		],
+		price: 50000,
 	},
 	{
 		slug: 'bridal-and-editorial-makeup',
 		title: 'Bridal & Editorial Makeup',
-		icon: IconWand,
 		category: 'Makeup',
 		level: 'All levels',
 		duration: '10 weeks',
@@ -320,11 +315,17 @@ export const PROGRAMS: Program[] = [
 			'Salon makeup specialist',
 			'Editorial and shoot makeup work',
 		],
+		price: 45000,
 	},
 ];
 
 export function getProgramBySlug(slug: string) {
 	return PROGRAMS.find((program) => program.slug === slug);
+}
+
+/** 1-based catalogue position, derived from order so it never needs storing. */
+export function getProgramPosition(slug: string) {
+	return PROGRAMS.findIndex((program) => program.slug === slug) + 1;
 }
 
 export function getRelatedPrograms(slug: string, limit = 3) {

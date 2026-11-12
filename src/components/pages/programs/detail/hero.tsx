@@ -4,15 +4,20 @@ import {
 	IconCertificate,
 	IconChevronRight,
 	IconClock,
+	IconCurrencyTaka,
 	IconScissors,
 	IconTarget,
 	IconUsers,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
+import {
+	formatProgramNumber,
+	ProgramNumber,
+} from '@/components/pages/programs/program-number';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import type { Program } from '@/data/programs';
+import { getProgramPosition, type Program } from '@/data/programs';
 
 const ENROLL_LINK: { label: string; to: string } = {
 	label: 'Enroll now',
@@ -24,7 +29,13 @@ const CONTACT_LINK: { label: string; to: string } = {
 	to: '/contact',
 };
 
+function formatPrice(amount: number) {
+	return `৳${amount.toLocaleString('en-US')}`;
+}
+
 export default function ProgramDetailHero({ program }: { program: Program }) {
+	const position = getProgramPosition(program.slug);
+
 	return (
 		<section
 			aria-labelledby="program-detail-heading"
@@ -70,13 +81,7 @@ export default function ProgramDetailHero({ program }: { program: Program }) {
 				<div className="mt-8 grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start lg:gap-16">
 					<div>
 						<div className="flex flex-wrap items-center gap-4">
-							<span className="flex size-14 items-center justify-center rounded-2xl border border-primary/25 bg-primary/5 text-primary">
-								<program.icon
-									className="size-7"
-									stroke={1.5}
-									aria-hidden="true"
-								/>
-							</span>
+							<ProgramNumber position={position} size="xl" />
 							<div className="flex flex-col gap-1.5">
 								<Badge
 									variant="outline"
@@ -150,9 +155,9 @@ export default function ProgramDetailHero({ program }: { program: Program }) {
 						/>
 						<div
 							aria-hidden="true"
-							className="pointer-events-none absolute -right-8 -bottom-10 text-primary/[0.05]"
+							className="pointer-events-none absolute -right-8 -bottom-10 font-bold font-mono text-[11rem] text-primary/[0.05] leading-none -rotate-12 select-none"
 						>
-							<program.icon className="size-48 -rotate-12" stroke={1} />
+							{formatProgramNumber(position)}
 						</div>
 
 						<div className="relative">
@@ -161,6 +166,11 @@ export default function ProgramDetailHero({ program }: { program: Program }) {
 							</p>
 
 							<dl className="mt-4 divide-y divide-border/60">
+								<DetailRow
+									icon={IconCurrencyTaka}
+									label="Tuition"
+									value={formatPrice(program.price)}
+								/>
 								<DetailRow
 									icon={IconClock}
 									label="Duration"

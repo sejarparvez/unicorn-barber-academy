@@ -23,6 +23,7 @@ import { Route as PublicTermsRouteImport } from './routes/_public/terms'
 import { Route as PublicVerifyRouteImport } from './routes/_public/verify'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/_admin/route'
+import { Route as DashboardAccountRouteImport } from './routes/dashboard/account'
 import { Route as EnrollIndexRouteImport } from './routes/enroll/index'
 import { Route as PublicAuthForgotPasswordRouteImport } from './routes/_public/auth/forgot-password'
 import { Route as PublicAuthResetPasswordRouteImport } from './routes/_public/auth/reset-password'
@@ -101,6 +102,11 @@ const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
   id: '/_admin',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardAccountRoute = DashboardAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const EnrollIndexRoute = EnrollIndexRouteImport.update({
   id: '/enroll/',
   path: '/enroll/',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
+  '/dashboard/account': typeof DashboardAccountRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/enroll/': typeof EnrollIndexRoute
   '/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
+  '/dashboard/account': typeof DashboardAccountRoute
   '/': typeof PublicIndexRoute
   '/enroll': typeof EnrollIndexRoute
   '/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/terms': typeof PublicTermsRoute
   '/_public/verify': typeof PublicVerifyRoute
+  '/dashboard/account': typeof DashboardAccountRoute
   '/_public/': typeof PublicIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/enroll/': typeof EnrollIndexRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/verify'
+    | '/dashboard/account'
     | '/dashboard/'
     | '/enroll/'
     | '/auth/forgot-password'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/verify'
+    | '/dashboard/account'
     | '/'
     | '/enroll'
     | '/auth/forgot-password'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/_public/privacy'
     | '/_public/terms'
     | '/_public/verify'
+    | '/dashboard/account'
     | '/_public/'
     | '/dashboard/'
     | '/enroll/'
@@ -395,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardAdminRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/account': {
+      id: '/dashboard/account'
+      path: '/account'
+      fullPath: '/dashboard/account'
+      preLoaderRoute: typeof DashboardAccountRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/enroll/': {
@@ -518,11 +537,13 @@ const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
 
 interface DashboardRouteRouteChildren {
   DashboardAdminRouteRoute: typeof DashboardAdminRouteRoute
+  DashboardAccountRoute: typeof DashboardAccountRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAdminRouteRoute: DashboardAdminRouteRoute,
+  DashboardAccountRoute: DashboardAccountRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 

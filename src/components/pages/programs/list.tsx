@@ -6,6 +6,7 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { SectionHeading } from '@/components/pages/home/section-heading';
+import { ProgramNumber } from '@/components/pages/programs/program-number';
 import { Badge } from '@/components/ui/badge';
 import {
 	Card,
@@ -80,25 +81,14 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
 
 				<CardHeader className="pt-6">
 					<div className="flex items-start justify-between gap-4">
-						<span className="flex size-12 items-center justify-center rounded-xl border border-primary/25 bg-primary/5 text-primary transition-colors group-hover:bg-primary/10">
-							<program.icon
-								className="size-6"
-								stroke={1.5}
-								aria-hidden="true"
-							/>
-						</span>
+						<ProgramNumber position={index + 1} />
 
-						<div className="flex flex-col items-end gap-2">
-							<Badge
-								variant="outline"
-								className="border-primary/25 text-[9px] text-primary uppercase tracking-[0.14em]"
-							>
-								{program.category}
-							</Badge>
-							<span className="font-mono text-[10px] text-muted-foreground/50 tracking-[0.2em]">
-								{String(index + 1).padStart(2, '0')}
-							</span>
-						</div>
+						<Badge
+							variant="outline"
+							className="border-primary/25 text-[9px] text-primary uppercase tracking-[0.14em]"
+						>
+							{program.category}
+						</Badge>
 					</div>
 
 					<div className="mt-5">
