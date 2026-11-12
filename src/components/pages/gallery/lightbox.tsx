@@ -7,13 +7,14 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { Image } from '@unpic/react';
+import type { ProgramOption } from '@/components/pages/programs/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { GalleryImage } from '@/data/gallery';
-import { getProgramBySlug } from '@/data/programs';
 
 type GalleryLightboxProps = {
 	images: GalleryImage[];
+	programs: ProgramOption[];
 	index: number | null;
 	onIndexChange: (index: number) => void;
 	onClose: () => void;
@@ -21,6 +22,7 @@ type GalleryLightboxProps = {
 
 export default function GalleryLightbox({
 	images,
+	programs,
 	index,
 	onIndexChange,
 	onClose,
@@ -28,7 +30,7 @@ export default function GalleryLightbox({
 	const image = index === null ? undefined : images[index];
 	const hasMultiple = images.length > 1;
 	const program = image?.programSlug
-		? getProgramBySlug(image.programSlug)
+		? programs.find((item) => item.slug === image.programSlug)
 		: undefined;
 
 	const goTo = (direction: number) => {

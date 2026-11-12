@@ -8,8 +8,10 @@ import Programs from '@/components/pages/home/programs';
 import Stats from '@/components/pages/home/stats';
 import Testimonials from '@/components/pages/home/testimonials';
 import WhyUnicorn from '@/components/pages/home/why-us';
+import { getPrograms } from '@/server/programs';
 
 export const Route = createFileRoute('/_public/')({
+	loader: () => getPrograms(),
 	head: () => ({
 		meta: [
 			{ title: 'Unicorn Barber Training Academy — Learn the craft in Dhaka' },
@@ -24,6 +26,8 @@ export const Route = createFileRoute('/_public/')({
 });
 
 function Home() {
+	const programs = Route.useLoaderData();
+
 	return (
 		<div>
 			<Hero />
@@ -31,7 +35,7 @@ function Home() {
 			<WhyUnicorn />
 			<Stats />
 			<Brand />
-			<Programs />
+			<Programs programs={programs} />
 			<Testimonials />
 			<Faq />
 			<Cta />

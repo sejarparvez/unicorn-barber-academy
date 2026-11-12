@@ -1,21 +1,7 @@
-import {
-	IconBriefcase,
-	IconCertificate,
-	IconScissors,
-	IconUsers,
-} from '@tabler/icons-react';
-
-export type ProgramCategory = 'Barbering' | 'Beauty & styling' | 'Makeup';
-
-export type ProgramModule = {
-	title: string;
-	description: string;
-};
-
-export type Program = {
+export type SeedProgram = {
 	slug: string;
 	title: string;
-	category: ProgramCategory;
+	category: string;
 	level: string;
 	duration: string;
 	schedule: string;
@@ -23,15 +9,15 @@ export type Program = {
 	description: string;
 	highlights: string[];
 	outcome: string;
-	curriculum: ProgramModule[];
+	curriculum: { title: string; description: string }[];
 	whoFor: string[];
 	careerPaths: string[];
-	/** Course price in BDT. Placeholder until the final figures are set. */
+	/** Course price in BDT. */
 	price: number;
 	featured?: boolean;
 };
 
-export const PROGRAMS: Program[] = [
+export const SEED_PROGRAMS: SeedProgram[] = [
 	{
 		slug: 'classic-barbering',
 		title: 'Classic Barbering',
@@ -316,67 +302,5 @@ export const PROGRAMS: Program[] = [
 			'Editorial and shoot makeup work',
 		],
 		price: 45000,
-	},
-];
-
-export function getProgramBySlug(slug: string) {
-	return PROGRAMS.find((program) => program.slug === slug);
-}
-
-/** 1-based catalogue position, derived from order so it never needs storing. */
-export function getProgramPosition(slug: string) {
-	return PROGRAMS.findIndex((program) => program.slug === slug) + 1;
-}
-
-export function getRelatedPrograms(slug: string, limit = 3) {
-	const current = getProgramBySlug(slug);
-
-	if (!current) {
-		return PROGRAMS.slice(0, limit);
-	}
-
-	const sameCategory = PROGRAMS.filter(
-		(program) => program.slug !== slug && program.category === current.category,
-	);
-	const otherCategories = PROGRAMS.filter(
-		(program) => program.slug !== slug && program.category !== current.category,
-	);
-
-	return [...sameCategory, ...otherCategories].slice(0, limit);
-}
-
-export const FEATURED_PROGRAMS = PROGRAMS.filter((program) => program.featured);
-
-export const PROGRAM_STATS = [
-	{ value: String(PROGRAMS.length), label: 'Career programs' },
-	{ value: '60+', label: 'Hiring partners' },
-	{ value: '2', label: 'Cohort times' },
-	{ value: '100%', label: 'Hands-on' },
-];
-
-export const PROGRAM_INCLUDES = [
-	{
-		icon: IconScissors,
-		title: 'A full professional kit',
-		description:
-			'Clippers and shears, or the styling and makeup kit for your track — yours from week one. No extra spend.',
-	},
-	{
-		icon: IconCertificate,
-		title: 'NTVQF certification',
-		description:
-			'Assessed throughout the course and certified under the National Technical and Vocational Qualification Framework.',
-	},
-	{
-		icon: IconUsers,
-		title: 'Small cohorts',
-		description:
-			'Capped class sizes mean your instructor sees your hands, corrects your grip and catches habits early.',
-	},
-	{
-		icon: IconBriefcase,
-		title: 'Placement support',
-		description:
-			'Portfolio reviews, interview prep and introductions to the 60+ salons and barbershops that hire from us.',
 	},
 ];

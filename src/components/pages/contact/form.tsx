@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { SectionHeading } from '@/components/pages/home/section-heading';
+import type { ProgramOption } from '@/components/pages/programs/types';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -28,18 +29,8 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { PROGRAMS } from '@/data/programs';
 import ContactDetails from './details';
 import { type ContactFormValues, contactSchema } from './form-schema';
-
-const INTEREST_OPTIONS = [
-	...PROGRAMS.map((program) => ({
-		value: program.slug,
-		label: program.title,
-	})),
-	{ value: 'not-sure', label: 'Not sure yet — help me choose' },
-	{ value: 'general', label: 'General enquiry' },
-];
 
 const EMPTY_FORM: ContactFormValues = {
 	name: '',
@@ -49,7 +40,11 @@ const EMPTY_FORM: ContactFormValues = {
 	message: '',
 };
 
-export default function ContactFormSection() {
+export default function ContactFormSection({
+	programs,
+}: {
+	programs: ProgramOption[];
+}) {
 	return (
 		<section
 			aria-labelledby="contact-form-heading"
@@ -70,7 +65,7 @@ export default function ContactFormSection() {
 				/>
 
 				<div className="mt-10 grid items-start gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8">
-					<ContactForm />
+					<ContactForm programs={programs} />
 					<ContactDetails />
 				</div>
 			</div>
@@ -78,8 +73,17 @@ export default function ContactFormSection() {
 	);
 }
 
-function ContactForm() {
+function ContactForm({ programs }: { programs: ProgramOption[] }) {
 	const [submitted, setSubmitted] = useState<ContactFormValues | null>(null);
+
+	const interestOptions = [
+		...programs.map((program) => ({
+			value: program.slug,
+			label: program.title,
+		})),
+		{ value: 'not-sure', label: 'Not sure yet — help me choose' },
+		{ value: 'general', label: 'General enquiry' },
+	];
 
 	const {
 		register,
@@ -214,7 +218,7 @@ function ContactForm() {
 									name="interest"
 									render={({ field }) => (
 										<Select
-											items={INTEREST_OPTIONS}
+											items={interestOptions}
 											name={field.name}
 											value={field.value || null}
 											onValueChange={(value) => field.onChange(value ?? '')}
@@ -231,7 +235,7 @@ function ContactForm() {
 												<SelectValue placeholder="Choose a program" />
 											</SelectTrigger>
 											<SelectContent>
-												{INTEREST_OPTIONS.map((option) => (
+												{interestOptions.map((option) => (
 													<SelectItem key={option.value} value={option.value}>
 														{option.label}
 													</SelectItem>

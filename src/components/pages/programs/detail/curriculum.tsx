@@ -1,8 +1,8 @@
 import { IconBriefcase, IconCheck, IconUsers } from '@tabler/icons-react';
 import { SectionHeading } from '@/components/pages/home/section-heading';
+import type { Program } from '@/components/pages/programs/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import type { Program } from '@/data/programs';
 
 export default function ProgramCurriculum({ program }: { program: Program }) {
 	return (

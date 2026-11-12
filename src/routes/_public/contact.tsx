@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import ContactCta from '@/components/pages/contact/cta';
 import ContactFormSection from '@/components/pages/contact/form';
+import { getProgramOptions } from '@/server/programs';
 
 export const Route = createFileRoute('/_public/contact')({
+	loader: () => getProgramOptions(),
 	head: () => ({
 		meta: [
 			{ title: 'Contact — Unicorn Barber Training Academy' },
@@ -17,9 +19,11 @@ export const Route = createFileRoute('/_public/contact')({
 });
 
 function Contact() {
+	const programs = Route.useLoaderData();
+
 	return (
 		<main>
-			<ContactFormSection />
+			<ContactFormSection programs={programs} />
 			<ContactCta />
 		</main>
 	);

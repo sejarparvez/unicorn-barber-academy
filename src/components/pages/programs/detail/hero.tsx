@@ -14,10 +14,10 @@ import {
 	formatProgramNumber,
 	ProgramNumber,
 } from '@/components/pages/programs/program-number';
+import type { Program } from '@/components/pages/programs/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { getProgramPosition, type Program } from '@/data/programs';
 
 const ENROLL_LINK: { label: string; to: string } = {
 	label: 'Enroll now',
@@ -34,7 +34,7 @@ function formatPrice(amount: number) {
 }
 
 export default function ProgramDetailHero({ program }: { program: Program }) {
-	const position = getProgramPosition(program.slug);
+	const position = program.position;
 
 	return (
 		<section

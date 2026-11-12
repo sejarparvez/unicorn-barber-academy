@@ -74,3 +74,43 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+model Program {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  category    String
+  level       String
+  duration    String
+  schedule    String
+  tagline     String
+  description String
+  highlights  String[]
+  outcome     String
+  whoFor      String[]
+  careerPaths String[]
+  price       Int
+  position    Int
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  modules ProgramModule[]
+
+  @@index([category])
+  @@index([position])
+  @@map("program")
+}
+
+model ProgramModule {
+  id          String  @id @default(cuid())
+  programId   String
+  program     Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  position    Int
+  title       String
+  description String
+
+  @@unique([programId, position])
+  @@index([programId])
+  @@map("program_module")
+}

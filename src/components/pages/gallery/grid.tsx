@@ -2,6 +2,7 @@ import { IconMaximize } from '@tabler/icons-react';
 import { Image } from '@unpic/react';
 import { useState } from 'react';
 import { SectionHeading } from '@/components/pages/home/section-heading';
+import type { ProgramOption } from '@/components/pages/programs/types';
 import { Badge } from '@/components/ui/badge';
 import {
 	GALLERY_FILTERS,
@@ -17,7 +18,11 @@ function countFor(filter: GalleryFilter) {
 		: GALLERY_IMAGES.filter((image) => image.category === filter).length;
 }
 
-export default function GalleryGrid() {
+export default function GalleryGrid({
+	programs,
+}: {
+	programs: ProgramOption[];
+}) {
 	const [activeFilter, setActiveFilter] = useState<GalleryFilter>('All');
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -172,6 +177,7 @@ export default function GalleryGrid() {
 
 			<GalleryLightbox
 				images={visibleImages}
+				programs={programs}
 				index={activeIndex}
 				onIndexChange={setActiveIndex}
 				onClose={() => setActiveIndex(null)}

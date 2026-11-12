@@ -1,9 +1,41 @@
-import { IconArrowRight } from '@tabler/icons-react';
+import {
+	IconArrowRight,
+	IconBriefcase,
+	IconCertificate,
+	IconScissors,
+	IconUsers,
+} from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { SectionHeading } from '@/components/pages/home/section-heading';
-import { PROGRAM_INCLUDES } from '@/data/programs';
 
 const CONTACT_LINK = { label: 'Talk to admissions', to: '/contact' };
+
+const PROGRAM_INCLUDES = [
+	{
+		icon: IconScissors,
+		title: 'A full professional kit',
+		description:
+			'Clippers and shears, or the styling and makeup kit for your track — yours from week one. No extra spend.',
+	},
+	{
+		icon: IconCertificate,
+		title: 'NTVQF certification',
+		description:
+			'Assessed throughout the course and certified under the National Technical and Vocational Qualification Framework.',
+	},
+	{
+		icon: IconUsers,
+		title: 'Small cohorts',
+		description:
+			'Capped class sizes mean your instructor sees your hands, corrects your grip and catches habits early.',
+	},
+	{
+		icon: IconBriefcase,
+		title: 'Placement support',
+		description:
+			'Portfolio reviews, interview prep and introductions to the 60+ salons and barbershops that hire from us.',
+	},
+];
 
 export default function ProgramsIncluded() {
 	return (

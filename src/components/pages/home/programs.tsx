@@ -1,6 +1,7 @@
 import { IconArrowRight, IconArrowUpRight } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { ProgramNumber } from '@/components/pages/programs/program-number';
+import type { Program } from '@/components/pages/programs/types';
 import { Badge } from '@/components/ui/badge';
 import {
 	Card,
@@ -10,63 +11,12 @@ import {
 } from '@/components/ui/card';
 import { SectionHeading } from './section-heading';
 
-type Program = {
-	title: string;
-	description: string;
-	meta: string[];
-	to: string;
-};
-
-// `to` is `string`-typed on purpose: the individual program routes are added
-// incrementally, so literal paths would fail type-checking until they exist.
-const FEATURED: Program[] = [
-	{
-		title: 'Classic Barbering',
-		description:
-			'Foundations, fades, tapers and classic cuts — the full barbering toolkit from first grip to final blend.',
-		meta: ['Beginner friendly', 'Hands-on', 'Certificate'],
-		to: '/programs/classic-barbering',
-	},
-	{
-		title: 'Fades & Tapers',
-		description:
-			'Precision fade work, taper blending and sharp line-ups, drilled until the transitions disappear.',
-		meta: ['Intermediate', 'Practical', 'Certificate'],
-		to: '/programs/fades-and-tapers',
-	},
-	{
-		title: 'Beard Sculpting',
-		description:
-			'Shape, line and finish beards with clipper work, razor detailing and hot-towel treatments.',
-		meta: ['All levels', 'Practical', 'Certificate'],
-		to: '/programs/beard-sculpting',
-	},
-];
-
-const ALSO_OFFERED: Program[] = [
-	{
-		title: 'Cosmetology Fundamentals',
-		description: 'Skin, hair and beauty science for the salon floor.',
-		meta: [],
-		to: '/programs/cosmetology-fundamentals',
-	},
-	{
-		title: 'Hair Styling & Colouring',
-		description: 'Cutting, colour theory and modern styling.',
-		meta: [],
-		to: '/programs/hair-styling-and-colouring',
-	},
-	{
-		title: 'Bridal & Editorial Makeup',
-		description: 'Client-ready looks for weddings and shoots.',
-		meta: [],
-		to: '/programs/bridal-and-editorial-makeup',
-	},
-];
-
 const ALL_PROGRAMS = { label: 'View all programs', to: '/programs' };
 
-export default function Programs() {
+export default function Programs({ programs }: { programs: Program[] }) {
+	const featured = programs.filter((program) => program.featured);
+	const alsoOffered = programs.filter((program) => !program.featured);
+
 	return (
 		<section
 			aria-labelledby="programs-heading"
@@ -104,19 +54,20 @@ export default function Programs() {
 				</div>
 
 				<div className="mt-14 grid gap-5 md:grid-cols-3">
-					{FEATURED.map((program, index) => (
-						<ProgramCard key={program.title} program={program} index={index} />
+					{featured.map((program) => (
+						<ProgramCard key={program.slug} program={program} />
 					))}
 				</div>
 
 				<div className="mt-5 grid gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/60 md:grid-cols-3">
-					{ALSO_OFFERED.map((program, index) => (
+					{alsoOffered.map((program) => (
 						<Link
-							key={program.title}
-							to={program.to}
+							key={program.slug}
+							to="/programs/$slug"
+							params={{ slug: program.slug }}
 							className="group flex items-start gap-4 bg-card/40 p-5 transition-colors hover:bg-primary/5"
 						>
-							<ProgramNumber position={FEATURED.length + index + 1} size="sm" />
+							<ProgramNumber position={program.position} size="sm" />
 							<span className="min-w-0">
 								<span className="flex items-center gap-1.5 font-medium text-foreground text-sm transition-colors group-hover:text-primary">
 									{program.title}
@@ -126,7 +77,7 @@ export default function Programs() {
 									/>
 								</span>
 								<span className="mt-1 block text-muted-foreground text-xs leading-relaxed">
-									{program.description}
+									{program.tagline}
 								</span>
 							</span>
 						</Link>
@@ -137,10 +88,13 @@ export default function Programs() {
 	);
 }
 
-function ProgramCard({ program, index }: { program: Program; index: number }) {
+function ProgramCard({ program }: { program: Program }) {
+	const meta = [program.level, program.duration, 'Certificate'];
+
 	return (
 		<Link
-			to={program.to}
+			to="/programs/$slug"
+			params={{ slug: program.slug }}
 			className="group block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 		>
 			<Card className="relative h-full gap-0 py-0 transition-all duration-300 group-hover:-translate-y-1 group-hover:ring-primary/40 group-hover:shadow-lg group-hover:shadow-primary/5">
@@ -151,7 +105,7 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
 
 				<CardHeader className="pt-6">
 					<div className="flex items-start justify-between gap-4">
-						<ProgramNumber position={index + 1} />
+						<ProgramNumber position={program.position} />
 					</div>
 
 					<h3 className="mt-5 font-semibold text-lg tracking-tight transition-colors group-hover:text-primary">
@@ -161,11 +115,11 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
 
 				<CardContent className="flex flex-1 flex-col gap-4 pt-4">
 					<p className="flex-1 text-muted-foreground text-sm leading-relaxed">
-						{program.description}
+						{program.tagline}
 					</p>
 
 					<ul className="flex flex-wrap gap-1.5">
-						{program.meta.map((item) => (
+						{meta.map((item) => (
 							<li key={item}>
 								<Badge
 									variant="outline"

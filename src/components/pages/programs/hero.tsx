@@ -5,9 +5,9 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { ProgramNumber } from '@/components/pages/programs/program-number';
+import type { Program } from '@/components/pages/programs/types';
 import { buttonVariants } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { PROGRAM_STATS, PROGRAMS } from '@/data/programs';
 import { cn } from '@/lib/utils';
 
 // Destinations are `string`-typed on purpose: routes are added incrementally,
@@ -22,7 +22,16 @@ const CONTACT_LINK: { label: string; to: string } = {
 	to: '/contact',
 };
 
-export default function ProgramsHero() {
+function programStats(count: number) {
+	return [
+		{ value: String(count), label: 'Career programs' },
+		{ value: '60+', label: 'Hiring partners' },
+		{ value: '2', label: 'Cohort times' },
+		{ value: '100%', label: 'Hands-on' },
+	];
+}
+
+export default function ProgramsHero({ programs }: { programs: Program[] }) {
 	return (
 		<section
 			aria-labelledby="programs-hero-heading"
@@ -74,7 +83,7 @@ export default function ProgramsHero() {
 						</h1>
 
 						<p className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:delay-100 mt-6 max-w-xl text-pretty text-[17px] text-foreground/70 leading-relaxed sm:text-lg">
-							{PROGRAMS.length} career programs, one working floor. Every course
+							{programs.length} career programs, one working floor. Every course
 							is built around real tools, chair time and the clients you will
 							meet on day one — not a slideshow.
 						</p>
@@ -117,18 +126,18 @@ export default function ProgramsHero() {
 							</p>
 							<span className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground/60 uppercase tracking-[0.18em]">
 								<IconClock className="size-3.5" stroke={1.6} />
-								{PROGRAMS.length} tracks
+								{programs.length} tracks
 							</span>
 						</div>
 
 						<ul className="mt-3 divide-y divide-border/60">
-							{PROGRAMS.map((program, index) => (
+							{programs.map((program) => (
 								<li key={program.slug}>
 									<a
 										href={`#${program.slug}`}
 										className="group flex items-center gap-3 py-3"
 									>
-										<ProgramNumber position={index + 1} size="sm" />
+										<ProgramNumber position={program.position} size="sm" />
 										<span className="min-w-0 flex-1">
 											<span className="block truncate font-medium text-foreground text-sm transition-colors group-hover:text-primary">
 												{program.title}
@@ -151,7 +160,7 @@ export default function ProgramsHero() {
 				<Separator className="mt-14 bg-linear-to-r from-transparent via-border to-transparent" />
 
 				<dl className="motion-safe:animate-in motion-safe:fade-in motion-safe:delay-200 mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
-					{PROGRAM_STATS.map((stat) => (
+					{programStats(programs.length).map((stat) => (
 						<div key={stat.label} className="flex flex-col gap-1">
 							<dt className="order-2 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
 								{stat.label}

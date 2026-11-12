@@ -2,6 +2,7 @@ import { IconArrowRight, IconArrowUpRight } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { SectionHeading } from '@/components/pages/home/section-heading';
 import { ProgramNumber } from '@/components/pages/programs/program-number';
+import type { Program } from '@/components/pages/programs/types';
 import { Badge } from '@/components/ui/badge';
 import {
 	Card,
@@ -9,7 +10,6 @@ import {
 	CardFooter,
 	CardHeader,
 } from '@/components/ui/card';
-import { getProgramPosition, type Program } from '@/data/programs';
 
 export default function RelatedPrograms({ programs }: { programs: Program[] }) {
 	return (
@@ -63,9 +63,7 @@ export default function RelatedPrograms({ programs }: { programs: Program[] }) {
 
 								<CardHeader className="pt-6">
 									<div className="flex items-start justify-between gap-4">
-										<ProgramNumber
-											position={getProgramPosition(program.slug)}
-										/>
+										<ProgramNumber position={program.position} />
 										<Badge
 											variant="outline"
 											className="border-primary/25 text-[9px] text-primary uppercase tracking-[0.14em]"

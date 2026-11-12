@@ -6,6 +6,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { SectionHeading } from '@/components/pages/home/section-heading';
+import type { ProgramOption } from '@/components/pages/programs/types';
 import { Badge } from '@/components/ui/badge';
 import {
 	Card,
@@ -19,7 +20,6 @@ import {
 	type Instructor,
 	type InstructorFilter,
 } from '@/data/instructors';
-import { getProgramBySlug } from '@/data/programs';
 import { cn, getInitials } from '@/lib/utils';
 
 const CONTACT_LINK: { label: string; to: string } = {
@@ -34,7 +34,11 @@ function countFor(filter: InstructorFilter) {
 				.length;
 }
 
-export default function InstructorsRoster() {
+export default function InstructorsRoster({
+	programs,
+}: {
+	programs: ProgramOption[];
+}) {
 	const [activeFilter, setActiveFilter] = useState<InstructorFilter>('All');
 
 	const visibleInstructors =
@@ -122,7 +126,11 @@ export default function InstructorsRoster() {
 
 				<div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
 					{visibleInstructors.map((instructor) => (
-						<InstructorCard key={instructor.slug} instructor={instructor} />
+						<InstructorCard
+							key={instructor.slug}
+							instructor={instructor}
+							programs={programs}
+						/>
 					))}
 				</div>
 
@@ -147,9 +155,15 @@ export default function InstructorsRoster() {
 	);
 }
 
-function InstructorCard({ instructor }: { instructor: Instructor }) {
-	const programs = instructor.programSlugs
-		.map((slug) => getProgramBySlug(slug))
+function InstructorCard({
+	instructor,
+	programs,
+}: {
+	instructor: Instructor;
+	programs: ProgramOption[];
+}) {
+	const taughtPrograms = instructor.programSlugs
+		.map((slug) => programs.find((program) => program.slug === slug))
 		.filter((program) => program !== undefined);
 
 	return (
@@ -252,10 +266,10 @@ function InstructorCard({ instructor }: { instructor: Instructor }) {
 
 				<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
 					<span className="font-semibold text-[9px] text-primary uppercase tracking-[0.16em]">
-						{programs.length > 0 ? 'Teaches' : 'Supports'}
+						{taughtPrograms.length > 0 ? 'Teaches' : 'Supports'}
 					</span>
-					{programs.length > 0 ? (
-						programs.map((program) => (
+					{taughtPrograms.length > 0 ? (
+						taughtPrograms.map((program) => (
 							<Link
 								key={program.slug}
 								to="/programs/$slug"

@@ -7,6 +7,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import { SectionHeading } from '@/components/pages/home/section-heading';
 import { ProgramNumber } from '@/components/pages/programs/program-number';
+import type { Program } from '@/components/pages/programs/types';
 import { Badge } from '@/components/ui/badge';
 import {
 	Card,
@@ -14,9 +15,8 @@ import {
 	CardFooter,
 	CardHeader,
 } from '@/components/ui/card';
-import { PROGRAMS, type Program } from '@/data/programs';
 
-export default function ProgramsList() {
+export default function ProgramsList({ programs }: { programs: Program[] }) {
 	return (
 		<section
 			aria-labelledby="programs-list-heading"
@@ -45,13 +45,13 @@ export default function ProgramsList() {
 						variant="outline"
 						className="shrink-0 self-start border-primary/30 text-[9px] text-primary tracking-[0.18em] sm:self-auto"
 					>
-						{PROGRAMS.length} CAREER PROGRAMS
+						{programs.length} CAREER PROGRAMS
 					</Badge>
 				</div>
 
 				<div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-					{PROGRAMS.map((program, index) => (
-						<ProgramCard key={program.slug} program={program} index={index} />
+					{programs.map((program) => (
+						<ProgramCard key={program.slug} program={program} />
 					))}
 				</div>
 			</div>
@@ -59,7 +59,7 @@ export default function ProgramsList() {
 	);
 }
 
-function ProgramCard({ program, index }: { program: Program; index: number }) {
+function ProgramCard({ program }: { program: Program }) {
 	return (
 		<Link
 			id={program.slug}
@@ -81,7 +81,7 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
 
 				<CardHeader className="pt-6">
 					<div className="flex items-start justify-between gap-4">
-						<ProgramNumber position={index + 1} />
+						<ProgramNumber position={program.position} />
 
 						<Badge
 							variant="outline"

@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import GalleryCta from '@/components/pages/gallery/cta';
 import GalleryGrid from '@/components/pages/gallery/grid';
+import { getProgramOptions } from '@/server/programs';
 
 export const Route = createFileRoute('/_public/gallery')({
+	loader: () => getProgramOptions(),
 	head: () => ({
 		meta: [
 			{ title: 'Gallery — Unicorn Barber Training Academy' },
@@ -17,9 +19,11 @@ export const Route = createFileRoute('/_public/gallery')({
 });
 
 function Gallery() {
+	const programs = Route.useLoaderData();
+
 	return (
 		<main>
-			<GalleryGrid />
+			<GalleryGrid programs={programs} />
 			<GalleryCta />
 		</main>
 	);
