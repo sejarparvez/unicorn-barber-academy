@@ -13,11 +13,17 @@ import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicSplatRouteImport } from './routes/_public/$'
+import { Route as PublicAboutRouteImport } from './routes/_public/about'
+import { Route as PublicGalleryRouteImport } from './routes/_public/gallery'
+import { Route as PublicInstructorsRouteImport } from './routes/_public/instructors'
 import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
+import { Route as PublicProgramsRouteRouteImport } from './routes/_public/programs/route'
 import { Route as PublicTermsRouteImport } from './routes/_public/terms'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as EnrollIndexRouteImport } from './routes/enroll/index'
+import { Route as PublicProgramsIndexRouteImport } from './routes/_public/programs/index'
+import { Route as PublicProgramsSlugRouteImport } from './routes/_public/programs/$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
@@ -39,9 +45,29 @@ const PublicSplatRoute = PublicSplatRouteImport.update({
   path: '/$',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const PublicAboutRoute = PublicAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicGalleryRoute = PublicGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicInstructorsRoute = PublicInstructorsRouteImport.update({
+  id: '/instructors',
+  path: '/instructors',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicProgramsRouteRoute = PublicProgramsRouteRouteImport.update({
+  id: '/programs',
+  path: '/programs',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const PublicTermsRoute = PublicTermsRouteImport.update({
@@ -64,6 +90,16 @@ const EnrollIndexRoute = EnrollIndexRouteImport.update({
   path: '/enroll/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicProgramsIndexRoute = PublicProgramsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PublicProgramsRouteRoute,
+} as any)
+const PublicProgramsSlugRoute = PublicProgramsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => PublicProgramsRouteRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -73,71 +109,105 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/programs': typeof PublicProgramsRouteRouteWithChildren
   '/$': typeof PublicSplatRoute
+  '/about': typeof PublicAboutRoute
+  '/gallery': typeof PublicGalleryRoute
+  '/instructors': typeof PublicInstructorsRoute
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/auth/signin': typeof AuthSigninRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/enroll/': typeof EnrollIndexRoute
+  '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/programs/': typeof PublicProgramsIndexRoute
 }
 export interface FileRoutesByTo {
   '/$': typeof PublicSplatRoute
+  '/about': typeof PublicAboutRoute
+  '/gallery': typeof PublicGalleryRoute
+  '/instructors': typeof PublicInstructorsRoute
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/auth/signin': typeof AuthSigninRoute
   '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/enroll': typeof EnrollIndexRoute
+  '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/programs': typeof PublicProgramsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/_public/programs': typeof PublicProgramsRouteRouteWithChildren
   '/_public/$': typeof PublicSplatRoute
+  '/_public/about': typeof PublicAboutRoute
+  '/_public/gallery': typeof PublicGalleryRoute
+  '/_public/instructors': typeof PublicInstructorsRoute
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/terms': typeof PublicTermsRoute
   '/auth/signin': typeof AuthSigninRoute
   '/_public/': typeof PublicIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/enroll/': typeof EnrollIndexRoute
+  '/_public/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_public/programs/': typeof PublicProgramsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/programs'
     | '/$'
+    | '/about'
+    | '/gallery'
+    | '/instructors'
     | '/privacy'
     | '/terms'
     | '/auth/signin'
     | '/dashboard/'
     | '/enroll/'
+    | '/programs/$slug'
     | '/api/auth/$'
+    | '/programs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/$'
+    | '/about'
+    | '/gallery'
+    | '/instructors'
     | '/privacy'
     | '/terms'
     | '/auth/signin'
     | '/'
     | '/dashboard'
     | '/enroll'
+    | '/programs/$slug'
     | '/api/auth/$'
+    | '/programs'
   id:
     | '__root__'
     | '/_public'
     | '/dashboard'
+    | '/_public/programs'
     | '/_public/$'
+    | '/_public/about'
+    | '/_public/gallery'
+    | '/_public/instructors'
     | '/_public/privacy'
     | '/_public/terms'
     | '/auth/signin'
     | '/_public/'
     | '/dashboard/'
     | '/enroll/'
+    | '/_public/programs/$slug'
     | '/api/auth/$'
+    | '/_public/programs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -178,11 +248,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicSplatRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_public/about': {
+      id: '/_public/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof PublicAboutRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/gallery': {
+      id: '/_public/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof PublicGalleryRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/instructors': {
+      id: '/_public/instructors'
+      path: '/instructors'
+      fullPath: '/instructors'
+      preLoaderRoute: typeof PublicInstructorsRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_public/privacy': {
       id: '/_public/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PublicPrivacyRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/programs': {
+      id: '/_public/programs'
+      path: '/programs'
+      fullPath: '/programs'
+      preLoaderRoute: typeof PublicProgramsRouteRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_public/terms': {
@@ -213,6 +311,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnrollIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public/programs/': {
+      id: '/_public/programs/'
+      path: '/'
+      fullPath: '/programs/'
+      preLoaderRoute: typeof PublicProgramsIndexRouteImport
+      parentRoute: typeof PublicProgramsRouteRoute
+    }
+    '/_public/programs/$slug': {
+      id: '/_public/programs/$slug'
+      path: '/$slug'
+      fullPath: '/programs/$slug'
+      preLoaderRoute: typeof PublicProgramsSlugRouteImport
+      parentRoute: typeof PublicProgramsRouteRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -223,15 +335,36 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PublicProgramsRouteRouteChildren {
+  PublicProgramsSlugRoute: typeof PublicProgramsSlugRoute
+  PublicProgramsIndexRoute: typeof PublicProgramsIndexRoute
+}
+
+const PublicProgramsRouteRouteChildren: PublicProgramsRouteRouteChildren = {
+  PublicProgramsSlugRoute: PublicProgramsSlugRoute,
+  PublicProgramsIndexRoute: PublicProgramsIndexRoute,
+}
+
+const PublicProgramsRouteRouteWithChildren =
+  PublicProgramsRouteRoute._addFileChildren(PublicProgramsRouteRouteChildren)
+
 interface PublicRouteRouteChildren {
+  PublicProgramsRouteRoute: typeof PublicProgramsRouteRouteWithChildren
   PublicSplatRoute: typeof PublicSplatRoute
+  PublicAboutRoute: typeof PublicAboutRoute
+  PublicGalleryRoute: typeof PublicGalleryRoute
+  PublicInstructorsRoute: typeof PublicInstructorsRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicProgramsRouteRoute: PublicProgramsRouteRouteWithChildren,
   PublicSplatRoute: PublicSplatRoute,
+  PublicAboutRoute: PublicAboutRoute,
+  PublicGalleryRoute: PublicGalleryRoute,
+  PublicInstructorsRoute: PublicInstructorsRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   PublicIndexRoute: PublicIndexRoute,

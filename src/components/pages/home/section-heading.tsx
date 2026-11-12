@@ -7,6 +7,7 @@ export function SectionHeading({
 	title,
 	description,
 	align = 'left',
+	as = 'h2',
 	className,
 }: {
 	id?: string;
@@ -14,9 +15,11 @@ export function SectionHeading({
 	title: ReactNode;
 	description?: string;
 	align?: 'left' | 'center';
+	as?: 'h1' | 'h2';
 	className?: string;
 }) {
 	const centered = align === 'center';
+	const Heading = as;
 
 	return (
 		<div
@@ -40,12 +43,12 @@ export function SectionHeading({
 				)}
 			</div>
 
-			<h2
+			<Heading
 				id={id}
 				className="mt-5 text-balance font-bold text-3xl text-foreground leading-[1.1] tracking-tight sm:text-4xl"
 			>
 				{title}
-			</h2>
+			</Heading>
 
 			{description && (
 				<p className="mt-4 text-pretty text-muted-foreground text-sm leading-relaxed sm:text-base">

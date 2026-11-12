@@ -41,9 +41,9 @@ const PROGRAMS: FooterLink[] = [
 const ACADEMY: FooterLink[] = [
 	{ label: 'About Us', to: '/about' },
 	{ label: 'Instructors', to: '/instructors' },
-	{ label: 'Student Life', to: '/student-life' },
-	{ label: 'Press & Media', to: '/media' },
-	{ label: 'Careers', to: '/careers' },
+	{ label: 'Gallery', to: '/gallery' },
+	{ label: 'Contact', to: '/contact' },
+	{ label: 'Blog', to: '/blog' },
 	{ label: 'Verify Certificate', to: '/verify' },
 ];
 
