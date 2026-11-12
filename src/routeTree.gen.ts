@@ -14,11 +14,13 @@ import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicSplatRouteImport } from './routes/_public/$'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
+import { Route as PublicContactRouteImport } from './routes/_public/contact'
 import { Route as PublicGalleryRouteImport } from './routes/_public/gallery'
 import { Route as PublicInstructorsRouteImport } from './routes/_public/instructors'
 import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as PublicProgramsRouteRouteImport } from './routes/_public/programs/route'
 import { Route as PublicTermsRouteImport } from './routes/_public/terms'
+import { Route as PublicVerifyRouteImport } from './routes/_public/verify'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as EnrollIndexRouteImport } from './routes/enroll/index'
@@ -50,6 +52,11 @@ const PublicAboutRoute = PublicAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const PublicContactRoute = PublicContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const PublicGalleryRoute = PublicGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -73,6 +80,11 @@ const PublicProgramsRouteRoute = PublicProgramsRouteRouteImport.update({
 const PublicTermsRoute = PublicTermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicVerifyRoute = PublicVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const AuthSigninRoute = AuthSigninRouteImport.update({
@@ -112,10 +124,12 @@ export interface FileRoutesByFullPath {
   '/programs': typeof PublicProgramsRouteRouteWithChildren
   '/$': typeof PublicSplatRoute
   '/about': typeof PublicAboutRoute
+  '/contact': typeof PublicContactRoute
   '/gallery': typeof PublicGalleryRoute
   '/instructors': typeof PublicInstructorsRoute
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
+  '/verify': typeof PublicVerifyRoute
   '/auth/signin': typeof AuthSigninRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/enroll/': typeof EnrollIndexRoute
@@ -126,10 +140,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/$': typeof PublicSplatRoute
   '/about': typeof PublicAboutRoute
+  '/contact': typeof PublicContactRoute
   '/gallery': typeof PublicGalleryRoute
   '/instructors': typeof PublicInstructorsRoute
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
+  '/verify': typeof PublicVerifyRoute
   '/auth/signin': typeof AuthSigninRoute
   '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -145,10 +161,12 @@ export interface FileRoutesById {
   '/_public/programs': typeof PublicProgramsRouteRouteWithChildren
   '/_public/$': typeof PublicSplatRoute
   '/_public/about': typeof PublicAboutRoute
+  '/_public/contact': typeof PublicContactRoute
   '/_public/gallery': typeof PublicGalleryRoute
   '/_public/instructors': typeof PublicInstructorsRoute
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/terms': typeof PublicTermsRoute
+  '/_public/verify': typeof PublicVerifyRoute
   '/auth/signin': typeof AuthSigninRoute
   '/_public/': typeof PublicIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -165,10 +183,12 @@ export interface FileRouteTypes {
     | '/programs'
     | '/$'
     | '/about'
+    | '/contact'
     | '/gallery'
     | '/instructors'
     | '/privacy'
     | '/terms'
+    | '/verify'
     | '/auth/signin'
     | '/dashboard/'
     | '/enroll/'
@@ -179,10 +199,12 @@ export interface FileRouteTypes {
   to:
     | '/$'
     | '/about'
+    | '/contact'
     | '/gallery'
     | '/instructors'
     | '/privacy'
     | '/terms'
+    | '/verify'
     | '/auth/signin'
     | '/'
     | '/dashboard'
@@ -197,10 +219,12 @@ export interface FileRouteTypes {
     | '/_public/programs'
     | '/_public/$'
     | '/_public/about'
+    | '/_public/contact'
     | '/_public/gallery'
     | '/_public/instructors'
     | '/_public/privacy'
     | '/_public/terms'
+    | '/_public/verify'
     | '/auth/signin'
     | '/_public/'
     | '/dashboard/'
@@ -255,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicAboutRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_public/contact': {
+      id: '/_public/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof PublicContactRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_public/gallery': {
       id: '/_public/gallery'
       path: '/gallery'
@@ -288,6 +319,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof PublicTermsRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/verify': {
+      id: '/_public/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof PublicVerifyRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/auth/signin': {
@@ -352,10 +390,12 @@ interface PublicRouteRouteChildren {
   PublicProgramsRouteRoute: typeof PublicProgramsRouteRouteWithChildren
   PublicSplatRoute: typeof PublicSplatRoute
   PublicAboutRoute: typeof PublicAboutRoute
+  PublicContactRoute: typeof PublicContactRoute
   PublicGalleryRoute: typeof PublicGalleryRoute
   PublicInstructorsRoute: typeof PublicInstructorsRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
+  PublicVerifyRoute: typeof PublicVerifyRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
@@ -363,10 +403,12 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicProgramsRouteRoute: PublicProgramsRouteRouteWithChildren,
   PublicSplatRoute: PublicSplatRoute,
   PublicAboutRoute: PublicAboutRoute,
+  PublicContactRoute: PublicContactRoute,
   PublicGalleryRoute: PublicGalleryRoute,
   PublicInstructorsRoute: PublicInstructorsRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
+  PublicVerifyRoute: PublicVerifyRoute,
   PublicIndexRoute: PublicIndexRoute,
 }
 
