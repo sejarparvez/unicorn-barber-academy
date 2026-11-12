@@ -21,9 +21,13 @@ import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as PublicProgramsRouteRouteImport } from './routes/_public/programs/route'
 import { Route as PublicTermsRouteImport } from './routes/_public/terms'
 import { Route as PublicVerifyRouteImport } from './routes/_public/verify'
-import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as EnrollIndexRouteImport } from './routes/enroll/index'
+import { Route as PublicAuthForgotPasswordRouteImport } from './routes/_public/auth/forgot-password'
+import { Route as PublicAuthResetPasswordRouteImport } from './routes/_public/auth/reset-password'
+import { Route as PublicAuthSigninRouteImport } from './routes/_public/auth/signin'
+import { Route as PublicAuthSignupRouteImport } from './routes/_public/auth/signup'
+import { Route as PublicAuthVerifyEmailRouteImport } from './routes/_public/auth/verify-email'
 import { Route as PublicProgramsIndexRouteImport } from './routes/_public/programs/index'
 import { Route as PublicProgramsSlugRouteImport } from './routes/_public/programs/$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -87,11 +91,6 @@ const PublicVerifyRoute = PublicVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => PublicRouteRoute,
 } as any)
-const AuthSigninRoute = AuthSigninRouteImport.update({
-  id: '/auth/signin',
-  path: '/auth/signin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -101,6 +100,32 @@ const EnrollIndexRoute = EnrollIndexRouteImport.update({
   id: '/enroll/',
   path: '/enroll/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PublicAuthForgotPasswordRoute =
+  PublicAuthForgotPasswordRouteImport.update({
+    id: '/auth/forgot-password',
+    path: '/auth/forgot-password',
+    getParentRoute: () => PublicRouteRoute,
+  } as any)
+const PublicAuthResetPasswordRoute = PublicAuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicAuthSigninRoute = PublicAuthSigninRouteImport.update({
+  id: '/auth/signin',
+  path: '/auth/signin',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicAuthSignupRoute = PublicAuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicAuthVerifyEmailRoute = PublicAuthVerifyEmailRouteImport.update({
+  id: '/auth/verify-email',
+  path: '/auth/verify-email',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 const PublicProgramsIndexRoute = PublicProgramsIndexRouteImport.update({
   id: '/',
@@ -130,9 +155,13 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
-  '/auth/signin': typeof AuthSigninRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/enroll/': typeof EnrollIndexRoute
+  '/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
+  '/auth/reset-password': typeof PublicAuthResetPasswordRoute
+  '/auth/signin': typeof PublicAuthSigninRoute
+  '/auth/signup': typeof PublicAuthSignupRoute
+  '/auth/verify-email': typeof PublicAuthVerifyEmailRoute
   '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/programs/': typeof PublicProgramsIndexRoute
@@ -146,10 +175,14 @@ export interface FileRoutesByTo {
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
-  '/auth/signin': typeof AuthSigninRoute
   '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/enroll': typeof EnrollIndexRoute
+  '/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
+  '/auth/reset-password': typeof PublicAuthResetPasswordRoute
+  '/auth/signin': typeof PublicAuthSigninRoute
+  '/auth/signup': typeof PublicAuthSignupRoute
+  '/auth/verify-email': typeof PublicAuthVerifyEmailRoute
   '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/programs': typeof PublicProgramsIndexRoute
@@ -167,10 +200,14 @@ export interface FileRoutesById {
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/terms': typeof PublicTermsRoute
   '/_public/verify': typeof PublicVerifyRoute
-  '/auth/signin': typeof AuthSigninRoute
   '/_public/': typeof PublicIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/enroll/': typeof EnrollIndexRoute
+  '/_public/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
+  '/_public/auth/reset-password': typeof PublicAuthResetPasswordRoute
+  '/_public/auth/signin': typeof PublicAuthSigninRoute
+  '/_public/auth/signup': typeof PublicAuthSignupRoute
+  '/_public/auth/verify-email': typeof PublicAuthVerifyEmailRoute
   '/_public/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_public/programs/': typeof PublicProgramsIndexRoute
@@ -189,9 +226,13 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/verify'
-    | '/auth/signin'
     | '/dashboard/'
     | '/enroll/'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/auth/verify-email'
     | '/programs/$slug'
     | '/api/auth/$'
     | '/programs/'
@@ -205,10 +246,14 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/verify'
-    | '/auth/signin'
     | '/'
     | '/dashboard'
     | '/enroll'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/auth/verify-email'
     | '/programs/$slug'
     | '/api/auth/$'
     | '/programs'
@@ -225,10 +270,14 @@ export interface FileRouteTypes {
     | '/_public/privacy'
     | '/_public/terms'
     | '/_public/verify'
-    | '/auth/signin'
     | '/_public/'
     | '/dashboard/'
     | '/enroll/'
+    | '/_public/auth/forgot-password'
+    | '/_public/auth/reset-password'
+    | '/_public/auth/signin'
+    | '/_public/auth/signup'
+    | '/_public/auth/verify-email'
     | '/_public/programs/$slug'
     | '/api/auth/$'
     | '/_public/programs/'
@@ -237,7 +286,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
-  AuthSigninRoute: typeof AuthSigninRoute
   EnrollIndexRoute: typeof EnrollIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -328,13 +376,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicVerifyRouteImport
       parentRoute: typeof PublicRouteRoute
     }
-    '/auth/signin': {
-      id: '/auth/signin'
-      path: '/auth/signin'
-      fullPath: '/auth/signin'
-      preLoaderRoute: typeof AuthSigninRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
@@ -348,6 +389,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/enroll/'
       preLoaderRoute: typeof EnrollIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_public/auth/forgot-password': {
+      id: '/_public/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof PublicAuthForgotPasswordRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/auth/reset-password': {
+      id: '/_public/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof PublicAuthResetPasswordRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/auth/signin': {
+      id: '/_public/auth/signin'
+      path: '/auth/signin'
+      fullPath: '/auth/signin'
+      preLoaderRoute: typeof PublicAuthSigninRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/auth/signup': {
+      id: '/_public/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof PublicAuthSignupRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/auth/verify-email': {
+      id: '/_public/auth/verify-email'
+      path: '/auth/verify-email'
+      fullPath: '/auth/verify-email'
+      preLoaderRoute: typeof PublicAuthVerifyEmailRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/_public/programs/': {
       id: '/_public/programs/'
@@ -397,6 +473,11 @@ interface PublicRouteRouteChildren {
   PublicTermsRoute: typeof PublicTermsRoute
   PublicVerifyRoute: typeof PublicVerifyRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicAuthForgotPasswordRoute: typeof PublicAuthForgotPasswordRoute
+  PublicAuthResetPasswordRoute: typeof PublicAuthResetPasswordRoute
+  PublicAuthSigninRoute: typeof PublicAuthSigninRoute
+  PublicAuthSignupRoute: typeof PublicAuthSignupRoute
+  PublicAuthVerifyEmailRoute: typeof PublicAuthVerifyEmailRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
@@ -410,6 +491,11 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicTermsRoute: PublicTermsRoute,
   PublicVerifyRoute: PublicVerifyRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicAuthForgotPasswordRoute: PublicAuthForgotPasswordRoute,
+  PublicAuthResetPasswordRoute: PublicAuthResetPasswordRoute,
+  PublicAuthSigninRoute: PublicAuthSigninRoute,
+  PublicAuthSignupRoute: PublicAuthSignupRoute,
+  PublicAuthVerifyEmailRoute: PublicAuthVerifyEmailRoute,
 }
 
 const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
@@ -431,7 +517,6 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   PublicRouteRoute: PublicRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
-  AuthSigninRoute: AuthSigninRoute,
   EnrollIndexRoute: EnrollIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

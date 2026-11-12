@@ -1,5 +1,29 @@
 export { cn } from 'cn';
 
+/**
+ * Keeps user-supplied redirects on this site. Accepts only relative paths
+ * starting with a single "/" and rejects protocol-relative URLs, backslash
+ * tricks, and control characters.
+ */
+export function safeRedirect(path?: string | null, fallback = '/'): string {
+	if (!path || typeof path !== 'string') {
+		return fallback;
+	}
+	if (!path.startsWith('/')) {
+		return fallback;
+	}
+	if (path.startsWith('//') || path.startsWith('/\\')) {
+		return fallback;
+	}
+	for (const character of path) {
+		const code = character.codePointAt(0);
+		if (code !== undefined && (code <= 0x1f || code === 0x7f)) {
+			return fallback;
+		}
+	}
+	return path;
+}
+
 export function getInitials(name?: string | null): string {
 	if (!name) {
 		return '';

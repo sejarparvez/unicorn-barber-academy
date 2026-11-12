@@ -13,9 +13,11 @@ export const Route = createFileRoute('/_public')({
 
 function RouteComponent() {
 	return (
-		<div>
+		<div className="flex min-h-svh flex-col">
 			<Header />
-			<Outlet />
+			<div className="flex flex-1 flex-col">
+				<Outlet />
+			</div>
 			<Footer />
 		</div>
 	);
