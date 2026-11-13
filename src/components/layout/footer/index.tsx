@@ -9,9 +9,9 @@ import {
 	IconMapPin,
 	IconPhone,
 } from '@tabler/icons-react';
-import { Link } from '@tanstack/react-router';
+import { Link, useRouteContext } from '@tanstack/react-router';
 import { Image } from '@unpic/react';
-import type { ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import logo from '@/assets/logo/logo.png';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,24 +19,6 @@ import { Separator } from '@/components/ui/separator';
 import { SITE } from '@/lib/site';
 
 type FooterLink = { label: string; to: string };
-
-const PROGRAMS: FooterLink[] = [
-	{ label: 'Classic Barbering', to: '/programs/classic-barbering' },
-	{ label: 'Beard Sculpting', to: '/programs/beard-sculpting' },
-	{ label: 'Fades & Tapers', to: '/programs/fades-and-tapers' },
-	{
-		label: 'Cosmetology Fundamentals',
-		to: '/programs/cosmetology-fundamentals',
-	},
-	{
-		label: 'Hair Styling & Colouring',
-		to: '/programs/hair-styling-and-colouring',
-	},
-	{
-		label: 'Bridal & Editorial Makeup',
-		to: '/programs/bridal-and-editorial-makeup',
-	},
-];
 
 const ACADEMY: FooterLink[] = [
 	{ label: 'About Us', to: '/about' },
@@ -53,6 +35,17 @@ const LEGAL_LINKS: FooterLink[] = [
 ];
 
 export default function Footer() {
+	const { programOptions } = useRouteContext({ from: '__root__' });
+
+	const programs = useMemo<FooterLink[]>(
+		() =>
+			programOptions.map((program) => ({
+				label: program.title,
+				to: `/programs/${program.slug}`,
+			})),
+		[programOptions],
+	);
+
 	return (
 		<footer className="relative overflow-hidden">
 			{/* Top gradient hairline, echoing the header divider */}
@@ -171,7 +164,7 @@ export default function Footer() {
 					/>
 
 					{/* Programs column */}
-					<FooterColumn title="Programs" links={PROGRAMS} />
+					<FooterColumn title="Programs" links={programs} />
 
 					<Separator
 						orientation="vertical"

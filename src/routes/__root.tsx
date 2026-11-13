@@ -3,13 +3,17 @@ import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { Toaster } from '@/components/ui/sonner';
 import { getSession } from '@/lib/auth.functions';
+import { getProgramOptions } from '@/server/programs';
 
 import appCss from '../styles.css?url';
 
 export const Route = createRootRoute({
 	beforeLoad: async () => {
-		const session = await getSession();
-		return { session };
+		const [session, programOptions] = await Promise.all([
+			getSession(),
+			getProgramOptions(),
+		]);
+		return { session, programOptions };
 	},
 	head: () => ({
 		meta: [

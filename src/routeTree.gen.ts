@@ -33,6 +33,9 @@ import { Route as PublicAuthVerifyEmailRouteImport } from './routes/_public/auth
 import { Route as PublicProgramsIndexRouteImport } from './routes/_public/programs/index'
 import { Route as PublicProgramsSlugRouteImport } from './routes/_public/programs/$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DashboardAdminProgramsIndexRouteImport } from './routes/dashboard/_admin/programs/index'
+import { Route as DashboardAdminProgramsNewRouteImport } from './routes/dashboard/_admin/programs/new'
+import { Route as DashboardAdminProgramsProgramIdEditRouteImport } from './routes/dashboard/_admin/programs/$programId/edit'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
@@ -153,6 +156,24 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAdminProgramsIndexRoute =
+  DashboardAdminProgramsIndexRouteImport.update({
+    id: '/programs/',
+    path: '/programs/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminProgramsNewRoute =
+  DashboardAdminProgramsNewRouteImport.update({
+    id: '/programs/new',
+    path: '/programs/new',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminProgramsProgramIdEditRoute =
+  DashboardAdminProgramsProgramIdEditRouteImport.update({
+    id: '/programs/$programId/edit',
+    path: '/programs/$programId/edit',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -177,6 +198,9 @@ export interface FileRoutesByFullPath {
   '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/programs/': typeof PublicProgramsIndexRoute
+  '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
+  '/dashboard/programs/': typeof DashboardAdminProgramsIndexRoute
+  '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardIndexRoute
@@ -199,13 +223,16 @@ export interface FileRoutesByTo {
   '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/programs': typeof PublicProgramsIndexRoute
+  '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
+  '/dashboard/programs': typeof DashboardAdminProgramsIndexRoute
+  '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/_public/programs': typeof PublicProgramsRouteRouteWithChildren
-  '/dashboard/_admin': typeof DashboardAdminRouteRoute
+  '/dashboard/_admin': typeof DashboardAdminRouteRouteWithChildren
   '/_public/$': typeof PublicSplatRoute
   '/_public/about': typeof PublicAboutRoute
   '/_public/contact': typeof PublicContactRoute
@@ -226,6 +253,9 @@ export interface FileRoutesById {
   '/_public/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_public/programs/': typeof PublicProgramsIndexRoute
+  '/dashboard/_admin/programs/new': typeof DashboardAdminProgramsNewRoute
+  '/dashboard/_admin/programs/': typeof DashboardAdminProgramsIndexRoute
+  '/dashboard/_admin/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -252,6 +282,9 @@ export interface FileRouteTypes {
     | '/programs/$slug'
     | '/api/auth/$'
     | '/programs/'
+    | '/dashboard/programs/new'
+    | '/dashboard/programs/'
+    | '/dashboard/programs/$programId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/dashboard'
@@ -274,6 +307,9 @@ export interface FileRouteTypes {
     | '/programs/$slug'
     | '/api/auth/$'
     | '/programs'
+    | '/dashboard/programs/new'
+    | '/dashboard/programs'
+    | '/dashboard/programs/$programId/edit'
   id:
     | '__root__'
     | '/_public'
@@ -300,6 +336,9 @@ export interface FileRouteTypes {
     | '/_public/programs/$slug'
     | '/api/auth/$'
     | '/_public/programs/'
+    | '/dashboard/_admin/programs/new'
+    | '/dashboard/_admin/programs/'
+    | '/dashboard/_admin/programs/$programId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -479,6 +518,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/_admin/programs/': {
+      id: '/dashboard/_admin/programs/'
+      path: '/programs'
+      fullPath: '/dashboard/programs/'
+      preLoaderRoute: typeof DashboardAdminProgramsIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/programs/new': {
+      id: '/dashboard/_admin/programs/new'
+      path: '/programs/new'
+      fullPath: '/dashboard/programs/new'
+      preLoaderRoute: typeof DashboardAdminProgramsNewRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/programs/$programId/edit': {
+      id: '/dashboard/_admin/programs/$programId/edit'
+      path: '/programs/$programId/edit'
+      fullPath: '/dashboard/programs/$programId/edit'
+      preLoaderRoute: typeof DashboardAdminProgramsProgramIdEditRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
   }
 }
 
@@ -535,14 +595,30 @@ const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
   PublicRouteRouteChildren,
 )
 
+interface DashboardAdminRouteRouteChildren {
+  DashboardAdminProgramsNewRoute: typeof DashboardAdminProgramsNewRoute
+  DashboardAdminProgramsIndexRoute: typeof DashboardAdminProgramsIndexRoute
+  DashboardAdminProgramsProgramIdEditRoute: typeof DashboardAdminProgramsProgramIdEditRoute
+}
+
+const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
+  DashboardAdminProgramsNewRoute: DashboardAdminProgramsNewRoute,
+  DashboardAdminProgramsIndexRoute: DashboardAdminProgramsIndexRoute,
+  DashboardAdminProgramsProgramIdEditRoute:
+    DashboardAdminProgramsProgramIdEditRoute,
+}
+
+const DashboardAdminRouteRouteWithChildren =
+  DashboardAdminRouteRoute._addFileChildren(DashboardAdminRouteRouteChildren)
+
 interface DashboardRouteRouteChildren {
-  DashboardAdminRouteRoute: typeof DashboardAdminRouteRoute
+  DashboardAdminRouteRoute: typeof DashboardAdminRouteRouteWithChildren
   DashboardAccountRoute: typeof DashboardAccountRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
-  DashboardAdminRouteRoute: DashboardAdminRouteRoute,
+  DashboardAdminRouteRoute: DashboardAdminRouteRouteWithChildren,
   DashboardAccountRoute: DashboardAccountRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

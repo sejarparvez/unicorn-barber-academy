@@ -42,6 +42,7 @@ function toProgram(row: ProgramRow): Program {
 export const getPrograms = createServerFn({ method: 'GET' }).handler(
 	async (): Promise<Program[]> => {
 		const rows = await db.program.findMany({
+			where: { hidden: false },
 			include: PROGRAM_INCLUDE,
 			orderBy: { position: 'asc' },
 		});
@@ -53,6 +54,7 @@ export const getPrograms = createServerFn({ method: 'GET' }).handler(
 export const getProgramOptions = createServerFn({ method: 'GET' }).handler(
 	async (): Promise<ProgramOption[]> =>
 		db.program.findMany({
+			where: { hidden: false },
 			select: { slug: true, title: true },
 			orderBy: { position: 'asc' },
 		}),
@@ -65,8 +67,8 @@ const slugSchema = z.object({
 export const getProgramBySlug = createServerFn({ method: 'GET' })
 	.validator((input: unknown) => slugSchema.parse(input))
 	.handler(async ({ data }): Promise<Program | null> => {
-		const row = await db.program.findUnique({
-			where: { slug: data.slug },
+		const row = await db.program.findFirst({
+			where: { slug: data.slug, hidden: false },
 			include: PROGRAM_INCLUDE,
 		});
 
@@ -82,8 +84,8 @@ export const getRelatedPrograms = createServerFn({ method: 'GET' })
 	.validator((input: unknown) => relatedSchema.parse(input))
 	.handler(async ({ data }): Promise<Program[]> => {
 		const limit = data.limit ?? 3;
-		const current = await db.program.findUnique({
-			where: { slug: data.slug },
+		const current = await db.program.findFirst({
+			where: { slug: data.slug, hidden: false },
 			select: { category: true },
 		});
 
@@ -95,6 +97,7 @@ export const getRelatedPrograms = createServerFn({ method: 'GET' })
 			where: {
 				slug: { not: data.slug },
 				category: current.category,
+				hidden: false,
 			},
 			orderBy: { position: 'asc' },
 			take: limit,
@@ -109,6 +112,7 @@ export const getRelatedPrograms = createServerFn({ method: 'GET' })
 			where: {
 				slug: { not: data.slug },
 				category: { not: current.category },
+				hidden: false,
 			},
 			orderBy: { position: 'asc' },
 			take: limit - sameCategory.length,
