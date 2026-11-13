@@ -35,12 +35,12 @@ export type AdminEnquiries = {
 	stats: EnquiryStats;
 };
 
-const GENERIC_INTERESTS: Record<string, string> = {
+export const GENERIC_INTERESTS: Record<string, string> = {
 	'not-sure': 'Not sure yet — help me choose',
 	general: 'General enquiry',
 };
 
-function interestLabel(
+export function interestLabel(
 	interest: string,
 	programTitles: Map<string, string>,
 ): string {
