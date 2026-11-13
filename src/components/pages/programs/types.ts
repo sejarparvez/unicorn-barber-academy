@@ -11,6 +11,24 @@ export type ProgramModule = {
 	description: string;
 };
 
+export type BatchStatus = 'upcoming' | 'running' | 'completed' | 'cancelled';
+
+/** A cohort of a program shown publicly, with live seat availability. */
+export type ProgramBatch = {
+	id: string;
+	name: string;
+	/** ISO date string. */
+	startDate: string;
+	/** ISO date string, or null when open-ended. */
+	endDate: string | null;
+	schedule: string;
+	capacity: number;
+	seatsTaken: number;
+	seatsRemaining: number;
+	isFull: boolean;
+	status: BatchStatus;
+};
+
 /** Shape returned by the program server functions and rendered by the UI. */
 export type Program = {
 	id: string;
@@ -19,7 +37,6 @@ export type Program = {
 	category: ProgramCategory;
 	level: string;
 	duration: string;
-	schedule: string;
 	tagline: string;
 	description: string;
 	highlights: string[];

@@ -24,17 +24,24 @@ import { Route as PublicVerifyRouteImport } from './routes/_public/verify'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/_admin/route'
 import { Route as DashboardAccountRouteImport } from './routes/dashboard/account'
-import { Route as EnrollIndexRouteImport } from './routes/enroll/index'
+import { Route as DashboardMyProgramsRouteImport } from './routes/dashboard/my-programs'
 import { Route as PublicAuthForgotPasswordRouteImport } from './routes/_public/auth/forgot-password'
 import { Route as PublicAuthResetPasswordRouteImport } from './routes/_public/auth/reset-password'
 import { Route as PublicAuthSigninRouteImport } from './routes/_public/auth/signin'
 import { Route as PublicAuthSignupRouteImport } from './routes/_public/auth/signup'
 import { Route as PublicAuthVerifyEmailRouteImport } from './routes/_public/auth/verify-email'
+import { Route as PublicEnrollIndexRouteImport } from './routes/_public/enroll/index'
 import { Route as PublicProgramsIndexRouteImport } from './routes/_public/programs/index'
 import { Route as PublicProgramsSlugRouteImport } from './routes/_public/programs/$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DashboardAdminStudentsRouteImport } from './routes/dashboard/_admin/students'
+import { Route as DashboardAdminApplicationsIndexRouteImport } from './routes/dashboard/_admin/applications/index'
+import { Route as DashboardAdminApplicationsEnrollmentIdRouteImport } from './routes/dashboard/_admin/applications/$enrollmentId'
+import { Route as DashboardAdminBatchesIndexRouteImport } from './routes/dashboard/_admin/batches/index'
+import { Route as DashboardAdminBatchesNewRouteImport } from './routes/dashboard/_admin/batches/new'
 import { Route as DashboardAdminProgramsIndexRouteImport } from './routes/dashboard/_admin/programs/index'
 import { Route as DashboardAdminProgramsNewRouteImport } from './routes/dashboard/_admin/programs/new'
+import { Route as DashboardAdminBatchesBatchIdEditRouteImport } from './routes/dashboard/_admin/batches/$batchId/edit'
 import { Route as DashboardAdminProgramsProgramIdEditRouteImport } from './routes/dashboard/_admin/programs/$programId/edit'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
@@ -110,10 +117,10 @@ const DashboardAccountRoute = DashboardAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const EnrollIndexRoute = EnrollIndexRouteImport.update({
-  id: '/enroll/',
-  path: '/enroll/',
-  getParentRoute: () => rootRouteImport,
+const DashboardMyProgramsRoute = DashboardMyProgramsRouteImport.update({
+  id: '/my-programs',
+  path: '/my-programs',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const PublicAuthForgotPasswordRoute =
   PublicAuthForgotPasswordRouteImport.update({
@@ -141,6 +148,11 @@ const PublicAuthVerifyEmailRoute = PublicAuthVerifyEmailRouteImport.update({
   path: '/auth/verify-email',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const PublicEnrollIndexRoute = PublicEnrollIndexRouteImport.update({
+  id: '/enroll/',
+  path: '/enroll/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const PublicProgramsIndexRoute = PublicProgramsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -156,6 +168,35 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAdminStudentsRoute = DashboardAdminStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => DashboardAdminRouteRoute,
+} as any)
+const DashboardAdminApplicationsIndexRoute =
+  DashboardAdminApplicationsIndexRouteImport.update({
+    id: '/applications/',
+    path: '/applications/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminApplicationsEnrollmentIdRoute =
+  DashboardAdminApplicationsEnrollmentIdRouteImport.update({
+    id: '/applications/$enrollmentId',
+    path: '/applications/$enrollmentId',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminBatchesIndexRoute =
+  DashboardAdminBatchesIndexRouteImport.update({
+    id: '/batches/',
+    path: '/batches/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminBatchesNewRoute =
+  DashboardAdminBatchesNewRouteImport.update({
+    id: '/batches/new',
+    path: '/batches/new',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
 const DashboardAdminProgramsIndexRoute =
   DashboardAdminProgramsIndexRouteImport.update({
     id: '/programs/',
@@ -166,6 +207,12 @@ const DashboardAdminProgramsNewRoute =
   DashboardAdminProgramsNewRouteImport.update({
     id: '/programs/new',
     path: '/programs/new',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminBatchesBatchIdEditRoute =
+  DashboardAdminBatchesBatchIdEditRouteImport.update({
+    id: '/batches/$batchId/edit',
+    path: '/batches/$batchId/edit',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
 const DashboardAdminProgramsProgramIdEditRoute =
@@ -188,8 +235,8 @@ export interface FileRoutesByFullPath {
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/enroll/': typeof EnrollIndexRoute
   '/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
   '/auth/reset-password': typeof PublicAuthResetPasswordRoute
   '/auth/signin': typeof PublicAuthSigninRoute
@@ -197,9 +244,16 @@ export interface FileRoutesByFullPath {
   '/auth/verify-email': typeof PublicAuthVerifyEmailRoute
   '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/students': typeof DashboardAdminStudentsRoute
+  '/enroll/': typeof PublicEnrollIndexRoute
   '/programs/': typeof PublicProgramsIndexRoute
+  '/dashboard/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
+  '/dashboard/batches/new': typeof DashboardAdminBatchesNewRoute
   '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
+  '/dashboard/applications/': typeof DashboardAdminApplicationsIndexRoute
+  '/dashboard/batches/': typeof DashboardAdminBatchesIndexRoute
   '/dashboard/programs/': typeof DashboardAdminProgramsIndexRoute
+  '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
   '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -213,8 +267,8 @@ export interface FileRoutesByTo {
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/': typeof PublicIndexRoute
-  '/enroll': typeof EnrollIndexRoute
   '/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
   '/auth/reset-password': typeof PublicAuthResetPasswordRoute
   '/auth/signin': typeof PublicAuthSigninRoute
@@ -222,9 +276,16 @@ export interface FileRoutesByTo {
   '/auth/verify-email': typeof PublicAuthVerifyEmailRoute
   '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/students': typeof DashboardAdminStudentsRoute
+  '/enroll': typeof PublicEnrollIndexRoute
   '/programs': typeof PublicProgramsIndexRoute
+  '/dashboard/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
+  '/dashboard/batches/new': typeof DashboardAdminBatchesNewRoute
   '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
+  '/dashboard/applications': typeof DashboardAdminApplicationsIndexRoute
+  '/dashboard/batches': typeof DashboardAdminBatchesIndexRoute
   '/dashboard/programs': typeof DashboardAdminProgramsIndexRoute
+  '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
   '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRoutesById {
@@ -242,9 +303,9 @@ export interface FileRoutesById {
   '/_public/terms': typeof PublicTermsRoute
   '/_public/verify': typeof PublicVerifyRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/_public/': typeof PublicIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/enroll/': typeof EnrollIndexRoute
   '/_public/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
   '/_public/auth/reset-password': typeof PublicAuthResetPasswordRoute
   '/_public/auth/signin': typeof PublicAuthSigninRoute
@@ -252,9 +313,16 @@ export interface FileRoutesById {
   '/_public/auth/verify-email': typeof PublicAuthVerifyEmailRoute
   '/_public/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/_admin/students': typeof DashboardAdminStudentsRoute
+  '/_public/enroll/': typeof PublicEnrollIndexRoute
   '/_public/programs/': typeof PublicProgramsIndexRoute
+  '/dashboard/_admin/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
+  '/dashboard/_admin/batches/new': typeof DashboardAdminBatchesNewRoute
   '/dashboard/_admin/programs/new': typeof DashboardAdminProgramsNewRoute
+  '/dashboard/_admin/applications/': typeof DashboardAdminApplicationsIndexRoute
+  '/dashboard/_admin/batches/': typeof DashboardAdminBatchesIndexRoute
   '/dashboard/_admin/programs/': typeof DashboardAdminProgramsIndexRoute
+  '/dashboard/_admin/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
   '/dashboard/_admin/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRouteTypes {
@@ -272,8 +340,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/verify'
     | '/dashboard/account'
+    | '/dashboard/my-programs'
     | '/dashboard/'
-    | '/enroll/'
     | '/auth/forgot-password'
     | '/auth/reset-password'
     | '/auth/signin'
@@ -281,9 +349,16 @@ export interface FileRouteTypes {
     | '/auth/verify-email'
     | '/programs/$slug'
     | '/api/auth/$'
+    | '/dashboard/students'
+    | '/enroll/'
     | '/programs/'
+    | '/dashboard/applications/$enrollmentId'
+    | '/dashboard/batches/new'
     | '/dashboard/programs/new'
+    | '/dashboard/applications/'
+    | '/dashboard/batches/'
     | '/dashboard/programs/'
+    | '/dashboard/batches/$batchId/edit'
     | '/dashboard/programs/$programId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -297,8 +372,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/verify'
     | '/dashboard/account'
+    | '/dashboard/my-programs'
     | '/'
-    | '/enroll'
     | '/auth/forgot-password'
     | '/auth/reset-password'
     | '/auth/signin'
@@ -306,9 +381,16 @@ export interface FileRouteTypes {
     | '/auth/verify-email'
     | '/programs/$slug'
     | '/api/auth/$'
+    | '/dashboard/students'
+    | '/enroll'
     | '/programs'
+    | '/dashboard/applications/$enrollmentId'
+    | '/dashboard/batches/new'
     | '/dashboard/programs/new'
+    | '/dashboard/applications'
+    | '/dashboard/batches'
     | '/dashboard/programs'
+    | '/dashboard/batches/$batchId/edit'
     | '/dashboard/programs/$programId/edit'
   id:
     | '__root__'
@@ -325,9 +407,9 @@ export interface FileRouteTypes {
     | '/_public/terms'
     | '/_public/verify'
     | '/dashboard/account'
+    | '/dashboard/my-programs'
     | '/_public/'
     | '/dashboard/'
-    | '/enroll/'
     | '/_public/auth/forgot-password'
     | '/_public/auth/reset-password'
     | '/_public/auth/signin'
@@ -335,16 +417,22 @@ export interface FileRouteTypes {
     | '/_public/auth/verify-email'
     | '/_public/programs/$slug'
     | '/api/auth/$'
+    | '/dashboard/_admin/students'
+    | '/_public/enroll/'
     | '/_public/programs/'
+    | '/dashboard/_admin/applications/$enrollmentId'
+    | '/dashboard/_admin/batches/new'
     | '/dashboard/_admin/programs/new'
+    | '/dashboard/_admin/applications/'
+    | '/dashboard/_admin/batches/'
     | '/dashboard/_admin/programs/'
+    | '/dashboard/_admin/batches/$batchId/edit'
     | '/dashboard/_admin/programs/$programId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
-  EnrollIndexRoute: typeof EnrollIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -455,12 +543,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAccountRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/enroll/': {
-      id: '/enroll/'
-      path: '/enroll'
-      fullPath: '/enroll/'
-      preLoaderRoute: typeof EnrollIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/dashboard/my-programs': {
+      id: '/dashboard/my-programs'
+      path: '/my-programs'
+      fullPath: '/dashboard/my-programs'
+      preLoaderRoute: typeof DashboardMyProgramsRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
     '/_public/auth/forgot-password': {
       id: '/_public/auth/forgot-password'
@@ -497,6 +585,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicAuthVerifyEmailRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_public/enroll/': {
+      id: '/_public/enroll/'
+      path: '/enroll'
+      fullPath: '/enroll/'
+      preLoaderRoute: typeof PublicEnrollIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_public/programs/': {
       id: '/_public/programs/'
       path: '/'
@@ -518,6 +613,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/_admin/students': {
+      id: '/dashboard/_admin/students'
+      path: '/students'
+      fullPath: '/dashboard/students'
+      preLoaderRoute: typeof DashboardAdminStudentsRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/applications/': {
+      id: '/dashboard/_admin/applications/'
+      path: '/applications'
+      fullPath: '/dashboard/applications/'
+      preLoaderRoute: typeof DashboardAdminApplicationsIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/applications/$enrollmentId': {
+      id: '/dashboard/_admin/applications/$enrollmentId'
+      path: '/applications/$enrollmentId'
+      fullPath: '/dashboard/applications/$enrollmentId'
+      preLoaderRoute: typeof DashboardAdminApplicationsEnrollmentIdRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/batches/': {
+      id: '/dashboard/_admin/batches/'
+      path: '/batches'
+      fullPath: '/dashboard/batches/'
+      preLoaderRoute: typeof DashboardAdminBatchesIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/batches/new': {
+      id: '/dashboard/_admin/batches/new'
+      path: '/batches/new'
+      fullPath: '/dashboard/batches/new'
+      preLoaderRoute: typeof DashboardAdminBatchesNewRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
     '/dashboard/_admin/programs/': {
       id: '/dashboard/_admin/programs/'
       path: '/programs'
@@ -530,6 +660,13 @@ declare module '@tanstack/react-router' {
       path: '/programs/new'
       fullPath: '/dashboard/programs/new'
       preLoaderRoute: typeof DashboardAdminProgramsNewRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/batches/$batchId/edit': {
+      id: '/dashboard/_admin/batches/$batchId/edit'
+      path: '/batches/$batchId/edit'
+      fullPath: '/dashboard/batches/$batchId/edit'
+      preLoaderRoute: typeof DashboardAdminBatchesBatchIdEditRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
     '/dashboard/_admin/programs/$programId/edit': {
@@ -571,6 +708,7 @@ interface PublicRouteRouteChildren {
   PublicAuthSigninRoute: typeof PublicAuthSigninRoute
   PublicAuthSignupRoute: typeof PublicAuthSignupRoute
   PublicAuthVerifyEmailRoute: typeof PublicAuthVerifyEmailRoute
+  PublicEnrollIndexRoute: typeof PublicEnrollIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
@@ -589,6 +727,7 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicAuthSigninRoute: PublicAuthSigninRoute,
   PublicAuthSignupRoute: PublicAuthSignupRoute,
   PublicAuthVerifyEmailRoute: PublicAuthVerifyEmailRoute,
+  PublicEnrollIndexRoute: PublicEnrollIndexRoute,
 }
 
 const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
@@ -596,14 +735,27 @@ const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
 )
 
 interface DashboardAdminRouteRouteChildren {
+  DashboardAdminStudentsRoute: typeof DashboardAdminStudentsRoute
+  DashboardAdminApplicationsEnrollmentIdRoute: typeof DashboardAdminApplicationsEnrollmentIdRoute
+  DashboardAdminBatchesNewRoute: typeof DashboardAdminBatchesNewRoute
   DashboardAdminProgramsNewRoute: typeof DashboardAdminProgramsNewRoute
+  DashboardAdminApplicationsIndexRoute: typeof DashboardAdminApplicationsIndexRoute
+  DashboardAdminBatchesIndexRoute: typeof DashboardAdminBatchesIndexRoute
   DashboardAdminProgramsIndexRoute: typeof DashboardAdminProgramsIndexRoute
+  DashboardAdminBatchesBatchIdEditRoute: typeof DashboardAdminBatchesBatchIdEditRoute
   DashboardAdminProgramsProgramIdEditRoute: typeof DashboardAdminProgramsProgramIdEditRoute
 }
 
 const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
+  DashboardAdminStudentsRoute: DashboardAdminStudentsRoute,
+  DashboardAdminApplicationsEnrollmentIdRoute:
+    DashboardAdminApplicationsEnrollmentIdRoute,
+  DashboardAdminBatchesNewRoute: DashboardAdminBatchesNewRoute,
   DashboardAdminProgramsNewRoute: DashboardAdminProgramsNewRoute,
+  DashboardAdminApplicationsIndexRoute: DashboardAdminApplicationsIndexRoute,
+  DashboardAdminBatchesIndexRoute: DashboardAdminBatchesIndexRoute,
   DashboardAdminProgramsIndexRoute: DashboardAdminProgramsIndexRoute,
+  DashboardAdminBatchesBatchIdEditRoute: DashboardAdminBatchesBatchIdEditRoute,
   DashboardAdminProgramsProgramIdEditRoute:
     DashboardAdminProgramsProgramIdEditRoute,
 }
@@ -614,12 +766,14 @@ const DashboardAdminRouteRouteWithChildren =
 interface DashboardRouteRouteChildren {
   DashboardAdminRouteRoute: typeof DashboardAdminRouteRouteWithChildren
   DashboardAccountRoute: typeof DashboardAccountRoute
+  DashboardMyProgramsRoute: typeof DashboardMyProgramsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAdminRouteRoute: DashboardAdminRouteRouteWithChildren,
   DashboardAccountRoute: DashboardAccountRoute,
+  DashboardMyProgramsRoute: DashboardMyProgramsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
@@ -630,7 +784,6 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   PublicRouteRoute: PublicRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
-  EnrollIndexRoute: EnrollIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

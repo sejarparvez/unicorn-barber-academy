@@ -97,7 +97,6 @@ export const getAdminProgram = createServerFn({ method: 'GET' })
 			category: row.category as ProgramFormValues['category'],
 			level: row.level,
 			duration: row.duration,
-			schedule: row.schedule,
 			tagline: row.tagline,
 			description: row.description,
 			highlights: row.highlights,

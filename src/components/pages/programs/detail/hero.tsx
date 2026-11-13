@@ -1,6 +1,5 @@
 import {
 	IconArrowRight,
-	IconCalendarEvent,
 	IconCertificate,
 	IconChevronRight,
 	IconClock,
@@ -180,11 +179,6 @@ export default function ProgramDetailHero({ program }: { program: Program }) {
 									icon={IconTarget}
 									label="Level"
 									value={program.level}
-								/>
-								<DetailRow
-									icon={IconCalendarEvent}
-									label="Schedule"
-									value={program.schedule}
 								/>
 								<DetailRow
 									icon={IconCertificate}

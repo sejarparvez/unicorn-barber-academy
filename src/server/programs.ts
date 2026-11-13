@@ -22,7 +22,6 @@ function toProgram(row: ProgramRow): Program {
 		category: row.category as ProgramCategory,
 		level: row.level,
 		duration: row.duration,
-		schedule: row.schedule,
 		tagline: row.tagline,
 		description: row.description,
 		highlights: row.highlights,

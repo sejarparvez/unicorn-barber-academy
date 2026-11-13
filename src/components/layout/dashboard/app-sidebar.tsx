@@ -82,8 +82,8 @@ const data = {
 					visibleFor: 'admin',
 				},
 				{
-					label: 'Intakes',
-					to: '/dashboard/intakes',
+					label: 'Batches',
+					to: '/dashboard/batches',
 					icon: IconCalendarEvent,
 					visibleFor: 'admin',
 				},

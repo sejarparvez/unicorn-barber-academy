@@ -1,7 +1,7 @@
 import {
 	IconArrowUpRight,
-	IconCalendarEvent,
 	IconClock,
+	IconCurrencyTaka,
 	IconTarget,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -118,9 +118,9 @@ function ProgramCard({ program }: { program: Program }) {
 							value={program.level}
 						/>
 						<ProgramMeta
-							icon={IconCalendarEvent}
-							label="Schedule"
-							value={program.schedule}
+							icon={IconCurrencyTaka}
+							label="Tuition"
+							value={`৳${program.price.toLocaleString('en-US')}`}
 						/>
 					</dl>
 

@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { PrismaNeon } from '@prisma/adapter-neon';
 import { PrismaClient } from './generated/prisma/client';
-import { SEED_PROGRAMS } from './seed-data';
+import { SEED_BATCHES, SEED_PROGRAMS } from './seed-data';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -20,6 +20,7 @@ async function main() {
 			...module,
 			position: moduleIndex + 1,
 		}));
+		const batches = buildBatches();
 
 		await db.program.upsert({
 			where: { slug: program.slug },
@@ -28,6 +29,7 @@ async function main() {
 				featured: featured ?? false,
 				position: index + 1,
 				modules: { create: modules },
+				batches: { create: batches },
 			},
 			update: {
 				...rest,
@@ -37,11 +39,34 @@ async function main() {
 					deleteMany: {},
 					create: modules,
 				},
+				batches: {
+					deleteMany: {},
+					create: batches,
+				},
 			},
 		});
 	}
 
 	console.log(`Seeded ${SEED_PROGRAMS.length} programs.`);
+}
+
+function buildBatches() {
+	const day = 24 * 60 * 60 * 1000;
+	const now = Date.now();
+
+	return SEED_BATCHES.map((batch) => {
+		const startDate = new Date(now + batch.startInDays * day);
+		const endDate = new Date(startDate.getTime() + batch.durationInDays * day);
+
+		return {
+			name: batch.name,
+			schedule: batch.schedule,
+			startDate,
+			endDate,
+			capacity: batch.capacity,
+			status: 'upcoming' as const,
+		};
+	});
 }
 
 main()

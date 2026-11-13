@@ -16,12 +16,13 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  sessions   Session[]
-  accounts   Account[]
-  role       String?
-  banned     Boolean?  @default(false)
-  banReason  String?
-  banExpires DateTime?
+  sessions    Session[]
+  accounts    Account[]
+  enrollments Enrollment[]
+  role        String?
+  banned      Boolean?  @default(false)
+  banReason   String?
+  banExpires  DateTime?
 
   @@map("user")
 }
@@ -82,7 +83,6 @@ model Program {
   category    String
   level       String
   duration    String
-  schedule    String
   tagline     String
   description String
   highlights  String[]
@@ -97,6 +97,7 @@ model Program {
   updatedAt   DateTime @updatedAt
 
   modules ProgramModule[]
+  batches Batch[]
 
   @@index([category])
   @@index([position])
@@ -114,4 +115,97 @@ model ProgramModule {
   @@unique([programId, position])
   @@index([programId])
   @@map("program_module")
+}
+
+enum BatchStatus {
+  upcoming
+  running
+  completed
+  cancelled
+}
+
+enum EnrollmentStatus {
+  applied
+  waitlisted
+  rejected
+  active
+  completed
+  withdrawn
+}
+
+/// A cohort of a program, e.g. the morning or evening intake. Students apply
+/// to a specific batch; seats are derived from its active enrollments.
+model Batch {
+  id        String      @id @default(cuid())
+  programId String
+  program   Program     @relation(fields: [programId], references: [id], onDelete: Cascade)
+  name      String
+  startDate DateTime
+  endDate   DateTime?
+  schedule  String
+  capacity  Int
+  status    BatchStatus @default(upcoming)
+  hidden    Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  enrollments Enrollment[]
+
+  @@index([programId, status])
+  @@map("batch")
+}
+
+/// A student's admission form and enrolment for one batch. `applied` is the
+/// initial state; admins move it through waitlisted/rejected to active, then
+/// completed or withdrawn. Unique per user and batch. The admission number and
+/// date are assigned by an admin when the application is approved.
+model Enrollment {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batchId     String
+  batch       Batch            @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  status      EnrollmentStatus @default(applied)
+
+  admissionNo String?  @unique
+  admittedAt  DateTime?
+
+  // 1. Student information
+  fullName    String
+  fatherName  String
+  motherName  String
+  dateOfBirth DateTime
+  nationality String
+  gender      String
+  nidNumber   String
+
+  // 2. Contact information
+  phone            String
+  whatsapp         String?
+  presentAddress   String
+  permanentAddress String
+
+  // 3. Emergency contact
+  emergencyName     String
+  emergencyRelation String
+  emergencyMobile   String
+  emergencyAddress  String?
+
+  // 4. Education & previous experience
+  education                    String
+  hasBarberingExperience       Boolean @default(false)
+  barberingExperienceDuration  String?
+  hasPreviousTraining          Boolean @default(false)
+  previousTrainingInstitution  String?
+  goal                         String
+
+  decidedAt   DateTime?
+  decidedById String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([userId, batchId])
+  @@index([batchId, status])
+  @@index([userId])
+  @@map("enrollment")
 }

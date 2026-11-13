@@ -4,7 +4,6 @@ export type SeedProgram = {
 	category: string;
 	level: string;
 	duration: string;
-	schedule: string;
 	tagline: string;
 	description: string;
 	highlights: string[];
@@ -24,7 +23,6 @@ export const SEED_PROGRAMS: SeedProgram[] = [
 		category: 'Barbering',
 		level: 'Beginner friendly',
 		duration: '12 weeks',
-		schedule: 'Day & evening',
 		tagline: 'Foundations, fades and classic cuts',
 		description:
 			'Start from your first grip and finish with the full barbering toolkit: sectioning, clipper work, classic cuts, tapers and the final blend.',
@@ -72,7 +70,6 @@ export const SEED_PROGRAMS: SeedProgram[] = [
 		category: 'Barbering',
 		level: 'Intermediate',
 		duration: '8 weeks',
-		schedule: 'Day & evening',
 		tagline: 'Precision fade work and clean transitions',
 		description:
 			'Drill the fade until the transitions disappear. Skin fades, taper blending, line-ups and the small details that separate a good cut from a sharp one.',
@@ -120,7 +117,6 @@ export const SEED_PROGRAMS: SeedProgram[] = [
 		category: 'Barbering',
 		level: 'All levels',
 		duration: '6 weeks',
-		schedule: 'Day & evening',
 		tagline: 'Shape, line and finish facial hair',
 		description:
 			'Work with clippers, razor detailing and hot-towel treatments to shape a beard that suits the face — then finish it so it holds its line.',
@@ -168,7 +164,6 @@ export const SEED_PROGRAMS: SeedProgram[] = [
 		category: 'Beauty & styling',
 		level: 'Beginner friendly',
 		duration: '16 weeks',
-		schedule: 'Day & evening',
 		tagline: 'Skin, hair and beauty science for the salon floor',
 		description:
 			'Build the knowledge underneath the service: skin and scalp science, hair structure, product chemistry, hygiene and safe client handling.',
@@ -215,7 +210,6 @@ export const SEED_PROGRAMS: SeedProgram[] = [
 		category: 'Beauty & styling',
 		level: 'All levels',
 		duration: '12 weeks',
-		schedule: 'Day & evening',
 		tagline: 'Cutting, colour theory and modern styling',
 		description:
 			'Move from basic cutting into colour theory, mixing, application and modern styling — with the consultation skills to defend your choices in front of a client.',
@@ -262,7 +256,6 @@ export const SEED_PROGRAMS: SeedProgram[] = [
 		category: 'Makeup',
 		level: 'All levels',
 		duration: '10 weeks',
-		schedule: 'Day & evening',
 		tagline: 'Client-ready looks for weddings and shoots',
 		description:
 			'Learn bridal and editorial makeup from the skin prep up: colour matching, longevity, lighting, and looks that photograph as well as they wear.',
@@ -302,5 +295,33 @@ export const SEED_PROGRAMS: SeedProgram[] = [
 			'Editorial and shoot makeup work',
 		],
 		price: 45000,
+	},
+];
+
+export type SeedBatch = {
+	name: string;
+	schedule: string;
+	/** Days from the day seeding runs to the batch start. */
+	startInDays: number;
+	/** Length of the batch in days. */
+	durationInDays: number;
+	capacity: number;
+};
+
+/** Morning and evening cohorts created for every seeded program. */
+export const SEED_BATCHES: SeedBatch[] = [
+	{
+		name: 'Morning',
+		schedule: 'Sat–Thu, 9:00 AM–12:00 PM',
+		startInDays: 14,
+		durationInDays: 84,
+		capacity: 15,
+	},
+	{
+		name: 'Evening',
+		schedule: 'Sat–Thu, 6:00 PM–9:00 PM',
+		startInDays: 28,
+		durationInDays: 84,
+		capacity: 15,
 	},
 ];

@@ -57,11 +57,6 @@ export const programSchema = z.object({
 		.trim()
 		.min(2, 'Please enter a duration.')
 		.max(80, 'Duration must be 80 characters or fewer.'),
-	schedule: z
-		.string()
-		.trim()
-		.min(2, 'Please enter a schedule.')
-		.max(80, 'Schedule must be 80 characters or fewer.'),
 	tagline: z
 		.string()
 		.trim()

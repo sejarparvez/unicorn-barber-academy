@@ -55,7 +55,6 @@ export function createEmptyProgram(position: number): ProgramFormValues {
 		category: 'Barbering',
 		level: '',
 		duration: '',
-		schedule: '',
 		tagline: '',
 		description: '',
 		highlights: [''],
@@ -231,18 +230,7 @@ export function ProgramForm({
 							</Field>
 						</div>
 
-						<div className="grid gap-6 sm:grid-cols-3">
-							<Field data-invalid={!!errors.schedule}>
-								<FieldLabel htmlFor="schedule">Schedule</FieldLabel>
-								<Input
-									id="schedule"
-									placeholder="Day & evening"
-									aria-invalid={!!errors.schedule}
-									{...register('schedule')}
-								/>
-								<FieldError errors={[errors.schedule]} />
-							</Field>
-
+						<div className="grid gap-6 sm:grid-cols-2">
 							<Field data-invalid={!!errors.price}>
 								<FieldLabel htmlFor="price">Price (BDT)</FieldLabel>
 								<Input
