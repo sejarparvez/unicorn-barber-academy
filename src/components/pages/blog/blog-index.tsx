@@ -33,11 +33,11 @@ export function BlogIndex({
 			<section className="relative overflow-hidden border-border/60 border-b">
 				<div
 					aria-hidden="true"
-					className="pointer-events-none absolute -top-40 left-1/3 size-[32rem] -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]"
+					className="pointer-events-none absolute -top-40 left-1/3 size-128 -translate-x-1/2 rounded-full bg-primary/10 blur-[130px]"
 				/>
 				<div
 					aria-hidden="true"
-					className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] opacity-[0.08] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_at_top,black_5%,transparent_65%)]"
+					className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] opacity-[0.08] bg-size-[64px_64px] mask-[radial-gradient(ellipse_at_top,black_5%,transparent_65%)]"
 				/>
 
 				<div className="relative mx-auto max-w-7xl px-4 pt-12 pb-14 sm:px-6 lg:px-10 lg:pt-16">
@@ -207,7 +207,7 @@ function EmptyState() {
 			<p className="font-semibold text-[11px] text-primary uppercase tracking-[0.3em]">
 				Coming soon
 			</p>
-			<h2 className="mt-4 text-balance font-semibold text-2xl tracking-tight">
+			<h2 className="mt-4 text-primary font-semibold text-2xl tracking-tight">
 				The first articles are on the way.
 			</h2>
 			<p className="mt-3 text-muted-foreground">

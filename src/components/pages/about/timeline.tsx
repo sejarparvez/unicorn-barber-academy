@@ -54,7 +54,7 @@ export default function Timeline() {
 		>
 			<div
 				aria-hidden="true"
-				className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] opacity-40 [background-size:56px_56px] [mask-image:radial-gradient(ellipse_at_center,black_15%,transparent_75%)]"
+				className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] opacity-40 bg-size-[56px_56px] mask-[radial-gradient(ellipse_at_center,black_15%,transparent_75%)]"
 			/>
 
 			<div className="relative mx-auto max-w-7xl">
@@ -95,7 +95,7 @@ export default function Timeline() {
 									</span>
 								</div>
 
-								<Card className="mt-5 flex-1 gap-0 border border-border py-0 transition-colors hover:border-primary/35 hover:bg-primary/[0.03]">
+								<Card className="mt-5 flex-1 gap-0 border border-border py-0 transition-colors hover:border-primary/35 hover:bg-primary/3">
 									<CardHeader className="pt-6">
 										<span className="flex size-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/5 text-primary">
 											<chapter.icon

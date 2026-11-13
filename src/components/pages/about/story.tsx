@@ -31,7 +31,7 @@ export default function Story() {
 		>
 			<div
 				aria-hidden="true"
-				className="pointer-events-none absolute top-0 right-0 size-[28rem] translate-x-1/3 -translate-y-1/3 rounded-full bg-primary/5 blur-[120px]"
+				className="pointer-events-none absolute top-0 right-0 size-112 translate-x-1/3 -translate-y-1/3 rounded-full bg-primary/5 blur-[120px]"
 			/>
 
 			<div className="relative mx-auto max-w-7xl">

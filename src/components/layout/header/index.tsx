@@ -59,7 +59,7 @@ export default function Header() {
 		<nav
 			aria-label="Main navigation"
 			className={cn(
-				'sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-transform duration-300',
+				'sticky top-0 z-50 border-b border-border bg-background transition-transform duration-300',
 				isVisible ? 'translate-y-0' : '-translate-y-full',
 			)}
 		>

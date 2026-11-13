@@ -66,7 +66,7 @@ export default function Faq() {
 		>
 			<div
 				aria-hidden="true"
-				className="pointer-events-none absolute bottom-0 left-0 size-[24rem] rounded-full bg-primary/5 blur-[120px]"
+				className="pointer-events-none absolute bottom-0 left-0 size-96 rounded-full bg-primary/5 blur-[120px]"
 			/>
 
 			<div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
