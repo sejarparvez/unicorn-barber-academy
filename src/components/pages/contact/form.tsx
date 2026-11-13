@@ -1,5 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IconArrowRight, IconCheck, IconSend } from '@tabler/icons-react';
+import {
+	IconAlertTriangle,
+	IconArrowRight,
+	IconCheck,
+	IconSend,
+} from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -29,6 +34,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { submitEnquiry } from '@/server/enquiries';
 import ContactDetails from './details';
 import { type ContactFormValues, contactSchema } from './form-schema';
 
@@ -75,6 +81,8 @@ export default function ContactFormSection({
 
 function ContactForm({ programs }: { programs: ProgramOption[] }) {
 	const [submitted, setSubmitted] = useState<ContactFormValues | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const interestOptions = [
 		...programs.map((program) => ({
@@ -97,10 +105,22 @@ function ContactForm({ programs }: { programs: ProgramOption[] }) {
 		mode: 'onTouched',
 	});
 
-	const onSubmit = (values: ContactFormValues) => {
-		console.log('[Unicorn contact form] submitted values:', values);
-		setSubmitted(values);
-		reset(EMPTY_FORM);
+	const onSubmit = async (values: ContactFormValues) => {
+		setIsSubmitting(true);
+		setSubmitError(null);
+		try {
+			await submitEnquiry({ data: values });
+			setSubmitted(values);
+			reset(EMPTY_FORM);
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error
+					? error.message
+					: 'We could not send your message. Please try again.',
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	if (submitted) {
@@ -118,17 +138,11 @@ function ContactForm({ programs }: { programs: ProgramOption[] }) {
 						Thanks, {submitted.name.split(' ')[0]}.
 					</h3>
 					<p className="mt-2 max-w-md text-pretty text-muted-foreground text-sm leading-relaxed">
-						Your details were captured in the browser. In a live site, our
-						admissions team would reply to{' '}
+						We&apos;ve received your enquiry. Our admissions team will reply to{' '}
 						<span className="font-medium text-foreground">
 							{submitted.email}
 						</span>{' '}
 						within one working day.
-					</p>
-
-					<p className="mt-6 max-w-md rounded-lg border border-border/70 bg-muted/60 px-4 py-3 text-pretty text-muted-foreground text-xs leading-relaxed">
-						Frontend demo only — no message was sent. Open your browser console
-						to see the submitted values.
 					</p>
 
 					<Button
@@ -267,6 +281,20 @@ function ContactForm({ programs }: { programs: ProgramOption[] }) {
 						</Field>
 					</FieldGroup>
 
+					{submitError ? (
+						<div
+							role="alert"
+							className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-destructive text-sm"
+						>
+							<IconAlertTriangle
+								className="mt-0.5 size-4 shrink-0"
+								stroke={1.75}
+								aria-hidden="true"
+							/>
+							<span>{submitError}</span>
+						</div>
+					) : null}
+
 					<div className="flex flex-col gap-4 border-border/60 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
 						<p className="max-w-sm text-muted-foreground text-xs leading-relaxed">
 							We only use these details to answer your enquiry. Read our{' '}
@@ -282,9 +310,10 @@ function ContactForm({ programs }: { programs: ProgramOption[] }) {
 						<Button
 							type="submit"
 							size="lg"
+							disabled={isSubmitting}
 							className="glow-gold h-11 shrink-0 gap-2 px-6 font-semibold text-[12px] tracking-[0.16em]"
 						>
-							SEND MESSAGE
+							{isSubmitting ? 'SENDING…' : 'SEND MESSAGE'}
 							<IconSend className="size-4" stroke={1.75} />
 						</Button>
 					</div>

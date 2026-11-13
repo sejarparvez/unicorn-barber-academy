@@ -43,6 +43,7 @@ import { Route as DashboardAdminApplicationsEnrollmentIdRouteImport } from './ro
 import { Route as DashboardAdminBatchesIndexRouteImport } from './routes/dashboard/_admin/batches/index'
 import { Route as DashboardAdminBatchesNewRouteImport } from './routes/dashboard/_admin/batches/new'
 import { Route as DashboardAdminCertificatesIndexRouteImport } from './routes/dashboard/_admin/certificates/index'
+import { Route as DashboardAdminEnquiriesIndexRouteImport } from './routes/dashboard/_admin/enquiries/index'
 import { Route as DashboardAdminPaymentsIndexRouteImport } from './routes/dashboard/_admin/payments/index'
 import { Route as DashboardAdminPaymentsNewRouteImport } from './routes/dashboard/_admin/payments/new'
 import { Route as DashboardAdminProgramsIndexRouteImport } from './routes/dashboard/_admin/programs/index'
@@ -225,6 +226,12 @@ const DashboardAdminCertificatesIndexRoute =
     path: '/certificates/',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
+const DashboardAdminEnquiriesIndexRoute =
+  DashboardAdminEnquiriesIndexRouteImport.update({
+    id: '/enquiries/',
+    path: '/enquiries/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
 const DashboardAdminPaymentsIndexRoute =
   DashboardAdminPaymentsIndexRouteImport.update({
     id: '/payments/',
@@ -297,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/applications/': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/batches/': typeof DashboardAdminBatchesIndexRoute
   '/dashboard/certificates/': typeof DashboardAdminCertificatesIndexRoute
+  '/dashboard/enquiries/': typeof DashboardAdminEnquiriesIndexRoute
   '/dashboard/payments/': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/programs/': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
@@ -335,6 +343,7 @@ export interface FileRoutesByTo {
   '/dashboard/applications': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/batches': typeof DashboardAdminBatchesIndexRoute
   '/dashboard/certificates': typeof DashboardAdminCertificatesIndexRoute
+  '/dashboard/enquiries': typeof DashboardAdminEnquiriesIndexRoute
   '/dashboard/payments': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/programs': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
@@ -378,6 +387,7 @@ export interface FileRoutesById {
   '/dashboard/_admin/applications/': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/_admin/batches/': typeof DashboardAdminBatchesIndexRoute
   '/dashboard/_admin/certificates/': typeof DashboardAdminCertificatesIndexRoute
+  '/dashboard/_admin/enquiries/': typeof DashboardAdminEnquiriesIndexRoute
   '/dashboard/_admin/payments/': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/_admin/programs/': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/_admin/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
@@ -420,6 +430,7 @@ export interface FileRouteTypes {
     | '/dashboard/applications/'
     | '/dashboard/batches/'
     | '/dashboard/certificates/'
+    | '/dashboard/enquiries/'
     | '/dashboard/payments/'
     | '/dashboard/programs/'
     | '/dashboard/batches/$batchId/edit'
@@ -458,6 +469,7 @@ export interface FileRouteTypes {
     | '/dashboard/applications'
     | '/dashboard/batches'
     | '/dashboard/certificates'
+    | '/dashboard/enquiries'
     | '/dashboard/payments'
     | '/dashboard/programs'
     | '/dashboard/batches/$batchId/edit'
@@ -500,6 +512,7 @@ export interface FileRouteTypes {
     | '/dashboard/_admin/applications/'
     | '/dashboard/_admin/batches/'
     | '/dashboard/_admin/certificates/'
+    | '/dashboard/_admin/enquiries/'
     | '/dashboard/_admin/payments/'
     | '/dashboard/_admin/programs/'
     | '/dashboard/_admin/batches/$batchId/edit'
@@ -753,6 +766,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminCertificatesIndexRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
+    '/dashboard/_admin/enquiries/': {
+      id: '/dashboard/_admin/enquiries/'
+      path: '/enquiries'
+      fullPath: '/dashboard/enquiries/'
+      preLoaderRoute: typeof DashboardAdminEnquiriesIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
     '/dashboard/_admin/payments/': {
       id: '/dashboard/_admin/payments/'
       path: '/payments'
@@ -862,6 +882,7 @@ interface DashboardAdminRouteRouteChildren {
   DashboardAdminApplicationsIndexRoute: typeof DashboardAdminApplicationsIndexRoute
   DashboardAdminBatchesIndexRoute: typeof DashboardAdminBatchesIndexRoute
   DashboardAdminCertificatesIndexRoute: typeof DashboardAdminCertificatesIndexRoute
+  DashboardAdminEnquiriesIndexRoute: typeof DashboardAdminEnquiriesIndexRoute
   DashboardAdminPaymentsIndexRoute: typeof DashboardAdminPaymentsIndexRoute
   DashboardAdminProgramsIndexRoute: typeof DashboardAdminProgramsIndexRoute
   DashboardAdminBatchesBatchIdEditRoute: typeof DashboardAdminBatchesBatchIdEditRoute
@@ -878,6 +899,7 @@ const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminApplicationsIndexRoute: DashboardAdminApplicationsIndexRoute,
   DashboardAdminBatchesIndexRoute: DashboardAdminBatchesIndexRoute,
   DashboardAdminCertificatesIndexRoute: DashboardAdminCertificatesIndexRoute,
+  DashboardAdminEnquiriesIndexRoute: DashboardAdminEnquiriesIndexRoute,
   DashboardAdminPaymentsIndexRoute: DashboardAdminPaymentsIndexRoute,
   DashboardAdminProgramsIndexRoute: DashboardAdminProgramsIndexRoute,
   DashboardAdminBatchesBatchIdEditRoute: DashboardAdminBatchesBatchIdEditRoute,

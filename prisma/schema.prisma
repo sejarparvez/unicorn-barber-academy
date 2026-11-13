@@ -21,6 +21,7 @@ model User {
   enrollments Enrollment[]
   recordedPayments Payment[] @relation("PaymentRecordedBy")
   issuedCertificates Certificate[] @relation("CertificateIssuedBy")
+  handledEnquiries Enquiry[] @relation("EnquiryHandledBy")
   role        String?
   banned      Boolean?  @default(false)
   banReason   String?
@@ -264,4 +265,34 @@ model Certificate {
 
   @@index([issuedAt])
   @@map("certificate")
+}
+
+enum EnquiryStatus {
+  new
+  in_progress
+  resolved
+  spam
+}
+
+/// A message sent through the public contact form. Admins triage these from
+/// the dashboard; the `interest` field holds a program slug or one of the
+/// generic values ("not-sure", "general").
+model Enquiry {
+  id          String        @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  interest    String
+  message     String
+  status      EnquiryStatus @default(new)
+  note        String?
+  handledById String?
+  handledBy   User?         @relation("EnquiryHandledBy", fields: [handledById], references: [id], onDelete: SetNull)
+  handledAt   DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("enquiry")
 }
