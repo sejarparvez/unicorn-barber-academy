@@ -20,6 +20,7 @@ model User {
   accounts    Account[]
   enrollments Enrollment[]
   recordedPayments Payment[] @relation("PaymentRecordedBy")
+  issuedCertificates Certificate[] @relation("CertificateIssuedBy")
   role        String?
   banned      Boolean?  @default(false)
   banReason   String?
@@ -207,6 +208,8 @@ model Enrollment {
 
   payments Payment[]
 
+  certificate Certificate?
+
   @@unique([userId, batchId])
   @@index([batchId, status])
   @@index([userId])
@@ -242,4 +245,23 @@ model Payment {
   @@index([enrollmentId])
   @@index([paidAt])
   @@map("payment")
+}
+
+/// A certificate issued to a student after completing a program. One per
+/// enrolment. The certificate number is unique and is what the public
+/// verification page looks up.
+model Certificate {
+  id            String     @id @default(cuid())
+  enrollmentId  String     @unique
+  enrollment    Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  certificateNo String     @unique
+  issuedAt      DateTime   @default(now())
+  issuedById    String?
+  issuedBy      User?      @relation("CertificateIssuedBy", fields: [issuedById], references: [id], onDelete: SetNull)
+  revokedAt     DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([issuedAt])
+  @@map("certificate")
 }

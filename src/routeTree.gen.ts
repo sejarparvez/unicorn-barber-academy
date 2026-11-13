@@ -21,9 +21,11 @@ import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as PublicProgramsRouteRouteImport } from './routes/_public/programs/route'
 import { Route as PublicTermsRouteImport } from './routes/_public/terms'
 import { Route as PublicVerifyRouteImport } from './routes/_public/verify'
+import { Route as CertificatesCertificateIdRouteImport } from './routes/certificates/$certificateId'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/_admin/route'
 import { Route as DashboardAccountRouteImport } from './routes/dashboard/account'
+import { Route as DashboardMyCertificatesRouteImport } from './routes/dashboard/my-certificates'
 import { Route as DashboardMyPaymentsRouteImport } from './routes/dashboard/my-payments'
 import { Route as DashboardMyProgramsRouteImport } from './routes/dashboard/my-programs'
 import { Route as PublicAuthForgotPasswordRouteImport } from './routes/_public/auth/forgot-password'
@@ -40,6 +42,7 @@ import { Route as DashboardAdminApplicationsIndexRouteImport } from './routes/da
 import { Route as DashboardAdminApplicationsEnrollmentIdRouteImport } from './routes/dashboard/_admin/applications/$enrollmentId'
 import { Route as DashboardAdminBatchesIndexRouteImport } from './routes/dashboard/_admin/batches/index'
 import { Route as DashboardAdminBatchesNewRouteImport } from './routes/dashboard/_admin/batches/new'
+import { Route as DashboardAdminCertificatesIndexRouteImport } from './routes/dashboard/_admin/certificates/index'
 import { Route as DashboardAdminPaymentsIndexRouteImport } from './routes/dashboard/_admin/payments/index'
 import { Route as DashboardAdminPaymentsNewRouteImport } from './routes/dashboard/_admin/payments/new'
 import { Route as DashboardAdminProgramsIndexRouteImport } from './routes/dashboard/_admin/programs/index'
@@ -106,6 +109,12 @@ const PublicVerifyRoute = PublicVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const CertificatesCertificateIdRoute =
+  CertificatesCertificateIdRouteImport.update({
+    id: '/certificates/$certificateId',
+    path: '/certificates/$certificateId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -118,6 +127,11 @@ const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
 const DashboardAccountRoute = DashboardAccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardMyCertificatesRoute = DashboardMyCertificatesRouteImport.update({
+  id: '/my-certificates',
+  path: '/my-certificates',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardMyPaymentsRoute = DashboardMyPaymentsRouteImport.update({
@@ -205,6 +219,12 @@ const DashboardAdminBatchesNewRoute =
     path: '/batches/new',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
+const DashboardAdminCertificatesIndexRoute =
+  DashboardAdminCertificatesIndexRouteImport.update({
+    id: '/certificates/',
+    path: '/certificates/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
 const DashboardAdminPaymentsIndexRoute =
   DashboardAdminPaymentsIndexRouteImport.update({
     id: '/payments/',
@@ -254,7 +274,9 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
+  '/certificates/$certificateId': typeof CertificatesCertificateIdRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-certificates': typeof DashboardMyCertificatesRoute
   '/dashboard/my-payments': typeof DashboardMyPaymentsRoute
   '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -274,6 +296,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/applications/': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/batches/': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/certificates/': typeof DashboardAdminCertificatesIndexRoute
   '/dashboard/payments/': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/programs/': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
@@ -289,7 +312,9 @@ export interface FileRoutesByTo {
   '/privacy': typeof PublicPrivacyRoute
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
+  '/certificates/$certificateId': typeof CertificatesCertificateIdRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-certificates': typeof DashboardMyCertificatesRoute
   '/dashboard/my-payments': typeof DashboardMyPaymentsRoute
   '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/': typeof PublicIndexRoute
@@ -309,6 +334,7 @@ export interface FileRoutesByTo {
   '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/applications': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/batches': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/certificates': typeof DashboardAdminCertificatesIndexRoute
   '/dashboard/payments': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/programs': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
@@ -328,7 +354,9 @@ export interface FileRoutesById {
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/terms': typeof PublicTermsRoute
   '/_public/verify': typeof PublicVerifyRoute
+  '/certificates/$certificateId': typeof CertificatesCertificateIdRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-certificates': typeof DashboardMyCertificatesRoute
   '/dashboard/my-payments': typeof DashboardMyPaymentsRoute
   '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/_public/': typeof PublicIndexRoute
@@ -349,6 +377,7 @@ export interface FileRoutesById {
   '/dashboard/_admin/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/_admin/applications/': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/_admin/batches/': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/_admin/certificates/': typeof DashboardAdminCertificatesIndexRoute
   '/dashboard/_admin/payments/': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/_admin/programs/': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/_admin/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
@@ -368,7 +397,9 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/verify'
+    | '/certificates/$certificateId'
     | '/dashboard/account'
+    | '/dashboard/my-certificates'
     | '/dashboard/my-payments'
     | '/dashboard/my-programs'
     | '/dashboard/'
@@ -388,6 +419,7 @@ export interface FileRouteTypes {
     | '/dashboard/programs/new'
     | '/dashboard/applications/'
     | '/dashboard/batches/'
+    | '/dashboard/certificates/'
     | '/dashboard/payments/'
     | '/dashboard/programs/'
     | '/dashboard/batches/$batchId/edit'
@@ -403,7 +435,9 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/verify'
+    | '/certificates/$certificateId'
     | '/dashboard/account'
+    | '/dashboard/my-certificates'
     | '/dashboard/my-payments'
     | '/dashboard/my-programs'
     | '/'
@@ -423,6 +457,7 @@ export interface FileRouteTypes {
     | '/dashboard/programs/new'
     | '/dashboard/applications'
     | '/dashboard/batches'
+    | '/dashboard/certificates'
     | '/dashboard/payments'
     | '/dashboard/programs'
     | '/dashboard/batches/$batchId/edit'
@@ -441,7 +476,9 @@ export interface FileRouteTypes {
     | '/_public/privacy'
     | '/_public/terms'
     | '/_public/verify'
+    | '/certificates/$certificateId'
     | '/dashboard/account'
+    | '/dashboard/my-certificates'
     | '/dashboard/my-payments'
     | '/dashboard/my-programs'
     | '/_public/'
@@ -462,6 +499,7 @@ export interface FileRouteTypes {
     | '/dashboard/_admin/programs/new'
     | '/dashboard/_admin/applications/'
     | '/dashboard/_admin/batches/'
+    | '/dashboard/_admin/certificates/'
     | '/dashboard/_admin/payments/'
     | '/dashboard/_admin/programs/'
     | '/dashboard/_admin/batches/$batchId/edit'
@@ -471,6 +509,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  CertificatesCertificateIdRoute: typeof CertificatesCertificateIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -560,6 +599,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicVerifyRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/certificates/$certificateId': {
+      id: '/certificates/$certificateId'
+      path: '/certificates/$certificateId'
+      fullPath: '/certificates/$certificateId'
+      preLoaderRoute: typeof CertificatesCertificateIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
@@ -579,6 +625,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/dashboard/account'
       preLoaderRoute: typeof DashboardAccountRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/my-certificates': {
+      id: '/dashboard/my-certificates'
+      path: '/my-certificates'
+      fullPath: '/dashboard/my-certificates'
+      preLoaderRoute: typeof DashboardMyCertificatesRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/my-payments': {
@@ -693,6 +746,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminBatchesNewRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
+    '/dashboard/_admin/certificates/': {
+      id: '/dashboard/_admin/certificates/'
+      path: '/certificates'
+      fullPath: '/dashboard/certificates/'
+      preLoaderRoute: typeof DashboardAdminCertificatesIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
     '/dashboard/_admin/payments/': {
       id: '/dashboard/_admin/payments/'
       path: '/payments'
@@ -801,6 +861,7 @@ interface DashboardAdminRouteRouteChildren {
   DashboardAdminProgramsNewRoute: typeof DashboardAdminProgramsNewRoute
   DashboardAdminApplicationsIndexRoute: typeof DashboardAdminApplicationsIndexRoute
   DashboardAdminBatchesIndexRoute: typeof DashboardAdminBatchesIndexRoute
+  DashboardAdminCertificatesIndexRoute: typeof DashboardAdminCertificatesIndexRoute
   DashboardAdminPaymentsIndexRoute: typeof DashboardAdminPaymentsIndexRoute
   DashboardAdminProgramsIndexRoute: typeof DashboardAdminProgramsIndexRoute
   DashboardAdminBatchesBatchIdEditRoute: typeof DashboardAdminBatchesBatchIdEditRoute
@@ -816,6 +877,7 @@ const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminProgramsNewRoute: DashboardAdminProgramsNewRoute,
   DashboardAdminApplicationsIndexRoute: DashboardAdminApplicationsIndexRoute,
   DashboardAdminBatchesIndexRoute: DashboardAdminBatchesIndexRoute,
+  DashboardAdminCertificatesIndexRoute: DashboardAdminCertificatesIndexRoute,
   DashboardAdminPaymentsIndexRoute: DashboardAdminPaymentsIndexRoute,
   DashboardAdminProgramsIndexRoute: DashboardAdminProgramsIndexRoute,
   DashboardAdminBatchesBatchIdEditRoute: DashboardAdminBatchesBatchIdEditRoute,
@@ -829,6 +891,7 @@ const DashboardAdminRouteRouteWithChildren =
 interface DashboardRouteRouteChildren {
   DashboardAdminRouteRoute: typeof DashboardAdminRouteRouteWithChildren
   DashboardAccountRoute: typeof DashboardAccountRoute
+  DashboardMyCertificatesRoute: typeof DashboardMyCertificatesRoute
   DashboardMyPaymentsRoute: typeof DashboardMyPaymentsRoute
   DashboardMyProgramsRoute: typeof DashboardMyProgramsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -837,6 +900,7 @@ interface DashboardRouteRouteChildren {
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAdminRouteRoute: DashboardAdminRouteRouteWithChildren,
   DashboardAccountRoute: DashboardAccountRoute,
+  DashboardMyCertificatesRoute: DashboardMyCertificatesRoute,
   DashboardMyPaymentsRoute: DashboardMyPaymentsRoute,
   DashboardMyProgramsRoute: DashboardMyProgramsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
@@ -849,6 +913,7 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   PublicRouteRoute: PublicRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  CertificatesCertificateIdRoute: CertificatesCertificateIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
