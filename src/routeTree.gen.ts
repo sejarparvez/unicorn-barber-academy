@@ -33,6 +33,8 @@ import { Route as PublicAuthResetPasswordRouteImport } from './routes/_public/au
 import { Route as PublicAuthSigninRouteImport } from './routes/_public/auth/signin'
 import { Route as PublicAuthSignupRouteImport } from './routes/_public/auth/signup'
 import { Route as PublicAuthVerifyEmailRouteImport } from './routes/_public/auth/verify-email'
+import { Route as PublicBlogIndexRouteImport } from './routes/_public/blog/index'
+import { Route as PublicBlogSlugRouteImport } from './routes/_public/blog/$slug'
 import { Route as PublicEnrollIndexRouteImport } from './routes/_public/enroll/index'
 import { Route as PublicProgramsIndexRouteImport } from './routes/_public/programs/index'
 import { Route as PublicProgramsSlugRouteImport } from './routes/_public/programs/$slug'
@@ -42,6 +44,8 @@ import { Route as DashboardAdminApplicationsIndexRouteImport } from './routes/da
 import { Route as DashboardAdminApplicationsEnrollmentIdRouteImport } from './routes/dashboard/_admin/applications/$enrollmentId'
 import { Route as DashboardAdminBatchesIndexRouteImport } from './routes/dashboard/_admin/batches/index'
 import { Route as DashboardAdminBatchesNewRouteImport } from './routes/dashboard/_admin/batches/new'
+import { Route as DashboardAdminBlogIndexRouteImport } from './routes/dashboard/_admin/blog/index'
+import { Route as DashboardAdminBlogNewRouteImport } from './routes/dashboard/_admin/blog/new'
 import { Route as DashboardAdminCertificatesIndexRouteImport } from './routes/dashboard/_admin/certificates/index'
 import { Route as DashboardAdminEnquiriesIndexRouteImport } from './routes/dashboard/_admin/enquiries/index'
 import { Route as DashboardAdminPaymentsIndexRouteImport } from './routes/dashboard/_admin/payments/index'
@@ -49,6 +53,7 @@ import { Route as DashboardAdminPaymentsNewRouteImport } from './routes/dashboar
 import { Route as DashboardAdminProgramsIndexRouteImport } from './routes/dashboard/_admin/programs/index'
 import { Route as DashboardAdminProgramsNewRouteImport } from './routes/dashboard/_admin/programs/new'
 import { Route as DashboardAdminBatchesBatchIdEditRouteImport } from './routes/dashboard/_admin/batches/$batchId/edit'
+import { Route as DashboardAdminBlogPostIdEditRouteImport } from './routes/dashboard/_admin/blog/$postId/edit'
 import { Route as DashboardAdminProgramsProgramIdEditRouteImport } from './routes/dashboard/_admin/programs/$programId/edit'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
@@ -171,6 +176,16 @@ const PublicAuthVerifyEmailRoute = PublicAuthVerifyEmailRouteImport.update({
   path: '/auth/verify-email',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const PublicBlogIndexRoute = PublicBlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicBlogSlugRoute = PublicBlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const PublicEnrollIndexRoute = PublicEnrollIndexRouteImport.update({
   id: '/enroll/',
   path: '/enroll/',
@@ -220,6 +235,16 @@ const DashboardAdminBatchesNewRoute =
     path: '/batches/new',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
+const DashboardAdminBlogIndexRoute = DashboardAdminBlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => DashboardAdminRouteRoute,
+} as any)
+const DashboardAdminBlogNewRoute = DashboardAdminBlogNewRouteImport.update({
+  id: '/blog/new',
+  path: '/blog/new',
+  getParentRoute: () => DashboardAdminRouteRoute,
+} as any)
 const DashboardAdminCertificatesIndexRoute =
   DashboardAdminCertificatesIndexRouteImport.update({
     id: '/certificates/',
@@ -262,6 +287,12 @@ const DashboardAdminBatchesBatchIdEditRoute =
     path: '/batches/$batchId/edit',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
+const DashboardAdminBlogPostIdEditRoute =
+  DashboardAdminBlogPostIdEditRouteImport.update({
+    id: '/blog/$postId/edit',
+    path: '/blog/$postId/edit',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
 const DashboardAdminProgramsProgramIdEditRoute =
   DashboardAdminProgramsProgramIdEditRouteImport.update({
     id: '/programs/$programId/edit',
@@ -292,22 +323,27 @@ export interface FileRoutesByFullPath {
   '/auth/signin': typeof PublicAuthSigninRoute
   '/auth/signup': typeof PublicAuthSignupRoute
   '/auth/verify-email': typeof PublicAuthVerifyEmailRoute
+  '/blog/$slug': typeof PublicBlogSlugRoute
   '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/students': typeof DashboardAdminStudentsRoute
+  '/blog/': typeof PublicBlogIndexRoute
   '/enroll/': typeof PublicEnrollIndexRoute
   '/programs/': typeof PublicProgramsIndexRoute
   '/dashboard/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
   '/dashboard/batches/new': typeof DashboardAdminBatchesNewRoute
+  '/dashboard/blog/new': typeof DashboardAdminBlogNewRoute
   '/dashboard/payments/new': typeof DashboardAdminPaymentsNewRoute
   '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/applications/': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/batches/': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/blog/': typeof DashboardAdminBlogIndexRoute
   '/dashboard/certificates/': typeof DashboardAdminCertificatesIndexRoute
   '/dashboard/enquiries/': typeof DashboardAdminEnquiriesIndexRoute
   '/dashboard/payments/': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/programs/': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
+  '/dashboard/blog/$postId/edit': typeof DashboardAdminBlogPostIdEditRoute
   '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -331,22 +367,27 @@ export interface FileRoutesByTo {
   '/auth/signin': typeof PublicAuthSigninRoute
   '/auth/signup': typeof PublicAuthSignupRoute
   '/auth/verify-email': typeof PublicAuthVerifyEmailRoute
+  '/blog/$slug': typeof PublicBlogSlugRoute
   '/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/students': typeof DashboardAdminStudentsRoute
+  '/blog': typeof PublicBlogIndexRoute
   '/enroll': typeof PublicEnrollIndexRoute
   '/programs': typeof PublicProgramsIndexRoute
   '/dashboard/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
   '/dashboard/batches/new': typeof DashboardAdminBatchesNewRoute
+  '/dashboard/blog/new': typeof DashboardAdminBlogNewRoute
   '/dashboard/payments/new': typeof DashboardAdminPaymentsNewRoute
   '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/applications': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/batches': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/blog': typeof DashboardAdminBlogIndexRoute
   '/dashboard/certificates': typeof DashboardAdminCertificatesIndexRoute
   '/dashboard/enquiries': typeof DashboardAdminEnquiriesIndexRoute
   '/dashboard/payments': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/programs': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
+  '/dashboard/blog/$postId/edit': typeof DashboardAdminBlogPostIdEditRoute
   '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRoutesById {
@@ -375,22 +416,27 @@ export interface FileRoutesById {
   '/_public/auth/signin': typeof PublicAuthSigninRoute
   '/_public/auth/signup': typeof PublicAuthSignupRoute
   '/_public/auth/verify-email': typeof PublicAuthVerifyEmailRoute
+  '/_public/blog/$slug': typeof PublicBlogSlugRoute
   '/_public/programs/$slug': typeof PublicProgramsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/_admin/students': typeof DashboardAdminStudentsRoute
+  '/_public/blog/': typeof PublicBlogIndexRoute
   '/_public/enroll/': typeof PublicEnrollIndexRoute
   '/_public/programs/': typeof PublicProgramsIndexRoute
   '/dashboard/_admin/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
   '/dashboard/_admin/batches/new': typeof DashboardAdminBatchesNewRoute
+  '/dashboard/_admin/blog/new': typeof DashboardAdminBlogNewRoute
   '/dashboard/_admin/payments/new': typeof DashboardAdminPaymentsNewRoute
   '/dashboard/_admin/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/_admin/applications/': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/_admin/batches/': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/_admin/blog/': typeof DashboardAdminBlogIndexRoute
   '/dashboard/_admin/certificates/': typeof DashboardAdminCertificatesIndexRoute
   '/dashboard/_admin/enquiries/': typeof DashboardAdminEnquiriesIndexRoute
   '/dashboard/_admin/payments/': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/_admin/programs/': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/_admin/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
+  '/dashboard/_admin/blog/$postId/edit': typeof DashboardAdminBlogPostIdEditRoute
   '/dashboard/_admin/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRouteTypes {
@@ -418,22 +464,27 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify-email'
+    | '/blog/$slug'
     | '/programs/$slug'
     | '/api/auth/$'
     | '/dashboard/students'
+    | '/blog/'
     | '/enroll/'
     | '/programs/'
     | '/dashboard/applications/$enrollmentId'
     | '/dashboard/batches/new'
+    | '/dashboard/blog/new'
     | '/dashboard/payments/new'
     | '/dashboard/programs/new'
     | '/dashboard/applications/'
     | '/dashboard/batches/'
+    | '/dashboard/blog/'
     | '/dashboard/certificates/'
     | '/dashboard/enquiries/'
     | '/dashboard/payments/'
     | '/dashboard/programs/'
     | '/dashboard/batches/$batchId/edit'
+    | '/dashboard/blog/$postId/edit'
     | '/dashboard/programs/$programId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -457,22 +508,27 @@ export interface FileRouteTypes {
     | '/auth/signin'
     | '/auth/signup'
     | '/auth/verify-email'
+    | '/blog/$slug'
     | '/programs/$slug'
     | '/api/auth/$'
     | '/dashboard/students'
+    | '/blog'
     | '/enroll'
     | '/programs'
     | '/dashboard/applications/$enrollmentId'
     | '/dashboard/batches/new'
+    | '/dashboard/blog/new'
     | '/dashboard/payments/new'
     | '/dashboard/programs/new'
     | '/dashboard/applications'
     | '/dashboard/batches'
+    | '/dashboard/blog'
     | '/dashboard/certificates'
     | '/dashboard/enquiries'
     | '/dashboard/payments'
     | '/dashboard/programs'
     | '/dashboard/batches/$batchId/edit'
+    | '/dashboard/blog/$postId/edit'
     | '/dashboard/programs/$programId/edit'
   id:
     | '__root__'
@@ -500,22 +556,27 @@ export interface FileRouteTypes {
     | '/_public/auth/signin'
     | '/_public/auth/signup'
     | '/_public/auth/verify-email'
+    | '/_public/blog/$slug'
     | '/_public/programs/$slug'
     | '/api/auth/$'
     | '/dashboard/_admin/students'
+    | '/_public/blog/'
     | '/_public/enroll/'
     | '/_public/programs/'
     | '/dashboard/_admin/applications/$enrollmentId'
     | '/dashboard/_admin/batches/new'
+    | '/dashboard/_admin/blog/new'
     | '/dashboard/_admin/payments/new'
     | '/dashboard/_admin/programs/new'
     | '/dashboard/_admin/applications/'
     | '/dashboard/_admin/batches/'
+    | '/dashboard/_admin/blog/'
     | '/dashboard/_admin/certificates/'
     | '/dashboard/_admin/enquiries/'
     | '/dashboard/_admin/payments/'
     | '/dashboard/_admin/programs/'
     | '/dashboard/_admin/batches/$batchId/edit'
+    | '/dashboard/_admin/blog/$postId/edit'
     | '/dashboard/_admin/programs/$programId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -696,6 +757,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicAuthVerifyEmailRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_public/blog/': {
+      id: '/_public/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof PublicBlogIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/blog/$slug': {
+      id: '/_public/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof PublicBlogSlugRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_public/enroll/': {
       id: '/_public/enroll/'
       path: '/enroll'
@@ -759,6 +834,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminBatchesNewRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
+    '/dashboard/_admin/blog/': {
+      id: '/dashboard/_admin/blog/'
+      path: '/blog'
+      fullPath: '/dashboard/blog/'
+      preLoaderRoute: typeof DashboardAdminBlogIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/blog/new': {
+      id: '/dashboard/_admin/blog/new'
+      path: '/blog/new'
+      fullPath: '/dashboard/blog/new'
+      preLoaderRoute: typeof DashboardAdminBlogNewRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
     '/dashboard/_admin/certificates/': {
       id: '/dashboard/_admin/certificates/'
       path: '/certificates'
@@ -808,6 +897,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminBatchesBatchIdEditRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
+    '/dashboard/_admin/blog/$postId/edit': {
+      id: '/dashboard/_admin/blog/$postId/edit'
+      path: '/blog/$postId/edit'
+      fullPath: '/dashboard/blog/$postId/edit'
+      preLoaderRoute: typeof DashboardAdminBlogPostIdEditRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
     '/dashboard/_admin/programs/$programId/edit': {
       id: '/dashboard/_admin/programs/$programId/edit'
       path: '/programs/$programId/edit'
@@ -847,6 +943,8 @@ interface PublicRouteRouteChildren {
   PublicAuthSigninRoute: typeof PublicAuthSigninRoute
   PublicAuthSignupRoute: typeof PublicAuthSignupRoute
   PublicAuthVerifyEmailRoute: typeof PublicAuthVerifyEmailRoute
+  PublicBlogSlugRoute: typeof PublicBlogSlugRoute
+  PublicBlogIndexRoute: typeof PublicBlogIndexRoute
   PublicEnrollIndexRoute: typeof PublicEnrollIndexRoute
 }
 
@@ -866,6 +964,8 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicAuthSigninRoute: PublicAuthSigninRoute,
   PublicAuthSignupRoute: PublicAuthSignupRoute,
   PublicAuthVerifyEmailRoute: PublicAuthVerifyEmailRoute,
+  PublicBlogSlugRoute: PublicBlogSlugRoute,
+  PublicBlogIndexRoute: PublicBlogIndexRoute,
   PublicEnrollIndexRoute: PublicEnrollIndexRoute,
 }
 
@@ -877,15 +977,18 @@ interface DashboardAdminRouteRouteChildren {
   DashboardAdminStudentsRoute: typeof DashboardAdminStudentsRoute
   DashboardAdminApplicationsEnrollmentIdRoute: typeof DashboardAdminApplicationsEnrollmentIdRoute
   DashboardAdminBatchesNewRoute: typeof DashboardAdminBatchesNewRoute
+  DashboardAdminBlogNewRoute: typeof DashboardAdminBlogNewRoute
   DashboardAdminPaymentsNewRoute: typeof DashboardAdminPaymentsNewRoute
   DashboardAdminProgramsNewRoute: typeof DashboardAdminProgramsNewRoute
   DashboardAdminApplicationsIndexRoute: typeof DashboardAdminApplicationsIndexRoute
   DashboardAdminBatchesIndexRoute: typeof DashboardAdminBatchesIndexRoute
+  DashboardAdminBlogIndexRoute: typeof DashboardAdminBlogIndexRoute
   DashboardAdminCertificatesIndexRoute: typeof DashboardAdminCertificatesIndexRoute
   DashboardAdminEnquiriesIndexRoute: typeof DashboardAdminEnquiriesIndexRoute
   DashboardAdminPaymentsIndexRoute: typeof DashboardAdminPaymentsIndexRoute
   DashboardAdminProgramsIndexRoute: typeof DashboardAdminProgramsIndexRoute
   DashboardAdminBatchesBatchIdEditRoute: typeof DashboardAdminBatchesBatchIdEditRoute
+  DashboardAdminBlogPostIdEditRoute: typeof DashboardAdminBlogPostIdEditRoute
   DashboardAdminProgramsProgramIdEditRoute: typeof DashboardAdminProgramsProgramIdEditRoute
 }
 
@@ -894,15 +997,18 @@ const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminApplicationsEnrollmentIdRoute:
     DashboardAdminApplicationsEnrollmentIdRoute,
   DashboardAdminBatchesNewRoute: DashboardAdminBatchesNewRoute,
+  DashboardAdminBlogNewRoute: DashboardAdminBlogNewRoute,
   DashboardAdminPaymentsNewRoute: DashboardAdminPaymentsNewRoute,
   DashboardAdminProgramsNewRoute: DashboardAdminProgramsNewRoute,
   DashboardAdminApplicationsIndexRoute: DashboardAdminApplicationsIndexRoute,
   DashboardAdminBatchesIndexRoute: DashboardAdminBatchesIndexRoute,
+  DashboardAdminBlogIndexRoute: DashboardAdminBlogIndexRoute,
   DashboardAdminCertificatesIndexRoute: DashboardAdminCertificatesIndexRoute,
   DashboardAdminEnquiriesIndexRoute: DashboardAdminEnquiriesIndexRoute,
   DashboardAdminPaymentsIndexRoute: DashboardAdminPaymentsIndexRoute,
   DashboardAdminProgramsIndexRoute: DashboardAdminProgramsIndexRoute,
   DashboardAdminBatchesBatchIdEditRoute: DashboardAdminBatchesBatchIdEditRoute,
+  DashboardAdminBlogPostIdEditRoute: DashboardAdminBlogPostIdEditRoute,
   DashboardAdminProgramsProgramIdEditRoute:
     DashboardAdminProgramsProgramIdEditRoute,
 }

@@ -296,3 +296,43 @@ model Enquiry {
   @@index([createdAt])
   @@map("enquiry")
 }
+
+enum PostStatus {
+  draft
+  published
+}
+
+enum PostCategory {
+  barbering
+  styling
+  makeup
+  career
+  academy_news
+}
+
+/// A blog article written from the dashboard. The body is Markdown, rendered
+/// and sanitized on the server before it reaches visitors. `publishedAt` is
+/// stamped the first time a post is published and kept stable afterwards so
+/// ordering never jumps when a post is edited.
+model Post {
+  id             String       @id @default(cuid())
+  slug           String       @unique
+  title          String
+  excerpt        String?
+  body           String       @default("")
+  coverImage     String?
+  coverImageAlt  String?
+  category       PostCategory
+  tags           String[]
+  status         PostStatus   @default(draft)
+  featured       Boolean      @default(false)
+  authorName     String
+  readingMinutes Int          @default(1)
+  publishedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([category])
+  @@map("post")
+}
