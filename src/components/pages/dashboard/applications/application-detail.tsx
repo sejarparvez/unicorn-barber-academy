@@ -1,6 +1,7 @@
 import {
 	IconArrowLeft,
 	IconCalendarEvent,
+	IconCash,
 	IconClock,
 	IconCurrencyTaka,
 	IconUsers,
@@ -11,13 +12,19 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { EnrollmentStatusBadge } from '@/components/pages/enroll/status-badge';
 import type { EnrollmentStatus } from '@/components/pages/enroll/types';
+import {
+	formatPaymentDate,
+	PAYMENT_METHOD_LABELS,
+} from '@/components/pages/payments/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatTaka } from '@/lib/utils';
 import {
 	type AdminApplication,
 	setEnrollmentStatus,
 } from '@/server/admin/enrollments';
+import type { EnrollmentPayments } from '@/server/admin/payments';
 import { actionsFor } from './actions';
 
 function formatDate(iso: string) {
@@ -60,10 +67,118 @@ function Section({
 	);
 }
 
-export function ApplicationDetail({
+function PaymentsSection({
 	application,
+	payments,
 }: {
 	application: AdminApplication;
+	payments: EnrollmentPayments | null;
+}) {
+	const canRecord =
+		application.status === 'active' || application.status === 'completed';
+
+	return (
+		<Card>
+			<CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+				<CardTitle className="text-base">Payments</CardTitle>
+				{canRecord ? (
+					<Button
+						size="sm"
+						render={
+							<Link
+								to="/dashboard/payments/new"
+								search={{ enrollmentId: application.id }}
+							/>
+						}
+					>
+						<IconCash stroke={1.75} />
+						Record payment
+					</Button>
+				) : (
+					<span className="text-muted-foreground text-xs">
+						Approve the application to record payments.
+					</span>
+				)}
+			</CardHeader>
+			<CardContent className="flex flex-col gap-4">
+				<dl className="grid grid-cols-3 gap-3 text-sm">
+					<div className="flex flex-col gap-0.5">
+						<dt className="font-medium text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
+							Total
+						</dt>
+						<dd className="tabular-nums">
+							{formatTaka(payments?.totalDue ?? 0)}
+						</dd>
+					</div>
+					<div className="flex flex-col gap-0.5">
+						<dt className="font-medium text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
+							Paid
+						</dt>
+						<dd className="tabular-nums">
+							{formatTaka(payments?.totalPaid ?? 0)}
+						</dd>
+					</div>
+					<div className="flex flex-col gap-0.5">
+						<dt className="font-medium text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
+							Balance
+						</dt>
+						<dd className="tabular-nums">
+							{formatTaka(payments?.balance ?? 0)}
+						</dd>
+					</div>
+				</dl>
+
+				{payments && payments.payments.length > 0 ? (
+					<div className="overflow-x-auto rounded-lg border border-border/60">
+						<table className="w-full min-w-[560px] text-left text-sm">
+							<thead className="border-border/60 border-b bg-muted/40 font-medium text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
+								<tr>
+									<th className="px-3 py-2">Date</th>
+									<th className="px-3 py-2">Method</th>
+									<th className="px-3 py-2">Reference</th>
+									<th className="px-3 py-2">Recorded by</th>
+									<th className="px-3 py-2 text-right">Amount</th>
+								</tr>
+							</thead>
+							<tbody className="divide-y divide-border/60">
+								{payments.payments.map((payment) => (
+									<tr key={payment.id}>
+										<td className="px-3 py-2.5 text-muted-foreground text-xs">
+											{formatPaymentDate(payment.paidAt)}
+										</td>
+										<td className="px-3 py-2.5 text-muted-foreground text-xs">
+											{PAYMENT_METHOD_LABELS[payment.method]}
+										</td>
+										<td className="px-3 py-2.5 text-muted-foreground text-xs">
+											{payment.reference ?? '—'}
+										</td>
+										<td className="px-3 py-2.5 text-muted-foreground text-xs">
+											{payment.recordedByName ?? '—'}
+										</td>
+										<td className="px-3 py-2.5 text-right font-medium tabular-nums">
+											{formatTaka(payment.amount)}
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				) : (
+					<p className="text-muted-foreground text-sm">
+						No payments recorded yet.
+					</p>
+				)}
+			</CardContent>
+		</Card>
+	);
+}
+
+export function ApplicationDetail({
+	application,
+	payments,
+}: {
+	application: AdminApplication;
+	payments: EnrollmentPayments | null;
 }) {
 	const router = useRouter();
 	const [isPending, setIsPending] = useState(false);
@@ -204,6 +319,8 @@ export function ApplicationDetail({
 					</div>
 				</CardContent>
 			</Card>
+
+			<PaymentsSection application={application} payments={payments} />
 
 			<Section title="1. Student information">
 				<DataRow label="Full name" value={application.fullName} />

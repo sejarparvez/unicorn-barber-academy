@@ -24,6 +24,7 @@ import { Route as PublicVerifyRouteImport } from './routes/_public/verify'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/_admin/route'
 import { Route as DashboardAccountRouteImport } from './routes/dashboard/account'
+import { Route as DashboardMyPaymentsRouteImport } from './routes/dashboard/my-payments'
 import { Route as DashboardMyProgramsRouteImport } from './routes/dashboard/my-programs'
 import { Route as PublicAuthForgotPasswordRouteImport } from './routes/_public/auth/forgot-password'
 import { Route as PublicAuthResetPasswordRouteImport } from './routes/_public/auth/reset-password'
@@ -39,6 +40,8 @@ import { Route as DashboardAdminApplicationsIndexRouteImport } from './routes/da
 import { Route as DashboardAdminApplicationsEnrollmentIdRouteImport } from './routes/dashboard/_admin/applications/$enrollmentId'
 import { Route as DashboardAdminBatchesIndexRouteImport } from './routes/dashboard/_admin/batches/index'
 import { Route as DashboardAdminBatchesNewRouteImport } from './routes/dashboard/_admin/batches/new'
+import { Route as DashboardAdminPaymentsIndexRouteImport } from './routes/dashboard/_admin/payments/index'
+import { Route as DashboardAdminPaymentsNewRouteImport } from './routes/dashboard/_admin/payments/new'
 import { Route as DashboardAdminProgramsIndexRouteImport } from './routes/dashboard/_admin/programs/index'
 import { Route as DashboardAdminProgramsNewRouteImport } from './routes/dashboard/_admin/programs/new'
 import { Route as DashboardAdminBatchesBatchIdEditRouteImport } from './routes/dashboard/_admin/batches/$batchId/edit'
@@ -115,6 +118,11 @@ const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
 const DashboardAccountRoute = DashboardAccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardMyPaymentsRoute = DashboardMyPaymentsRouteImport.update({
+  id: '/my-payments',
+  path: '/my-payments',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardMyProgramsRoute = DashboardMyProgramsRouteImport.update({
@@ -197,6 +205,18 @@ const DashboardAdminBatchesNewRoute =
     path: '/batches/new',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
+const DashboardAdminPaymentsIndexRoute =
+  DashboardAdminPaymentsIndexRouteImport.update({
+    id: '/payments/',
+    path: '/payments/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminPaymentsNewRoute =
+  DashboardAdminPaymentsNewRouteImport.update({
+    id: '/payments/new',
+    path: '/payments/new',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
 const DashboardAdminProgramsIndexRoute =
   DashboardAdminProgramsIndexRouteImport.update({
     id: '/programs/',
@@ -235,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-payments': typeof DashboardMyPaymentsRoute
   '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
@@ -249,9 +270,11 @@ export interface FileRoutesByFullPath {
   '/programs/': typeof PublicProgramsIndexRoute
   '/dashboard/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
   '/dashboard/batches/new': typeof DashboardAdminBatchesNewRoute
+  '/dashboard/payments/new': typeof DashboardAdminPaymentsNewRoute
   '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/applications/': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/batches/': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/payments/': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/programs/': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
   '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
@@ -267,6 +290,7 @@ export interface FileRoutesByTo {
   '/terms': typeof PublicTermsRoute
   '/verify': typeof PublicVerifyRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-payments': typeof DashboardMyPaymentsRoute
   '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/': typeof PublicIndexRoute
   '/auth/forgot-password': typeof PublicAuthForgotPasswordRoute
@@ -281,9 +305,11 @@ export interface FileRoutesByTo {
   '/programs': typeof PublicProgramsIndexRoute
   '/dashboard/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
   '/dashboard/batches/new': typeof DashboardAdminBatchesNewRoute
+  '/dashboard/payments/new': typeof DashboardAdminPaymentsNewRoute
   '/dashboard/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/applications': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/batches': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/payments': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/programs': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
   '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
@@ -303,6 +329,7 @@ export interface FileRoutesById {
   '/_public/terms': typeof PublicTermsRoute
   '/_public/verify': typeof PublicVerifyRoute
   '/dashboard/account': typeof DashboardAccountRoute
+  '/dashboard/my-payments': typeof DashboardMyPaymentsRoute
   '/dashboard/my-programs': typeof DashboardMyProgramsRoute
   '/_public/': typeof PublicIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -318,9 +345,11 @@ export interface FileRoutesById {
   '/_public/programs/': typeof PublicProgramsIndexRoute
   '/dashboard/_admin/applications/$enrollmentId': typeof DashboardAdminApplicationsEnrollmentIdRoute
   '/dashboard/_admin/batches/new': typeof DashboardAdminBatchesNewRoute
+  '/dashboard/_admin/payments/new': typeof DashboardAdminPaymentsNewRoute
   '/dashboard/_admin/programs/new': typeof DashboardAdminProgramsNewRoute
   '/dashboard/_admin/applications/': typeof DashboardAdminApplicationsIndexRoute
   '/dashboard/_admin/batches/': typeof DashboardAdminBatchesIndexRoute
+  '/dashboard/_admin/payments/': typeof DashboardAdminPaymentsIndexRoute
   '/dashboard/_admin/programs/': typeof DashboardAdminProgramsIndexRoute
   '/dashboard/_admin/batches/$batchId/edit': typeof DashboardAdminBatchesBatchIdEditRoute
   '/dashboard/_admin/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
@@ -340,6 +369,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/verify'
     | '/dashboard/account'
+    | '/dashboard/my-payments'
     | '/dashboard/my-programs'
     | '/dashboard/'
     | '/auth/forgot-password'
@@ -354,9 +384,11 @@ export interface FileRouteTypes {
     | '/programs/'
     | '/dashboard/applications/$enrollmentId'
     | '/dashboard/batches/new'
+    | '/dashboard/payments/new'
     | '/dashboard/programs/new'
     | '/dashboard/applications/'
     | '/dashboard/batches/'
+    | '/dashboard/payments/'
     | '/dashboard/programs/'
     | '/dashboard/batches/$batchId/edit'
     | '/dashboard/programs/$programId/edit'
@@ -372,6 +404,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/verify'
     | '/dashboard/account'
+    | '/dashboard/my-payments'
     | '/dashboard/my-programs'
     | '/'
     | '/auth/forgot-password'
@@ -386,9 +419,11 @@ export interface FileRouteTypes {
     | '/programs'
     | '/dashboard/applications/$enrollmentId'
     | '/dashboard/batches/new'
+    | '/dashboard/payments/new'
     | '/dashboard/programs/new'
     | '/dashboard/applications'
     | '/dashboard/batches'
+    | '/dashboard/payments'
     | '/dashboard/programs'
     | '/dashboard/batches/$batchId/edit'
     | '/dashboard/programs/$programId/edit'
@@ -407,6 +442,7 @@ export interface FileRouteTypes {
     | '/_public/terms'
     | '/_public/verify'
     | '/dashboard/account'
+    | '/dashboard/my-payments'
     | '/dashboard/my-programs'
     | '/_public/'
     | '/dashboard/'
@@ -422,9 +458,11 @@ export interface FileRouteTypes {
     | '/_public/programs/'
     | '/dashboard/_admin/applications/$enrollmentId'
     | '/dashboard/_admin/batches/new'
+    | '/dashboard/_admin/payments/new'
     | '/dashboard/_admin/programs/new'
     | '/dashboard/_admin/applications/'
     | '/dashboard/_admin/batches/'
+    | '/dashboard/_admin/payments/'
     | '/dashboard/_admin/programs/'
     | '/dashboard/_admin/batches/$batchId/edit'
     | '/dashboard/_admin/programs/$programId/edit'
@@ -543,6 +581,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAccountRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/my-payments': {
+      id: '/dashboard/my-payments'
+      path: '/my-payments'
+      fullPath: '/dashboard/my-payments'
+      preLoaderRoute: typeof DashboardMyPaymentsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/my-programs': {
       id: '/dashboard/my-programs'
       path: '/my-programs'
@@ -648,6 +693,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminBatchesNewRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
+    '/dashboard/_admin/payments/': {
+      id: '/dashboard/_admin/payments/'
+      path: '/payments'
+      fullPath: '/dashboard/payments/'
+      preLoaderRoute: typeof DashboardAdminPaymentsIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/_admin/payments/new': {
+      id: '/dashboard/_admin/payments/new'
+      path: '/payments/new'
+      fullPath: '/dashboard/payments/new'
+      preLoaderRoute: typeof DashboardAdminPaymentsNewRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
     '/dashboard/_admin/programs/': {
       id: '/dashboard/_admin/programs/'
       path: '/programs'
@@ -738,9 +797,11 @@ interface DashboardAdminRouteRouteChildren {
   DashboardAdminStudentsRoute: typeof DashboardAdminStudentsRoute
   DashboardAdminApplicationsEnrollmentIdRoute: typeof DashboardAdminApplicationsEnrollmentIdRoute
   DashboardAdminBatchesNewRoute: typeof DashboardAdminBatchesNewRoute
+  DashboardAdminPaymentsNewRoute: typeof DashboardAdminPaymentsNewRoute
   DashboardAdminProgramsNewRoute: typeof DashboardAdminProgramsNewRoute
   DashboardAdminApplicationsIndexRoute: typeof DashboardAdminApplicationsIndexRoute
   DashboardAdminBatchesIndexRoute: typeof DashboardAdminBatchesIndexRoute
+  DashboardAdminPaymentsIndexRoute: typeof DashboardAdminPaymentsIndexRoute
   DashboardAdminProgramsIndexRoute: typeof DashboardAdminProgramsIndexRoute
   DashboardAdminBatchesBatchIdEditRoute: typeof DashboardAdminBatchesBatchIdEditRoute
   DashboardAdminProgramsProgramIdEditRoute: typeof DashboardAdminProgramsProgramIdEditRoute
@@ -751,9 +812,11 @@ const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminApplicationsEnrollmentIdRoute:
     DashboardAdminApplicationsEnrollmentIdRoute,
   DashboardAdminBatchesNewRoute: DashboardAdminBatchesNewRoute,
+  DashboardAdminPaymentsNewRoute: DashboardAdminPaymentsNewRoute,
   DashboardAdminProgramsNewRoute: DashboardAdminProgramsNewRoute,
   DashboardAdminApplicationsIndexRoute: DashboardAdminApplicationsIndexRoute,
   DashboardAdminBatchesIndexRoute: DashboardAdminBatchesIndexRoute,
+  DashboardAdminPaymentsIndexRoute: DashboardAdminPaymentsIndexRoute,
   DashboardAdminProgramsIndexRoute: DashboardAdminProgramsIndexRoute,
   DashboardAdminBatchesBatchIdEditRoute: DashboardAdminBatchesBatchIdEditRoute,
   DashboardAdminProgramsProgramIdEditRoute:
@@ -766,6 +829,7 @@ const DashboardAdminRouteRouteWithChildren =
 interface DashboardRouteRouteChildren {
   DashboardAdminRouteRoute: typeof DashboardAdminRouteRouteWithChildren
   DashboardAccountRoute: typeof DashboardAccountRoute
+  DashboardMyPaymentsRoute: typeof DashboardMyPaymentsRoute
   DashboardMyProgramsRoute: typeof DashboardMyProgramsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -773,6 +837,7 @@ interface DashboardRouteRouteChildren {
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAdminRouteRoute: DashboardAdminRouteRouteWithChildren,
   DashboardAccountRoute: DashboardAccountRoute,
+  DashboardMyPaymentsRoute: DashboardMyPaymentsRoute,
   DashboardMyProgramsRoute: DashboardMyProgramsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

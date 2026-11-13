@@ -19,6 +19,7 @@ model User {
   sessions    Session[]
   accounts    Account[]
   enrollments Enrollment[]
+  recordedPayments Payment[] @relation("PaymentRecordedBy")
   role        String?
   banned      Boolean?  @default(false)
   banReason   String?
@@ -204,8 +205,41 @@ model Enrollment {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
+  payments Payment[]
+
   @@unique([userId, batchId])
   @@index([batchId, status])
   @@index([userId])
   @@map("enrollment")
+}
+
+enum PaymentMethod {
+  cash
+  bkash
+  nagad
+  bank
+  card
+  other
+}
+
+/// A single payment received from a student against an enrolment. Payments are
+/// recorded manually by admins; a student's balance is the program price minus
+/// the sum of their recorded payments.
+model Payment {
+  id           String        @id @default(cuid())
+  enrollmentId String
+  enrollment   Enrollment    @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  amount       Int
+  method       PaymentMethod @default(cash)
+  reference    String?
+  note         String?
+  paidAt       DateTime      @default(now())
+  recordedById String?
+  recordedBy   User?         @relation("PaymentRecordedBy", fields: [recordedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([enrollmentId])
+  @@index([paidAt])
+  @@map("payment")
 }

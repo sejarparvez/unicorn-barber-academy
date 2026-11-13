@@ -24,6 +24,11 @@ export function safeRedirect(path?: string | null, fallback = '/'): string {
 	return path;
 }
 
+/** Formats an amount in Bangladeshi Taka, e.g. 12000 → "৳12,000". */
+export function formatTaka(amount: number): string {
+	return `৳${amount.toLocaleString('en-US')}`;
+}
+
 export function getInitials(name?: string | null): string {
 	if (!name) {
 		return '';
