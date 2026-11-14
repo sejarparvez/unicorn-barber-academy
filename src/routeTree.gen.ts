@@ -11,6 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicSplatRouteImport } from './routes/_public/$'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
@@ -63,6 +67,26 @@ const PublicRouteRoute = PublicRouteRouteImport.update({
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RssDotxmlRoute = RssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
@@ -303,6 +327,10 @@ const DashboardAdminProgramsProgramIdEditRoute =
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/programs': typeof PublicProgramsRouteRouteWithChildren
   '/$': typeof PublicSplatRoute
   '/about': typeof PublicAboutRoute
@@ -347,6 +375,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/programs/$programId/edit': typeof DashboardAdminProgramsProgramIdEditRoute
 }
 export interface FileRoutesByTo {
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof DashboardIndexRoute
   '/$': typeof PublicSplatRoute
   '/about': typeof PublicAboutRoute
@@ -394,6 +426,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_public/programs': typeof PublicProgramsRouteRouteWithChildren
   '/dashboard/_admin': typeof DashboardAdminRouteRouteWithChildren
   '/_public/$': typeof PublicSplatRoute
@@ -444,6 +480,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/llms.txt'
+    | '/robots.txt'
+    | '/rss.xml'
+    | '/sitemap.xml'
     | '/programs'
     | '/$'
     | '/about'
@@ -488,6 +528,10 @@ export interface FileRouteTypes {
     | '/dashboard/programs/$programId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/llms.txt'
+    | '/robots.txt'
+    | '/rss.xml'
+    | '/sitemap.xml'
     | '/dashboard'
     | '/$'
     | '/about'
@@ -534,6 +578,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_public'
     | '/dashboard'
+    | '/llms.txt'
+    | '/robots.txt'
+    | '/rss.xml'
+    | '/sitemap.xml'
     | '/_public/programs'
     | '/dashboard/_admin'
     | '/_public/$'
@@ -583,6 +631,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  RssDotxmlRoute: typeof RssDotxmlRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CertificatesCertificateIdRoute: typeof CertificatesCertificateIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -601,6 +653,34 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rss.xml': {
+      id: '/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/rss.xml'
+      preLoaderRoute: typeof RssDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public/': {
@@ -1041,6 +1121,10 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   PublicRouteRoute: PublicRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  LlmsDottxtRoute: LlmsDottxtRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  RssDotxmlRoute: RssDotxmlRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   CertificatesCertificateIdRoute: CertificatesCertificateIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

@@ -11,19 +11,35 @@ import {
 	LegalSection,
 	type LegalSectionMeta,
 } from '@/components/pages/legal/legal-page';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+import { pageSeo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 
+const TITLE = 'Terms of Service | Unicorn Barber Training Academy';
+const DESCRIPTION =
+	'Enrollment, payment, attendance, certification and refund terms for programs at Unicorn Barber Training Academy.';
+
 export const Route = createFileRoute('/_public/terms')({
-	head: () => ({
-		meta: [
-			{ title: 'Terms of Service — Unicorn Barber Training Academy' },
-			{
-				name: 'description',
-				content:
-					'Enrollment, payment, attendance, certification and refund terms for programs at Unicorn Barber Training Academy.',
-			},
-		],
-	}),
+	head: () => {
+		const breadcrumb = breadcrumbSchema([
+			{ name: 'Home', path: '/' },
+			{ name: 'Terms of Service', path: '/terms' },
+		]);
+
+		return pageSeo({
+			title: TITLE,
+			description: DESCRIPTION,
+			path: '/terms',
+			jsonLd: [
+				webPageSchema({
+					name: TITLE,
+					description: DESCRIPTION,
+					path: '/terms',
+					breadcrumb,
+				}),
+			],
+		});
+	},
 	component: TermsPage,
 });
 

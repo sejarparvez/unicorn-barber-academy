@@ -4,6 +4,8 @@ import ProgramBatches from '@/components/pages/programs/detail/batches';
 import ProgramCurriculum from '@/components/pages/programs/detail/curriculum';
 import ProgramDetailHero from '@/components/pages/programs/detail/hero';
 import RelatedPrograms from '@/components/pages/programs/detail/related';
+import { breadcrumbSchema, courseSchema } from '@/lib/schema';
+import { pageSeo } from '@/lib/seo';
 import { getProgramBatches } from '@/server/batches';
 import { getProgramBySlug, getRelatedPrograms } from '@/server/programs';
 
@@ -22,23 +24,41 @@ export const Route = createFileRoute('/_public/programs/$slug')({
 
 		return { program, relatedPrograms, batches };
 	},
-	head: ({ match }) => {
-		const program = match.loaderData?.program;
+	head: ({ loaderData }) => {
+		const program = loaderData?.program;
 
 		if (!program) {
-			return {
-				meta: [
-					{ title: 'Program not found — Unicorn Barber Training Academy' },
-				],
-			};
+			return pageSeo({
+				title: 'Program not found | Unicorn Barber Training Academy',
+				description: 'This program could not be found.',
+				path: '/programs',
+				noindex: true,
+			});
 		}
 
-		return {
-			meta: [
-				{ title: `${program.title} — Unicorn Barber Training Academy` },
-				{ name: 'description', content: program.description },
+		const path = `/programs/${program.slug}`;
+		const breadcrumb = breadcrumbSchema([
+			{ name: 'Home', path: '/' },
+			{ name: 'Programs', path: '/programs' },
+			{ name: program.title, path },
+		]);
+
+		return pageSeo({
+			title: `${program.title} Course in Dhaka | Unicorn Academy`,
+			description: `${program.tagline} ${program.description}`,
+			path,
+			keywords: [
+				program.title,
+				program.category,
+				program.level,
+				'barber training Dhaka',
+				'Bangladesh',
 			],
-		};
+			jsonLd: [
+				courseSchema(program, loaderData?.batches ?? [], path),
+				breadcrumb,
+			],
+		});
 	},
 	component: ProgramDetail,
 });

@@ -11,18 +11,34 @@ import {
 	LegalSection,
 	type LegalSectionMeta,
 } from '@/components/pages/legal/legal-page';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+import { pageSeo } from '@/lib/seo';
+
+const TITLE = 'Privacy Policy | Unicorn Barber Training Academy';
+const DESCRIPTION =
+	'How Unicorn Barber Training Academy collects, uses, shares and protects the personal information of applicants and students.';
 
 export const Route = createFileRoute('/_public/privacy')({
-	head: () => ({
-		meta: [
-			{ title: 'Privacy Policy — Unicorn Barber Training Academy' },
-			{
-				name: 'description',
-				content:
-					'How Unicorn Barber Training Academy collects, uses, shares and protects the personal information of applicants and students.',
-			},
-		],
-	}),
+	head: () => {
+		const breadcrumb = breadcrumbSchema([
+			{ name: 'Home', path: '/' },
+			{ name: 'Privacy Policy', path: '/privacy' },
+		]);
+
+		return pageSeo({
+			title: TITLE,
+			description: DESCRIPTION,
+			path: '/privacy',
+			jsonLd: [
+				webPageSchema({
+					name: TITLE,
+					description: DESCRIPTION,
+					path: '/privacy',
+					breadcrumb,
+				}),
+			],
+		});
+	},
 	component: PrivacyPage,
 });
 

@@ -24,6 +24,12 @@ import {
 } from '@/components/ui/sidebar';
 
 export const Route = createFileRoute('/dashboard')({
+	head: () => ({
+		meta: [
+			{ title: 'Dashboard | Unicorn Barber Training Academy' },
+			{ name: 'robots', content: 'noindex, nofollow' },
+		],
+	}),
 	beforeLoad: ({ context, location }) => {
 		if (!context.session) {
 			throw redirect({

@@ -16,7 +16,13 @@ import {
 } from '@/components/ui/card';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+import { pageSeo } from '@/lib/seo';
 import { verifyCertificate } from '@/server/certificates';
+
+const TITLE = 'Verify a Certificate | Unicorn Barber Training Academy';
+const DESCRIPTION =
+	'Check that a Unicorn Barber Training Academy certificate is genuine using the certificate number printed on it.';
 
 export const Route = createFileRoute('/_public/verify')({
 	validateSearch: (search: Record<string, unknown>): { no?: string } => ({
@@ -29,16 +35,31 @@ export const Route = createFileRoute('/_public/verify')({
 		}
 		return verifyCertificate({ data: { certificateNo: deps.no } });
 	},
-	head: () => ({
-		meta: [
-			{ title: 'Verify a certificate | Unicorn Barber Training Academy' },
-			{
-				name: 'description',
-				content:
-					'Check that a Unicorn Barber Training Academy certificate is genuine.',
-			},
-		],
-	}),
+	head: () => {
+		const breadcrumb = breadcrumbSchema([
+			{ name: 'Home', path: '/' },
+			{ name: 'Verify a certificate', path: '/verify' },
+		]);
+
+		return pageSeo({
+			title: TITLE,
+			description: DESCRIPTION,
+			path: '/verify',
+			keywords: [
+				'verify certificate',
+				'Unicorn Barber Training Academy certificate',
+				'NTVQF certificate check',
+			],
+			jsonLd: [
+				webPageSchema({
+					name: TITLE,
+					description: DESCRIPTION,
+					path: '/verify',
+					breadcrumb,
+				}),
+			],
+		});
+	},
 	component: RouteComponent,
 });
 
