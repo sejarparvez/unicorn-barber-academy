@@ -4,16 +4,11 @@ import {
 	IconCash,
 	IconCertificate,
 	IconClipboardList,
-	IconHistory,
 	IconLayoutDashboard,
 	IconMail,
 	IconPhoto,
-	IconQuestionMark,
 	IconReceipt,
 	IconSchool,
-	IconSettings,
-	IconStar,
-	IconUser,
 	IconUserCircle,
 	IconUsers,
 } from '@tabler/icons-react';
@@ -41,6 +36,12 @@ const data = {
 					to: '/dashboard',
 					icon: IconLayoutDashboard,
 					visibleFor: 'all',
+				},
+				{
+					label: 'Students',
+					to: '/dashboard/students',
+					icon: IconUsers,
+					visibleFor: 'admin',
 				},
 			],
 		},
@@ -87,30 +88,21 @@ const data = {
 					icon: IconCalendarEvent,
 					visibleFor: 'admin',
 				},
-			],
-		},
-		{
-			label: 'Students',
-			items: [
-				{
-					label: 'Students',
-					to: '/dashboard/students',
-					icon: IconUsers,
-					visibleFor: 'admin',
-				},
-			],
-		},
-		{
-			label: 'Finance',
-			items: [
 				{
 					label: 'Payments',
 					to: '/dashboard/payments',
 					icon: IconCash,
 					visibleFor: 'admin',
 				},
+				{
+					label: 'Certificates',
+					to: '/dashboard/certificates',
+					icon: IconCertificate,
+					visibleFor: 'admin',
+				},
 			],
 		},
+
 		{
 			label: 'Content',
 			items: [
@@ -126,39 +118,11 @@ const data = {
 					icon: IconArticle,
 					visibleFor: 'admin',
 				},
-				{
-					label: 'Instructors',
-					to: '/dashboard/instructors',
-					icon: IconUser,
-					visibleFor: 'admin',
-				},
+
 				{
 					label: 'Gallery',
 					to: '/dashboard/gallery',
 					icon: IconPhoto,
-					visibleFor: 'admin',
-				},
-				{
-					label: 'Testimonials',
-					to: '/dashboard/testimonials',
-					icon: IconStar,
-					visibleFor: 'admin',
-				},
-				{
-					label: 'FAQs',
-					to: '/dashboard/faqs',
-					icon: IconQuestionMark,
-					visibleFor: 'admin',
-				},
-			],
-		},
-		{
-			label: 'Certificates',
-			items: [
-				{
-					label: 'Certificates',
-					to: '/dashboard/certificates',
-					icon: IconCertificate,
 					visibleFor: 'admin',
 				},
 			],
@@ -174,23 +138,7 @@ const data = {
 				},
 			],
 		},
-		{
-			label: 'System',
-			items: [
-				{
-					label: 'Site settings',
-					to: '/dashboard/settings',
-					icon: IconSettings,
-					visibleFor: 'admin',
-				},
-				{
-					label: 'Activity',
-					to: '/dashboard/activity',
-					icon: IconHistory,
-					visibleFor: 'admin',
-				},
-			],
-		},
+
 		{
 			label: 'Account',
 			items: [

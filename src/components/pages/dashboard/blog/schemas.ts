@@ -46,8 +46,8 @@ export const postSchema = z.object({
 	coverImage: z
 		.string()
 		.trim()
-		.refine((value) => value === '' || /^https?:\/\//.test(value), {
-			message: 'Cover image must be an uploaded image.',
+		.refine((value) => value === '' || /^https?:\/\//i.test(value), {
+			message: 'Enter a valid image URL starting with http:// or https://.',
 		}),
 	coverImageAlt: z
 		.string()
