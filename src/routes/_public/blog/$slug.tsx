@@ -52,7 +52,9 @@ export const Route = createFileRoute('/_public/blog/$slug')({
 });
 
 function PostRoute() {
-	const { post, related } = Route.useLoaderData();
+	const { post, related, newer, older } = Route.useLoaderData();
 
-	return <PostDetailPage post={post} related={related} />;
+	return (
+		<PostDetailPage post={post} related={related} newer={newer} older={older} />
+	);
 }

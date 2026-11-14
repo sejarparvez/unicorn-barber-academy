@@ -64,6 +64,9 @@ export type PostDetail = PostSummary & {
 	updatedAt: string;
 };
 
+/** A heading pulled from a rendered article, used to build the table of contents. */
+export type PostHeading = { id: string; text: string; level: 2 | 3 };
+
 export type PaginatedPosts = {
 	items: PostSummary[];
 	total: number;
@@ -117,4 +120,42 @@ export function formatPostDate(iso: string): string {
 		month: 'short',
 		year: 'numeric',
 	});
+}
+
+const HTML_ENTITIES: Record<string, string> = {
+	'&amp;': '&',
+	'&lt;': '<',
+	'&gt;': '>',
+	'&quot;': '"',
+	'&#39;': "'",
+	'&apos;': "'",
+	'&nbsp;': ' ',
+};
+
+function decodeEntities(value: string): string {
+	return value.replace(
+		/&(?:amp|lt|gt|quot|#39|apos|nbsp);/g,
+		(m) => HTML_ENTITIES[m] ?? m,
+	);
+}
+
+/**
+ * Pulls the H2/H3 headings out of rendered article HTML to build the table of
+ * contents. Anchors are added server-side by `transformMarkdown`, so headings
+ * without an `id` are skipped. Pure string work — safe on the server and client.
+ */
+export function extractHeadings(html: string): PostHeading[] {
+	const headings: PostHeading[] = [];
+	const pattern = /<h([23])\s+id="([^"]+)"[^>]*>([\s\S]*?)<\/h\1>/g;
+
+	for (const match of html.matchAll(pattern)) {
+		const level = Number(match[1]) as 2 | 3;
+		const id = match[2];
+		const text = decodeEntities(match[3].replace(/<[^>]+>/g, '')).trim();
+		if (id && text) {
+			headings.push({ id, text, level });
+		}
+	}
+
+	return headings;
 }

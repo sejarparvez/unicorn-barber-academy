@@ -102,7 +102,12 @@ export const getPublishedPostBySlug = createServerFn({ method: 'GET' })
 	.handler(
 		async ({
 			data,
-		}): Promise<{ post: PostDetail; related: PostSummary[] } | null> => {
+		}): Promise<{
+			post: PostDetail;
+			related: PostSummary[];
+			newer: PostSummary | null;
+			older: PostSummary | null;
+		} | null> => {
 			const row = await db.post.findFirst({
 				where: { slug: data.slug, status: 'published' },
 			});
@@ -111,16 +116,32 @@ export const getPublishedPostBySlug = createServerFn({ method: 'GET' })
 				return null;
 			}
 
-			const relatedRows = await db.post.findMany({
-				where: {
-					status: 'published',
-					slug: { not: row.slug },
-					...(row.tags.length ? { tags: { hasSome: row.tags } } : {}),
-				},
-				orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
-				take: 3,
-				select: SUMMARY_SELECT,
-			});
+			// Chronological cursor so the prev/next links can page through the
+			// archive in publication order.
+			const cursor = row.publishedAt ?? row.createdAt;
+
+			const [relatedRows, olderRow, newerRow] = await Promise.all([
+				db.post.findMany({
+					where: {
+						status: 'published',
+						slug: { not: row.slug },
+						...(row.tags.length ? { tags: { hasSome: row.tags } } : {}),
+					},
+					orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+					take: 3,
+					select: SUMMARY_SELECT,
+				}),
+				db.post.findFirst({
+					where: { status: 'published', publishedAt: { lt: cursor } },
+					orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+					select: SUMMARY_SELECT,
+				}),
+				db.post.findFirst({
+					where: { status: 'published', publishedAt: { gt: cursor } },
+					orderBy: [{ publishedAt: 'asc' }, { createdAt: 'asc' }],
+					select: SUMMARY_SELECT,
+				}),
+			]);
 
 			const summary = toSummary(row);
 
@@ -132,6 +153,8 @@ export const getPublishedPostBySlug = createServerFn({ method: 'GET' })
 					updatedAt: row.updatedAt.toISOString(),
 				},
 				related: relatedRows.map(toSummary),
+				newer: newerRow ? toSummary(newerRow) : null,
+				older: olderRow ? toSummary(olderRow) : null,
 			};
 		},
 	);

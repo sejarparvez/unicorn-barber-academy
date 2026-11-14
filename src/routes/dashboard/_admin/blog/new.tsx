@@ -19,7 +19,7 @@ function RouteComponent() {
 	const authorName = session?.user?.name?.trim() || 'Unicorn Academy';
 
 	return (
-		<div className=" mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 rounded-2xl border border-border/60 bg-background p-4 sm:p-6">
+		<div className="section-light mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 rounded-2xl border border-border/60 bg-background p-4 sm:p-6">
 			<div>
 				<h1 className="font-semibold text-2xl tracking-tight">New post</h1>
 				<p className="text-muted-foreground text-sm">

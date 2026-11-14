@@ -36,7 +36,7 @@ export const Route = createFileRoute('/_public/blog/')({
 		]);
 
 		// An out-of-range ?page= is a bad URL, not an empty blog.
-		if (deps.page && posts.page !== deps.page) {
+		if (deps.page && deps.page > posts.totalPages) {
 			throw notFound();
 		}
 
