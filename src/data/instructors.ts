@@ -47,7 +47,7 @@ export const INSTRUCTORS: Instructor[] = [
 		quote:
 			'A demo only matters if a student can repeat it tomorrow — without me standing there.',
 		credential: 'NTVQF Level 4 · Master barber',
-		programSlugs: ['classic-barbering', 'fades-and-tapers'],
+		programSlugs: ['barber-foundation-training'],
 	},
 	{
 		slug: 'rakibul-hasan',
@@ -61,7 +61,7 @@ export const INSTRUCTORS: Instructor[] = [
 		quote:
 			'Speed is a by-product of doing the same cut correctly a thousand times.',
 		credential: 'NTVQF Level 3 · Barbering assessor',
-		programSlugs: ['fades-and-tapers', 'beard-sculpting'],
+		programSlugs: ['barber-foundation-training'],
 	},
 	{
 		slug: 'tania-sultana',
@@ -75,7 +75,7 @@ export const INSTRUCTORS: Instructor[] = [
 		quote:
 			'If you cannot explain the colour plan to the client, you are not ready to mix it.',
 		credential: 'NTVQF Level 4 · Colour specialist',
-		programSlugs: ['hair-styling-and-colouring', 'bridal-and-editorial-makeup'],
+		programSlugs: ['advanced-hair-colour-training', 'advanced-makeup-training'],
 	},
 	{
 		slug: 'farzana-akter',
@@ -89,7 +89,11 @@ export const INSTRUCTORS: Instructor[] = [
 		quote:
 			'Knowing why a product works is what separates a stylist from someone following a recipe.',
 		credential: 'BSc Cosmetology · Salon educator',
-		programSlugs: ['cosmetology-fundamentals'],
+		programSlugs: [
+			'advanced-facial-training',
+			'advanced-hair-treatment-training',
+			'advanced-massage-body-grooming-training',
+		],
 	},
 	{
 		slug: 'sadia-karim',
@@ -103,7 +107,7 @@ export const INSTRUCTORS: Instructor[] = [
 		quote:
 			'A look is not finished until it survives the photographs and the last dance.',
 		credential: 'Pro artist · Bridal & editorial',
-		programSlugs: ['bridal-and-editorial-makeup'],
+		programSlugs: ['advanced-makeup-training'],
 	},
 	{
 		slug: 'moinul-islam',

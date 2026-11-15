@@ -1,9 +1,4 @@
-import {
-	IconArrowUpRight,
-	IconClock,
-	IconCurrencyTaka,
-	IconTarget,
-} from '@tabler/icons-react';
+import { IconArrowUpRight, IconClock, IconTarget } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { SectionHeading } from '@/components/pages/home/section-heading';
 import { ProgramNumber } from '@/components/pages/programs/program-number';
@@ -106,7 +101,7 @@ function ProgramCard({ program }: { program: Program }) {
 						{program.description}
 					</p>
 
-					<dl className="grid grid-cols-3 divide-x divide-border/60 overflow-hidden rounded-lg border border-border/70 bg-background/50">
+					<dl className="grid grid-cols-2 divide-x divide-border/60 overflow-hidden rounded-lg border border-border/70 bg-background/50">
 						<ProgramMeta
 							icon={IconClock}
 							label="Length"
@@ -116,11 +111,6 @@ function ProgramCard({ program }: { program: Program }) {
 							icon={IconTarget}
 							label="Level"
 							value={program.level}
-						/>
-						<ProgramMeta
-							icon={IconCurrencyTaka}
-							label="Tuition"
-							value={`৳${program.price.toLocaleString('en-US')}`}
 						/>
 					</dl>
 

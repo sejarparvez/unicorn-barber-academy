@@ -63,7 +63,7 @@ export const getProgramBatches = createServerFn({ method: 'GET' })
 
 export type EnrollmentTarget = {
 	batch: ProgramBatch;
-	program: { slug: string; title: string; price: number };
+	program: { slug: string; title: string };
 	existingStatus: EnrollmentStatus | null;
 	/** Prefill for the admission form, taken from the signed-in account. */
 	defaults: { fullName: string; whatsapp: string };
@@ -116,7 +116,7 @@ export const getEnrollmentTarget = createServerFn({ method: 'GET' })
 			include: {
 				...BATCH_INCLUDE,
 				program: {
-					select: { slug: true, title: true, price: true, hidden: true },
+					select: { slug: true, title: true, hidden: true },
 				},
 			},
 		});
@@ -137,7 +137,6 @@ export const getEnrollmentTarget = createServerFn({ method: 'GET' })
 			program: {
 				slug: batch.program.slug,
 				title: batch.program.title,
-				price: batch.program.price,
 			},
 			existingStatus: existing?.status ?? null,
 			defaults: {

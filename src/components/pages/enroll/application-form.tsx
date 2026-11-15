@@ -4,7 +4,6 @@ import {
 	IconCalendarEvent,
 	IconCheck,
 	IconClock,
-	IconCurrencyTaka,
 	IconUsers,
 } from '@tabler/icons-react';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
@@ -48,10 +47,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import type { EnrollmentTarget } from '@/server/batches';
 import { applyToBatch } from '@/server/batches';
-
-function formatPrice(amount: number) {
-	return `৳${amount.toLocaleString('en-US')}`;
-}
 
 export function ApplicationForm({ target }: { target: EnrollmentTarget }) {
 	const { batch, program, existingStatus } = target;
@@ -151,16 +146,6 @@ function BatchSummary({ target }: { target: EnrollmentTarget }) {
 						/>
 						<dd className="text-muted-foreground">
 							{batch.seatsTaken} of {batch.capacity} seats taken
-						</dd>
-					</div>
-					<div className="flex items-center gap-3">
-						<IconCurrencyTaka
-							className="size-4 shrink-0 text-primary/80"
-							stroke={1.6}
-							aria-hidden="true"
-						/>
-						<dd className="text-muted-foreground">
-							Tuition {formatPrice(program.price)}
 						</dd>
 					</div>
 				</dl>

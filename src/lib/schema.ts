@@ -204,11 +204,10 @@ export function courseSchema(
 	const openBatches = batches.filter(
 		(batch) => batch.status === 'upcoming' || batch.status === 'running',
 	);
-	const hasSeats = openBatches.some((batch) => !batch.isFull);
 	const prerequisite =
 		program.level === 'Beginner friendly'
 			? 'No prior experience required'
-			: program.level === 'Intermediate'
+			: program.level === 'Intermediate' || program.level === 'Advanced'
 				? 'Prior barbering or salon experience recommended'
 				: 'Open to all experience levels';
 
@@ -237,16 +236,6 @@ export function courseSchema(
 			'@id': ORGANIZATION_ID,
 			name: SITE.name,
 			url: SITE.url,
-		},
-		offers: {
-			'@type': 'Offer',
-			category: 'Paid',
-			price: program.price,
-			priceCurrency: 'BDT',
-			url,
-			availability: hasSeats
-				? 'https://schema.org/InStock'
-				: 'https://schema.org/SoldOut',
 		},
 		hasCourseInstance: openBatches.map((batch) => ({
 			'@type': 'CourseInstance',

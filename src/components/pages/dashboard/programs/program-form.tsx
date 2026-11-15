@@ -147,7 +147,7 @@ export function ProgramForm({
 								<FieldLabel htmlFor="title">Title</FieldLabel>
 								<Input
 									id="title"
-									placeholder="Classic Barbering"
+									placeholder="Barber Foundation Training Program"
 									aria-invalid={!!errors.title}
 									{...register('title')}
 								/>
@@ -158,7 +158,7 @@ export function ProgramForm({
 								<FieldLabel htmlFor="slug">Slug</FieldLabel>
 								<Input
 									id="slug"
-									placeholder="classic-barbering"
+									placeholder="barber-foundation-training"
 									aria-invalid={!!errors.slug}
 									{...register('slug')}
 								/>

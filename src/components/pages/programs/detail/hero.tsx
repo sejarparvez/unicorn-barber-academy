@@ -3,7 +3,6 @@ import {
 	IconCertificate,
 	IconChevronRight,
 	IconClock,
-	IconCurrencyTaka,
 	IconScissors,
 	IconTarget,
 	IconUsers,
@@ -27,10 +26,6 @@ const CONTACT_LINK: { label: string; to: string } = {
 	label: 'Talk to admissions',
 	to: '/contact',
 };
-
-function formatPrice(amount: number) {
-	return `৳${amount.toLocaleString('en-US')}`;
-}
 
 export default function ProgramDetailHero({ program }: { program: Program }) {
 	const position = program.position;
@@ -165,11 +160,6 @@ export default function ProgramDetailHero({ program }: { program: Program }) {
 							</p>
 
 							<dl className="mt-4 divide-y divide-border/60">
-								<DetailRow
-									icon={IconCurrencyTaka}
-									label="Tuition"
-									value={formatPrice(program.price)}
-								/>
 								<DetailRow
 									icon={IconClock}
 									label="Duration"

@@ -44,7 +44,6 @@ export type Program = {
 	curriculum: ProgramModule[];
 	whoFor: string[];
 	careerPaths: string[];
-	price: number;
 	position: number;
 	featured: boolean;
 };

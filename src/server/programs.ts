@@ -32,7 +32,6 @@ function toProgram(row: ProgramRow): Program {
 		})),
 		whoFor: row.whoFor,
 		careerPaths: row.careerPaths,
-		price: row.price,
 		position: row.position,
 		featured: row.featured,
 	};

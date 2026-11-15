@@ -36,7 +36,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Barbering',
 		width: 4858,
 		height: 3239,
-		programSlug: 'classic-barbering',
+		programSlug: 'barber-foundation-training',
 	},
 	{
 		id: 'photo-1621605815971-fbc98d665033',
@@ -46,7 +46,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Barbering',
 		width: 5760,
 		height: 3840,
-		programSlug: 'fades-and-tapers',
+		programSlug: 'barber-foundation-training',
 	},
 	{
 		id: 'photo-1599351431202-1e0f0137899a',
@@ -56,7 +56,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Barbering',
 		width: 4016,
 		height: 6016,
-		programSlug: 'beard-sculpting',
+		programSlug: 'barber-foundation-training',
 	},
 	{
 		id: 'photo-1532710093739-9470acff878f',
@@ -66,7 +66,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Barbering',
 		width: 4272,
 		height: 2848,
-		programSlug: 'classic-barbering',
+		programSlug: 'barber-foundation-training',
 	},
 	{
 		id: 'photo-1512690459411-b9245aed614b',
@@ -76,7 +76,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Styling',
 		width: 5184,
 		height: 3456,
-		programSlug: 'hair-styling-and-colouring',
+		programSlug: 'advanced-hair-colour-training',
 	},
 	{
 		id: 'photo-1522337360788-8b13dee7a37e',
@@ -86,7 +86,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Styling',
 		width: 6016,
 		height: 4016,
-		programSlug: 'hair-styling-and-colouring',
+		programSlug: 'advanced-hair-colour-training',
 	},
 	{
 		id: 'photo-1493256338651-d82f7acb2b38',
@@ -96,7 +96,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Styling',
 		width: 5472,
 		height: 3648,
-		programSlug: 'hair-styling-and-colouring',
+		programSlug: 'advanced-hair-colour-training',
 	},
 	{
 		id: 'photo-1560066984-138dadb4c035',
@@ -106,7 +106,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Styling',
 		width: 4032,
 		height: 3024,
-		programSlug: 'hair-styling-and-colouring',
+		programSlug: 'advanced-hair-colour-training',
 	},
 	{
 		id: 'photo-1487412947147-5cebf100ffc2',
@@ -116,7 +116,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Makeup',
 		width: 4088,
 		height: 2725,
-		programSlug: 'bridal-and-editorial-makeup',
+		programSlug: 'advanced-makeup-training',
 	},
 	{
 		id: 'photo-1596462502278-27bfdc403348',
@@ -126,7 +126,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Makeup',
 		width: 2500,
 		height: 2500,
-		programSlug: 'bridal-and-editorial-makeup',
+		programSlug: 'advanced-makeup-training',
 	},
 	{
 		id: 'photo-1526045478516-99145907023c',
@@ -136,7 +136,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
 		category: 'Makeup',
 		width: 5472,
 		height: 3648,
-		programSlug: 'bridal-and-editorial-makeup',
+		programSlug: 'advanced-makeup-training',
 	},
 	{
 		id: 'photo-1585747860715-2ba37e788b70',

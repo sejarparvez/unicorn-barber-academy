@@ -11,7 +11,6 @@ export type SeoProgram = {
 	description: string;
 	level: string;
 	duration: string;
-	price: number;
 	updatedAt: string;
 };
 
@@ -42,7 +41,6 @@ export async function getSeoContent(): Promise<SeoContent> {
 				description: true,
 				level: true,
 				duration: true,
-				price: true,
 				updatedAt: true,
 			},
 		}),
@@ -68,7 +66,6 @@ export async function getSeoContent(): Promise<SeoContent> {
 			description: program.description,
 			level: program.level,
 			duration: program.duration,
-			price: program.price,
 			updatedAt: program.updatedAt.toISOString(),
 		})),
 		posts: posts.map((post) => ({
@@ -253,7 +250,7 @@ export function renderLlmsTxt(content: SeoContent): string {
 	const programLines = content.programs
 		.map(
 			(program) =>
-				`- [${program.title}](${absoluteUrl(`/programs/${program.slug}`)}): ${program.tagline} Level: ${program.level}; duration: ${program.duration}; fee: ৳${program.price.toLocaleString('en-US')}.`,
+				`- [${program.title}](${absoluteUrl(`/programs/${program.slug}`)}): ${program.tagline} Level: ${program.level}; duration: ${program.duration}.`,
 		)
 		.join('\n');
 

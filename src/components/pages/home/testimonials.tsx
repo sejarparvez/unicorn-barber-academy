@@ -21,37 +21,37 @@ type Testimonial = {
 const TESTIMONIALS: Testimonial[] = [
 	{
 		name: 'Rafiul Islam',
-		program: 'Classic Barbering',
+		program: 'Barber Foundation Training Program',
 		quote:
 			'I arrived never having held clippers properly. By the end I was cutting live clients — and had two job offers before graduation.',
 	},
 	{
 		name: 'Nusrat Jahan',
-		program: 'Bridal & Editorial Makeup',
+		program: 'Advanced Makeup Training',
 		quote:
 			'The instructors still work in the industry, so every class felt like the real thing. Not a slideshow, not a textbook.',
 	},
 	{
 		name: 'Sabbir Ahmed',
-		program: 'Fades & Tapers',
+		program: 'Barber Foundation Training Program',
 		quote:
 			'The kit alone saved me a fortune, and the placement support put me in a chair within a month of finishing.',
 	},
 	{
 		name: 'Sadia Rahman',
-		program: 'Hair Styling & Colouring',
+		program: 'Advanced Hair Colour Training',
 		quote:
 			'I could already cut, but colour theory was a mystery. Now I can talk a client through a full colour service with confidence.',
 	},
 	{
 		name: 'Imran Hossain',
-		program: 'Classic Barbering',
+		program: 'Barber Foundation Training Program',
 		quote:
 			'The evening cohort meant I kept my job while I trained — same instructors, same chair time, just after hours.',
 	},
 	{
 		name: 'Farhana Akter',
-		program: 'Cosmetology Fundamentals',
+		program: 'Advanced Facial Training',
 		quote:
 			'Small classes make the difference. You get corrected in the moment, not three weeks later when the mistake is already a habit.',
 	},
