@@ -18,6 +18,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicSplatRouteImport } from './routes/_public/$'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
+import { Route as PublicCertificateDesignRouteImport } from './routes/_public/certificate-design'
 import { Route as PublicContactRouteImport } from './routes/_public/contact'
 import { Route as PublicGalleryRouteImport } from './routes/_public/gallery'
 import { Route as PublicInstructorsRouteImport } from './routes/_public/instructors'
@@ -102,6 +103,11 @@ const PublicSplatRoute = PublicSplatRouteImport.update({
 const PublicAboutRoute = PublicAboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicCertificateDesignRoute = PublicCertificateDesignRouteImport.update({
+  id: '/certificate-design',
+  path: '/certificate-design',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const PublicContactRoute = PublicContactRouteImport.update({
@@ -334,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/programs': typeof PublicProgramsRouteRouteWithChildren
   '/$': typeof PublicSplatRoute
   '/about': typeof PublicAboutRoute
+  '/certificate-design': typeof PublicCertificateDesignRoute
   '/contact': typeof PublicContactRoute
   '/gallery': typeof PublicGalleryRoute
   '/instructors': typeof PublicInstructorsRoute
@@ -382,6 +389,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardIndexRoute
   '/$': typeof PublicSplatRoute
   '/about': typeof PublicAboutRoute
+  '/certificate-design': typeof PublicCertificateDesignRoute
   '/contact': typeof PublicContactRoute
   '/gallery': typeof PublicGalleryRoute
   '/instructors': typeof PublicInstructorsRoute
@@ -434,6 +442,7 @@ export interface FileRoutesById {
   '/dashboard/_admin': typeof DashboardAdminRouteRouteWithChildren
   '/_public/$': typeof PublicSplatRoute
   '/_public/about': typeof PublicAboutRoute
+  '/_public/certificate-design': typeof PublicCertificateDesignRoute
   '/_public/contact': typeof PublicContactRoute
   '/_public/gallery': typeof PublicGalleryRoute
   '/_public/instructors': typeof PublicInstructorsRoute
@@ -487,6 +496,7 @@ export interface FileRouteTypes {
     | '/programs'
     | '/$'
     | '/about'
+    | '/certificate-design'
     | '/contact'
     | '/gallery'
     | '/instructors'
@@ -535,6 +545,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/$'
     | '/about'
+    | '/certificate-design'
     | '/contact'
     | '/gallery'
     | '/instructors'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/dashboard/_admin'
     | '/_public/$'
     | '/_public/about'
+    | '/_public/certificate-design'
     | '/_public/contact'
     | '/_public/gallery'
     | '/_public/instructors'
@@ -702,6 +714,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof PublicAboutRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/certificate-design': {
+      id: '/_public/certificate-design'
+      path: '/certificate-design'
+      fullPath: '/certificate-design'
+      preLoaderRoute: typeof PublicCertificateDesignRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_public/contact': {
@@ -1011,6 +1030,7 @@ interface PublicRouteRouteChildren {
   PublicProgramsRouteRoute: typeof PublicProgramsRouteRouteWithChildren
   PublicSplatRoute: typeof PublicSplatRoute
   PublicAboutRoute: typeof PublicAboutRoute
+  PublicCertificateDesignRoute: typeof PublicCertificateDesignRoute
   PublicContactRoute: typeof PublicContactRoute
   PublicGalleryRoute: typeof PublicGalleryRoute
   PublicInstructorsRoute: typeof PublicInstructorsRoute
@@ -1032,6 +1052,7 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicProgramsRouteRoute: PublicProgramsRouteRouteWithChildren,
   PublicSplatRoute: PublicSplatRoute,
   PublicAboutRoute: PublicAboutRoute,
+  PublicCertificateDesignRoute: PublicCertificateDesignRoute,
   PublicContactRoute: PublicContactRoute,
   PublicGalleryRoute: PublicGalleryRoute,
   PublicInstructorsRoute: PublicInstructorsRoute,
